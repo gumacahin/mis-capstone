@@ -11,6 +11,7 @@ python = "^3.12"
 django = "^5.0.6"
 djangorestframework = "^3.15.1"
 django-cors-headers = "^4.3.1"
+django-todo = "^2.5.0"
 
 
 [build-system]

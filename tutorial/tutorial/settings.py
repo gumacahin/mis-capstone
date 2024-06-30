@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     'corsheaders',
+    'todo',
+    'dal',
+    'dal_select2',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +138,5 @@ REST_FRAMEWORK = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+SITE_ID = 1
