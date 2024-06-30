@@ -1,26 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+import useSuggestedTodos from "../data/use-suggested-todos";
+import { Button, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
-const API_URL = "http://127.0.01:8000";
+// const API_URL = "http://127.0.01:8000";
 
 function HomePage() {
-  const { isPending, error, data } = useQuery({
-    queryKey: ['repoData'],
-    queryFn: () =>
-      fetch(API_URL).then((res) =>
-        res.json(),
-      ),
-  })
+  const { isPending, error, data } = useSuggestedTodos();
 
   if (isPending) return "Loading...";
 
   if (error) return "An error has occurred: " + error.message;
 
   return (
-    <div>
-      <h1>Home Page</h1>
-      <p>Welcome to the home page</p>
-      <pre>{JSON.stringify(data)}</pre>
-    </div>
+    <List>
+        { data.map((todo) => (
+    <ListItem key={todo.id} disablePadding>
+      <ListItemButton>
+        <ListItemText primary={todo.title}  />
+      </ListItemButton>
+    </ListItem> ))}
+    </List>
   );
 }
 
