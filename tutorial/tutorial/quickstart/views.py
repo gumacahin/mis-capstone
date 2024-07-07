@@ -1,8 +1,8 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import permissions, viewsets
-from todo.models import Task
+from todo.models import Task, TaskList
 
-from tutorial.quickstart.serializers import GroupSerializer, UserSerializer, TaskSerializer
+from tutorial.quickstart.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -28,4 +28,12 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
     queryset = Task.objects.all().order_by('priority')
     serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class TaskListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows task lists to be viewed or edited.
+    """
+    queryset = Task.objects.all().order_by('priority')
+    serializer_class = TaskListSerializer
     permission_classes = [permissions.IsAuthenticated]
