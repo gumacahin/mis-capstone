@@ -34,6 +34,6 @@ class TaskListViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows task lists to be viewed or edited.
     """
-    queryset = Task.objects.all().order_by('priority')
+    queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer
     permission_classes = [permissions.IsAuthenticated]
