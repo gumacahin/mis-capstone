@@ -15,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     domain="dev-tbs5lvhtbsscsnn5.us.auth0.com"
     clientId="rN7LAyREwX1U1xMm2Y9Zo7GaEgE7c1bq"
     authorizationParams={{
-      redirect_uri: window.location.origin
+      redirect_uri: window.location.origin,
+      audience: "http://todoappdev/api",
+      scope: "read:current_user update:current_user_metadata"
     }}
     useRefreshTokens
     cacheLocation="localstorage"

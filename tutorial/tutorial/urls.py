@@ -26,4 +26,7 @@ urlpatterns = [
     path("logout", auth_views.LogoutView.as_view(), name="logout"),
     path("gtdadmin/", admin.site.urls),
     path("todo/", include("todo.urls", namespace="todo")),
+    path('api/public', views.public),
+    path('api/private', views.private),
+    path('api/private-scoped', views.private_scoped),
 ]
