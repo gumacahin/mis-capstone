@@ -162,3 +162,6 @@ JWT_AUTH = {
     'JWT_ISSUER': 'dev-tbs5lvhtbsscsnn5',
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
+
+# TODO: Move this to env vars
+AUTH0_DOMAIN = 'dev-tbs5lvhtbsscsnn5.us.auth0.com'

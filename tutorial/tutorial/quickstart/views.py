@@ -1,13 +1,18 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
+from auth0.authentication import Users as Auth0Users
 from todo.models import Task, TaskList
+from tutorial.settings import AUTH0_DOMAIN
+from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 
 from tutorial.quickstart.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
 
 from functools import wraps
 import jwt
 
-from django.http import JsonResponse
+from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -71,6 +76,43 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @action(methods=['GET'], detail=False)
+    def me(self, request):
+        # users = Auth0Users(AUTH0_DOMAIN)
+        # token = get_token_auth_header(request)
+        # userinfo = users.userinfo(token)
+    #     if request.user.username == '':
+    #         request.user.email = userinfo['email']
+    #         request.user.save()
+
+        # FIXME: This is not working
+        # if request.user.profile.name in (None, ''):
+        #     request.user.profile.name = (
+        #         userinfo['nickname']
+        #         if userinfo['name'] == userinfo['email']
+        #         else userinfo['name']
+        #     )
+        #     request.user.save()
+        # TODO: confirm this is the best way to do this
+        user = get_object_or_404(User, username=request.user)
+        serializer = UserSerializer(user, context={'request': request})
+        return Response(serializer.data)
+    
+    # TODO: Understand what this is for
+    def partial_update(self, request, pk=None, *args, **kwargs):
+        user = self.queryset.get(id=pk)
+        user.profile: UserProfile
+
+        if (is_admin := data.get('is_admin')) is not None:
+            user.profile.is_admin = is_admin
+
+        data = request.data
+        username = data['name']
+        user.profile.name = username
+        user.profile.save()
+
+
 
 
 class GroupViewSet(viewsets.ModelViewSet):
