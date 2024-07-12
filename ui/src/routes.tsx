@@ -74,7 +74,6 @@ const routes = [
             index: true,
             element: <HomePage />,
             name: "home",
-            loader: authLoader,
           },
           {
             loader: authLoader,

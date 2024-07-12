@@ -2,30 +2,38 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import useSuggestedTodos from "../data/use-suggested-todos";
+import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom';
+import { Box } from '@mui/material';
+import TodayPage from './TodayPage';
 
-// const API_URL = "http://127.0.01:8000";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 
 function HomePage() {
-  const { isPending, error, data } = useSuggestedTodos();
+  const { isAuthenticated, isLoading, user } = useAuth0();
 
-  if (error) {
-    throw error.message;
+  if (isAuthenticated) {
+    return <TodayPage />;
   }
 
-  if (isPending) return "Loading...";
+  if (isLoading) {
+    return (
+    <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={true}
+        // onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    )
+  }
 
   return (
-    <>
-      <List>
-      { data.map((todo) => (
-        <ListItem key={todo.id} disablePadding>
-          <ListItemButton>
-            <ListItemText primary={todo.title}  />
-          </ListItemButton>
-        </ListItem> ))}
-      </List>
-    </>
+    <Box>
+      <h1>Hello World!</h1>
+    </Box>
   );
 }
 

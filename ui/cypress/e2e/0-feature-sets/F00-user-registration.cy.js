@@ -24,14 +24,16 @@ describe('F00-user-registration', () => {
     cy.findByText(/log in/i).click();
   })
 
-  // IMPORTANT!: you need to remove this user first fo this to work.
+  // IMPORTANT: you need to remove this user first fo this to work.
+  // TODO: Try to check for the error in the auth0 login page indicting that
+  // this account aleready exists. That should be enough to satisfy this test.
   // Also requires seeding the db.
-  // it('UC-00: User registration', () => {
-  //   cy.signupToAuth0(
-  //     Cypress.env('auth0_username'),
-  //     Cypress.env('auth0_password')
-  //   )
-  // })
+  it('UC-00: User registration', () => {
+    cy.signupToAuth0(
+      Cypress.env('auth0_username'),
+      Cypress.env('auth0_password')
+    )
+  })
 
   it('UC-01: User login', function () {
     cy.loginToAuth0(
@@ -40,7 +42,10 @@ describe('F00-user-registration', () => {
     )
   })
 
-  it.only('UC-01: User logout', function () {
+  // NOTE: technically this covers login and logout
+  // which is why UC-01 above is commented out.
+  // FIXME: not documented in the spec yet
+  it('UC-04: User logout', function () {
     cy.loginToAuth0(
       Cypress.env('auth0_username'),
       Cypress.env('auth0_password')

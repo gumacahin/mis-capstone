@@ -77,14 +77,22 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(methods=['GET'], detail=False)
+    @action(methods=['GET'], detail=False, permission_classes=[AllowAny])
     def me(self, request):
-        # users = Auth0Users(AUTH0_DOMAIN)
-        # token = get_token_auth_header(request)
-        # userinfo = users.userinfo(token)
-    #     if request.user.username == '':
-    #         request.user.email = userinfo['email']
-    #         request.user.save()
+        users = Auth0Users(AUTH0_DOMAIN)
+        # FIXME: When the user is not logged in, this will raise an error.
+        # Ideally, we don't crash when the user is not logged in.
+        # How should we handle this?
+        try:
+            token = get_token_auth_header(request)
+        except(AttributeError):
+            # TODO: What should be the response here?
+            return Response(None)
+
+        userinfo = users.userinfo(token)
+        if request.user.username == '':
+            request.user.email = userinfo['email']
+            request.user.save()
 
         # FIXME: This is not working
         # if request.user.profile.name in (None, ''):
@@ -95,7 +103,7 @@ class UserViewSet(viewsets.ModelViewSet):
         #     )
         #     request.user.save()
         # TODO: confirm this is the best way to do this
-        # user = get_object(User, username=request.user)
+        user = get_object_or_404(User, username=request.user)
         serializer = UserSerializer(user, context={'request': request})
         return Response(serializer.data)
     
