@@ -10,8 +10,9 @@ api:
 .PHONY: shell
 
 shell:
-	cd tutorial; \
+	python3 -m venv env; \
 	source env/bin/activate; \
+	cd api; \
 	poetry install; \
 	poetry run python manage.py shell; \
 

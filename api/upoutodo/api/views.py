@@ -3,11 +3,11 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from auth0.authentication import Users as Auth0Users
 from todo.models import Task, TaskList
-from tutorial.settings import AUTH0_DOMAIN
+from upoutodo.settings import AUTH0_DOMAIN
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
-from tutorial.api.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
+from upoutodo.api.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
 
 from functools import wraps
 import jwt

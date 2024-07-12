@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from tutorial.api import views
+from upoutodo.api import views
 
 from django.conf import settings
 from django.conf.urls.static import static

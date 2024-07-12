@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tutorial"
+name = "upoutodo"
 version = "0.1.0"
 description = ""
 authors = ["Marco Enrico <mvalviar@gmail.com>"]

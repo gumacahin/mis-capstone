@@ -1,4 +1,4 @@
-# tutorials/utils.py
+# upoutodo/utils.py
 
 from django.contrib.auth import authenticate
 import jwt
