@@ -95,7 +95,7 @@ class UserViewSet(viewsets.ModelViewSet):
         #     )
         #     request.user.save()
         # TODO: confirm this is the best way to do this
-        user = get_object_or_404(User, username=request.user)
+        # user = get_object(User, username=request.user)
         serializer = UserSerializer(user, context={'request': request})
         return Response(serializer.data)
     

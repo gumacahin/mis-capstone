@@ -8,8 +8,11 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import LoginButton from "../components/LoginButton";
 import LogoutButton from "../components/LogoutButton";
+import { useAuth0 } from '@auth0/auth0-react';
+import AccountMenu from "./AccountMenu";
 
 export default function Layout() {
+    const { isAuthenticated } = useAuth0();
     return (
         <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -27,7 +30,7 @@ export default function Layout() {
                 TODO APP
             </Typography>
             <LoginButton />
-            <LogoutButton />
+            { isAuthenticated && <AccountMenu /> }
             </Toolbar>
         </AppBar>
         <Container>
