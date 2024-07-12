@@ -154,9 +154,9 @@ AUTHENTICATION_BACKENDS = [
 
 JWT_AUTH = {
     'JWT_PAYLOAD_GET_USERNAME_HANDLER':
-        'tutorial.quickstart.utils.jwt_get_username_from_payload_handler',
+        'tutorial.api.utils.jwt_get_username_from_payload_handler',
     'JWT_DECODE_HANDLER':
-        'tutorial.quickstart.utils.jwt_decode_token',
+        'tutorial.api.utils.jwt_decode_token',
     'JWT_ALGORITHM': 'RS256',
     'JWT_AUDIENCE': 'http://todoappdev/api',
     'JWT_ISSUER': 'dev-tbs5lvhtbsscsnn5',

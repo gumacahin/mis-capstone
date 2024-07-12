@@ -7,7 +7,7 @@ from tutorial.settings import AUTH0_DOMAIN
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
-from tutorial.quickstart.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
+from tutorial.api.serializers import GroupSerializer, UserSerializer, TaskSerializer, TaskListSerializer
 
 from functools import wraps
 import jwt
