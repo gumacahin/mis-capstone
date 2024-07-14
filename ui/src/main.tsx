@@ -7,17 +7,23 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import {
+  AUTH0_DOMAIN,
+  AUTH0_CLIENT_ID,
+  AUTH0_REDIRECT_URL,
+  AUTH0_AUDIENCE,
+  AUTH0_SCOPE,
+} from './constants/auth';
 
-// TODO: use environment variables
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
   <Auth0Provider
-    domain="dev-tbs5lvhtbsscsnn5.us.auth0.com"
-    clientId="rN7LAyREwX1U1xMm2Y9Zo7GaEgE7c1bq"
+    domain={AUTH0_DOMAIN}
+    clientId={AUTH0_CLIENT_ID}
     authorizationParams={{
-      redirect_uri: window.location.origin,
-      audience: "http://todoappdev/api",
-      scope: "read:current_user update:current_user_metadata"
+      redirect_uri: AUTH0_REDIRECT_URL,
+      audience: AUTH0_AUDIENCE,
+      scope: AUTH0_SCOPE,
     }}
     useRefreshTokens
     cacheLocation="localstorage"
