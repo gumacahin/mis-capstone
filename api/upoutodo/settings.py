@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -152,16 +153,21 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.RemoteUserBackend',
 ]
 
+AUTH0 = {
+    'AUTH0_DOMAIN': os.getenv('VITE_AUTH0_DOMAIN'),
+    'AUTH0_CLIENT_ID': os.getenv('VITE_AUTH0_CLIENT_ID'),
+    'AUTH0_AUDIENCE': os.getenv('VITE_AUTH0_AUDIENCE'),
+    'AUTH0_SCOPE': os.getenv('VITE_AUTH0_SCOPE'),
+    'AUTH0_REDIRECT_URL': os.getenv('VITE_AUTH0_REDIRECT_URL'),
+}
+
 JWT_AUTH = {
     'JWT_PAYLOAD_GET_USERNAME_HANDLER':
         'upoutodo.api.utils.jwt_get_username_from_payload_handler',
     'JWT_DECODE_HANDLER':
         'upoutodo.api.utils.jwt_decode_token',
     'JWT_ALGORITHM': 'RS256',
-    'JWT_AUDIENCE': 'http://todoappdev/api',
-    'JWT_ISSUER': 'dev-tbs5lvhtbsscsnn5',
+    'JWT_AUDIENCE': AUTH0['AUTH0_AUDIENCE'],
+    'JWT_ISSUER': AUTH0['AUTH0_DOMAIN'],
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
-
-# TODO: Move this to env vars
-AUTH0_DOMAIN = 'dev-tbs5lvhtbsscsnn5.us.auth0.com'

@@ -3,7 +3,7 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from auth0.authentication import Users as Auth0Users
 from todo.models import Task, TaskList
-from upoutodo.settings import AUTH0_DOMAIN
+from upoutodo.settings import AUTH0
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
@@ -79,7 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=False, permission_classes=[AllowAny])
     def me(self, request):
-        users = Auth0Users(AUTH0_DOMAIN)
+        users = Auth0Users(AUTH0['AUTH0_DOMAIN']);
         # FIXME: When the user is not logged in, this will raise an error.
         # Ideally, we don't crash when the user is not logged in.
         # How should we handle this?
@@ -87,7 +87,7 @@ class UserViewSet(viewsets.ModelViewSet):
             token = get_token_auth_header(request)
         except(AttributeError):
             # TODO: What should be the response here?
-            return Response(None)
+            return Response(None);
 
         userinfo = users.userinfo(token)
         if request.user.username == '':

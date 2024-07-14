@@ -58,7 +58,12 @@ const authLoader = () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json();
+      try {
+        return await response.json();
+      } catch (e) {
+        console.log('Empty response. User is not authenticated');
+        return null
+      }
     },
     staleTime: 10000,
   });
@@ -69,6 +74,7 @@ const routes = [
         path: "/",
         element: <Layout />,
         errorElement: <RootErrorBoundary />,
+        loader: authLoader,
         children: [
           {
             index: true,
@@ -76,7 +82,6 @@ const routes = [
             name: "home",
           },
           {
-            loader: authLoader,
             path: "/",
             element: <ProtectedRoute />,
             children: [
