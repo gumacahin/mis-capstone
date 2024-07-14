@@ -36,7 +36,7 @@ function HomePage() {
       <Typography variant={"h1"}fontSize={'md'}>Welcome to UPOU Todo App</Typography>
       <Typography variant={"subtitle2"}>Welcome to UPOU Todo App</Typography>
       <ButtonGroup>
-        <LoginButton color={'primary'} size={'large'} variant={'contained'}>Sign In</LoginButton>
+        <LoginButton color={'primary'} size={'large'} variant={'contained'}>Get Started</LoginButton>
       </ButtonGroup>
     </Stack>
   </Box>

@@ -1,24 +1,28 @@
+import { useEffect } from 'react';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import TodayPage from './pages/TodayPage';
 import { Alert, Box, Button, Container } from '@mui/material';
-import { useNavigate, useRouteError, Outlet } from 'react-router-dom';
+import { useRouteError, Outlet } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { QueryClient } from '@tanstack/react-query';
 
 
 export function ProtectedRoute() {
-    const { isAuthenticated, isLoading } = useAuth0();
-    const navigate = useNavigate();
+    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+
+    useEffect(() => {
+      if (!isAuthenticated) {
+          loginWithRedirect();
+      }
+    }, [isAuthenticated]);
+
 
     if (isLoading) {
         return "Checking authentication...";
     }
 
-    if (!isAuthenticated) {
-        navigate('/');
-    }
-    return <Outlet />
+    return isAuthenticated && <Outlet />
 }
 
 export function RootErrorBoundary() {
