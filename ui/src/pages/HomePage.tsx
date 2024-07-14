@@ -1,15 +1,10 @@
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, ButtonGroup, Stack, Typography } from '@mui/material';
 import TodayPage from './TodayPage';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import Button from '@mui/material/Button';
+import LoginButton from '../components/LoginButton';
 
 function HomePage() {
   const { isAuthenticated, isLoading, user } = useAuth0();
@@ -31,9 +26,20 @@ function HomePage() {
   }
 
   return (
-    <Box>
-      <h1>Hello World!</h1>
-    </Box>
+    <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    minHeight={`calc(100vh - 64px)`}
+  >
+    <Stack spacing={2}>
+      <Typography variant={"h1"}fontSize={'md'}>Welcome to UPOU Todo App</Typography>
+      <Typography variant={"subtitle2"}>Welcome to UPOU Todo App</Typography>
+      <ButtonGroup>
+        <LoginButton color={'primary'} size={'large'} variant={'contained'}>Sign In</LoginButton>
+      </ButtonGroup>
+    </Stack>
+  </Box>
   );
 }
 
