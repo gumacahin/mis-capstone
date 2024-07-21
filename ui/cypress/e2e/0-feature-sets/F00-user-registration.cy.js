@@ -50,7 +50,7 @@ describe('F00-user-registration', () => {
       Cypress.env('auth0_username'),
       Cypress.env('auth0_password')
     )
-    cy.findByLabelText('Account settings').click();
+    cy.findByLabelText('Account menu').click();
     cy.findByText(/logout/i).click();
   })
 

@@ -25,7 +25,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       audience: AUTH0_AUDIENCE,
       scope: AUTH0_SCOPE,
     }}
-    useRefreshTokens
     cacheLocation="localstorage"
   >
     <App />

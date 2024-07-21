@@ -18,6 +18,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from django.http import JsonResponse
 
+from rest_framework.filters import OrderingFilter
+
 def get_token_auth_header(request):
     """Obtains the Access Token from the Authorization Header
     """
@@ -77,34 +79,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(methods=['GET'], detail=False, permission_classes=[AllowAny])
+    @action(methods=['GET'], detail=False)
     def me(self, request):
-        users = Auth0Users(AUTH0['AUTH0_DOMAIN']);
-        # FIXME: When the user is not logged in, this will raise an error.
-        # Ideally, we don't crash when the user is not logged in.
-        # How should we handle this?
-        try:
-            token = get_token_auth_header(request)
-        except(AttributeError):
-            # TODO: What should be the response here?
-            return Response(None);
-
-        userinfo = users.userinfo(token)
-        if request.user.username == '':
-            request.user.email = userinfo['email']
-            request.user.save()
-
-        # FIXME: This is not working
-        # if request.user.profile.name in (None, ''):
-        #     request.user.profile.name = (
-        #         userinfo['nickname']
-        #         if userinfo['name'] == userinfo['email']
-        #         else userinfo['name']
-        #     )
-        #     request.user.save()
-        # TODO: confirm this is the best way to do this
-        user = get_object_or_404(User, username=request.user)
-        serializer = UserSerializer(user, context={'request': request})
+        serializer = UserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
     
     # TODO: Understand what this is for
@@ -138,6 +115,16 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all().order_by('priority')
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [OrderingFilter]
+    # ordering_fields = ['priority', 'due_date', 'created_date', 'title']
+    ordering = ['-priority', 'due_date', 'created_date']
+
+    def get_queryset(self):
+        return super().get_queryset().filter(created_by=self.request.user)
+
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, assigned_to=self.request.user)
 
 class TaskListViewSet(viewsets.ModelViewSet):
     """

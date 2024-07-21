@@ -11,11 +11,13 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AccountMenu () {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const { logout } = useAuth0();
+    const navigate = useNavigate();
     // const handleClick = (event: MouseEvent<HTMLElement>) => {
     //   setAnchorEl(event.currentTarget);
     // };
@@ -29,10 +31,21 @@ export default function AccountMenu () {
     const handleClose = () => {
       setAnchorEl(null);
     };
+
+    const handleProfileClick = () => {
+        navigate('/profile');
+        handleClose();
+    };
+
+    const handleSettingsClick = () => {
+        navigate('/settings');
+        handleClose();
+    };
+
     return(
         <>
             <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-                <Tooltip title="Account settings">
+                <Tooltip title="Account menu">
                     <IconButton
                     onClick={handleClick}
                     size="small"
@@ -82,10 +95,10 @@ export default function AccountMenu () {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleProfileClick}>
                 <Avatar /> Profile
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleSettingsClick}>
                 <ListItemIcon>
                     <Settings fontSize="small" />
                 </ListItemIcon>

@@ -6,6 +6,7 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import { IconButton } from '@mui/material';
 
 import DueDatePicker from './DueDatePicker';
 
@@ -13,57 +14,34 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useApiClient from '../apiClient';
 import { Task } from '../types/common';
 import dayjs from 'dayjs';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
-export default function AddTodoDialog({open, setOpen}: {open: boolean, setOpen: (open: boolean) => void}) {
+
+
+export default function QuickEditTaskIcon({task}: {task: Task}) {
+    const [open, setOpen] = useState(false);
     const apiClient = useApiClient();
     const queryClient = useQueryClient()
 
-    const [dueDate, setDueDate] = useState<Date | null>(null);
+    const [dueDate, setDueDate] = useState(task.due_date ? dayjs(task.due_date).format('YYYY-MM-DD') : undefined);
 
     // Function to handle date change
-    const handleDateChange = (event) => {
-        setDueDate(event.format('YYYY-MM-DD'));
+    const handleDateChange = (date) => {
+      setDueDate(date.format('YYYY-MM-DD'));
     };
   
-    // // Function to handle form submission
-    // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    //   event.preventDefault();
-    //   // Assuming you have other form data to collect, include dueDate in your submission logic
-    //   const formData = {
-    //     // other form data...
-    //     dueDate: dueDate,
-    //   };
-    //   console.log(formData); // Replace this with your actual form submission logic
-    //   // Submit formData to your backend or state management
-    // };
+    // Function to handle form submission
+    const handleClick = (event: React.FormEvent) => {
+        event.preventDefault();
+        setOpen(true);
+    };
 
     const mutation = useMutation({
-        mutationKey: ['addTask'],
-        mutationFn: async (newTask: Task) => {
-            const result = await apiClient.post('/tasks/', newTask);
+        mutationKey: ['updateTask', {taskId: task.id}],
+        mutationFn: async (updatedTask: Task) => {
+            const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
             return result.data;
         },
-        // TODO: optimistic update
-        // onMutate: async (newTask: Task) => {
-        //     // Cancel any outgoing refetches
-        //     // (so they don't overwrite our optimistic update)
-        //     await queryClient.cancelQueries({ queryKey: ['tasks'] })
-
-        //     // Snapshot the previous value
-        //     const previousTodos = queryClient.getQueryData(['tasks'])
-
-        //     // Optimistically update to the new value
-        //     queryClient.setQueryData(['tasks'], (old: Task[]) => [newTask, ...old])
-
-        //     return { previousTodos }
-
-        // },
-        // If the mutation fails,
-        // use the context returned from onMutate to roll back
-        // onError: (_, __, context: {previousTodos: Task[];}) => {
-        //     queryClient.setQueryData(['tasks'], context.previousTodos)
-        // },
-        // Always refetch after error or success:
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] })
         },
@@ -77,19 +55,23 @@ export default function AddTodoDialog({open, setOpen}: {open: boolean, setOpen: 
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const newTask = Object.fromEntries((formData as any).entries()) as Task;
-        newTask.due_date = dueDate ? dayjs(dueDate).format('YYYY-MM-DD') : undefined;
+        newTask.due_date = dueDate
         void mutation.mutate(newTask);
         handleClose();
     }
 
     return(
+        <>
+            <IconButton onClick={handleClick} aria-label="Quick edit task">
+              <EditOutlinedIcon />
+            </IconButton>
             <Dialog open={open}
                     PaperProps={{
                         component: 'form',
                         onSubmit: handleSubmit,
                       }}
             >
-                <DialogTitle>Add Task</DialogTitle>
+                <DialogTitle>Update Task</DialogTitle>
                 <DialogContent>
                     <Stack spacing={3}>
                         <TextField
@@ -102,6 +84,7 @@ export default function AddTodoDialog({open, setOpen}: {open: boolean, setOpen: 
                             type="text"
                             fullWidth
                             variant="standard"
+                            defaultValue={task.title}
                         />
                         <TextField
                             multiline
@@ -112,16 +95,19 @@ export default function AddTodoDialog({open, setOpen}: {open: boolean, setOpen: 
                             type="text"
                             fullWidth
                             variant="standard"
+                            defaultValue={task.note}
                         />
                     <DueDatePicker id="due_date" name="due_date" label="Due Date"
                        onChange={handleDateChange}
+                       defaultValue={task.due_date ? dayjs(task.due_date) : undefined}
                      />
                     </Stack>
                 </DialogContent>
                 <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit">Add Task</Button>
+                <Button type="submit">Update Task</Button>
                 </DialogActions>
             </Dialog>
+        </>
     );
 }

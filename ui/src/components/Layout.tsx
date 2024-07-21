@@ -10,9 +10,16 @@ import LoginButton from "../components/LoginButton";
 import LogoutButton from "../components/LogoutButton";
 import { useAuth0 } from '@auth0/auth0-react';
 import AccountMenu from "./AccountMenu";
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import { useNavigate }from 'react-router-dom';
 
 export default function Layout() {
     const { isAuthenticated } = useAuth0();
+    const navigate = useNavigate();
+    const handleHomeClick = () => {
+        navigate('/');
+    };
     return (
         <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -26,9 +33,11 @@ export default function Layout() {
             >
                 <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                TODO APP
-            </Typography>
+            <Tooltip title="Application home">
+                <Typography component={Button} color={'inherit'} variant="h6" sx={{ flexGrow: 1 }} onClick={handleHomeClick}>
+                    TODO APP
+                </Typography>
+            </Tooltip>
             <LoginButton />
             { isAuthenticated && <AccountMenu /> }
             </Toolbar>

@@ -1,29 +1,15 @@
-import { useEffect } from 'react';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import TodayPage from './pages/TodayPage';
+import ProfilePage from './pages/ProfilePage';
 import { Alert, Box, Button, Container } from '@mui/material';
 import { useRouteError, Outlet } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { QueryClient } from '@tanstack/react-query';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
-export function ProtectedRoute() {
-    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
 
-    useEffect(() => {
-      if (!isAuthenticated) {
-          loginWithRedirect();
-      }
-    }, [isAuthenticated]);
-
-
-    if (isLoading) {
-        return "Checking authentication...";
-    }
-
-    return isAuthenticated && <Outlet />
-}
 
 export function RootErrorBoundary() {
     const error = useRouteError() as Error;
@@ -54,31 +40,35 @@ export function RootErrorBoundary() {
 }
 
 const queryClient = new QueryClient();
-const authLoader = () => {
-  return queryClient.fetchQuery({
-    queryKey: ['me'],
-    queryFn: async () => {
-      const response = await fetch('/api/users/me');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      try {
-        return await response.json();
-      } catch (e) {
-        console.log('Empty response. User is not authenticated');
-        return null
-      }
-    },
-    staleTime: 10000,
-  });
-};
+// const authLoader = () => {
+//   const { getAccessTokenSilently } = useAuth0();
+//     return queryClient.fetchQuery({
+//       queryKey: ['me'],
+//       queryFn: async () => {
+//         try {
+//           const token = await getAccessTokenSilently();
+
+//           const response = await fetch(`/api/users/me/`, {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//             },
+//           });
+
+//           const responseData = await response.json();
+
+//           return responseData;
+//         } catch (error) {
+//           console.log(error);
+//         }
+//       },
+//   });
+// };
 
 const routes = [
     {
         path: "/",
         element: <Layout />,
         errorElement: <RootErrorBoundary />,
-        loader: authLoader,
         children: [
           {
             index: true,
@@ -93,6 +83,16 @@ const routes = [
                 path: "/today",
                 element: <TodayPage />,
                 name: "dashboard"
+              },
+              {
+                path: "/profile",
+                element: <ProfilePage />,
+                name: "profile"
+              },
+              {
+                path: "/settings",
+                element: <p>settings</p>,
+                name: "profile"
               },
             ]
           },
