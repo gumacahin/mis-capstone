@@ -6,11 +6,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 // import Divider from '@mui/material/Divider';
 import { Task } from '../types/common';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import TaskActionMenuIcon from './TaskActionsMenuIcon';
-import { IconButton } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import QuickEditTaskIcon from './QuickEditTaskIcon';
+import TaskCheckIcon from './TaskCheckIcon';
 
 export default function TaskList({tasks}: {tasks: Task[]}) {
 
@@ -37,9 +36,7 @@ export default function TaskList({tasks}: {tasks: Task[]}) {
         }>
         <ListItemButton>
           <ListItemIcon>
-            <IconButton>
-              <CircleOutlinedIcon />
-            </IconButton>
+            <TaskCheckIcon task={task} />
           </ListItemIcon>
           <ListItemText primary={task.title} secondary={task.note} />
         </ListItemButton>

@@ -1,7 +1,8 @@
 // apiClient.js
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { Task } from './types/common';
 
 const useApiClient = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -52,14 +53,21 @@ export const useAddTask = () => {
     mutationFn: async (task: any) => {
         const response = await apiClient.post('/tasks/', task);
         return response.data;
-        // await fetch('/api/tasks/', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Authorization': `Bearer ${AUTH0_ACCESS_KEY}`, // Added Bearer auth header
-        //     },
-        //     body: JSON.stringify(task),
-        // });
+    },
+  });
+};
+
+export const useUpdateTask = (task: Task) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['updateTask', {taskId: task.id}],
+    mutationFn: async (updatedTask: Task) => {
+        const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
+        return result.data;
+    },
+    onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: ['tasks'] })
     },
   });
 };

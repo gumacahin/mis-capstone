@@ -15,13 +15,12 @@ import useApiClient from '../apiClient';
 import { Task } from '../types/common';
 import dayjs from 'dayjs';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { useUpdateTask } from '../api';
 
 
 
 export default function QuickEditTaskIcon({task}: {task: Task}) {
     const [open, setOpen] = useState(false);
-    const apiClient = useApiClient();
-    const queryClient = useQueryClient()
 
     const [dueDate, setDueDate] = useState(task.due_date ? dayjs(task.due_date).format('YYYY-MM-DD') : undefined);
 
@@ -36,27 +35,18 @@ export default function QuickEditTaskIcon({task}: {task: Task}) {
         setOpen(true);
     };
 
-    const mutation = useMutation({
-        mutationKey: ['updateTask', {taskId: task.id}],
-        mutationFn: async (updatedTask: Task) => {
-            const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
-            return result.data;
-        },
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ['tasks'] })
-        },
-    });
+    const mutation = useUpdateTask(task);
 
     const handleClose = () => {
         setOpen(false);
     }
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const newTask = Object.fromEntries((formData as any).entries()) as Task;
         newTask.due_date = dueDate
-        void mutation.mutate(newTask);
+        mutation.mutate(newTask);
         handleClose();
     }
 
