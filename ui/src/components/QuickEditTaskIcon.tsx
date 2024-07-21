@@ -10,8 +10,6 @@ import { IconButton } from "@mui/material";
 
 import DueDatePicker from "./DueDatePicker";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useApiClient from "../apiClient";
 import { Task } from "../types/common";
 import dayjs from "dayjs";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
