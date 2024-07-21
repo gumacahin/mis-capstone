@@ -1,23 +1,22 @@
-import AddTodoFab from '../components/AddTodoFab';
+import AddTodoFab from "../components/AddTodoFab";
 import { useTasksToday } from "../api";
-import TaskList from '../components/TaskList';
-
+import TaskList from "../components/TaskList";
 
 export default function TodayPage() {
-    const { isPending, isError, data}  = useTasksToday();
+  const { isPending, isError, data } = useTasksToday();
 
-    if (isPending) {
-        return <div>Loading...</div>;
-    }
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
 
-    if (isError) {
-        return <div>Ops something went wrong...</div>;
-    }
+  if (isError) {
+    return <div>Ops something went wrong...</div>;
+  }
 
-    return (
-        <>
-            <AddTodoFab />
-            <TaskList tasks={data.results} />
-        </>
-    );
+  return (
+    <>
+      <AddTodoFab />
+      <TaskList tasks={data.results} />
+    </>
+  );
 }

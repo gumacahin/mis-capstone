@@ -7,7 +7,7 @@ export interface Api<T = any> {
     url: string,
     method?: "POST" | "UPDATE" | "PUT" | "GET" | "DELETE" | "PATCH",
     body?: AnyJSON | FormData,
-    returnType?: "json" | "file"
+    returnType?: "json" | "file",
   ) => Promise<T>;
 }
 
@@ -19,7 +19,7 @@ export default function useApi() {
       url: string,
       method: "POST" | "UPDATE" | "PUT" | "GET" | "DELETE" | "PATCH" = "GET",
       body?: AnyJSON | FormData,
-      returnType: "json" | "file" = "json"
+      returnType: "json" | "file" = "json",
     ) => {
       const token = await getAccessTokenSilently({
         authorizationParams: {
@@ -71,7 +71,7 @@ export default function useApi() {
 
       return result;
     },
-    [getAccessTokenSilently]
+    [getAccessTokenSilently],
   );
 
   return { api };

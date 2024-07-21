@@ -7,7 +7,7 @@ function loginViaAuth0Ui(username: string, password: string) {
       cy.get("input#username").type(username);
       cy.get("input#password").type(password, { log: false });
       cy.contains("button[value=default]", "Continue").click();
-    }
+    },
   );
 
   // Ensure Auth0 has redirected us back to the RWA.
@@ -46,7 +46,7 @@ function signupViaAuth0Ui(username: string, password: string) {
       // If the user does not exist ideally we see this. Then we get redirected
       // as suggested below.
       // cy.contains("button[value=accept]", "Accept").click();
-    }
+    },
   );
 
   // Ensure Auth0 has redirected us back to the RWA.

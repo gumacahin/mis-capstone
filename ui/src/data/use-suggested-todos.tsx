@@ -1,9 +1,9 @@
 // import { useQuery } from "@tanstack/react-query";
 
 export default function useSuggestedTodos() {
-    const data = [];
+  const data = [];
 
-const tasks = [
+  const tasks = [
     "Do the laundry",
     "Walk the dog",
     "Buy groceries",
@@ -44,16 +44,16 @@ const tasks = [
     "Go hiking",
     "Plan a party",
     "Learn a new language",
-    "Donate old clothes"
-];
+    "Donate old clothes",
+  ];
 
-for (let i = 1; i <= 1000; i++) {
+  for (let i = 1; i <= 1000; i++) {
     const title = tasks[i % tasks.length];
     data.push({ id: i, title: `${title}`, completed: false });
-}
-    return {
-        isPending: false,
-        error: null,
-        data,
-    };
+  }
+  return {
+    isPending: false,
+    error: null,
+    data,
+  };
 }
