@@ -3,20 +3,21 @@ from todo.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+
 # FIXME: This is not working. I attempted to add a user profile model but failed.
 class UserProfile(models.Model):
     name = models.TextField(
         null=True,
         blank=True,
-        help_text="Editable user name  that defaults to a user's Google/Auth0 name"
+        help_text="Editable user name  that defaults to a user's Google/Auth0 name",
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     is_admin = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
     is_deactivated = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Username: {self.user.email}'
+        return f"Username: {self.user.email}"
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

@@ -19,6 +19,9 @@ pyjwt = "^2.8.0"
 auth0-python = "^4.7.1"
 
 
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
