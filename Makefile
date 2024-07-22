@@ -20,6 +20,5 @@ shell:
 .PHONY: ui
 
 ui:
-	cd ui; \
-	npm install; \
-	npm run dev; \
+	npm install --workspace=ui; \
+	npm run dev --workspace=ui; \
