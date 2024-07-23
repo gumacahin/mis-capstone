@@ -320,10 +320,12 @@
     "yocto-queue": "^0.1.0"
   },
   "devDependencies": {
-    "husky": "^9.1.1"
+    "husky": "^9.1.1",
+    "lint-staged": "^15.2.7"
   },
   "scripts": {
-    "test": "test"
+    "test": "echo 'Add tests!'",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -343,5 +345,14 @@
   "bugs": {
     "url": "https://github.com/gumacahin/capstone/issues"
   },
-  "homepage": "https://github.com/gumacahin/capstone#readme"
+  "homepage": "https://github.com/gumacahin/capstone#readme",
+  "lint-staged": {
+    "*.py": [
+      "black"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{js,jsx,ts,tsx,css,md}": "prettier --write"
+  }
 }
