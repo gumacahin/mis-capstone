@@ -1,10 +1,12 @@
 from django.db import models
-from todo.models import User
-from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from todo.models import User
 
 
-# FIXME: This is not working. I attempted to add a user profile model but failed.
+# FIXME: This is not working. I attempted to add a user profile model but
+# failed.
+# Revisiting this: Attempted? How?
 class UserProfile(models.Model):
     name = models.TextField(
         null=True,
@@ -26,17 +28,18 @@ class UserProfile(models.Model):
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, created, **kwargs):
-        email = instance.email
-        if email and created:
-            date_joined = instance.date_joined
+        pass
+        # email = instance.email
+        # if email and created:
+        #     date_joined = instance.date_joined
 
-            # TODO: send email to user
-            # send_email(
-            #     "User Signup",
-            #     email,
-            #     "new_user_signup",
-            #     {
-            #         "email": email,
-            #         "signup_date": date_joined,
-            #     },
-            # )
+        # TODO: send email to user
+        # send_email(
+        #     "User Signup",
+        #     email,
+        #     "new_user_signup",
+        #     {
+        #         "email": email,
+        #         "signup_date": date_joined,
+        #     },
+        # )
