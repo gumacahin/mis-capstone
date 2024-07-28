@@ -348,7 +348,9 @@
   "homepage": "https://github.com/gumacahin/capstone#readme",
   "lint-staged": {
     "*.py": [
-      "black"
+      "isort",
+      "black",
+      "flake8"
     ],
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix"
