@@ -1,29 +1,21 @@
+from functools import wraps
+
+import jwt
 from django.contrib.auth.models import Group, User
+from django.http import JsonResponse
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import action
-from auth0.authentication import Users as Auth0Users
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from todo.models import Task, TaskList
-from upoutodo.settings import AUTH0
-from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 
 from upoutodo.api.serializers import (
     GroupSerializer,
-    UserSerializer,
-    TaskSerializer,
     TaskListSerializer,
+    TaskSerializer,
+    UserSerializer,
 )
-
-from functools import wraps
-import jwt
-
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
-
-from django.http import JsonResponse
-
-from rest_framework.filters import OrderingFilter
 
 
 def get_token_auth_header(request):
@@ -110,18 +102,19 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data)
 
-    # TODO: Understand what this is for
-    def partial_update(self, request, pk=None, *args, **kwargs):
-        user = self.queryset.get(id=pk)
-        user.profile: UserProfile
 
-        if (is_admin := data.get("is_admin")) is not None:
-            user.profile.is_admin = is_admin
+# TODO: Understand what this is for
+# def partial_update(self, request, pk=None, *args, **kwargs):
+# user = self.queryset.get(id=pk)
+# user.profile: UserProfile
 
-        data = request.data
-        username = data["name"]
-        user.profile.name = username
-        user.profile.save()
+# if (is_admin := data.get("is_admin")) is not None:
+#     user.profile.is_admin = is_admin
+
+# data = request.data
+# username = data["name"]
+# user.profile.name = username
+# user.profile.save()
 
 
 class GroupViewSet(viewsets.ModelViewSet):

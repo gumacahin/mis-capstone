@@ -1,10 +1,12 @@
 # upoutodo/utils.py
 
-from django.contrib.auth import authenticate
-from upoutodo.settings import JWT_AUTH
+import json
+
 import jwt
 import requests
-import json
+from django.contrib.auth import authenticate
+
+from upoutodo.settings import JWT_AUTH
 
 
 def jwt_get_username_from_payload_handler(payload):

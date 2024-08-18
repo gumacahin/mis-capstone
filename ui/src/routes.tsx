@@ -3,9 +3,7 @@ import HomePage from "./pages/HomePage";
 import TodayPage from "./pages/TodayPage";
 import ProfilePage from "./pages/ProfilePage";
 import { Alert, Box, Button, Container } from "@mui/material";
-import { useRouteError, Outlet } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
-import { QueryClient } from "@tanstack/react-query";
+import { useRouteError } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export function RootErrorBoundary() {
@@ -40,31 +38,6 @@ export function RootErrorBoundary() {
     </Container>
   );
 }
-
-const queryClient = new QueryClient();
-// const authLoader = () => {
-//   const { getAccessTokenSilently } = useAuth0();
-//     return queryClient.fetchQuery({
-//       queryKey: ['me'],
-//       queryFn: async () => {
-//         try {
-//           const token = await getAccessTokenSilently();
-
-//           const response = await fetch(`/api/users/me/`, {
-//             headers: {
-//               Authorization: `Bearer ${token}`,
-//             },
-//           });
-
-//           const responseData = await response.json();
-
-//           return responseData;
-//         } catch (error) {
-//           console.log(error);
-//         }
-//       },
-//   });
-// };
 
 const routes = [
   {

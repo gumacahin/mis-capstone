@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -9,10 +9,9 @@ import Stack from "@mui/material/Stack";
 
 import DueDatePicker from "./DueDatePicker";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useApiClient from "../apiClient";
+import { toast } from "react-hot-toast";
 import { Task } from "../types/common";
-import dayjs from "dayjs";
+import { useAddTask } from "../api";
 
 export default function AddTodoDialog({
   open,
@@ -21,59 +20,7 @@ export default function AddTodoDialog({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const apiClient = useApiClient();
-  const queryClient = useQueryClient();
-
-  const [dueDate, setDueDate] = useState<Date | null>(null);
-
-  // Function to handle date change
-  const handleDateChange = (event) => {
-    setDueDate(event.format("YYYY-MM-DD"));
-  };
-
-  // // Function to handle form submission
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   // Assuming you have other form data to collect, include dueDate in your submission logic
-  //   const formData = {
-  //     // other form data...
-  //     dueDate: dueDate,
-  //   };
-  //   console.log(formData); // Replace this with your actual form submission logic
-  //   // Submit formData to your backend or state management
-  // };
-
-  const mutation = useMutation({
-    mutationKey: ["addTask"],
-    mutationFn: async (newTask: Task) => {
-      const result = await apiClient.post("/tasks/", newTask);
-      return result.data;
-    },
-    // TODO: optimistic update
-    // onMutate: async (newTask: Task) => {
-    //     // Cancel any outgoing refetches
-    //     // (so they don't overwrite our optimistic update)
-    //     await queryClient.cancelQueries({ queryKey: ['tasks'] })
-
-    //     // Snapshot the previous value
-    //     const previousTodos = queryClient.getQueryData(['tasks'])
-
-    //     // Optimistically update to the new value
-    //     queryClient.setQueryData(['tasks'], (old: Task[]) => [newTask, ...old])
-
-    //     return { previousTodos }
-
-    // },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    // onError: (_, __, context: {previousTodos: Task[];}) => {
-    //     queryClient.setQueryData(['tasks'], context.previousTodos)
-    // },
-    // Always refetch after error or success:
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-    },
-  });
+  const addTask = useAddTask();
 
   const handleClose = () => {
     setOpen(false);
@@ -82,11 +29,12 @@ export default function AddTodoDialog({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newTask = Object.fromEntries((formData as any).entries()) as Task;
-    newTask.due_date = dueDate
-      ? dayjs(dueDate).format("YYYY-MM-DD")
-      : undefined;
-    void mutation.mutate(newTask);
+    const newTask = Object.fromEntries(formData.entries()) as unknown as Task;
+    toast.promise(addTask.mutateAsync(newTask), {
+      loading: "Adding task...",
+      success: "Task added successfully!",
+      error: "Error adding task.",
+    });
     handleClose();
   };
 
@@ -123,10 +71,10 @@ export default function AddTodoDialog({
             variant="standard"
           />
           <DueDatePicker
-            id="due_date"
             name="due_date"
             label="Due Date"
-            onChange={handleDateChange}
+            // onChange={handleDateChange}
+            // value={dueDate}
           />
         </Stack>
       </DialogContent>

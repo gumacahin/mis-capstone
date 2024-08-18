@@ -4,8 +4,69 @@ import * as React from "react";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Task } from "../types/common";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { Typography, Alert, Stack } from "@mui/material";
+import { useDeleteTask } from "../api";
+import toast from "react-hot-toast";
 
-export default function TaskActionsMenuIcon(task: Task) {
+function DeleteTaskDialog({
+  showDialog,
+  setShowDialog,
+  task,
+}: {
+  showDialog: boolean;
+  setShowDialog: (show: boolean) => void;
+  task: Task;
+}) {
+  const deleteTask = useDeleteTask(task);
+  const handleDelete = () => {
+    toast.promise(deleteTask.mutateAsync(), {
+      loading: "Deleting task...",
+      success: "Task deleted successfully!",
+      error: "Error deleting task.",
+    });
+    setShowDialog(false);
+  };
+  return (
+    <>
+      <Dialog
+        open={showDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{`Delete task "${task.title}?"`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Stack spacing={1}>
+              <Alert severity="warning">
+                <Typography>
+                  Are you sure you want to delete this task?
+                </Typography>
+                <Typography>This cannot be undone.</Typography>
+              </Alert>
+            </Stack>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="text" onClick={handleDelete}>
+            Delete
+          </Button>
+          <Button onClick={() => setShowDialog(false)} autoFocus>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
+
+export default function TaskActionsMenuIcon({ task }: { task: Task }) {
+  const [showDialog, setShowDialog] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -16,6 +77,7 @@ export default function TaskActionsMenuIcon(task: Task) {
   };
 
   const handleDelete = () => {
+    setShowDialog(true);
     handleClose();
   };
 
@@ -53,6 +115,11 @@ export default function TaskActionsMenuIcon(task: Task) {
         <MenuItem onClick={handleEdit}>Edit</MenuItem>
         <MenuItem onClick={handleDelete}>Delete</MenuItem>
       </Menu>
+      <DeleteTaskDialog
+        showDialog={showDialog}
+        setShowDialog={setShowDialog}
+        task={task}
+      />
     </>
   );
 }

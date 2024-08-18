@@ -1,7 +1,7 @@
+from datetime import datetime
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from todo.models import Task, TaskList
-from datetime import datetime
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,20 +16,24 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["url", "name"]
 
 
-class DateFromDateTimeField(serializers.Field):
+class NullableDateField(serializers.DateField):
+    def to_internal_value(self, data):
+        if data == "":
+            return None
+        if isinstance(data, datetime):
+            data = data.date()
+        return super().to_internal_value(data)
+
     def to_representation(self, value):
         if isinstance(value, datetime):
-            return value.date()
-        return value
-
-    def to_internal_value(self, data):
-        return data
+            value = value.date()
+        return super().to_representation(value)
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
-    created_date = DateFromDateTimeField(required=False)
-    due_date = DateFromDateTimeField(required=False)
-    completed_date = DateFromDateTimeField(required=False)
+    created_date = NullableDateField(required=False)
+    due_date = NullableDateField(allow_null=True, required=False)
+    completed_date = NullableDateField(required=False)
 
     class Meta:
         model = Task

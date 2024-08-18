@@ -14,18 +14,10 @@ import { Task } from "../types/common";
 import dayjs from "dayjs";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useUpdateTask } from "../api";
+import { toast } from "react-hot-toast";
 
 export default function QuickEditTaskIcon({ task }: { task: Task }) {
   const [open, setOpen] = useState(false);
-
-  const [dueDate, setDueDate] = useState(
-    task.due_date ? dayjs(task.due_date).format("YYYY-MM-DD") : undefined,
-  );
-
-  // Function to handle date change
-  const handleDateChange = (date) => {
-    setDueDate(date.format("YYYY-MM-DD"));
-  };
 
   // Function to handle form submission
   const handleClick = (event: React.FormEvent) => {
@@ -33,7 +25,7 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
     setOpen(true);
   };
 
-  const mutation = useUpdateTask(task);
+  const updateTask = useUpdateTask(task);
 
   const handleClose = () => {
     setOpen(false);
@@ -42,9 +34,14 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newTask = Object.fromEntries((formData as any).entries()) as Task;
-    newTask.due_date = dueDate;
-    mutation.mutate(newTask);
+    const updatedTask = Object.fromEntries(
+      formData.entries(),
+    ) as unknown as Task;
+    toast.promise(updateTask.mutateAsync(updatedTask), {
+      loading: "Updating task...",
+      success: "Task updated successfully!",
+      error: "Error updating task.",
+    });
     handleClose();
   };
 
@@ -87,11 +84,9 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
               defaultValue={task.note}
             />
             <DueDatePicker
-              id="due_date"
               name="due_date"
               label="Due Date"
-              onChange={handleDateChange}
-              defaultValue={task.due_date ? dayjs(task.due_date) : undefined}
+              defaultValue={task.due_date ? dayjs(task.due_date) : null}
             />
           </Stack>
         </DialogContent>

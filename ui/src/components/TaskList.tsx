@@ -19,30 +19,32 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
   // </Box>
 
   return (
-    <List>
-      {tasks.map((task: Task) => (
-        <ListItem
-          key={task.id}
-          // NOTE: We use disabled padding there because of the stacked secondary actions
-          // we have at teach ListItem. Without it the last icon button get's pushed
-          // out of the ListItem
-          disablePadding
-          disableGutters
-          secondaryAction={
-            <Stack direction={"row"}>
-              <QuickEditTaskIcon task={task} />
-              <TaskActionMenuIcon task={task} />
-            </Stack>
-          }
-        >
-          <ListItemButton>
-            <ListItemIcon>
-              <TaskCheckIcon task={task} />
-            </ListItemIcon>
-            <ListItemText primary={task.title} secondary={task.note} />
-          </ListItemButton>
-        </ListItem>
-      ))}
-    </List>
+    <>
+      <List>
+        {tasks.map((task: Task) => (
+          <ListItem
+            key={task.id}
+            // NOTE: We use disabled padding there because of the stacked secondary actions
+            // we have at teach ListItem. Without it the last icon button gets pushed
+            // out of the ListItem
+            disablePadding
+            disableGutters
+            secondaryAction={
+              <Stack direction={"row"}>
+                <QuickEditTaskIcon task={task} />
+                <TaskActionMenuIcon task={task} />
+              </Stack>
+            }
+          >
+            <ListItemButton>
+              <ListItemIcon>
+                <TaskCheckIcon task={task} />
+              </ListItemIcon>
+              <ListItemText primary={task.title} secondary={task.note} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </>
   );
 }

@@ -22,3 +22,11 @@ shell:
 ui:
 	npm install --workspace=ui; \
 	npm run dev --workspace=ui; \
+
+.PHONY: pylint
+	python3 -m venv env; \
+	source env/bin/activate; \
+	cd api; \
+	poetry run isort . ; \
+	poetry run black . ; \
+	poetry run flake8 . ;

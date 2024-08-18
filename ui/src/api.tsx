@@ -50,12 +50,16 @@ export const useTasksToday = () => {
 };
 
 export const useAddTask = () => {
+  const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addTask"],
-    mutationFn: async (task: any) => {
+    mutationFn: async (task: Task) => {
       const response = await apiClient.post("/tasks/", task);
       return response.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 };
@@ -67,6 +71,21 @@ export const useUpdateTask = (task: Task) => {
     mutationKey: ["updateTask", { taskId: task.id }],
     mutationFn: async (updatedTask: Task) => {
       const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
+export const useDeleteTask = (task: Task) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteTask", { taskId: task.id }],
+    mutationFn: async () => {
+      const result = await apiClient.delete(`/tasks/${task.id}/`);
       return result.data;
     },
     onSettled: () => {
