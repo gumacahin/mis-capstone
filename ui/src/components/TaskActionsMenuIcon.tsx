@@ -81,10 +81,6 @@ export default function TaskActionsMenuIcon({ task }: { task: Task }) {
     handleClose();
   };
 
-  const handleEdit = () => {
-    handleClose();
-  };
-
   return (
     <>
       <IconButton
@@ -112,7 +108,6 @@ export default function TaskActionsMenuIcon({ task }: { task: Task }) {
           horizontal: "left",
         }}
       >
-        <MenuItem onClick={handleEdit}>Edit</MenuItem>
         <MenuItem onClick={handleDelete}>Delete</MenuItem>
       </Menu>
       <DeleteTaskDialog

@@ -4,7 +4,7 @@ import Fab from "@mui/material/Fab";
 import AddTodoDialog from "./AddTodoDialog";
 
 const fabStyle = {
-  position: "absolute",
+  position: "fixed",
   bottom: 16,
   right: 16,
 };

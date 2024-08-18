@@ -1,7 +1,6 @@
-// import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 // import Divider from '@mui/material/Divider';
@@ -10,13 +9,21 @@ import TaskActionMenuIcon from "./TaskActionsMenuIcon";
 import Stack from "@mui/material/Stack";
 import QuickEditTaskIcon from "./QuickEditTaskIcon";
 import TaskCheckIcon from "./TaskCheckIcon";
+import { Typography } from "@mui/material";
 
 export default function TaskList({ tasks }: { tasks: Task[] }) {
   if (tasks.length === 0) {
-    return <div>No tasks</div>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height={`calc(100vh - 64px)`}
+      >
+        <Typography>No tasks found.</Typography>
+      </Box>
+    );
   }
-  // <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-  // </Box>
 
   return (
     <>
@@ -36,12 +43,10 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
               </Stack>
             }
           >
-            <ListItemButton>
-              <ListItemIcon>
-                <TaskCheckIcon task={task} />
-              </ListItemIcon>
-              <ListItemText primary={task.title} secondary={task.note} />
-            </ListItemButton>
+            <ListItemIcon>
+              <TaskCheckIcon task={task} />
+            </ListItemIcon>
+            <ListItemText primary={task.title} secondary={task.note} />
           </ListItem>
         ))}
       </List>
