@@ -1,32 +1,26 @@
-.PHONY: api
+.PHONY: api shell ui
+
+VENV_DIR := env
+API_DIR := api
+UI_DIR := ui
+
+define SETUP_ENV
+    python3 -m venv $(VENV_DIR); \
+    source $(VENV_DIR)/bin/activate; \
+    pip install -U pip setuptools; \
+    pip install poetry
+endef
 
 api:
-	python3 -m venv env; \
-	source env/bin/activate; \
-	cd api; \
-	poetry install; \
-	poetry run python manage.py runserver; \
-
-.PHONY: shell
+	$(SETUP_ENV); \
+	poetry -C $(API_DIR) install; \
+	poetry -C $(API_DIR) run python $(API_DIR)/manage.py runserver; \
 
 shell:
-	python3 -m venv env; \
-	source env/bin/activate; \
-	cd api; \
-	poetry install; \
-	poetry run python manage.py shell; \
+	$(SETUP_ENV); \
+	poetry -C $(API_DIR) run python $(API_DIR)/manage.py shell; \
 
-
-.PHONY: ui
 
 ui:
-	npm install --workspace=ui; \
-	npm run dev --workspace=ui; \
-
-.PHONY: pylint
-	python3 -m venv env; \
-	source env/bin/activate; \
-	cd api; \
-	poetry run isort . ; \
-	poetry run black . ; \
-	poetry run flake8 . ;
+	npm install --workspace=$(UI_DIR); \
+	npm run dev --workspace=$(UI_DIR); \
