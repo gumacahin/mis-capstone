@@ -22,5 +22,5 @@ shell:
 
 
 ui:
-	npm install --workspace=$(UI_DIR); \
-	npm run dev --workspace=$(UI_DIR); \
+	npm install --prefix $(UI_DIR); \
+	npm run dev --prefix $(UI_DIR); \
