@@ -2,6 +2,7 @@ import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import TodayPage from "./pages/TodayPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import { Alert, Box, Button, Container } from "@mui/material";
 import { useRouteError } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -66,7 +67,7 @@ const routes = [
           },
           {
             path: "/settings",
-            element: <p>settings</p>,
+            element: <SettingsPage />,
             name: "profile",
           },
         ],

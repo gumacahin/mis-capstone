@@ -17,26 +17,28 @@ import {
 } from "./constants/auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
+import { ThemeContextProvider } from "./components/ThemeContext.tsx";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <CssBaseline />
-    <Auth0Provider
-      domain={AUTH0_DOMAIN}
-      clientId={AUTH0_CLIENT_ID}
-      authorizationParams={{
-        redirect_uri: AUTH0_REDIRECT_URL,
-        audience: AUTH0_AUDIENCE,
-        scope: AUTH0_SCOPE,
-      }}
-      cacheLocation="localstorage"
-    >
-      <QueryClientProvider client={queryClient}>
-        <App />
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      </QueryClientProvider>
-    </Auth0Provider>
+    <ThemeContextProvider>
+      <CssBaseline />
+      <Auth0Provider
+        domain={AUTH0_DOMAIN}
+        clientId={AUTH0_CLIENT_ID}
+        authorizationParams={{
+          redirect_uri: AUTH0_REDIRECT_URL,
+          audience: AUTH0_AUDIENCE,
+          scope: AUTH0_SCOPE,
+        }}
+        cacheLocation="localstorage"
+      >
+        <QueryClientProvider client={queryClient}>
+          <App />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        </QueryClientProvider>
+      </Auth0Provider>
+    </ThemeContextProvider>
   </React.StrictMode>,
 );
