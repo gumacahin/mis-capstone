@@ -13,10 +13,5 @@ export default function TodayPage() {
     return <div>Ops something went wrong...</div>;
   }
 
-  return (
-    <>
-      <AddTodoFab />
-      <TaskList tasks={data.results} />
-    </>
-  );
+  return <TaskList tasks={data.results} />;
 }

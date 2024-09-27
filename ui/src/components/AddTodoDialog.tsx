@@ -15,16 +15,12 @@ import { useAddTask } from "../api";
 
 export default function AddTodoDialog({
   open,
-  setOpen,
+  handleClose,
 }: {
   open: boolean;
-  setOpen: (open: boolean) => void;
+  handleClose: () => void;
 }) {
   const addTask = useAddTask();
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

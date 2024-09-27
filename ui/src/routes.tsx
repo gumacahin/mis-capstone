@@ -1,7 +1,6 @@
 import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import TodayPage from "./pages/TodayPage";
-import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import { Alert, Box, Button, Container } from "@mui/material";
 import { useRouteError } from "react-router-dom";
@@ -43,7 +42,6 @@ export function RootErrorBoundary() {
 const routes = [
   {
     path: "/",
-    element: <Layout />,
     errorElement: <RootErrorBoundary />,
     children: [
       {
@@ -52,23 +50,30 @@ const routes = [
         name: "home",
       },
       {
-        path: "/",
+        path: "app",
+        name: "app",
         element: <ProtectedRoute />,
         children: [
           {
-            path: "/today",
+            index: true,
+            path: "today",
             element: <TodayPage />,
-            name: "dashboard",
+            name: "today",
           },
           {
-            path: "/profile",
-            element: <ProfilePage />,
-            name: "profile",
+            path: "inbox",
+            element: <h1>Inbox</h1>,
+            name: "inbox",
           },
           {
-            path: "/settings",
+            path: "upcoming",
+            element: <h1>Upcoming</h1>,
+            name: "upcoming",
+          },
+          {
+            path: "settings",
             element: <SettingsPage />,
-            name: "profile",
+            name: "settings",
           },
         ],
       },

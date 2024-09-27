@@ -1,24 +1,34 @@
+import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Box, ButtonGroup, Stack, Typography } from "@mui/material";
-import TodayPage from "./TodayPage";
+import {
+  Box,
+  ButtonGroup,
+  Stack,
+  Typography,
+  Container,
+  Center,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import LoginButton from "../components/LoginButton";
 
 function HomePage() {
-  const { isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
 
-  if (isAuthenticated) {
-    return <TodayPage />;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/app");
+    }
+  }, [isAuthenticated, navigate]);
 
   if (isLoading) {
     return (
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={true}
-        // onClick={handleClose}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -27,22 +37,24 @@ function HomePage() {
 
   return (
     <Box
+      sx={{ flexGrow: 1 }}
       display="flex"
       justifyContent="center"
       alignItems="center"
-      minHeight={`calc(100vh - 64px)`}
+      minHeight={"100vh"}
     >
-      <Stack spacing={2}>
-        <Typography variant={"h1"} fontSize={"md"}>
-          Welcome to UPOU Todo App
-        </Typography>
-        <Typography variant={"subtitle2"}>Welcome to UPOU Todo App</Typography>
-        <ButtonGroup>
-          <LoginButton color={"primary"} size={"large"} variant={"contained"}>
-            Get Started
-          </LoginButton>
-        </ButtonGroup>
-      </Stack>
+      <Container>
+        <Stack spacing={2} alignItems={"center"}>
+          <Typography variant={"h1"} fontSize={"sm"}>
+            Welcome to UPOU Todo App
+          </Typography>
+          <ButtonGroup>
+            <LoginButton color={"primary"} size={"large"} variant={"contained"}>
+              Get Started
+            </LoginButton>
+          </ButtonGroup>
+        </Stack>
+      </Container>
     </Box>
   );
 }
