@@ -6,9 +6,11 @@ from django.http import JsonResponse
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from todo.models import Task, TaskList
+from .filters import TaskFilter
 
 from upoutodo.api.serializers import (
     GroupSerializer,
@@ -135,7 +137,8 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all().order_by("priority")
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [OrderingFilter]
+    filterset_class = TaskFilter
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     # ordering_fields = ['priority', 'due_date', 'created_date', 'title']
     ordering = ["-priority", "due_date", "created_date"]
 
