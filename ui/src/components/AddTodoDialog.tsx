@@ -40,6 +40,7 @@ export default function AddTodoDialog({
       PaperProps={{
         component: "form",
         onSubmit: handleSubmit,
+        sx: { minWidth: { xs: "100vw", sm: 600 } },
       }}
     >
       <DialogTitle>Add Task</DialogTitle>

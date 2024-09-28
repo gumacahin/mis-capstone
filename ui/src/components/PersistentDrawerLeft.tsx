@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { styled, useTheme, Theme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -19,14 +17,13 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
-import { useMediaQuery } from "@mui/material";
+import { Typography, useMediaQuery } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import TodayIcon from "@mui/icons-material/Today";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import AddTodoDialog from "./AddTodoDialog";
-import { Add } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -65,9 +62,7 @@ function DrawerContents({
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(() => handleAddTodoDialogOpen())}
-          >
+          <ListItemButton onClick={() => handleAddTodoDialogOpen()}>
             <ListItemIcon>
               <AddCircleIcon />
             </ListItemIcon>
@@ -186,7 +181,7 @@ export default function PersistentDrawerLeft({
 }) {
   const theme = useTheme();
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTodoDialogOpen, setIsAddTodoDialogOpen] = useState(false);
 
   const handleDrawerOpen = () => {
@@ -204,11 +199,15 @@ export default function PersistentDrawerLeft({
         handleClose={() => setIsAddTodoDialogOpen(false)}
       />
       <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <AppBar position="fixed" open={open}>
+        <AppBar
+          position="fixed"
+          open={open}
+          elevation={0}
+          sx={{ backgroundColor: "transparent" }}
+        >
           <Toolbar>
             <IconButton
-              color="inherit"
+              color="default"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
@@ -221,9 +220,7 @@ export default function PersistentDrawerLeft({
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Persistent drawer
-            </Typography>
+            <Typography> </Typography>
           </Toolbar>
         </AppBar>
         {!isLargeDisplay && (
@@ -269,8 +266,7 @@ export default function PersistentDrawerLeft({
           </Drawer>
         )}
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
-          <DrawerHeader />
-          {children}
+          <Box minHeight={`calc(100vh - 69px)`}>{children}</Box>
         </Main>
       </Box>
     </>

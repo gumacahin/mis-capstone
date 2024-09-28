@@ -1,6 +1,7 @@
-import Layout from "./components/Layout";
 import HomePage from "./pages/HomePage";
 import TodayPage from "./pages/TodayPage";
+import InboxPage from "./pages/InboxPage";
+import UpcomingPage from "./pages/UpcomingPage";
 import SettingsPage from "./pages/SettingsPage";
 import { Alert, Box, Button, Container } from "@mui/material";
 import { useRouteError } from "react-router-dom";
@@ -62,12 +63,12 @@ const routes = [
           },
           {
             path: "inbox",
-            element: <h1>Inbox</h1>,
+            element: <InboxPage />,
             name: "inbox",
           },
           {
             path: "upcoming",
-            element: <h1>Upcoming</h1>,
+            element: <UpcomingPage />,
             name: "upcoming",
           },
           {

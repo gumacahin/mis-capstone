@@ -83,16 +83,20 @@ export default function SettingsPage() {
   return (
     <>
       <Box maxWidth={600}>
-        <Typography variant="h4" my={3}>
+        <Typography variant="h5" my={3} component={"h2"}>
           Settings
         </Typography>
         <Stack spacing={4} my={2}>
           <Stack spacing={2}>
-            <Typography variant="h5">Theme</Typography>
+            <Typography variant="h6" component={"h3"}>
+              Theme
+            </Typography>
             <ThemeSelect />
           </Stack>
           <Stack spacing={2}>
-            <Typography variant="h5">Account</Typography>
+            <Typography variant="h6" component={"h3"}>
+              Account
+            </Typography>
             <Stack spacing={1}>
               <Button
                 variant="outlined"

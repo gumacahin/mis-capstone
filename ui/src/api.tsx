@@ -41,9 +41,31 @@ export const useAuth = () => {
 export const useTasksToday = () => {
   const apiClient = useApiClient();
   return useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", "today"],
     queryFn: async () => {
-      const { data } = await apiClient.get("tasks/");
+      const { data } = await apiClient.get("tasks/?today=1");
+      return data;
+    },
+  });
+};
+
+export const useInboxTasks = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["tasks", "inbox"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("tasks/?inbox=1");
+      return data;
+    },
+  });
+};
+
+export const useUpcomingTasks = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["tasks", "upcoming"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("tasks/?upcoming=1");
       return data;
     },
   });
