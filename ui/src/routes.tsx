@@ -3,6 +3,7 @@ import TodayPage from "./pages/TodayPage";
 import InboxPage from "./pages/InboxPage";
 import UpcomingPage from "./pages/UpcomingPage";
 import SettingsPage from "./pages/SettingsPage";
+import { Navigate } from "react-router-dom";
 import { Alert, Box, Button, Container } from "@mui/material";
 import { useRouteError } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -57,6 +58,9 @@ const routes = [
         children: [
           {
             index: true,
+            element: <Navigate to="/app/today" replace />,
+          },
+          {
             path: "today",
             element: <TodayPage />,
             name: "today",
