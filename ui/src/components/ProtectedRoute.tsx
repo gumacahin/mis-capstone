@@ -1,6 +1,8 @@
 import { Outlet } from "react-router-dom";
 import { withAuthenticationRequired } from "@auth0/auth0-react";
 import PersistentDrawerLeft from "./PersistentDrawerLeft";
+import Spinner from "./Spinner";
+import { Box } from "@mui/material";
 
 export function ProtectedRoute() {
   return (
@@ -11,5 +13,14 @@ export function ProtectedRoute() {
 }
 
 export default withAuthenticationRequired(ProtectedRoute, {
-  onRedirecting: () => <div>Loading...</div>,
+  onRedirecting: () => (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <Spinner />
+    </Box>
+  ),
 });

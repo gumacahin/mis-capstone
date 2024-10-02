@@ -4,6 +4,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Toaster } from "react-hot-toast";
 
 import "./App.css";
+import { Box } from "@mui/material";
+import Spinner from "./components/Spinner";
 
 function App() {
   const { isLoading, error } = useAuth0();
@@ -13,7 +15,16 @@ function App() {
   }
 
   if (isLoading) {
-    return <p>loading...</p>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Spinner />
+      </Box>
+    );
   }
 
   return (
