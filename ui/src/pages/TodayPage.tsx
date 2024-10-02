@@ -1,5 +1,6 @@
 import React from "react";
-import { useTasksToday } from "../api";
+import { toast } from "react-hot-toast";
+import { useRescheduleTasks, useTasksToday } from "../api";
 import TaskList from "../components/TaskList";
 import { Alert, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
@@ -12,8 +13,12 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import SkeletonList from "../components/SkeletonList";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
 import { Task } from "../types/common";
 import dayjs from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -34,6 +39,61 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
   },
 }));
 
+function RescheduleDialog({ tasks }: { tasks: Task[] }) {
+  const rescheduleTasks = useRescheduleTasks(tasks);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
+    null,
+  );
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleReschedule = (date: Date | null) => {
+    if (!date) {
+      return;
+    }
+    const updatedTasks = tasks.map((task: Task) => {
+      task.due_date = dayjs(date).format("YYYY-MM-DD");
+      delete task.completed_date;
+      return task;
+    });
+    toast.promise(rescheduleTasks.mutateAsync(updatedTasks), {
+      loading: "Rescheduling tasks...",
+      success: "Tasks rescheduled successfully!",
+      error: "Error rescheduling task.",
+    });
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "reschedule-popover" : undefined;
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Button onClick={handleClick} size="small">
+        Reschedule
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateCalendar disablePast onChange={handleReschedule} />
+        </LocalizationProvider>
+      </Popover>
+    </div>
+  );
+}
+
 function TaskListToday({ tasks }: { tasks: Task[] }) {
   if (tasks.length === 0) {
     return (
@@ -50,10 +110,6 @@ function TaskListToday({ tasks }: { tasks: Task[] }) {
     (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
   );
 
-  const handleReschedule = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-  };
-
   return (
     <>
       {overdueTasks.length > 0 && (
@@ -68,9 +124,7 @@ function TaskListToday({ tasks }: { tasks: Task[] }) {
               <Typography variant={"h6"} component={"h3"}>
                 Overdue
               </Typography>
-              <Button onClick={handleReschedule} size="small">
-                Reschedule
-              </Button>
+              <RescheduleDialog tasks={overdueTasks} />
             </Box>
           </AccordionSummary>
           <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>

@@ -101,6 +101,27 @@ export const useUpdateTask = (task: Task) => {
   });
 };
 
+export const useRescheduleTasks = (tasks: Task[]) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: [
+      "rescheduleTasks",
+      { taskIds: tasks.map((task: Task) => task.id) },
+    ],
+    mutationFn: async (rescheduledTasks: Task[]) => {
+      const result = await apiClient.put(
+        `/tasks/bulk_update/`,
+        rescheduledTasks,
+      );
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
 export const useDeleteTask = (task: Task) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();

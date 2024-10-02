@@ -3,7 +3,7 @@ from functools import wraps
 import jwt
 from django.contrib.auth.models import Group, User
 from django.http import JsonResponse
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -147,6 +147,40 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user, assigned_to=self.request.user)
+
+    @action(detail=False, methods=["put", "patch"], url_path="bulk_update")
+    def bulk_update(self, request):
+        if not isinstance(request.data, list):
+            return Response(
+                {"error": "Expected a list of task objects."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        partial = request.method == "PATCH" or request.method == "PUT"
+
+        for task_data in request.data:
+            task_id = task_data.get("id")
+            if not task_id:
+                return Response(
+                    {"error": "'id' field is required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            try:
+                task = Task.objects.get(id=task_id, created_by=self.request.user)
+            except Task.DoesNotExist:
+                return Response(
+                    {"error": f"Task with id {task_id} does not exist."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            serializer = self.get_serializer(task, data=task_data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+        return Response(
+            {"status": "Tasks updated successfully"}, status=status.HTTP_200_OK
+        )
 
 
 class TaskListViewSet(viewsets.ModelViewSet):
