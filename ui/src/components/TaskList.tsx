@@ -5,22 +5,25 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 // import Divider from '@mui/material/Divider';
 import { Task } from "../types/common";
-import TaskActionMenuIcon from "./TaskActionsMenuIcon";
-import Stack from "@mui/material/Stack";
-import QuickEditTaskIcon from "./QuickEditTaskIcon";
 import TaskCheckIcon from "./TaskCheckIcon";
 import EventIcon from "@mui/icons-material/Event";
 import { Typography } from "@mui/material";
 import dayjs from "dayjs";
 
-export default function TaskList({ tasks }: { tasks: Task[] }) {
-  if (tasks.length === 0) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <Typography>No tasks found.</Typography>
-      </Box>
-    );
-  }
+export default function TaskList({
+  tasks,
+  hideDueDates,
+}: {
+  tasks: Task[];
+  hideDueDates?: boolean;
+}) {
+  // if (tasks.length === 0) {
+  //   return (
+  //     <Box display="flex" justifyContent="center" alignItems="center">
+  //       <Typography>No tasks found.</Typography>
+  //     </Box>
+  //   );
+  // }
   // if (tasks.length === 0) {
   //   return (
   //     <Box display="flex" justifyContent="center" alignItems="center">
@@ -32,10 +35,8 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
   return (
     <List>
       {tasks.map((task: Task) => {
-        const isOverdueOrToday =
-          task.due_date &&
-          (dayjs(task.due_date).isBefore(dayjs(), "day") ||
-            dayjs(task.due_date).isSame(dayjs(), "day"));
+        const isOverdue =
+          task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
         return (
           <ListItem
             key={task.id}
@@ -44,26 +45,36 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
             // out of the ListItem
             disablePadding
             disableGutters
-            secondaryAction={
-              <Stack direction={"row"}>
-                <QuickEditTaskIcon task={task} />
-                <TaskActionMenuIcon task={task} />
-              </Stack>
-            }
           >
             <ListItemIcon>
               <TaskCheckIcon task={task} />
             </ListItemIcon>
             <ListItemText
-              primary={task.title}
+              primary={
+                <Typography
+                  sx={{
+                    textDecoration: task.completed ? "line-through" : "default",
+                  }}
+                >
+                  {task.title}
+                </Typography>
+              }
               secondary={
                 <>
-                  <Typography>{task.note}</Typography>
-                  {task.due_date && (
+                  <Typography
+                    sx={{
+                      textDecoration: task.completed
+                        ? "line-through"
+                        : "default",
+                    }}
+                  >
+                    {task.note}
+                  </Typography>
+                  {!hideDueDates && task.due_date && (
                     <Box
                       display={"flex"}
                       alignItems={"center"}
-                      sx={isOverdueOrToday ? { color: "rgb(209, 69, 59)" } : {}}
+                      sx={isOverdue ? { color: "rgb(209, 69, 59)" } : {}}
                     >
                       <EventIcon fontSize="small" />
                       <Typography ml="10px" variant={"caption"}>

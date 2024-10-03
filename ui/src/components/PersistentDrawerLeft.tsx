@@ -118,8 +118,9 @@ function DrawerContents({
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme }) => ({
+  overflow: "hidden",
   flexGrow: 1,
-  padding: theme.spacing(3),
+  // padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -266,7 +267,7 @@ export default function PersistentDrawerLeft({
           </Drawer>
         )}
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
-          <Box minHeight={`calc(100vh - 69px)`}>{children}</Box>
+          <Box minHeight={`calc(100vh - 72px)`}>{children}</Box>
         </Main>
       </Box>
     </>

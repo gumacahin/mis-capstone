@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Task } from "./types/common";
+import dayjs from "dayjs";
 
 const useApiClient = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -66,6 +67,21 @@ export const useUpcomingTasks = () => {
     queryKey: ["tasks", "upcoming"],
     queryFn: async () => {
       const { data } = await apiClient.get("tasks/?upcoming=1");
+      return data;
+    },
+  });
+};
+
+export const useTasks = (start: Date, end: Date) => {
+  const apiClient = useApiClient();
+  const startStr = dayjs(start).format("YYYY-MM-DD");
+  const endStr = dayjs(end).format("YYYY-MM-DD");
+  return useQuery({
+    queryKey: ["tasks", { start: startStr, end: endStr }],
+    queryFn: async () => {
+      const { data } = await apiClient.get(
+        `tasks/?start_date=${startStr}&end_date=${endStr}`,
+      );
       return data;
     },
   });

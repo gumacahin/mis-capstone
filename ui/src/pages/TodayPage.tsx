@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import AddTodoButton from "../components/AddTodoButton";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -140,22 +141,35 @@ function TaskListToday({ tasks }: { tasks: Task[] }) {
           <TaskList tasks={todayTasks} />
         </>
       )}
+      <AddTodoButton dueDate={dayjs().toDate()} />
     </>
   );
 }
 export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();
 
+  const tasks: Task[] = data?.results ?? [];
+
   return (
-    <>
-      <Typography my={3} variant={"h5"} component={"h2"}>
-        Today
-      </Typography>
-      <Box maxWidth={600} mx={"auto"}>
-        {isError && <Alert severity="error">Ops something went wrong...</Alert>}
-        {isPending && <SkeletonList length={10} />}
-        {data && <TaskListToday tasks={data.results} />}
+    <Box display={"flex"} flexDirection={"column"} height="100vh">
+      <Box padding={3} flex="0 1 auto">
+        <Typography my={3} variant={"h5"} component={"h2"}>
+          Today
+        </Typography>
       </Box>
-    </>
+      <Box overflow={"auto"}>
+        <Box maxWidth={600} mx={"auto"}>
+          {isPending ? (
+            <SkeletonList count={5} width={250} />
+          ) : isError ? (
+            <Alert severity="error">Failed to load tasks</Alert>
+          ) : (
+            <>
+              <TaskListToday tasks={tasks} />
+            </>
+          )}
+        </Box>
+      </Box>
+    </Box>
   );
 }
