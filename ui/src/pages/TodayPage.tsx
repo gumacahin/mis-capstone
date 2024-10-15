@@ -20,6 +20,16 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import AddTodoButton from "../components/AddTodoButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import TodayIcon from "@mui/icons-material/Today";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import NextWeekIcon from "@mui/icons-material/NextWeek";
+import WeekendIcon from "@mui/icons-material/Weekend";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -60,7 +70,7 @@ function RescheduleDialog({ tasks }: { tasks: Task[] }) {
     }
     const updatedTasks = tasks.map((task: Task) => {
       task.due_date = dayjs(date).format("YYYY-MM-DD");
-      delete task.completed_date;
+      task.completed_date = "";
       return task;
     });
     toast.promise(rescheduleTasks.mutateAsync(updatedTasks), {
@@ -87,8 +97,82 @@ function RescheduleDialog({ tasks }: { tasks: Task[] }) {
           horizontal: "left",
         }}
       >
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                handleReschedule(dayjs().toDate());
+                handleClose();
+              }}
+            >
+              <ListItemIcon>
+                <TodayIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Today"} />
+              <ListItemSecondaryAction>
+                {dayjs().format("ddd")}
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                handleReschedule(dayjs().add(1, "day").toDate());
+                handleClose();
+              }}
+            >
+              <ListItemIcon>
+                <WbSunnyIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Tomorrow"} />
+              <ListItemSecondaryAction>
+                {dayjs().add(1, "day").format("ddd")}
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                handleReschedule(
+                  dayjs().startOf("week").add(6, "day").toDate(),
+                );
+                handleClose();
+              }}
+            >
+              <ListItemIcon>
+                <WeekendIcon />
+              </ListItemIcon>
+              <ListItemText primary={"This weekend"} />
+              <ListItemSecondaryAction>
+                {dayjs().startOf("week").add(6, "day").format("ddd")}
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => {
+                handleReschedule(dayjs().add(7, "day").toDate());
+                handleClose();
+              }}
+            >
+              <ListItemIcon>
+                <NextWeekIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Next Week"} />
+              <ListItemSecondaryAction>
+                {dayjs().add(7, "day").format("ddd MMM D")}{" "}
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          </ListItem>
+        </List>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateCalendar disablePast onChange={handleReschedule} />
+          <DateCalendar
+            disablePast
+            onChange={(date) => {
+              handleReschedule(date);
+              handleClose();
+            }}
+          />
         </LocalizationProvider>
       </Popover>
     </div>

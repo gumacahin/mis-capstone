@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Task } from "./types/common";
+import { Task, Comment } from "./types/common";
 import dayjs from "dayjs";
 
 const useApiClient = () => {
@@ -72,6 +72,18 @@ export const useUpcomingTasks = () => {
   });
 };
 
+export const useTask = (task: Task) => {
+  const apiClient = useApiClient();
+  return useQuery({
+    initialData: task,
+    queryKey: ["task", { task }],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`tasks/${task.id}/`);
+      return data;
+    },
+  });
+};
+
 export const useTasks = (start: Date, end: Date) => {
   const apiClient = useApiClient();
   const startStr = dayjs(start).format("YYYY-MM-DD");
@@ -113,6 +125,53 @@ export const useUpdateTask = (task: Task) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["task", { task }] });
+    },
+  });
+};
+
+export const useAddComment = (task: Task) => {
+  const queryClient = useQueryClient();
+  const apiClient = useApiClient();
+  return useMutation({
+    mutationKey: ["addComment"],
+    mutationFn: async (comment: Comment) => {
+      const response = await apiClient.post("/comments/", comment);
+      return response.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { taskId: task.id }],
+      });
+    },
+  });
+};
+
+export const useComments = (task: Task) => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["comments", { taskId: task.id }],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`comments/?task=${task.id}`);
+      return data;
+    },
+  });
+};
+
+export const useDeleteComment = (comment: Comment) => {
+  console.log(comment);
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteComment", { commentId: comment.id }],
+    mutationFn: async () => {
+      const result = await apiClient.delete(`/comments/${comment.id}/`);
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { taskId: comment.task_id }],
+      });
     },
   });
 };

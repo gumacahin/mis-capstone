@@ -15,11 +15,19 @@ export type Task = {
   title: string;
   assigned_to: string | null;
   completed: boolean;
-  completed_date?: string | null;
+  completed_date: string | null;
   created_by: string;
   created_date: string;
   due_date: string | null;
   note: string;
   priority: number | null;
   task_list: string;
+};
+
+export type Comment = {
+  id?: number;
+  body: string;
+  date?: string | null;
+  author_name?: string;
+  task_id: number;
 };

@@ -9,7 +9,7 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from todo.models import Task, TaskList
+from todo.models import Task, TaskList, Comment
 from .filters import TaskFilter
 
 from upoutodo.api.serializers import (
@@ -17,6 +17,7 @@ from upoutodo.api.serializers import (
     TaskListSerializer,
     TaskSerializer,
     UserSerializer,
+    CommentSerializer,
 )
 
 
@@ -139,7 +140,6 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = TaskFilter
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    # ordering_fields = ['priority', 'due_date', 'created_date', 'title']
     ordering = ["-priority", "due_date", "created_date"]
 
     def get_queryset(self):
@@ -191,3 +191,24 @@ class TaskListViewSet(viewsets.ModelViewSet):
     queryset = TaskList.objects.all()
     serializer_class = TaskListSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows comments on tasks to be viewed or edited.
+    """
+
+    queryset = Comment.objects.all().order_by("date")
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        task_id = self.request.query_params.get("task_id")
+        if task_id:
+            return super().get_queryset().filter(task__id=task_id)
+        return Comment.objects.none()
+
+    def perform_create(self, serializer):
+        task_id = self.request.data.get("task_id")
+        task = Task.objects.get(id=task_id)
+        serializer.save(author=self.request.user, task=task)
