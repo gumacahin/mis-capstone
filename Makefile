@@ -1,26 +1,20 @@
-.PHONY: api shell ui
 
-VENV_DIR := env
-API_DIR := api
-UI_DIR := ui
 
-define SETUP_ENV
-    python3 -m venv $(VENV_DIR); \
-    source $(VENV_DIR)/bin/activate; \
-    pip install -U pip setuptools; \
-    pip install poetry
-endef
-
+.PHONY: api
 api:
-	$(SETUP_ENV); \
-	poetry -C $(API_DIR) install; \
-	poetry -C $(API_DIR) run python $(API_DIR)/manage.py runserver; \
+	cd api; \
+	poetry install; \
+	poetry run python manage.py runserver; \
 
-shell:
-	$(SETUP_ENV); \
-	poetry -C $(API_DIR) run python $(API_DIR)/manage.py shell; \
-
-
+.PHONY: ui
 ui:
-	npm install --prefix $(UI_DIR); \
-	npm run dev --prefix $(UI_DIR); \
+	cd ui; \
+	npm install; \
+	npm run dev; \
+
+.PHONY: shell
+shell:
+	cd api; \
+	poetry run python manage.py shell; \
+
+
