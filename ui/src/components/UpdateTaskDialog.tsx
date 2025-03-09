@@ -1,28 +1,29 @@
-import { useState } from "react";
-import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import dayjs from "dayjs";
-import DueDatePicker from "./DueDatePicker";
-import { toast } from "react-hot-toast";
-import { Task } from "../types/common";
-import { useUpdateTask, useTask, useAddComment, useAuth } from "../api";
-import TaskCheckIcon from "./TaskCheckIcon";
-import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import CommentList from "./CommentList";
+import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+
+import { useAddComment, useAuth, useTask, useUpdateTask } from "../api";
+import { Task } from "../types/common";
+import CommentList from "./CommentList";
+import DueDatePicker from "./DueDatePicker";
+import TaskCheckIcon from "./TaskCheckIcon";
 
 function DescriptionIcon() {
   return (
@@ -108,7 +109,6 @@ function AddCommentForm({ task }: { task: Task }) {
       {addCommentOpen && (
         <Stack my={3} spacing={2}>
           <TextField
-            autoFocus
             id="comment"
             label="Comment"
             multiline
@@ -224,7 +224,6 @@ export default function UpdateTaskDialog({
                   <Stack spacing={3}>
                     <TextField
                       defaultValue={data.title}
-                      autoFocus
                       required
                       margin="dense"
                       id="title"
@@ -283,7 +282,6 @@ function stringToColor(string: string) {
   let hash = 0;
   let i;
 
-  /* eslint-disable no-bitwise */
   for (i = 0; i < string.length; i += 1) {
     hash = string.charCodeAt(i) + ((hash << 5) - hash);
   }
@@ -294,7 +292,6 @@ function stringToColor(string: string) {
     const value = (hash >> (i * 8)) & 0xff;
     color += `00${value.toString(16)}`.slice(-2);
   }
-  /* eslint-enable no-bitwise */
 
   return color;
 }

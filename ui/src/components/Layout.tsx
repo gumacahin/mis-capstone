@@ -1,18 +1,17 @@
-import { Outlet } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import LoginButton from "../components/LoginButton";
-import LogoutButton from "../components/LogoutButton";
-import { useAuth0 } from "@auth0/auth0-react";
-import AccountMenu from "./AccountMenu";
-import Button from "@mui/material/Button";
+import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
-import { useNavigate } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import { Outlet, useNavigate } from "react-router-dom";
+
+import LoginButton from "../components/LoginButton";
+import AccountMenu from "./AccountMenu";
 
 export default function Layout() {
   const { isAuthenticated } = useAuth0();

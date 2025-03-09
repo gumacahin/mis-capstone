@@ -1,12 +1,13 @@
-import IconButton from "@mui/material/IconButton";
-import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
-import { Task } from "../types/common";
-import { useUpdateTask, useTask } from "../api";
-import toast from "react-hot-toast";
-import dayjs from "dayjs";
-import Skeleton from "@mui/material/Skeleton";
+import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import IconButton from "@mui/material/IconButton";
+import Skeleton from "@mui/material/Skeleton";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
+
+import { useTask, useUpdateTask } from "../api";
+import { Task } from "../types/common";
 
 export default function TaskCheckIcon({
   task,

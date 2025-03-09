@@ -1,35 +1,36 @@
-import React from "react";
-import { toast } from "react-hot-toast";
-import { useRescheduleTasks, useTasksToday } from "../api";
-import TaskList from "../components/TaskList";
+import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import NextWeekIcon from "@mui/icons-material/NextWeek";
+import TodayIcon from "@mui/icons-material/Today";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import WeekendIcon from "@mui/icons-material/Weekend";
 import { Alert, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
-import { styled } from "@mui/material/styles";
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import AccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
   AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import SkeletonList from "../components/SkeletonList";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Popover from "@mui/material/Popover";
-import { Task } from "../types/common";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import AddTodoButton from "../components/AddTodoButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
-import TodayIcon from "@mui/icons-material/Today";
-import WbSunnyIcon from "@mui/icons-material/WbSunny";
-import NextWeekIcon from "@mui/icons-material/NextWeek";
-import WeekendIcon from "@mui/icons-material/Weekend";
+import ListItemText from "@mui/material/ListItemText";
+import Popover from "@mui/material/Popover";
+import { styled } from "@mui/material/styles";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import React from "react";
+import { toast } from "react-hot-toast";
+
+import { useRescheduleTasks, useTasksToday } from "../api";
+import AddTodoButton from "../components/AddTodoButton";
+import SkeletonList from "../components/SkeletonList";
+import TaskList from "../components/TaskList";
+import { Task } from "../types/common";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -83,6 +84,8 @@ function RescheduleDialog({ tasks }: { tasks: Task[] }) {
   const open = Boolean(anchorEl);
   const id = open ? "reschedule-popover" : undefined;
   return (
+    // FIXME: This is an a11y issue. The div should be a button.
+    // eslint-disable-next-line
     <div onClick={(e) => e.stopPropagation()}>
       <Button onClick={handleClick} size="small">
         Reschedule

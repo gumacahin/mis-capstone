@@ -1,18 +1,19 @@
-import IconButton from "@mui/material/IconButton";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
-import * as React from "react";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import { Task } from "../types/common";
+import { Alert, Stack, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Typography, Alert, Stack } from "@mui/material";
-import { useDeleteTask } from "../api";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import * as React from "react";
 import toast from "react-hot-toast";
+
+import { useDeleteTask } from "../api";
+import { Task } from "../types/common";
 
 function DeleteTaskDialog({
   showDialog,
@@ -56,9 +57,7 @@ function DeleteTaskDialog({
           <Button variant="text" onClick={handleDelete}>
             Delete
           </Button>
-          <Button onClick={() => setShowDialog(false)} autoFocus>
-            Cancel
-          </Button>
+          <Button onClick={() => setShowDialog(false)}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </>

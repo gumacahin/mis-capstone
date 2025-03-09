@@ -1,17 +1,10 @@
-import { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import {
-  Box,
-  ButtonGroup,
-  Stack,
-  Typography,
-  Container,
-  Center,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-
+import { Box, ButtonGroup, Container, Stack, Typography } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import LoginButton from "../components/LoginButton";
 
 function HomePage() {

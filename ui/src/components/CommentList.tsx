@@ -1,7 +1,10 @@
-import { useState } from "react";
-import Accordion from "@mui/material/Accordion";
-import Alert from "@mui/material/Alert";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from "@mui/material/AccordionSummary";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -10,17 +13,14 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import MuiAccordionSummary, {
-  AccordionSummaryProps,
-} from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
 import { styled } from "@mui/material/styles";
-import { Task } from "../types/common";
-import Comment from "./Comment";
-import { Comment as CommentType } from "../types/common";
-import { useComments, useDeleteComment } from "../api";
+import Typography from "@mui/material/Typography";
+import { useState } from "react";
 import toast from "react-hot-toast";
+
+import { useComments, useDeleteComment } from "../api";
+import { Comment as CommentType, Task } from "../types/common";
+import Comment from "./Comment";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -67,9 +67,7 @@ function DeleteCommentDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Back</Button>
-        <Button onClick={handleDelete} autoFocus>
-          Delete
-        </Button>
+        <Button onClick={handleDelete}>Delete</Button>
       </DialogActions>
     </Dialog>
   );

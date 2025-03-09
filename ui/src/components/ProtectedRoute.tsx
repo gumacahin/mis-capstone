@@ -1,8 +1,9 @@
-import { Outlet } from "react-router-dom";
 import { withAuthenticationRequired } from "@auth0/auth0-react";
+import { Box } from "@mui/material";
+import { Outlet } from "react-router-dom";
+
 import PersistentDrawerLeft from "./PersistentDrawerLeft";
 import Spinner from "./Spinner";
-import { Box } from "@mui/material";
 
 export function ProtectedRoute() {
   return (

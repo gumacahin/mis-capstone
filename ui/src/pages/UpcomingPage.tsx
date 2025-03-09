@@ -1,24 +1,25 @@
-import { useState } from "react";
-import { useTasks } from "../api";
-import TaskList from "../components/TaskList";
-import { Alert, Typography } from "@mui/material";
-import SkeletonList from "../components/SkeletonList";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import Box from "@mui/material/Box";
-import Popover from "@mui/material/Popover";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import isBetween from "dayjs/plugin/isBetween";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Task } from "../types/common";
+import { Alert, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Popover from "@mui/material/Popover";
+import Stack from "@mui/material/Stack";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useState } from "react";
+
+import { useTasks } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
+import SkeletonList from "../components/SkeletonList";
+import TaskList from "../components/TaskList";
+import { Task } from "../types/common";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -208,8 +209,8 @@ export default function UpcomingPage() {
         }}
       >
         <Stack direction="row" spacing={2}>
-          {weekDates.map((date) => (
-            <Box minWidth={300}>
+          {weekDates.map((date, i) => (
+            <Box minWidth={300} key={i}>
               <Typography fontWeight={500} component={"h4"}>
                 {`${dayjs(date).format("MMM D")} ‧ ${formatDayOfWeek(date)}`}
               </Typography>

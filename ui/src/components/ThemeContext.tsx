@@ -1,6 +1,6 @@
-import { createContext, useContext, ReactNode } from "react";
-import { createTheme, ThemeProvider, Theme } from "@mui/material/styles";
+import { createTheme, Theme, ThemeProvider } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { createContext, ReactNode, useContext } from "react";
 import useLocalStorage from "use-local-storage";
 
 interface ThemeContextType {

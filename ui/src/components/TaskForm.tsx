@@ -1,11 +1,12 @@
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import DueDatePicker from "./DueDatePicker";
-import { Task } from "../types/common";
-import { useAddTask } from "../api";
 import { toast } from "react-hot-toast";
+
+import { useAddTask } from "../api";
+import { Task } from "../types/common";
+import DueDatePicker from "./DueDatePicker";
 
 export default function TaskForm({
   dueDate,
@@ -36,7 +37,6 @@ export default function TaskForm({
       sx={{ maxWidth: "100%" }}
     >
       <TextField
-        autoFocus
         required
         margin="dense"
         id="title"

@@ -1,20 +1,19 @@
-import React, { useState } from "react";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import { IconButton } from "@mui/material";
-
-import DueDatePicker from "./DueDatePicker";
-
-import { Task } from "../types/common";
-import dayjs from "dayjs";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useUpdateTask } from "../api";
+import { IconButton } from "@mui/material";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import dayjs from "dayjs";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+
+import { useUpdateTask } from "../api";
+import { Task } from "../types/common";
+import DueDatePicker from "./DueDatePicker";
 
 export default function QuickEditTaskIcon({ task }: { task: Task }) {
   const [open, setOpen] = useState(false);
@@ -61,7 +60,6 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
         <DialogContent>
           <Stack spacing={3}>
             <TextField
-              autoFocus
               required
               margin="dense"
               id="title"

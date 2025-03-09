@@ -1,10 +1,11 @@
-import { useInboxTasks } from "../api";
-import TaskList from "../components/TaskList";
 import { Alert, Typography } from "@mui/material";
-import SkeletonList from "../components/SkeletonList";
 import Box from "@mui/material/Box";
-import { Task } from "../types/common";
+
+import { useInboxTasks } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
+import SkeletonList from "../components/SkeletonList";
+import TaskList from "../components/TaskList";
+import { Task } from "../types/common";
 
 export default function InboxPage() {
   const { isPending, isError, data } = useInboxTasks();

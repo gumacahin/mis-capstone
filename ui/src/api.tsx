@@ -1,9 +1,10 @@
 // apiClient.js
-import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { Task, Comment } from "./types/common";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import dayjs from "dayjs";
+
+import { Comment, Task } from "./types/common";
 
 const useApiClient = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -22,6 +23,7 @@ const useApiClient = () => {
       }
       return config;
     },
+    // eslint-disable-next-line
     (error) => Promise.reject(error),
   );
 

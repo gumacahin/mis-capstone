@@ -1,17 +1,16 @@
-import React from "react";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
-
-import DueDatePicker from "./DueDatePicker";
-
+import TextField from "@mui/material/TextField";
+import React from "react";
 import { toast } from "react-hot-toast";
-import { Task } from "../types/common";
+
 import { useAddTask } from "../api";
+import { Task } from "../types/common";
+import DueDatePicker from "./DueDatePicker";
 
 export default function AddTodoDialog({
   open,
@@ -47,7 +46,6 @@ export default function AddTodoDialog({
       <DialogContent>
         <Stack spacing={3}>
           <TextField
-            autoFocus
             required
             margin="dense"
             id="title"

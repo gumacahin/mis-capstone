@@ -1,17 +1,18 @@
-import { useState } from "react";
-import { Comment as CommentType } from "../types/common";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import Typography from "@mui/material/Typography";
+import { useState } from "react";
+
+import { Comment as CommentType } from "../types/common";
 
 export default function Comment({
   comment,
@@ -83,7 +84,6 @@ function stringToColor(string: string) {
   let hash = 0;
   let i;
 
-  /* eslint-disable no-bitwise */
   for (i = 0; i < string.length; i += 1) {
     hash = string.charCodeAt(i) + ((hash << 5) - hash);
   }
@@ -94,7 +94,6 @@ function stringToColor(string: string) {
     const value = (hash >> (i * 8)) & 0xff;
     color += `00${value.toString(16)}`.slice(-2);
   }
-  /* eslint-enable no-bitwise */
 
   return color;
 }

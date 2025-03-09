@@ -1,12 +1,12 @@
-import HomePage from "./pages/HomePage";
-import TodayPage from "./pages/TodayPage";
-import InboxPage from "./pages/InboxPage";
-import UpcomingPage from "./pages/UpcomingPage";
-import SettingsPage from "./pages/SettingsPage";
-import { Navigate } from "react-router-dom";
 import { Alert, Box, Button, Container } from "@mui/material";
-import { useRouteError } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { Navigate, useRouteError } from "react-router-dom";
+
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import HomePage from "./pages/HomePage";
+import InboxPage from "./pages/InboxPage";
+import SettingsPage from "./pages/SettingsPage";
+import TodayPage from "./pages/TodayPage";
+import UpcomingPage from "./pages/UpcomingPage";
 
 export function RootErrorBoundary() {
   const error = useRouteError() as Error;

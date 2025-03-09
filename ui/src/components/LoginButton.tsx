@@ -1,7 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
+import { ReactNode } from "react";
 
-const LoginButton = ({ children, ...props }) => {
+interface LoginButtonProps extends ButtonProps {
+  children?: ReactNode;
+}
+
+const LoginButton = ({ children, ...props }: LoginButtonProps) => {
   const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0();
 
   if (isLoading) {

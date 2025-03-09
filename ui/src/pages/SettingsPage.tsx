@@ -1,25 +1,31 @@
-import { useState } from "react";
 import {
-  Typography,
-  Stack,
   Alert,
   Box,
   FormControl,
   InputLabel,
   MenuItem,
-  Modal,
   Select,
+  Stack,
+  Typography,
 } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
-import { useThemeContext } from "../components/ThemeContext";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { SelectChangeEvent } from "@mui/material/Select";
+import { useState } from "react";
 
-function ConfirmDeleteDialog({ open, handleClose }) {
+import { useThemeContext } from "../components/ThemeContext";
+
+function ConfirmDeleteDialog({
+  open,
+  handleClose,
+}: {
+  open: boolean;
+  handleClose: () => void;
+}) {
   return (
     <>
       <Dialog
@@ -37,12 +43,8 @@ function ConfirmDeleteDialog({ open, handleClose }) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} autoFocus>
-            Yes, I'm sure
-          </Button>
-          <Button onClick={handleClose} autoFocus>
-            No, go back
-          </Button>
+          <Button onClick={handleClose}>Yes, I&apos;m sure</Button>
+          <Button onClick={handleClose}>No, go back</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -79,7 +81,7 @@ function ThemeSelect() {
 }
 
 export default function SettingsPage() {
-  const [open, setOpen] = useState<Boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
   return (
     <>
       <Box maxWidth={600}>
