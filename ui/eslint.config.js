@@ -80,8 +80,6 @@ export default [
         node: {
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },
-        node: true,
-        typescript: true,
         typescript: {
           alwaysTryTypes: true,
           project: "./tsconfig.json",
