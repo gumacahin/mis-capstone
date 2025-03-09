@@ -1,0 +1,60 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: poetry run black
+        language: system
+        #types: [file, python]
+        #files: "^(src|test)/"
+  - repo: local
+    hooks:
+      - id: flake8
+        name: flake8
+        entry: poetry run flake8
+        language: system
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: poetry run isort
+        language: system
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: "v9.22.0"
+    hooks:
+      - id: eslint
+        files: ui/src/.+[^(\.d)]\.[jt]sx?$
+        types: [file]
+        args:
+          - "--config"
+          - "ui/eslint.config.js"
+          - "--fix"
+          - "--quiet"
+        additional_dependencies:
+          - eslint@9.22.0
+          - eslint-plugin-cypress@4.2.0
+          - "@typescript-eslint/eslint-plugin@5.0.0"
+          - "@typescript-eslint/parser@5.37.0"
+          - eslint-config-prettier@10.1.1
+          - eslint-config-standard-with-typescript@23.0.0
+          - eslint-plugin-import@2.31.0
+          - eslint-plugin-jsx-a11y@6.10.2
+          - eslint-plugin-prettier@5.2.3
+          - eslint-plugin-promise@7.2.1
+          - eslint-plugin-react@7.34.4
+          - eslint-plugin-react-hooks@5.2.0
+          - eslint-plugin-react-refresh@0.4.19
+          - eslint-plugin-simple-import-sort@12.1.1
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: ui/src/.+\.(json|[jt]sx?|html|css)$
+        args:
+          - "--config"
+          - "ui/.prettierrc.json"
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.0
+    hooks:
+      - id: gitleaks
+        args: ["--verbose", "--config-path=.gitleaks.toml"]
