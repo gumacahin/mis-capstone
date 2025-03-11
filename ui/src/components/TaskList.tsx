@@ -96,6 +96,8 @@ export default function TaskList({
                       )}
                     </>
                   }
+                  primaryTypographyProps={{ component: "div" }}
+                  secondaryTypographyProps={{ component: "div" }}
                 />
               </ListItemButton>
             </ListItem>

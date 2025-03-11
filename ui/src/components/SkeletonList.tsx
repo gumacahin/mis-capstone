@@ -37,6 +37,8 @@ export default function SkeletonList({
                 />
               </Box>
             }
+            primaryTypographyProps={{ component: "div" }}
+            secondaryTypographyProps={{ component: "div" }}
           />
         </ListItem>
       ))}
