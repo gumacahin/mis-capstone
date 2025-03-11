@@ -154,7 +154,7 @@ export const useComments = (task: Task) => {
   return useQuery({
     queryKey: ["comments", { taskId: task.id }],
     queryFn: async () => {
-      const { data } = await apiClient.get(`comments/?task=${task.id}`);
+      const { data } = await apiClient.get(`comments/?task_id=${task.id}`);
       return data;
     },
   });
