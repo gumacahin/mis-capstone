@@ -33,7 +33,6 @@ export default function TaskList({
     <>
       {task && (
         <UpdateTaskDialog
-          defaultDueDate={dayjs().toDate()}
           open={open}
           handleClose={() => {
             setOpen(false);

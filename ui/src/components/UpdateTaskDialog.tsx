@@ -138,12 +138,10 @@ export default function UpdateTaskDialog({
   open,
   handleClose,
   task,
-  defaultDueDate,
 }: {
   open: boolean;
   handleClose: () => void;
   task: Task;
-  defaultDueDate?: Date;
 }) {
   const [formActive, setFormActive] = useState(false);
   const updateTask = useUpdateTask(task);
@@ -248,7 +246,7 @@ export default function UpdateTaskDialog({
                       defaultValue={
                         data.due_date
                           ? dayjs(data.due_date).toDate()
-                          : defaultDueDate
+                          : undefined
                       }
                     />
                   </Stack>
