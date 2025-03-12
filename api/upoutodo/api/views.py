@@ -195,7 +195,7 @@ class TaskListViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows comments on tasks to be viewed or edited.
+    API endpoint that allows comments on tasks to be viewed, edited or deleted.
     """
 
     queryset = Comment.objects.all().order_by("date")

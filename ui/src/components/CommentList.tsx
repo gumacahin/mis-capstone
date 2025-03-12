@@ -19,7 +19,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { useComments, useDeleteComment } from "../api";
-import { Comment as CommentType, Task } from "../types/common";
+import { IComment, ITask } from "../types/common";
 import Comment from "./Comment";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
@@ -46,7 +46,7 @@ function DeleteCommentDialog({
   comment,
 }: {
   handleClose: () => void;
-  comment: CommentType;
+  comment: IComment;
 }) {
   const deleteComment = useDeleteComment(comment);
   const handleDelete = () => {
@@ -73,10 +73,20 @@ function DeleteCommentDialog({
   );
 }
 
-export default function CommentList({ task }: { task: Task }) {
+export default function CommentList({
+  task,
+  userId,
+}: {
+  task: ITask;
+  userId: number;
+}) {
   const { isPending, isError, data } = useComments(task);
-  const [commentForDeletion, setCommentForDeletion] =
-    useState<CommentType | null>(null);
+  const [commentForDeletion, setCommentForDeletion] = useState<IComment | null>(
+    null,
+  );
+  const [commentForEditing, setCommentForEditing] = useState<IComment | null>(
+    null,
+  );
 
   if (isError) {
     return <Alert severity="error">Failed to load comments</Alert>;
@@ -109,12 +119,20 @@ export default function CommentList({ task }: { task: Task }) {
         </AccordionSummary>
         <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
           <List disablePadding>
-            {data.results.map((comment: CommentType) => (
+            {data.results.map((comment: IComment) => (
               <Comment
                 comment={comment}
                 key={comment.id}
+                userId={userId}
                 handleDelete={() => {
                   setCommentForDeletion(comment);
+                }}
+                isEditing={comment.id === commentForEditing?.id}
+                handleEdit={() => {
+                  setCommentForEditing(comment);
+                }}
+                handleCloseEdit={() => {
+                  setCommentForEditing(null);
                 }}
               />
             ))}

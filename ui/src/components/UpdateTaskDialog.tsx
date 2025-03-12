@@ -20,7 +20,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useAddComment, useAuth, useTask, useUpdateTask } from "../api";
-import { Task } from "../types/common";
+import { ITask } from "../types/common";
 import CommentList from "./CommentList";
 import DueDatePicker from "./DueDatePicker";
 import TaskCheckIcon from "./TaskCheckIcon";
@@ -51,8 +51,13 @@ function DescriptionIcon() {
   );
 }
 
-function AddCommentForm({ task }: { task: Task }) {
-  const { data: user } = useAuth();
+function AddCommentForm({
+  task,
+  userDisplayName,
+}: {
+  task: ITask;
+  userDisplayName: string;
+}) {
   const [addCommentOpen, setAddCommentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [comment, setComment] = useState("");
@@ -84,9 +89,6 @@ function AddCommentForm({ task }: { task: Task }) {
     );
   };
 
-  const userDisplayName = user
-    ? user?.first_name + " " + (user?.last_name && user.last_name[0])
-    : "Todo User";
   return (
     <>
       {!addCommentOpen && (
@@ -98,6 +100,7 @@ function AddCommentForm({ task }: { task: Task }) {
             <ListItemText
               primary={
                 <TextField
+                  fullWidth
                   placeholder="Comment"
                   onClick={() => setAddCommentOpen(true)}
                 />
@@ -107,7 +110,7 @@ function AddCommentForm({ task }: { task: Task }) {
         </List>
       )}
       {addCommentOpen && (
-        <Stack my={3} spacing={2}>
+        <Stack my={3} spacing={1}>
           <TextField
             id="comment"
             label="Comment"
@@ -115,8 +118,10 @@ function AddCommentForm({ task }: { task: Task }) {
             fullWidth
             value={comment}
             onChange={(e) => setComment(e.target.value)}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
           />
-          <Stack direction="row" spacing={2} justifyContent={"flex-end"}>
+          <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
             <Button onClick={() => setAddCommentOpen(false)} variant="text">
               Cancel
             </Button>
@@ -141,16 +146,22 @@ export default function UpdateTaskDialog({
 }: {
   open: boolean;
   handleClose: () => void;
-  task: Task;
+  task: ITask;
 }) {
+  const { data: user } = useAuth();
+  const userId = user?.id;
   const [formActive, setFormActive] = useState(false);
   const updateTask = useUpdateTask(task);
   const { isError, data } = useTask(task);
 
+  const userDisplayName = user
+    ? user?.first_name + " " + (user?.last_name && user.last_name[0])
+    : "Todo User";
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newTask = Object.fromEntries(formData.entries()) as unknown as Task;
+    const newTask = Object.fromEntries(formData.entries()) as unknown as ITask;
     toast.promise(updateTask.mutateAsync(newTask), {
       loading: "Updating task...",
       success: "Task updated successfully!",
@@ -163,8 +174,6 @@ export default function UpdateTaskDialog({
     <Dialog
       open={open}
       PaperProps={{
-        component: "form",
-        onSubmit: handleSubmit,
         sx: { minWidth: { xs: "100vw", sm: 600 } },
       }}
     >
@@ -218,60 +227,53 @@ export default function UpdateTaskDialog({
                 </Stack>
               )}
               {formActive && (
-                <>
-                  <Stack spacing={3}>
-                    <TextField
-                      defaultValue={data.title}
-                      required
-                      margin="dense"
-                      id="title"
-                      name="title"
-                      label="Task name"
-                      type="text"
-                      fullWidth
-                      variant="standard"
-                    />
-                    <TextField
-                      defaultValue={data.note}
-                      multiline
-                      margin="dense"
-                      id="desciption"
-                      name="note"
-                      label="Description"
-                      type="text"
-                      fullWidth
-                      variant="standard"
-                    />
-                    <DueDatePicker
-                      defaultValue={
-                        data.due_date
-                          ? dayjs(data.due_date).toDate()
-                          : undefined
-                      }
-                    />
-                  </Stack>
-                  <Box
-                    width="100%"
-                    display="flex"
-                    justifyContent={"end"}
+                <Stack component="form" onSubmit={handleSubmit} spacing={3}>
+                  <TextField
+                    defaultValue={data.title}
+                    required
+                    margin="dense"
+                    id="title"
+                    name="title"
+                    label="Task name"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                  <TextField
+                    defaultValue={data.note}
+                    multiline
+                    margin="dense"
+                    id="desciption"
+                    name="note"
+                    label="Description"
+                    type="text"
+                    fullWidth
+                    variant="standard"
+                  />
+                  <DueDatePicker
+                    defaultValue={
+                      data.due_date ? dayjs(data.due_date).toDate() : undefined
+                    }
+                  />
+                  <Stack
                     py={2}
+                    direction="row"
+                    spacing={1}
+                    justifyContent={"flex-end"}
                   >
                     <Button onClick={() => setFormActive(false)}>Cancel</Button>
-                    <Button type="submit">Save Task</Button>
-                  </Box>
-                </>
+                    <Button type="submit" variant="contained">
+                      Save Task
+                    </Button>
+                  </Stack>
+                </Stack>
               )}
-              <CommentList task={data} />
-              <AddCommentForm task={data} />
+              <CommentList task={data} userId={userId} />
+              <AddCommentForm task={data} userDisplayName={userDisplayName} />
             </Box>
           </Box>
         )}
       </DialogContent>
-      <DialogActions>
-        <Button type="submit" variant="contained">
-          Update
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }

@@ -84,7 +84,9 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
             <DueDatePicker
               name="due_date"
               label="Due Date"
-              defaultValue={task.due_date ? dayjs(task.due_date) : null}
+              defaultValue={
+                task.due_date ? dayjs(task.due_date).toDate() : undefined
+              }
             />
           </Stack>
         </DialogContent>

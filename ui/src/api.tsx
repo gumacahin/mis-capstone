@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 
-import { Comment, Task } from "./types/common";
+import { IComment, ITask } from "./types/common";
 
 const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
@@ -77,7 +77,7 @@ export const useUpcomingTasks = () => {
   });
 };
 
-export const useTask = (task: Task) => {
+export const useTask = (task: ITask) => {
   const apiClient = useApiClient();
   return useQuery({
     initialData: task,
@@ -109,7 +109,7 @@ export const useAddTask = () => {
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addTask"],
-    mutationFn: async (task: Task) => {
+    mutationFn: async (task: ITask) => {
       const response = await apiClient.post("/tasks/", task);
       return response.data;
     },
@@ -119,12 +119,12 @@ export const useAddTask = () => {
   });
 };
 
-export const useUpdateTask = (task: Task) => {
+export const useUpdateTask = (task: ITask) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateTask", { taskId: task.id }],
-    mutationFn: async (updatedTask: Task) => {
+    mutationFn: async (updatedTask: ITask) => {
       const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
       return result.data;
     },
@@ -135,12 +135,12 @@ export const useUpdateTask = (task: Task) => {
   });
 };
 
-export const useAddComment = (task: Task) => {
+export const useAddComment = (task: ITask) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addComment"],
-    mutationFn: async (comment: Comment) => {
+    mutationFn: async (comment: IComment) => {
       const response = await apiClient.post("/comments/", comment);
       return response.data;
     },
@@ -152,7 +152,7 @@ export const useAddComment = (task: Task) => {
   });
 };
 
-export const useComments = (task: Task) => {
+export const useComments = (task: ITask) => {
   const apiClient = useApiClient();
   return useQuery({
     queryKey: ["comments", { taskId: task.id }],
@@ -163,14 +163,35 @@ export const useComments = (task: Task) => {
   });
 };
 
-export const useDeleteComment = (comment: Comment) => {
-  console.log(comment);
+export const useDeleteComment = (comment: IComment) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["deleteComment", { commentId: comment.id }],
     mutationFn: async () => {
-      const result = await apiClient.delete(`/comments/${comment.id}/`);
+      const result = await apiClient.delete(
+        `/comments/${comment.id}/?task_id=${comment.task_id}`,
+      );
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { commentId: comment.task_id }],
+      });
+    },
+  });
+};
+
+export const useUpdateComment = (comment: IComment) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateComment", { commentId: comment.id }],
+    mutationFn: async (updatedComment: IComment) => {
+      const result = await apiClient.put(
+        `/comments/${comment.id}/?task_id=${comment.task_id}`,
+        updatedComment,
+      );
       return result.data;
     },
     onSettled: () => {
@@ -181,15 +202,15 @@ export const useDeleteComment = (comment: Comment) => {
   });
 };
 
-export const useRescheduleTasks = (tasks: Task[]) => {
+export const useRescheduleTasks = (tasks: ITask[]) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: [
       "rescheduleTasks",
-      { taskIds: tasks.map((task: Task) => task.id) },
+      { taskIds: tasks.map((task: ITask) => task.id) },
     ],
-    mutationFn: async (rescheduledTasks: Task[]) => {
+    mutationFn: async (rescheduledTasks: ITask[]) => {
       const result = await apiClient.put(
         `/tasks/bulk_update/`,
         rescheduledTasks,
@@ -202,7 +223,7 @@ export const useRescheduleTasks = (tasks: Task[]) => {
   });
 };
 
-export const useDeleteTask = (task: Task) => {
+export const useDeleteTask = (task: ITask) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({

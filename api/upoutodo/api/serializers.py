@@ -5,9 +5,22 @@ from todo.models import Task, TaskList, Comment
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["url", "username", "first_name", "last_name", "email", "groups"]
+        fields = [
+            "id",
+            "url",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "groups",
+        ]
+
+    def get_id(self, obj):
+        return obj.id
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -61,17 +74,22 @@ class TaskListSerializer(serializers.HyperlinkedModelSerializer):
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
     author_name = serializers.SerializerMethodField()
     task_id = serializers.SerializerMethodField()
+    author_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = [
             "id",
             "author_name",
+            "author_id",
             "author",
             "body",
             "date",
             "task_id",
         ]
+
+    def get_author_id(self, obj):
+        return obj.author.id
 
     def get_author_name(self, obj):
         if obj.author.first_name and obj.author.last_name:
