@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { Comment, Task } from "./types/common";
 
 const useApiClient = () => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
 
   const apiClient = axios.create({
     baseURL: "http://localhost:5173/api/",
@@ -19,6 +19,9 @@ const useApiClient = () => {
         const token = await getAccessTokenSilently();
         config.headers.Authorization = `Bearer ${token}`;
       } catch (error) {
+        if (error instanceof Error && error.message === "login_required") {
+          loginWithRedirect();
+        }
         console.error("Error getting access token", error);
       }
       return config;
