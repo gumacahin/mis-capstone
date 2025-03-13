@@ -42,7 +42,7 @@ export interface IComment {
   id?: number;
   body: string;
   date?: string | null;
-  author_name: string;
-  author_id: number;
+  author_name?: string;
+  author_id?: number;
   task_id: number;
 }
