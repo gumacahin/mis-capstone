@@ -1,13 +1,14 @@
-import os
-import django
 import argparse
+import os
 from datetime import datetime
+
+import django
+
+from api.models import Task
 
 # Set up Django environment
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "upoutodo.settings")
 django.setup()
-
-from api.models import Task
 
 
 def add_task(name, description=None, due_date=None):

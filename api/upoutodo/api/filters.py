@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django_filters.rest_framework import FilterSet, BooleanFilter, DateFilter
+from django_filters.rest_framework import BooleanFilter, DateFilter, FilterSet
 from todo.models import Task
 
 

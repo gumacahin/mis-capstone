@@ -1,7 +1,8 @@
 from datetime import datetime
+
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
-from todo.models import Task, TaskList, Comment
+from todo.models import Comment, Task, TaskList
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

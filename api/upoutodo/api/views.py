@@ -3,22 +3,23 @@ from functools import wraps
 import jwt
 from django.contrib.auth.models import Group, User
 from django.http import JsonResponse
-from rest_framework import permissions, viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from todo.models import Task, TaskList, Comment
-from .filters import TaskFilter
+from todo.models import Comment, Task, TaskList
 
 from upoutodo.api.serializers import (
+    CommentSerializer,
     GroupSerializer,
     TaskListSerializer,
     TaskSerializer,
     UserSerializer,
-    CommentSerializer,
 )
+
+from .filters import TaskFilter
 
 
 def get_token_auth_header(request):
@@ -63,7 +64,10 @@ def requires_scope(required_scope):
 def public(request):
     return JsonResponse(
         {
-            "message": "Hello from a public endpoint! You don't need to be authenticated to see this."
+            "message": (
+                "Hello from a public endpoint! You don't need to be authenticated "
+                "to see this."
+            )
         }
     )
 
@@ -72,7 +76,10 @@ def public(request):
 def private(request):
     return JsonResponse(
         {
-            "message": "Hello from a private endpoint! You need to be authenticated to see this."
+            "message": (
+                "Hello from a private endpoint! You need to be authenticated to "
+                "see this."
+            )
         }
     )
 
@@ -86,7 +93,10 @@ def private(request):
 def private_scoped(request):
     return JsonResponse(
         {
-            "message": "Hello from a private endpoint! You need to be authenticated and have a scope of read:messages to see this."
+            "message": (
+                "Hello from a private endpoint! You need to be authenticated "
+                " and have a scope of read:messages to see this."
+            )
         }
     )
 

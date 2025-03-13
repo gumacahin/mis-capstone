@@ -96,7 +96,10 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        ),
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -161,7 +164,9 @@ AUTH0 = {
 }
 
 JWT_AUTH = {
-    "JWT_PAYLOAD_GET_USERNAME_HANDLER": "upoutodo.api.utils.jwt_get_username_from_payload_handler",
+    "JWT_PAYLOAD_GET_USERNAME_HANDLER": (
+        "upoutodo.api.utils.jwt_get_username_from_payload_handler"
+    ),
     "JWT_DECODE_HANDLER": "upoutodo.api.utils.jwt_decode_token",
     "JWT_ALGORITHM": "RS256",
     "JWT_AUDIENCE": AUTH0["AUTH0_AUDIENCE"],
