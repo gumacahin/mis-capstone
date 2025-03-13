@@ -19,10 +19,11 @@ const useApiClient = () => {
         const token = await getAccessTokenSilently();
         config.headers.Authorization = `Bearer ${token}`;
       } catch (error) {
-        if (error instanceof Error && error.message === "login_required") {
-          loginWithRedirect();
+        if (error instanceof Error && error.message === "Login required") {
+          await loginWithRedirect();
+        } else {
+          console.error("Unexpected error getting access token", error);
         }
-        console.error("Error getting access token", error);
       }
       return config;
     },
