@@ -6,9 +6,7 @@ from django.dispatch import receiver
 # from django.contrib.auth.models import Group
 
 
-# FIXME: This is not working. I attempted to add a user profile model but
-# failed.
-# Revisiting this: Attempted? How?
+# TODO: complete this model
 class UserProfile(models.Model):
     name = models.TextField(
         null=True,

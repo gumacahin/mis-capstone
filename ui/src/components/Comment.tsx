@@ -53,7 +53,6 @@ export default function Comment({
     const updatedComment = Object.fromEntries(
       formData.entries(),
     ) as unknown as IComment;
-    console.log("updatedComment", updatedComment);
     toast.promise(
       updateComment.mutateAsync(updatedComment, {
         onSettled: () => {
@@ -95,7 +94,6 @@ export default function Comment({
     );
   }
   const commentBelongsToUser = comment.author_id === userId;
-  console.log("userId", userId);
   return (
     <ListItem key={comment.id}>
       <ListItemIcon>
