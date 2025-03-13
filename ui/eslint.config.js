@@ -30,9 +30,11 @@ export default [
       "**/dist",
       "**/node_modules",
       "**/.prettierrc",
-      "**/cypress",
       "**/cypress.config.ts",
       "**/eslint.config.js",
+      "**/package.json",
+      "**/tsconfig.json",
+      "**/package-lock.json",
     ],
   },
   ...fixupConfigRules(
