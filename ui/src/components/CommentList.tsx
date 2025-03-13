@@ -118,7 +118,7 @@ export default function CommentList({
           </Box>
         </AccordionSummary>
         <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
-          <List disablePadding>
+          <List disablePadding sx={{ maxHeight: "40vh", overflowY: "scroll" }}>
             {data.results.map((comment: IComment) => (
               <Comment
                 comment={comment}
