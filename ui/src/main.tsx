@@ -7,11 +7,11 @@ import "@fontsource/roboto/700.css";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { CssBaseline } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
 import App from "./App.tsx";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeContextProvider } from "./components/ThemeContext.tsx";
 import {
   AUTH0_AUDIENCE,
@@ -38,7 +38,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       >
         <QueryClientProvider client={queryClient}>
           <App />
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </Auth0Provider>
     </ThemeContextProvider>
