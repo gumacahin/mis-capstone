@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";

@@ -176,7 +176,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-export default function PersistentDrawerLeft({
+export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;

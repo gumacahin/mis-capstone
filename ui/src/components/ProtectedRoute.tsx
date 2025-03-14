@@ -2,14 +2,14 @@ import { withAuthenticationRequired } from "@auth0/auth0-react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
-import PersistentDrawerLeft from "./PersistentDrawerLeft";
+import AppLayout from "./AppLayout";
 import Spinner from "./Spinner";
 
 const ProtectedRoute = withAuthenticationRequired(
   () => (
-    <PersistentDrawerLeft>
+    <AppLayout>
       <Outlet />
-    </PersistentDrawerLeft>
+    </AppLayout>
   ),
   {
     onRedirecting: () => (
