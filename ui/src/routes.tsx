@@ -1,45 +1,12 @@
-import { Alert, Box, Button, Container } from "@mui/material";
-import { Navigate, useRouteError } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import RootErrorBoundary from "./components/RootErrorBoundry";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
 import SettingsPage from "./pages/SettingsPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
-
-export function RootErrorBoundary() {
-  const error = useRouteError() as Error;
-  return (
-    <Container>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          height: "100vh", // This assumes the Box is directly within the body or a full-height container
-        }}
-      >
-        <Alert
-          severity="warning"
-          action={
-            <Button
-              onClick={() => window.location.reload()}
-              color="inherit"
-              size="small"
-            >
-              REFRESH
-            </Button>
-          }
-        >
-          Something went wrong. Please try refreshing the page.
-        </Alert>
-        <Box component={"pre"}>{error.message}</Box>
-      </Box>
-    </Container>
-  );
-}
 
 const routes = [
   {
