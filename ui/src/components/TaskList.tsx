@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import { useState } from "react";
 
 // import Divider from '@mui/material/Divider';
-import { Task } from "../types/common";
+import type { Task } from "../types/common";
 import TaskCheckIcon from "./TaskCheckIcon";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
@@ -54,7 +54,11 @@ export default function TaskList({
               disablePadding
               disableGutters
             >
-              <ListItemButton onClick={() => handleOpenTask(task)}>
+              <ListItemButton
+                onClick={() => {
+                  handleOpenTask(task);
+                }}
+              >
                 <ListItemIcon>
                   <TaskCheckIcon task={task} />
                 </ListItemIcon>

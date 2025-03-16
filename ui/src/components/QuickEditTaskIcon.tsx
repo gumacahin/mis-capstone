@@ -8,18 +8,18 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 import DueDatePicker from "./DueDatePicker";
 
-export default function QuickEditTaskIcon({ task }: { task: Task }) {
+export default function QuickEditTaskIcon({ task }: { task: ITask }) {
   const [open, setOpen] = useState(false);
 
   // Function to handle form submission
-  const handleClick = (event: React.FormEvent) => {
+  const handleClick = (event: FormEvent) => {
     event.preventDefault();
     setOpen(true);
   };
@@ -30,7 +30,7 @@ export default function QuickEditTaskIcon({ task }: { task: Task }) {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const updatedTask = Object.fromEntries(

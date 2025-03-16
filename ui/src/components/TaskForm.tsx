@@ -2,10 +2,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import { FormEvent } from "react";
 import { toast } from "react-hot-toast";
 
 import { useAddTask } from "../api";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 import DueDatePicker from "./DueDatePicker";
 
 export default function TaskForm({
@@ -14,11 +15,11 @@ export default function TaskForm({
   handleClose,
 }: {
   dueDate?: Date;
-  task?: Task;
+  task?: ITask;
   handleClose: () => void;
 }) {
   const addTask = useAddTask();
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const newTask = Object.fromEntries(formData.entries()) as unknown as Task;

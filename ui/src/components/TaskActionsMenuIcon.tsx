@@ -9,11 +9,11 @@ import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import * as React from "react";
+import { MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useDeleteTask } from "../api";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 
 function DeleteTaskDialog({
   showDialog,
@@ -22,7 +22,7 @@ function DeleteTaskDialog({
 }: {
   showDialog: boolean;
   setShowDialog: (show: boolean) => void;
-  task: Task;
+  task: ITask;
 }) {
   const deleteTask = useDeleteTask(task);
   const handleDelete = () => {
@@ -57,18 +57,24 @@ function DeleteTaskDialog({
           <Button variant="text" onClick={handleDelete}>
             Delete
           </Button>
-          <Button onClick={() => setShowDialog(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              setShowDialog(false);
+            }}
+          >
+            Cancel
+          </Button>
         </DialogActions>
       </Dialog>
     </>
   );
 }
 
-export default function TaskActionsMenuIcon({ task }: { task: Task }) {
-  const [showDialog, setShowDialog] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+export default function TaskActionsMenuIcon({ task }: { task: ITask }) {
+  const [showDialog, setShowDialog] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {

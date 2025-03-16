@@ -10,20 +10,6 @@ export type jsonable =
   | { [key: string]: jsonable }
   | { toJSON: () => jsonable };
 
-export type Task = {
-  id: number;
-  title: string;
-  assigned_to: string | null;
-  completed: boolean;
-  completed_date: string | null;
-  created_by: string;
-  created_date: string;
-  due_date: string | null;
-  note: string;
-  priority: number | null;
-  task_list: string;
-};
-
 export interface ITask {
   id: number;
   title: string;

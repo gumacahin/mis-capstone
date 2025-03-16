@@ -17,7 +17,9 @@ export default function AddTodoFab() {
     <>
       <Fab
         sx={fabStyle}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
         color="primary"
         aria-label="add"
       >

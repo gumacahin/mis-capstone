@@ -2,7 +2,7 @@ import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
-  AccordionSummaryProps,
+  type AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -19,7 +19,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { useComments, useDeleteComment } from "../api";
-import { IComment, ITask } from "../types/common";
+import type { IComment, ITask } from "../types/common";
 import Comment from "./Comment";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
@@ -141,7 +141,9 @@ export default function CommentList({
       </Accordion>
       {commentForDeletion && (
         <DeleteCommentDialog
-          handleClose={() => setCommentForDeletion(null)}
+          handleClose={() => {
+            setCommentForDeletion(null);
+          }}
           comment={commentForDeletion}
         />
       )}

@@ -14,7 +14,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { SelectChangeEvent } from "@mui/material/Select";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import { useState } from "react";
 
 import { useThemeContext } from "../components/ThemeContext";
@@ -103,7 +103,9 @@ export default function SettingsPage() {
               <Button
                 variant="outlined"
                 color="error"
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                  setOpen(true);
+                }}
               >
                 Delete Account
               </Button>
@@ -112,7 +114,12 @@ export default function SettingsPage() {
           </Stack>
         </Stack>
       </Box>
-      <ConfirmDeleteDialog open={open} handleClose={() => setOpen(false)} />
+      <ConfirmDeleteDialog
+        open={open}
+        handleClose={() => {
+          setOpen(false);
+        }}
+      />
     </>
   );
 }

@@ -5,11 +5,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import React from "react";
+import type { FormEvent } from "react";
 import { toast } from "react-hot-toast";
 
 import { useAddTask } from "../api";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 import DueDatePicker from "./DueDatePicker";
 
 export default function AddTodoDialog({
@@ -21,10 +21,10 @@ export default function AddTodoDialog({
 }) {
   const addTask = useAddTask();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newTask = Object.fromEntries(formData.entries()) as unknown as Task;
+    const newTask = Object.fromEntries(formData.entries()) as unknown as ITask;
     toast.promise(addTask.mutateAsync(newTask), {
       loading: "Adding task...",
       success: "Task added successfully!",

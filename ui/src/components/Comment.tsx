@@ -13,11 +13,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { FormEvent, MouseEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useUpdateComment } from "../api";
-import { IComment } from "../types/common";
+import type { IComment } from "../types/common";
 
 export default function Comment({
   comment,
@@ -39,14 +39,14 @@ export default function Comment({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [editedComment, setEditedComment] = useState(comment.body);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     const formData = new FormData(event.currentTarget);
@@ -78,7 +78,9 @@ export default function Comment({
           multiline
           fullWidth
           value={editedComment}
-          onChange={(e) => setEditedComment(e.target.value)}
+          onChange={(e) => {
+            setEditedComment(e.target.value);
+          }}
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
         />
@@ -175,6 +177,6 @@ function stringAvatar(name: string) {
     sx: {
       bgcolor: stringToColor(name),
     },
-    children: `${name[0]}`,
+    children: name[0],
   };
 }

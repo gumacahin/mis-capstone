@@ -15,11 +15,11 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useAddComment, useAuth, useTask, useUpdateTask } from "../api";
-import { ITask } from "../types/common";
+import type { ITask } from "../types/common";
 import CommentList from "./CommentList";
 import DueDatePicker from "./DueDatePicker";
 import TaskCheckIcon from "./TaskCheckIcon";
@@ -101,7 +101,9 @@ function AddCommentForm({
                 <TextField
                   fullWidth
                   placeholder="Comment"
-                  onClick={() => setAddCommentOpen(true)}
+                  onClick={() => {
+                    setAddCommentOpen(true);
+                  }}
                 />
               }
             />
@@ -116,12 +118,19 @@ function AddCommentForm({
             multiline
             fullWidth
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(e) => {
+              setComment(e.target.value);
+            }}
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
           <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
-            <Button onClick={() => setAddCommentOpen(false)} variant="text">
+            <Button
+              onClick={() => {
+                setAddCommentOpen(false);
+              }}
+              variant="text"
+            >
               Cancel
             </Button>
             <Button
@@ -154,10 +163,10 @@ export default function UpdateTaskDialog({
   const { isError, data } = useTask(task);
 
   const userDisplayName = user
-    ? user?.first_name + " " + (user?.last_name && user.last_name[0])
+    ? user?.first_name + " " + user?.last_name?.[0]
     : "Todo User";
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const newTask = Object.fromEntries(formData.entries()) as unknown as ITask;
@@ -260,7 +269,13 @@ export default function UpdateTaskDialog({
                     spacing={1}
                     justifyContent={"flex-end"}
                   >
-                    <Button onClick={() => setFormActive(false)}>Cancel</Button>
+                    <Button
+                      onClick={() => {
+                        setFormActive(false);
+                      }}
+                    >
+                      Cancel
+                    </Button>
                     <Button type="submit" variant="contained">
                       Save Task
                     </Button>
@@ -300,6 +315,6 @@ function stringAvatar(name: string) {
     sx: {
       bgcolor: stringToColor(name),
     },
-    children: `${name[0]}`,
+    children: name[0],
   };
 }

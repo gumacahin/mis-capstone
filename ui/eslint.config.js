@@ -6,7 +6,6 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-// import love from "eslint-config-love";
 import cypress from "eslint-plugin-cypress";
 import _import from "eslint-plugin-import";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
@@ -26,10 +25,14 @@ const compat = new FlatCompat({
 
 export default [
   {
+    files: ["ui/**/*.js", "ui/**/*.ts", "ui/**/*.jsx", "ui/**/*.tsx"],
+  },
+  {
     ignores: [
       "**/dist",
       "**/node_modules",
       "**/.prettierrc",
+      "**/cypress",
       "**/cypress.config.ts",
       "**/eslint.config.js",
       "**/package.json",

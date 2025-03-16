@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useCallback } from "react";
 
-import { AnyJSON } from "../types/common";
+import type { AnyJSON } from "../types/common";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface Api<T = any> {
   api: (

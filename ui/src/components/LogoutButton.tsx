@@ -12,9 +12,9 @@ const LogoutButton = () => {
     isAuthenticated && (
       <Button
         color="inherit"
-        onClick={() =>
-          logout({ logoutParams: { returnTo: window.location.origin } })
-        }
+        onClick={async () => {
+          await logout({ logoutParams: { returnTo: window.location.origin } });
+        }}
       >
         Log Out
       </Button>

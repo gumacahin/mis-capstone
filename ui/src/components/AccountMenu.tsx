@@ -9,7 +9,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AccountMenu() {
@@ -20,9 +20,10 @@ export default function AccountMenu() {
   // const handleClick = (event: MouseEvent<HTMLElement>) => {
   //   setAnchorEl(event.currentTarget);
   // };
-  const handleLogout = () =>
-    logout({ logoutParams: { returnTo: window.location.origin } });
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleLogout = async () => {
+    await logout({ logoutParams: { returnTo: window.location.origin } });
+  };
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 

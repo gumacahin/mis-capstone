@@ -10,11 +10,18 @@ export default function AddTodoButton({ dueDate }: { dueDate?: Date }) {
   return (
     <>
       {open ? (
-        <TaskForm dueDate={dueDate} handleClose={() => setOpen(false)} />
+        <TaskForm
+          dueDate={dueDate}
+          handleClose={() => {
+            setOpen(false);
+          }}
+        />
       ) : (
         <Button
           startIcon={<AddIcon />}
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true);
+          }}
           color="primary"
           aria-label="add"
         >

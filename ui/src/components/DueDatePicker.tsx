@@ -14,13 +14,10 @@ import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import { useState } from "react";
-
-// type DatePickerProps = React.ComponentProps<typeof DatePicker>;
+import { MouseEvent, useState } from "react";
 
 export default function DueDatePicker({
   defaultValue,
@@ -32,7 +29,7 @@ export default function DueDatePicker({
   );
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -76,7 +73,12 @@ export default function DueDatePicker({
           {formatDayOfWeek(selectedDate)}
         </Button>
         {selectedDate && (
-          <Button variant="outlined" onClick={() => setSelectedDate(null)}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setSelectedDate(null);
+            }}
+          >
             <CloseIcon />
           </Button>
         )}

@@ -5,7 +5,12 @@ const LoginButton = () => {
   const { loginWithRedirect } = useAuth0();
 
   return (
-    <Button color="inherit" onClick={() => loginWithRedirect()}>
+    <Button
+      color="inherit"
+      onClick={async () => {
+        await loginWithRedirect();
+      }}
+    >
       Log In
     </Button>
   );

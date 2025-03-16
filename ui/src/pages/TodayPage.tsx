@@ -7,7 +7,7 @@ import { Alert, Typography } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
-  AccordionSummaryProps,
+  type AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -23,14 +23,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import React from "react";
+import { MouseEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useRescheduleTasks, useTasksToday } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
@@ -51,13 +51,11 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
   },
 }));
 
-function RescheduleDialog({ tasks }: { tasks: Task[] }) {
+function RescheduleDialog({ tasks }: { tasks: ITask[] }) {
   const rescheduleTasks = useRescheduleTasks(tasks);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
-    null,
-  );
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -69,7 +67,7 @@ function RescheduleDialog({ tasks }: { tasks: Task[] }) {
     if (!date) {
       return;
     }
-    const updatedTasks = tasks.map((task: Task) => {
+    const updatedTasks = tasks.map((task: ITask) => {
       task.due_date = dayjs(date).format("YYYY-MM-DD");
       task.completed_date = "";
       return task;
@@ -182,7 +180,7 @@ function RescheduleDialog({ tasks }: { tasks: Task[] }) {
   );
 }
 
-function TaskListToday({ tasks }: { tasks: Task[] }) {
+function TaskListToday({ tasks }: { tasks: ITask[] }) {
   if (tasks.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
@@ -235,7 +233,7 @@ function TaskListToday({ tasks }: { tasks: Task[] }) {
 export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();
 
-  const tasks: Task[] = data?.results ?? [];
+  const tasks: ITask[] = data?.results ?? [];
 
   return (
     <Box display={"flex"} flexDirection={"column"} height="100vh">

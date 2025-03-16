@@ -17,7 +17,7 @@ repos:
     rev: "v9.22.0"
     hooks:
       - id: eslint
-        files: ui/src/.+[^(\.d)]\.[jt]sx?$
+        files: ui/src/.+.[jt]sx?$
         types: [file]
         args:
           - "--config"
@@ -30,7 +30,6 @@ repos:
           - "@typescript-eslint/eslint-plugin@5.0.0"
           - "@typescript-eslint/parser@5.37.0"
           - eslint-config-prettier@10.1.1
-          - eslint-config-standard-with-typescript@23.0.0
           - eslint-plugin-import@2.31.0
           - eslint-plugin-jsx-a11y@6.10.2
           - eslint-plugin-prettier@5.2.3

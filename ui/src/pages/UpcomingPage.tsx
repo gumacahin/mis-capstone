@@ -13,13 +13,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 
 import { useTasks } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -110,7 +110,7 @@ function CalendarDialog({
 }) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -181,7 +181,7 @@ export default function UpcomingPage() {
     return dayjs(date).format("dddd");
   };
 
-  const tasks: Task[] = data?.results ?? [];
+  const tasks: ITask[] = data?.results ?? [];
 
   return (
     <Box display={"flex"} flexDirection={"column"} height="100vh">
@@ -222,7 +222,7 @@ export default function UpcomingPage() {
                 <>
                   <TaskList
                     hideDueDates
-                    tasks={tasks.filter((task: Task) =>
+                    tasks={tasks.filter((task: ITask) =>
                       dayjs(task.due_date).isSame(dayjs(date)),
                     )}
                   />

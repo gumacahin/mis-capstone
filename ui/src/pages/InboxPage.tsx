@@ -5,11 +5,11 @@ import { useInboxTasks } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 
 export default function InboxPage() {
   const { isPending, isError, data } = useInboxTasks();
-  const tasks: Task[] = data?.results ?? [];
+  const tasks: ITask[] = data?.results ?? [];
   return (
     <Box display={"flex"} flexDirection={"column"} height="100vh">
       <Box padding={3} flex="0 1 auto">

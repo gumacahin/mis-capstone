@@ -49,7 +49,7 @@ export default function useSuggestedTodos() {
 
   for (let i = 1; i <= 1000; i++) {
     const title = tasks[i % tasks.length];
-    data.push({ id: i, title: `${title}`, completed: false });
+    data.push({ id: i, title, completed: false });
   }
   return {
     isPending: false,

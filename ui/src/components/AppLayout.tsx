@@ -9,7 +9,9 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
 import { Typography, useMediaQuery } from "@mui/material";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import MuiAppBar, {
+  type AppBarProps as MuiAppBarProps,
+} from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
@@ -19,9 +21,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { styled, Theme, useTheme } from "@mui/material/styles";
+import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AddTodoDialog from "./AddTodoDialog";
@@ -63,7 +65,11 @@ function DrawerContents({
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleAddTodoDialogOpen()}>
+          <ListItemButton
+            onClick={() => {
+              handleAddTodoDialogOpen();
+            }}
+          >
             <ListItemIcon>
               <AddCircleIcon />
             </ListItemIcon>
@@ -71,7 +77,11 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleClick(() => navigate("inbox"))}>
+          <ListItemButton
+            onClick={handleClick(() => {
+              navigate("inbox");
+            })}
+          >
             <ListItemIcon>
               <InboxIcon />
             </ListItemIcon>
@@ -79,7 +89,11 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleClick(() => navigate("today"))}>
+          <ListItemButton
+            onClick={handleClick(() => {
+              navigate("today");
+            })}
+          >
             <ListItemIcon>
               <TodayIcon />
             </ListItemIcon>
@@ -87,7 +101,11 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleClick(() => navigate("upcoming"))}>
+          <ListItemButton
+            onClick={handleClick(() => {
+              navigate("upcoming");
+            })}
+          >
             <ListItemIcon>
               <UpcomingIcon />
             </ListItemIcon>
@@ -96,7 +114,11 @@ function DrawerContents({
         </ListItem>
         <Divider />
         <ListItem disablePadding>
-          <ListItemButton onClick={handleClick(() => navigate("settings"))}>
+          <ListItemButton
+            onClick={handleClick(() => {
+              navigate("settings");
+            })}
+          >
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
@@ -104,7 +126,11 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleClick(() => logout())}>
+          <ListItemButton
+            onClick={handleClick(async () => {
+              await logout();
+            })}
+          >
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
@@ -179,7 +205,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function AuthenticatedLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const theme = useTheme();
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
@@ -198,7 +224,9 @@ export default function AuthenticatedLayout({
     <>
       <AddTodoDialog
         open={isAddTodoDialogOpen}
-        handleClose={() => setIsAddTodoDialogOpen(false)}
+        handleClose={() => {
+          setIsAddTodoDialogOpen(false);
+        }}
       />
       <Box sx={{ display: "flex" }}>
         <AppBar
@@ -241,7 +269,9 @@ export default function AuthenticatedLayout({
             <DrawerContents
               theme={theme}
               handleDrawerClose={handleDrawerClose}
-              handleAddTodoDialogOpen={() => setIsAddTodoDialogOpen(true)}
+              handleAddTodoDialogOpen={() => {
+                setIsAddTodoDialogOpen(true);
+              }}
             />
           </Drawer>
         )}
@@ -263,7 +293,9 @@ export default function AuthenticatedLayout({
               theme={theme}
               handleDrawerClose={handleDrawerClose}
               isLargeDisplay
-              handleAddTodoDialogOpen={() => setIsAddTodoDialogOpen(true)}
+              handleAddTodoDialogOpen={() => {
+                setIsAddTodoDialogOpen(true);
+              }}
             />
           </Drawer>
         )}

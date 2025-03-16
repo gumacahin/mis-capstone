@@ -1,10 +1,9 @@
-// apiClient.js
 import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 
-import { IComment, ITask } from "./types/common";
+import type { IComment, ITask } from "./types/common";
 
 const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
@@ -13,23 +12,19 @@ const useApiClient = () => {
     baseURL: "http://localhost:5173/api/",
   });
 
-  apiClient.interceptors.request.use(
-    async (config) => {
-      try {
-        const token = await getAccessTokenSilently();
-        config.headers.Authorization = `Bearer ${token}`;
-      } catch (error) {
-        if (error instanceof Error && error.message === "Login required") {
-          await loginWithRedirect();
-        } else {
-          console.error("Unexpected error getting access token", error);
-        }
+  apiClient.interceptors.request.use(async (config) => {
+    try {
+      const token = await getAccessTokenSilently();
+      config.headers.Authorization = `Bearer ${token}`;
+    } catch (error) {
+      if (error instanceof Error && error.message === "Login required") {
+        await loginWithRedirect();
+      } else {
+        console.error("Unexpected error getting access token", error);
       }
-      return config;
-    },
-    // eslint-disable-next-line
-    (error) => Promise.reject(error),
-  );
+    }
+    return config;
+  });
 
   return apiClient;
 };

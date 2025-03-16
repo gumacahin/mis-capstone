@@ -21,7 +21,9 @@ export default function RootErrorBoundary() {
           severity="warning"
           action={
             <Button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                window.location.reload();
+              }}
               color="inherit"
               size="small"
             >

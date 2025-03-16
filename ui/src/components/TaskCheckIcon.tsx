@@ -4,24 +4,25 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import IconButton from "@mui/material/IconButton";
 import Skeleton from "@mui/material/Skeleton";
 import dayjs from "dayjs";
+import { MouseEvent } from "react";
 import toast from "react-hot-toast";
 
 import { useTask, useUpdateTask } from "../api";
-import { Task } from "../types/common";
+import type { ITask } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
   disabled,
 }: {
-  task: Task;
+  task: ITask;
   disabled?: boolean;
 }) {
   const updateTask = useUpdateTask(task);
   const { isPending, isError, data } = useTask(task);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    const updatedTask: Task = {
+    const updatedTask: ITask = {
       ...data,
       completed: !data.completed,
       completed_date: data.completed ? "" : dayjs().format("YYYY-MM-DD"),
