@@ -15,8 +15,9 @@ import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { MouseEvent, useState } from "react";
 
-import { useTasks } from "../api";
+import { useTasks, useTasksToday } from "../api";
 import AddTodoButton from "../components/AddTodoButton";
+import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
 import type { ITask } from "../types/common";
@@ -164,6 +165,8 @@ export default function UpcomingPage() {
     weekDates[weekDates.length - 1],
   );
 
+  const { isError: tasksTodayIsError, data: tasksTodayData } = useTasksToday();
+
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
   };
@@ -182,6 +185,10 @@ export default function UpcomingPage() {
   };
 
   const tasks: ITask[] = data?.results ?? [];
+  const tasksToday: ITask[] = tasksTodayData?.results ?? [];
+  const overdueTasks = tasksToday.filter(
+    (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
+  );
 
   return (
     <Box display={"flex"} flexDirection={"column"} height="100vh">
@@ -209,6 +216,26 @@ export default function UpcomingPage() {
         }}
       >
         <Stack direction="row" spacing={2}>
+          {tasksTodayIsError && (
+            <Alert severity="error">Failed to load tasks</Alert>
+          )}
+          {overdueTasks.length > 0 && (
+            <Box minWidth={300}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography fontWeight={500} component={"h4"}>
+                  Overdue
+                </Typography>
+                <RescheduleDialog tasks={overdueTasks} />
+              </Box>
+              <TaskList tasks={overdueTasks} />
+            </Box>
+          )}
           {weekDates.map((date, i) => (
             <Box minWidth={300} key={i}>
               <Typography fontWeight={500} component={"h4"}>
