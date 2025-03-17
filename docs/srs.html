@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//Tigris//DTD XHTML 1.0 Transitional//EN"
+"http://style.tigris.org/tigris_transitional.dtd">
+<html>
+<head>
+ <style type="text/css">
+/* <![CDATA[ */
+@import "css/readyset.css";
+@import "css/inst.css";
+/*  ]]> */
+ </style>
+
+<link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+ <title>SRS</title>
+</head>
+
+<body>
+<div class="app">
+<div class="readyset">
+ <h2>Software Requirements Specification</h2>
+
+ <div id="releaseinfo">
+ <h3>Release Information</h3>
+ <table border="1" cellpadding="3" cellspacing="2" class="axial">
+  <tr>
+   <th>Project:</th>
+   <td><a href="index.html">IS295</a></td>
+  </tr>
+  <tr>
+   <th>Internal Release Number:</th>
+   <td>1.0.0</td>
+  </tr>
+  <tr>
+   <th>Attached worksheets:</th>
+   <td>
+    <div>SRS &gt; <a href="use-case-suite.html">Use case suite</a></div>
+    <div>SRS &gt; <a href="feature-set.html">Feature set</a></div>
+   </td>
+  </tr>
+  <tr>
+   <th>Related Documents:</th>
+   <td>
+    <div><a href="proposal.html">Project proposal</a> &gt;
+         <a href="user-needs.html">User needs</a></div>
+   </td>
+  </tr>
+ </table>
+ </div> <!-- /releaseinfo -->
+
+
+ <div id="processimpact" style="display:none;">
+  <strong>Process impact:</strong> The SRS
+  precisely defines the software product that will be built.  Decisions
+  made in writing the SRS are based on information in the <a
+  href="proposal.html">project proposal</a> and <a
+  href="user-needs.html">user needs</a> documents.  The SRS sets
+  requirements that must be satisfied by the <a
+  href="design.html">system design</a>.  The SRS is verified and
+  validated by activities outlined in the <a href="qa-plan.html">QA
+  plan</a>.
+ </div> <!-- /processimpact -->
+
+ <div id="introduction">
+ <h3>Introduction</h3>
+
+ <div>
+  The project aims to develop a web-based application called &ldquo;WSIDT&rdquo; that serves as a task-management and productivity-tracking tool for the University of the Philippines Open University (UPOU) community. The objective is to evaluate its usefulness for increasing productivity among UPOU faculty and staff.
+ </div>
+
+ <p>For more information, see the project <a
+ href="proposal.html">proposal</a>.</p>
+ </div> <!-- /introduction -->
+
+
+
+ <div id="usecases">
+ <h3>Use Cases</h3>
+
+ <p>The software application has two actors: users and administrators. User are
+  the primary actors. Users are able to register and sign in to the application.
+  Once signed in users are able to create todos and organize them. Administrators
+  are users given administrative roles and are able to login to the administrative
+  section of the application and able to manage various aspects of the app.</p>
+
+ <p>Details:</p>
+ <ul>
+  <li>Actors are described in the <a href="user-needs.html">user
+  needs</a> document.</li>
+
+  <li>The <a href="use-case-suite.html">use case suite</a> lists all
+  use cases in an organized way.</li>
+
+ </ul>
+ </div> <!-- /usecases -->
+
+
+
+ <div id="functional">
+ <h3>Functional Requirements</h3>
+
+ <p>The main functional requirement of the web-application is to allow users to
+  create tasks and organize them. In addition, adminstrative users are to be
+  allowed to manage various aspects of the web-application.
+ </p>
+
+ <p>Details:</p>
+ <ul>
+  <li>The <a href="feature-set.html">feature set</a> lists all
+   features in an organized way.</li>
+ </ul>
+ </div> <!-- /functional -->
+
+ <div id="nonfunctional">
+ <h3>Non-Functional Requirements</h3>
+
+ <div class="todo" style="display: none;">
+  TODO: Describe the non-functional requirements for this release.
+  Some examples are provided below.
+ </div>
+
+ <dl>
+
+  <dt>Usability Requirements</dt>
+
+  <dd class="sample1">
+    <dl>
+      <dt>User Interface Design</dt>
+      <dd>
+        <p>Consistency is a paramount requirment in user interface design. Throughout the application, the design should maintain a cohesive and unified appearance. This consistency extends to color schemes, fonts, and layout elements.</p>
+
+        <p>The user interface must be intuitive. Users should be able to perform common tasks seamlessly without the need for extensive training. Navigation elements and interactions should be clear and self-explanatory.</p>
+
+        <p>The user interface should be responsive. The application should promptly respond to user actions, offering immediate feedback.</p>
+      </dd>
+
+      <dt>Navigation</dt>
+
+      <dd>
+        <p>Efficient task entry is a core aspect of the system's usability. Adding a new task should be a straightforward process, achievable with a maximum of two clicks. The task entry form must be easily accessible from any screen within the application.</p>
+
+        <p>Managing tasks should be intuitive. Users should be able to effortlessly edit or delete tasks through a clear and accessible interface. Support for drag-and-drop functionality for task prioritization and sorting is essential.</p>
+      </dd>
+
+      <dt>Accessibility</dt>
+      <dd>
+        <p>The web-application must be compatible with major web browsers, including Chrome, Firefox, Safari, and Edge. The system should be mobile responsives.</p>
+
+        <p>Accessibility considerations should be integrated into the design. In particular, customizable font size settings should be available to the user.</p>
+      </dd>
+    </dl>
+  </dd>
+
+
+  <dt>Reliability and Uptime</dt>
+
+  <dd class="sample1">
+   <p>The web-app's server should have an uptime of 99.9%. The web-application
+    itself should be compatible with modern browsers running on relatively recent desktop, laptops and mobile devices.</p>
+  </dd>
+
+  <dt>Security Requirements</dt>
+
+  <dd class="sample1">
+    <p>The security of the web-app will be checked against the <a href="https://owasp.org/www-project-top-ten/">OWASP Top Ten</a>.</p>
+  </dd>
+ </dl>
+ </div> <!-- /nonfunctional -->
+
+
+ <div id="environmental">
+ <h3>Environmental Requirements</h3>
+
+ <div class="todo" style="display: none;">
+  TODO: Describe the environmental requirements for this release.
+  Environmental requirements describe the larger system of hardware,
+  software, and data that this product must work within.  Some
+  examples are provided below.
+ </div>
+
+ <dl>
+
+  <dt>Hardware Requirements</dt>
+
+  <dd class="sample1">
+   <p>A majority of the users will be using their work desktop or laptop. Modern work machines have enough computing power to run day-to-day tasks including modern browers from which the web-application will be accessed. Outside of their work machines, users will access the application through a mobile browser on their personal smart phones.</p>
+  </dd>
+
+
+  <dt>System Software Requirements?</dt>
+
+  <dd class="sample1">
+   <p>The web-application require an modern browser running on desktop, laptop or mobile device.</p>
+  </dd>
+
+
+
+ </dl>
+
+ </div> <!-- /environmental -->
+
+</div>
+
+
+ <div class="todo" style="display: none;">
+  TODO:  Check for <a
+  href="http://readyset.tigris.org/words-of-wisdom/srs.html">words
+  of wisdom</a> and discuss ways to improve this template.
+  Or, evaluate the ReadySET Pro <a title="pro use case template and sample test plan"
+  href="http://www.readysetpro.com/">professional software requirements specification template</a>.
+ </div>
+
+<div class="legal1">Company Proprietary</div>
+
+<div class="footnote">
+ Copyright &#169; 2003-2004 Jason Robbins.  All rights reserved. <a href="readyset-license.html">License terms</a>.
+ Retain this copyright statement whenever this file is used as a
+ template.
+</div>
+
+</div>
+</body>
+</html>

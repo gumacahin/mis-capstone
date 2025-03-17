@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//Tigris//DTD XHTML 1.0 Transitional//EN"
+"http://style.tigris.org/tigris_transitional.dtd">
+<html>
+<head>
+ <style type="text/css">
+/* <![CDATA[ */
+@import "css/readyset.css";
+@import "css/inst.css";
+/*  ]]> */
+
+.drawtheline { border-bottom: solid 1px black; margin-bottom: 1em; }
+
+ </style>
+
+<link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+ <title>Feature Set</title>
+</head>
+
+<body>
+<div class="app">
+<div class="readyset">
+
+
+<h2><a href="srs.html">SRS</a> &gt; Feature Set</h2>
+
+ <div id="releaseinfo">
+ <h3>Release Information</h3>
+ <table border="1" cellpadding="3" cellspacing="2" class="axial">
+  <tr>
+   <th>Project:</th>
+   <td><a href="index.html">IS295</a></td>
+  </tr>
+  <tr>
+   <th>Internal Release Number:</th>
+   <td>1.0.0</td>
+  </tr>
+  <tr>
+   <th>Related Documents:</th>
+   <td>
+    <div><a href="proposal.html">Project proposal</a> &gt;
+         <a href="user-needs.html">User needs</a></div>
+    <div><a href="srs.html">SRS</a> &gt;
+         <a href="use-case-suite.html">Use case suite</a></div>
+    <!-- <div><a href="feature-format.html">Feature format</a></div>
+    <div><a href="LINK-TO-DIAGRAM">Use case diagram</a></div>
+    <div>LINKS TO RELEVANT STANDARDS</div>
+    <div>LINKS TO OTHER DOCUMENTS</div> -->
+   </td>
+  </tr>
+ </table>
+ </div> <!-- /releaseinfo -->
+
+ <div id="processimpact" style="display:block">
+  <b>NOTE:</b> Unless noted otherwise, each of the system's features have a
+  voice enabled interface, i.e, user is able to use voice to interact with
+  interactive elements on screen using voice commands in a conversational manner.
+  Use cases that belong to features that support voice enabled interace are
+  rendered on devices' screens and voice prompts, AI generated voice prompts
+  are available to help users interact with UI elements.
+ </div> <!-- /processimpact -->
+
+<div class="todo" style="display:none"> TODO: Before writing individual feature
+  descriptions, list all the features that you think you will need.
+  Organize them so that missing features appear as blanks on this
+  page, and extra features will appear to be extras that don't
+  fit anywhere.  See the <a href="feature-format.html#checklist">feature
+  format</a> document for more tips on specifying features and feature
+  sets.
+</div>
+
+<div class="tip" style="display:none">
+ TIP: Refer back to the user stories in your <a
+ href="user-needs.html">user needs</a> document and to the <a
+ href="use-case-suite.html">use case suite</a>.  Use them for ideas and
+ make sure that you cover all of them.
+</div>
+
+
+
+<div id="bypriority">
+<h3>Features by Release and Priority</h3>
+
+<div class="todo" style="display:none">
+ TODO: Select subset of features can be implemented for a given
+ release.  When features are listed in priority order, choosing the
+ features to implement in a release simply becomes a matter of
+ "drawing a line": features below the line must wait for a later
+ release.  Make sure to also consider estimated effort and risk.
+</div>
+
+
+<ul>
+ <li class="drawtheline">Release 1.0
+ <ul>
+ <li>Essential
+  <ul>
+   <li><a href="features.html#F-00">F-00</a> User registration</li>
+   <li><a href="features.html#F-01">F-01</a> Site configuration</li>
+   <li><a href="features.html#F-11">F-11</a> Task configuration (creating, editing, deleting, tracking, archiving, viewing completed tasks, viewing overdue tasks, labeling and prioritizing)</li>
+   <li><a href="features.html#F-21">F-21</a> Personal scheduling</li>
+   <li><a href="features.html#F-31">F-31</a> Reminders and notifications</li>
+   <li><a href="features.html#F-12">F-12</a> Suggested tasks (daily recurring or based on analytics)</li>
+   <li><a href="features.html#F-41">F-41</a> Productivity report (daily, weekly, monthy, yearly) with analytics</li>
+   <li><a href="features.html#F-51">F-51</a> Device synching</li>
+   <li><a href="features.html#F-60">F-60</a> Admin area</li>
+  </ul>
+ </li>
+
+ <li>Desired
+  <ul>
+   <li><a href="features.html#F-42">F-42</a> Energy tracking (includes time tracking)</li>
+   <li><a href="features.html#F-52">F-52</a> Application integration</li>
+  </ul>
+ </li>
+ </ul>
+ </li>
+
+ <li class="drawtheline">Later Releases
+ <ul>
+ <li>Optional
+  <ul>
+   <li><a href="features.html#F-53">F-53</a> Integration with Google Calendar (University's activities)</li>
+   <li><a href="features.html#F-54">F-54</a> Integration with OUIC (Internal communication)</li>
+   <li><a href="features.html#F-13">F-13</a> Task collaborations with messaging and commenting</li>
+   <li><a href="features.html#F-22">F-22</a> Group scheduling</li>
+   <li><a href="features.html#F-42">F-42</a> Energy tracking (includes time tracking)</li>
+   <li><a href="features.html#F-43">F-43</a> Motivation system</li>
+  </ul>
+ </li>
+</ul>
+ </div> <!-- /bypriority -->
+
+
+
+
+<div id="byrisk">
+<h3>Features by Release and Risk</h3>
+
+<ul>
+ <li class="drawtheline">Release 1.0
+ <ul>
+   <li><a href="features.html#F-00">F-00</a> Safe : User registration</li>
+   <li><a href="features.html#F-01">F-01</a> Safe : Site configuration</li>
+   <li><a href="features.html#F-11">F-11</a> Safe : Task configuration (creating, editing, deleting, tracking, archiving, viewing completed tasks, viewing overdue tasks, labeling and prioritizing)</li>
+   <li><a href="features.html#F-21">F-21</a> Safe : Personal scheduling</li>
+   <li><a href="features.html#F-31">F-31</a> Safe : Reminders and notifications</li>
+   <li><a href="features.html#F-12">F-12</a> Safe : Suggested tasks (daily recurring or based on analytics)</li>
+   <li><a href="features.html#F-41">F-41</a> Safe : Productivity report (daily, weekly, monthy, yearly) with analytics</li>
+   <li><a href="features.html#F-51">F-51</a> Device synching</li>
+   <li><a href="features.html#F-42">F-42</a> Energy tracking (includes time tracking)</li>
+   <li><a href="features.html#F-52">F-52</a> Application integration</li>
+   <li><a href="features.html#F-60">F-60</a> Admin area</li>
+   <li>Total unique risk factors: 0</li>
+ </ul>
+ </li>
+
+ <li>Later Releases
+ <ul>
+   <li><a href="features.html#F-53">F-53</a> Safe : Integration with Google Calendar (University's activities)</li>
+   <li><a href="features.html#F-54">F-54</a> Safe : Integration with OUIC (Internal communication)</li>
+   <li><a href="features.html#F-13">F-13</a> Safe : Task collaborations with messaging and commenting</li>
+   <li><a href="features.html#F-22">F-22</a> Safe : Group scheduling</li>
+   <li><a href="features.html#F-42">F-42</a> Safe : Energy tracking (includes time tracking)</li>
+   <li><a href="features.html#F-43">F-43</a> Safe : Motivation system</li>
+   <li>Total unique risk factors: 0</li>
+ </ul>
+ </li>
+
+</ul>
+ </div> <!-- /byrisk -->
+
+
+
+<div id="byfunction">
+<h3>Features by Functional Area</h3>
+
+<ul>
+ <li id="function-getting-started">GETTING STARTED
+  <ul>
+   <li><a href="features.html#F-00">F-00</a> User registration</li>
+   <li><a href="features.html#F-01">F-01</a> Site configuration</li>
+  </ul>
+ </li>
+
+ <li id="function-tasks">TASKS
+  <ul>
+   <li><a href="features.html#F-11">F-11</a> Task configuration (creating, editing, deleting, tracking, archiving, viewing completed tasks, viewing overdue tasks, labeling and prioritizing)</li>
+   <li><a href="features.html#F-12">F-12</a> Suggested tasks (daily recurring or based on analytics)</li>
+   <li><a href="features.html#F-13">F-13</a> Task collaborations with messaging and commenting</li>
+  </ul>
+ </li>
+
+ <li id="function-scheduling">SCHEDULING
+  <ul>
+   <li><a href="features.html#F-21">F-21</a> Personal scheduling</li>
+   <li><a href="features.html#F-22">F-22</a> Group Scheduling</li>
+  </ul>
+ </li>
+
+ <li id="function-reminders">REMINDERS
+  <ul>
+   <li><a href="features.html#F-31">F-31</a> Reminders and notifications</li>
+  </ul>
+ </li>
+
+ <li id="function-reports-rewards">REPORTS AND REWARDS
+  <ul>
+   <li><a href="features.html#F-41">F-41</a> Productivity report (daily, monthly, yearly) with analytics</li>
+   <li><a href="features.html#F-42">F-42</a> Energy tracking (includes time tracking)</li>
+   <li><a href="features.html#F-43">F-43</a> Motivation system</li>
+  </ul>
+ </li>
+
+ <li id="function-synching-integration">SYNCHING AND INTEGRATION
+  <ul>
+   <li><a href="features.html#F-51">F-51</a> Device Synching</li>
+   <li><a href="features.html#F-52">F-52</a> Application integration</li>
+   <li><a href="features.html#F-53">F-53</a> Integration with Google Calendar (University's activities)</li>
+   <li><a href="features.html#F-54">F-54</a> Integration with OUIC (Internal communication)</li>
+  </ul>
+ </li>
+
+ <li>SITE ADMINISTRATION
+  <ul>
+   <li><a href="features.html#F-60">F-60</a> Admin area</li>
+  </ul>
+ </li>
+
+
+</ul>
+ </div> <!-- /byfunction -->
+
+
+
+</div>
+
+  <div class="todo" style="display:none">
+  TODO:  Check for <a
+  href="http://readyset.tigris.org/words-of-wisdom/feature-set.html">words
+  of wisdom</a> and discuss ways to improve this template.
+  Or, evaluate the ReadySET Pro <a title="pro use case template and sample test plan"
+  href="http://www.readysetpro.com/">professional feature set template</a>.
+  </div>
+
+<div class="legal1">Company Proprietary</div>
+
+<div class="footnote">
+ Copyright &#169; 2003-2004 Jason Robbins.  All rights reserved. <a href="readyset-license.html">License terms</a>.
+ Retain this copyright statement whenever this file is used as a
+ template.
+</div>
+
+</div>
+</body>
+</html>
