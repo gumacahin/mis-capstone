@@ -9,7 +9,7 @@ const REACT_APP_AUTH0_DOMAIN = "dev-tbs5lvhtbsscsnn5.us.auth0.com";
 const REACT_APP_AUTH0_AUDIENCE = "http://todoappdev/api";
 const REACT_APP_AUTH0_SCOPE = "";
 const REACT_APP_AUTH0_CLIENTID = "rN7LAyREwX1U1xMm2Y9Zo7GaEgE7c1bq";
-const REACT_APP_BASE_URL = "http://localhost:5173/";
+const REACT_APP_BASE_URL = "http://localhost:3000/";
 
 // Populate process.env with values from .env file
 // TODO: Use env vars
