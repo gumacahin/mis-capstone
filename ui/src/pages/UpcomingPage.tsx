@@ -30,15 +30,10 @@ const getWeekDatesFromDate = (date: Date) => {
   const today = dayjs();
   const dates = [];
   for (let i = 0; i < 7; i++) {
-    const dayOfWeek = startOfWeek.add(i, "day");
-    if (dayOfWeek.isAfter(today, "day") || dayOfWeek.isSame(today, "day")) {
-      dates.push(dayOfWeek.toDate());
+    const currentDate = startOfWeek.add(i, "day");
+    if (currentDate.isAfter(today, "day") || currentDate.isSame(today, "day")) {
+      dates.push(currentDate.toDate());
     }
-  }
-  const lastDay = dayjs(dates[dates.length - 1]);
-  for (let i = 1; dates.length < 7; i++) {
-    const dayOfWeek = lastDay.add(i, "day");
-    dates.push(dayOfWeek.toDate());
   }
   return dates;
 };
