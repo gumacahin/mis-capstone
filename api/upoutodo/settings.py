@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "todo",
     "dal",
     "dal_select2",
-    "upoutodo.api.apps.UpoutodoConfig",
+    "upoutodo.api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [
