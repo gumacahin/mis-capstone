@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "upoutodo.api.apps.ApiConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,10 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "rest_framework",
     "corsheaders",
-    "todo",
-    "dal",
-    "dal_select2",
-    "upoutodo.api.apps.ApiConfig",
+    "taggit",
 ]
 
 MIDDLEWARE = [

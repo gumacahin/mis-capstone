@@ -1,14 +1,33 @@
 # signals.py
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from todo.models import TaskList
+
+from upoutodo.api.models import Project, ProjectSection, UserProfile
 
 
 @receiver(post_save, sender=User)
-def create_user_group(sender, instance, created, **kwargs):
+def setup_user_inbox(sender, instance, created, **kwargs):
+    """The default project is the user's inbox."""
     if created:
-        group_name = instance.username
-        group = Group.objects.create(name=group_name)
-        instance.groups.add(group)
-        TaskList.objects.create(name="Inbox", slug="inbox", group=group)
+        username = instance.username
+        Project.objects.create(
+            title=username, is_default=True, created_by=instance, updated_by=instance
+        )
+
+
+@receiver(post_save, sender=User)
+def setup_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+        # TODO: send email
+
+
+@receiver(post_save, sender=Project)
+def setup_default_project_section(sender, instance, created, **kwargs):
+    if created:
+        ProjectSection.objects.create(
+            title=Project.DEFAULT_PROJECT_SECTION_TITLE,
+            project=instance,
+            is_default=True,
+        )

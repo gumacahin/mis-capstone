@@ -17,4 +17,9 @@ shell:
 	cd api; \
 	poetry run python manage.py shell; \
 
+.PHONY: test
+test:
+	cd api; \
+	poetry run pytest; \
+
 
