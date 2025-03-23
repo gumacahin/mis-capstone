@@ -27,6 +27,7 @@ import type { FormValues } from "./AddTodoDialog";
 
 type DueDatePickerProps = DateCalendarProps<Dayjs> & {
   control: Control<FormValues>;
+  dueDate: Dayjs | null;
 };
 
 export default function DueDatePicker(props: DueDatePickerProps) {
@@ -44,6 +45,7 @@ export default function DueDatePicker(props: DueDatePickerProps) {
   const id = open ? "calendar-popover" : undefined;
 
   const formatDayOfWeek = (date: Dayjs | null) => {
+    console.log("formatDayOfWeek", date);
     if (date === null) {
       return "No due date";
     }

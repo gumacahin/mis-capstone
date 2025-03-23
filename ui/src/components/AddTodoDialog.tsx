@@ -30,7 +30,7 @@ export default function AddTodoDialog({
 }) {
   const addTask = useAddTask();
 
-  const { control, register, handleSubmit } = useForm<FormValues>({
+  const { control, register, handleSubmit, watch } = useForm<FormValues>({
     defaultValues: {
       title: "",
       description: "",
@@ -42,8 +42,12 @@ export default function AddTodoDialog({
     const data: ITask = {
       title: formValues.title,
       description: formValues.description,
-      due_date: null,
+      due_date:
+        formValues.due_date != null
+          ? formValues.due_date.format("YYYY-MM-DD")
+          : null,
     };
+    // return;
     toast.promise(addTask.mutateAsync(data), {
       loading: "Adding task...",
       success: "Task added successfully!",
@@ -51,6 +55,8 @@ export default function AddTodoDialog({
     });
     handleClose();
   };
+
+  const dueDate = watch("due_date");
 
   return (
     <Dialog
@@ -84,7 +90,7 @@ export default function AddTodoDialog({
             variant="standard"
             {...register("description")}
           />
-          <DueDatePicker control={control} />
+          <DueDatePicker control={control} dueDate={dueDate} />
         </Stack>
       </DialogContent>
       <DialogActions>
