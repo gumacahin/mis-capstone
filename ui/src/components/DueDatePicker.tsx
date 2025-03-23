@@ -14,19 +14,22 @@ import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import {
+  DateCalendar,
+  type DateCalendarProps,
+} from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { MouseEvent, useState } from "react";
+import { type Control, Controller } from "react-hook-form";
 
-export default function DueDatePicker({
-  defaultValue,
-}: {
-  defaultValue?: Date;
-}) {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    defaultValue ? dayjs(defaultValue).toDate() : null,
-  );
+import type { FormValues } from "./AddTodoDialog";
+
+type DueDatePickerProps = DateCalendarProps<Dayjs> & {
+  control: Control<FormValues>;
+};
+
+export default function DueDatePicker(props: DueDatePickerProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -36,12 +39,11 @@ export default function DueDatePicker({
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const open = Boolean(anchorEl);
 
   const id = open ? "calendar-popover" : undefined;
 
-  const formatDayOfWeek = (date: Date | null) => {
+  const formatDayOfWeek = (date: Dayjs | null) => {
     if (date === null) {
       return "No due date";
     }
@@ -62,128 +64,133 @@ export default function DueDatePicker({
   };
 
   return (
-    <>
-      <input
-        type="hidden"
-        name="due_date"
-        value={selectedDate ? dayjs(selectedDate).format("YYYY-MM-DD") : ""}
-      />
-      <ButtonGroup variant="outlined" size="small">
-        <Button variant="outlined" onClick={handleClick} size="small">
-          {formatDayOfWeek(selectedDate)}
-        </Button>
-        {selectedDate && (
-          <Button
-            variant="outlined"
-            onClick={() => {
-              setSelectedDate(null);
-            }}
-          >
-            <CloseIcon />
-          </Button>
-        )}
-      </ButtonGroup>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-      >
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                setSelectedDate(dayjs().toDate());
-                handleClose();
-              }}
-            >
-              <ListItemIcon>
-                <TodayIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Today"} />
-              <ListItemSecondaryAction>
-                {dayjs().format("ddd")}
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                setSelectedDate(dayjs().add(1, "day").toDate());
-                handleClose();
-              }}
-            >
-              <ListItemIcon>
-                <WbSunnyIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Tomorrow"} />
-              <ListItemSecondaryAction>
-                {dayjs().add(1, "day").format("ddd")}
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                setSelectedDate(dayjs().startOf("week").add(6, "day").toDate());
-                handleClose();
-              }}
-            >
-              <ListItemIcon>
-                <WeekendIcon />
-              </ListItemIcon>
-              <ListItemText primary={"This weekend"} />
-              <ListItemSecondaryAction>
-                {dayjs().startOf("week").add(6, "day").format("ddd")}
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                setSelectedDate(dayjs().add(7, "day").toDate());
-                handleClose();
-              }}
-            >
-              <ListItemIcon>
-                <NextWeekIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Next Week"} />
-              <ListItemSecondaryAction>
-                {dayjs().add(7, "day").format("ddd MMM D")}{" "}
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </ListItem>
-          {selectedDate && (
-            <ListItem disablePadding>
-              <ListItemButton
+    <Controller
+      name="due_date"
+      control={props.control}
+      render={({ field }) => (
+        <>
+          <ButtonGroup variant="outlined" size="small">
+            <Button variant="outlined" onClick={handleClick} size="small">
+              {formatDayOfWeek(props.dueDate)}
+            </Button>
+            {field.value && (
+              <Button
+                variant="outlined"
                 onClick={() => {
-                  setSelectedDate(null);
-                  handleClose();
+                  field.onChange(null);
                 }}
               >
-                <ListItemIcon>
-                  <NotInterestedIcon />
-                </ListItemIcon>
-                <ListItemText primary={"No date"} />
-              </ListItemButton>
-            </ListItem>
-          )}
-        </List>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateCalendar
-            disablePast
-            onChange={(date) => {
-              setSelectedDate(date);
-              handleClose();
+                <CloseIcon />
+              </Button>
+            )}
+          </ButtonGroup>
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "left",
             }}
-          />
-        </LocalizationProvider>
-      </Popover>
-    </>
+          >
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    field.onChange(dayjs());
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <TodayIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Today"} />
+                  <ListItemSecondaryAction>
+                    {dayjs().format("ddd")}
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    const tomorrow = dayjs().add(1, "day");
+                    field.onChange(tomorrow);
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <WbSunnyIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Tomorrow"} />
+                  <ListItemSecondaryAction>
+                    {dayjs().add(1, "day").format("ddd")}
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    const weekend = dayjs().startOf("week").add(6, "day");
+                    field.onChange(weekend);
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <WeekendIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"This weekend"} />
+                  <ListItemSecondaryAction>
+                    {dayjs().startOf("week").add(6, "day").format("ddd")}
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    const nextWeek = dayjs().add(7, "day");
+                    field.onChange(nextWeek);
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <NextWeekIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Next Week"} />
+                  <ListItemSecondaryAction>
+                    {dayjs().add(7, "day").format("ddd MMM D")}{" "}
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              </ListItem>
+              {field.value && (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      field.onChange(null);
+                      handleClose();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <NotInterestedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"No date"} />
+                  </ListItemButton>
+                </ListItem>
+              )}
+            </List>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateCalendar
+                disablePast
+                value={field.value}
+                onChange={(newDate) => {
+                  field.onChange(newDate);
+                  handleClose();
+                }}
+              />
+            </LocalizationProvider>
+          </Popover>
+        </>
+      )}
+    />
   );
 }

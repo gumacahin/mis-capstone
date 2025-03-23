@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 
-import type { IComment, ITask } from "./types/common";
+import type { IComment, IProject, ITask } from "./types/common";
 
 const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
@@ -56,7 +56,7 @@ export const useInboxTasks = () => {
   return useQuery({
     queryKey: ["tasks", "inbox"],
     queryFn: async () => {
-      const { data } = await apiClient.get("tasks/?inbox=1");
+      const { data } = await apiClient.get("projects/inbox/");
       return data;
     },
   });
@@ -230,6 +230,43 @@ export const useDeleteTask = (task: ITask) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
+export const useProjects = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`/projects/`);
+      return data;
+    },
+  });
+};
+
+export const useProject = (projectId: number) => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["project", { projectId }],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`/projects/${projectId}`);
+      return data;
+    },
+  });
+};
+
+export const useAddProject = () => {
+  const queryClient = useQueryClient();
+  const apiClient = useApiClient();
+  return useMutation({
+    mutationKey: ["addProject"],
+    mutationFn: async (project: IProject) => {
+      const response = await apiClient.post("/projects/", project);
+      return response.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 };

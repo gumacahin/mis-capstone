@@ -5,12 +5,21 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import type { FormEvent } from "react";
+import { Dayjs } from "dayjs";
+// import type { FormEvent } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useAddTask } from "../api";
 import type { ITask } from "../types/common";
 import DueDatePicker from "./DueDatePicker";
+
+export type FormValues = {
+  title: string;
+  description: string | null;
+  due_date: Dayjs | null;
+  section: number | null;
+};
 
 export default function AddTodoDialog({
   open,
@@ -21,11 +30,21 @@ export default function AddTodoDialog({
 }) {
   const addTask = useAddTask();
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const newTask = Object.fromEntries(formData.entries()) as unknown as ITask;
-    toast.promise(addTask.mutateAsync(newTask), {
+  const { control, register, handleSubmit } = useForm<FormValues>({
+    defaultValues: {
+      title: "",
+      description: "",
+      due_date: null,
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormValues> = async (formValues) => {
+    const data: ITask = {
+      title: formValues.title,
+      description: formValues.description,
+      due_date: null,
+    };
+    toast.promise(addTask.mutateAsync(data), {
       loading: "Adding task...",
       success: "Task added successfully!",
       error: "Error adding task.",
@@ -38,7 +57,7 @@ export default function AddTodoDialog({
       open={open}
       PaperProps={{
         component: "form",
-        onSubmit: handleSubmit,
+        onSubmit: handleSubmit(onSubmit),
         sx: { minWidth: { xs: "100vw", sm: 600 } },
       }}
     >
@@ -49,28 +68,23 @@ export default function AddTodoDialog({
             required
             margin="dense"
             id="title"
-            name="title"
             label="Task name"
             type="text"
             fullWidth
             variant="standard"
+            {...register("title")}
           />
           <TextField
             multiline
             margin="dense"
             id="desciption"
-            name="note"
             label="Description"
             type="text"
             fullWidth
             variant="standard"
+            {...register("description")}
           />
-          <DueDatePicker
-            name="due_date"
-            label="Due Date"
-            // onChange={handleDateChange}
-            // value={dueDate}
-          />
+          <DueDatePicker control={control} />
         </Stack>
       </DialogContent>
       <DialogActions>
