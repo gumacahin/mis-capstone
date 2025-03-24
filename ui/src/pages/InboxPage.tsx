@@ -1,45 +1,54 @@
 import { Alert, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 
 import { useInboxTasks } from "../api";
-import AddTodoButton from "../components/AddTodoButton";
+import PageLayout from "../components/PageLayout";
+import ProjectView from "../components/ProjectView";
+import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
-import TaskList from "../components/TaskList";
-import type { ITask } from "../types/common";
 
 export default function InboxPage() {
-  const { isPending, isError, data } = useInboxTasks();
-  const tasks: ITask[] = data?.results ?? [];
+  const { isPending, isError, data: project } = useInboxTasks();
+  const pageTitle = "Inbox";
+
+  if (isError) {
+    return (
+      <PageLayout>
+        <Alert severity="error">Failed to load inbox</Alert>
+      </PageLayout>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <PageLayout>
+        <SkeletonList count={5} width={250} />
+      </PageLayout>
+    );
+  }
+
   return (
-    <Box display={"flex"} flexDirection={"column"} height="100vh">
-      <Box padding={3} flex="0 1 auto">
-        <Typography my={3} variant={"h5"} component={"h2"}>
-          Inbox
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          flex: "1 1 auto",
-          width: "100%",
-          overflowX: "auto",
-          paddingX: 3,
-        }}
-      >
-        <Box overflow={"auto"}>
-          <Box maxWidth={600} mx={"auto"}>
-            {isPending ? (
-              <SkeletonList count={5} width={250} />
-            ) : isError ? (
-              <Alert severity="error">Failed to load tasks</Alert>
-            ) : (
-              <>
-                <TaskList tasks={tasks} />
-                <AddTodoButton />
-              </>
-            )}
+    <PageLayout>
+      <Stack spacing={2}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box display={"flex"} alignItems={"center"}>
+            <Typography fontSize={32} variant={"h1"}>
+              {pageTitle}
+            </Typography>
           </Box>
+          <ProjectViewMenu project={project} />
         </Box>
-      </Box>
-    </Box>
+        <Box
+          sx={[
+            project.view === "list" && {
+              mx: 6,
+            },
+          ]}
+        >
+          <ProjectView project={project} />
+        </Box>
+      </Stack>
+    </PageLayout>
   );
 }

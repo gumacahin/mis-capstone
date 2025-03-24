@@ -9,22 +9,21 @@ import ListItemText from "@mui/material/ListItemText";
 import dayjs from "dayjs";
 import { useState } from "react";
 
-// import Divider from '@mui/material/Divider';
-import type { Task } from "../types/common";
+import type { ISection, ITask } from "../types/common";
 import TaskCheckIcon from "./TaskCheckIcon";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
 export default function TaskList({
-  tasks,
+  section,
   hideDueDates,
 }: {
-  tasks: Task[];
+  section: ISection;
   hideDueDates?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [task, setTask] = useState<Task | null>(null);
-
-  const handleOpenTask = (task: Task) => {
+  const [task, setTask] = useState<ITask | null>(null);
+  const tasks = section.tasks;
+  const handleOpenTask = (task: ITask) => {
     setTask(task);
     setOpen(true);
   };
@@ -42,7 +41,7 @@ export default function TaskList({
         />
       )}
       <List>
-        {tasks.map((task: Task) => {
+        {tasks.map((task: ITask) => {
           const isOverdue =
             task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
           return (
@@ -60,13 +59,13 @@ export default function TaskList({
                 }}
               >
                 <ListItemIcon>
-                  <TaskCheckIcon task={task} />
+                  <TaskCheckIcon task={task} projectId={section.project} />
                 </ListItemIcon>
                 <ListItemText
                   primary={
                     <Typography
                       sx={{
-                        textDecoration: task.completed
+                        textDecoration: task.completion_date
                           ? "line-through"
                           : "default",
                       }}
@@ -78,12 +77,12 @@ export default function TaskList({
                     <>
                       <Typography
                         sx={{
-                          textDecoration: task.completed
+                          textDecoration: task.completion_date
                             ? "line-through"
                             : "default",
                         }}
                       >
-                        {task.note}
+                        {task.description}
                       </Typography>
                       {!hideDueDates && task.due_date && (
                         <Box
@@ -99,8 +98,10 @@ export default function TaskList({
                       )}
                     </>
                   }
-                  primaryTypographyProps={{ component: "div" }}
-                  secondaryTypographyProps={{ component: "div" }}
+                  slotProps={{
+                    primary: { component: "div" },
+                    secondary: { component: "div" },
+                  }}
                 />
               </ListItemButton>
             </ListItem>

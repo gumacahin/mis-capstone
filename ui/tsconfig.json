@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "eslint.config.js"],
+  "include": ["src", "eslint.config.js", "src/components/DueDatePicker.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

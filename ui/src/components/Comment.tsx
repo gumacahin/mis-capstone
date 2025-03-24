@@ -70,29 +70,37 @@ export default function Comment({
 
   if (isEditing) {
     return (
-      <Stack my={3} spacing={1} component={"form"} onSubmit={handleSubmit}>
-        <TextField
-          id="comment"
-          label="Comment"
-          name="body"
-          multiline
-          fullWidth
-          value={editedComment}
-          onChange={(e) => {
-            setEditedComment(e.target.value);
-          }}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-        />
-        <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
-          <Button onClick={handleCloseEdit} variant="text">
-            Cancel
-          </Button>
-          <Button disabled={isLoading} variant="contained" type="submit">
-            Update Comment
-          </Button>
+      <ListItem key={comment.id}>
+        <Stack
+          width={"100%"}
+          my={3}
+          spacing={1}
+          component={"form"}
+          onSubmit={handleSubmit}
+        >
+          <TextField
+            id="comment"
+            label="Comment"
+            name="body"
+            multiline
+            fullWidth
+            value={editedComment}
+            onChange={(e) => {
+              setEditedComment(e.target.value);
+            }}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+          <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
+            <Button onClick={handleCloseEdit} variant="text">
+              Cancel
+            </Button>
+            <Button disabled={isLoading} variant="outlined" type="submit">
+              Update Comment
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
+      </ListItem>
     );
   }
   const commentBelongsToUser = comment.author_id === userId;

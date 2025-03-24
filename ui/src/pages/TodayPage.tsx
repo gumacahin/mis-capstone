@@ -10,7 +10,7 @@ import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 
 import { useTasksToday } from "../api";
-import AddTodoButton from "../components/AddTodoButton";
+import AddTaskButton from "../components/AddTaskButton";
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
@@ -81,7 +81,7 @@ function TaskListToday({ tasks }: { tasks: ITask[] }) {
           <TaskList tasks={todayTasks} />
         </>
       )}
-      <AddTodoButton dueDate={dayjs().toDate()} />
+      <AddTaskButton dueDate={dayjs().toDate()} />
     </>
   );
 }

@@ -3,7 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 
-import type { IComment, IProject, ITask } from "./types/common";
+import type {
+  IComment,
+  IPaginatedResponse,
+  IProject,
+  ISection,
+  ITask,
+  ProjectViewType,
+} from "./types/common";
 
 const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
@@ -54,7 +61,7 @@ export const useTasksToday = () => {
 export const useInboxTasks = () => {
   const apiClient = useApiClient();
   return useQuery({
-    queryKey: ["tasks", "inbox"],
+    queryKey: ["projects", "inbox"],
     queryFn: async () => {
       const { data } = await apiClient.get("projects/inbox/");
       return data;
@@ -100,7 +107,7 @@ export const useTasks = (start: Date, end: Date) => {
   });
 };
 
-export const useAddTask = () => {
+export const useAddTask = (projectId?: number) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
@@ -111,22 +118,32 @@ export const useAddTask = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      if (projectId) {
+        console.log("Invalidating project", ["project", { projectId }]);
+        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      }
     },
   });
 };
 
-export const useUpdateTask = (task: ITask) => {
+export const useUpdateTask = (task: ITask, projectId?: number) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
+  const taskId = task.id;
   return useMutation({
-    mutationKey: ["updateTask", { taskId: task.id }],
-    mutationFn: async (updatedTask: ITask) => {
-      const result = await apiClient.put(`/tasks/${task.id}/`, updatedTask);
+    mutationKey: ["updateTask", { taskId }],
+    mutationFn: async (updatedTask: Partial<ITask>) => {
+      const result = await apiClient.patch(`/tasks/${task.id}/`, updatedTask);
       return result.data;
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["task", { task }] });
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["projects", "inbox"] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
     },
   });
 };
@@ -251,8 +268,10 @@ export const useProject = (projectId: number) => {
     queryKey: ["project", { projectId }],
     queryFn: async () => {
       const { data } = await apiClient.get(`/projects/${projectId}`);
-      return data;
+      return data as IProject;
     },
+    // FIXME: we will fix this when we migrate to tanstack/router
+    enabled: !!projectId,
   });
 };
 
@@ -267,6 +286,105 @@ export const useAddProject = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+};
+
+export const useUpdateProject = (projectId: number) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateProject", { projectId }],
+    mutationFn: async (data: Partial<IProject>) => {
+      const result = await apiClient.patch(`/projects/${projectId}/`, data);
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+    },
+  });
+};
+
+export const useDeleteProject = (project: IProject) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteProject", { projectId: project.id }],
+    mutationFn: async () => {
+      const result = await apiClient.delete(`/projects/${project.id}/`);
+      return result.data;
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["projects"] });
+      queryClient.setQueryData(
+        ["projects"],
+        (oldProjects: IPaginatedResponse<IProject> | undefined) => {
+          const newProjects = oldProjects?.results.filter(
+            (p) => p.id !== project.id,
+          );
+          return { ...oldProjects, results: newProjects };
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+};
+
+export const useUpdateProjectView = (project: IProject) => {
+  const queryClient = useQueryClient();
+  const apiClient = useApiClient();
+  return useMutation({
+    mutationKey: ["updateProjectView", { projectId: project.id }],
+    mutationFn: async (view: ProjectViewType) => {
+      const response = await apiClient.patch(`/projects/${project.id}/`, {
+        view,
+      });
+      return response.data;
+    },
+    onMutate: async (view: ProjectViewType) => {
+      await queryClient.cancelQueries({ queryKey: ["projects", "inbox"] });
+      if (project.is_default) {
+        queryClient.setQueryData(["projects", "inbox"], {
+          ...project,
+          view,
+        });
+      } else {
+        queryClient.setQueryData(["project", { projectId: project.id }], {
+          ...project,
+          view,
+        });
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+};
+
+export const useAddSection = (projectId: number, order: number) => {
+  console.log("useAddSection", projectId, order);
+  const queryClient = useQueryClient();
+  const apiClient = useApiClient();
+  return useMutation({
+    mutationKey: ["addSection", { projectId }],
+    mutationFn: async (project: Partial<ISection>) => {
+      const data = {
+        title: project.title,
+        project: projectId,
+        order: order,
+      };
+      const response = await apiClient.post("/project_sections/", data);
+      return response.data;
+    },
+    onSettled: () => {
+      if (projectId) {
+        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["projects", "inbox"] });
+      }
     },
   });
 };

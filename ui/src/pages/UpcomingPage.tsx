@@ -16,7 +16,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { MouseEvent, useState } from "react";
 
 import { useTasks, useTasksToday } from "../api";
-import AddTodoButton from "../components/AddTodoButton";
+import AddTaskButton from "../components/AddTaskButton";
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
@@ -248,7 +248,7 @@ export default function UpcomingPage() {
                       dayjs(task.due_date).isSame(dayjs(date)),
                     )}
                   />
-                  <AddTodoButton dueDate={date} />
+                  <AddTaskButton dueDate={date} />
                 </>
               )}
             </Box>

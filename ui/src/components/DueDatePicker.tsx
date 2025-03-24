@@ -23,7 +23,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { MouseEvent, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
-import type { FormValues } from "./AddTodoDialog";
+import type { FormValues } from "./AddTaskDialog";
 
 type DueDatePickerProps = DateCalendarProps<Dayjs> & {
   control: Control<FormValues>;
@@ -184,7 +184,7 @@ export default function DueDatePicker(props: DueDatePickerProps) {
               <DateCalendar
                 disablePast
                 value={field.value}
-                onChange={(newDate) => {
+                onChange={(newDate: Dayjs | null) => {
                   field.onChange(newDate);
                   handleClose();
                 }}

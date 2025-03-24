@@ -7,53 +7,55 @@ import dayjs from "dayjs";
 import { MouseEvent } from "react";
 import toast from "react-hot-toast";
 
-import { useTask, useUpdateTask } from "../api";
+import { useUpdateTask } from "../api";
 import type { ITask } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
+  projectId,
   disabled,
 }: {
   task: ITask;
   disabled?: boolean;
+  projectId: number;
 }) {
-  const updateTask = useUpdateTask(task);
-  const { isPending, isError, data } = useTask(task);
+  const updateTask = useUpdateTask(task, projectId);
+
+  const isTaskCompleted = task.completion_date !== null;
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    const updatedTask: ITask = {
-      ...data,
-      completed: !data.completed,
-      completed_date: data.completed ? "" : dayjs().format("YYYY-MM-DD"),
+
+    const data: Pick<ITask, "completion_date"> = {
+      completion_date: isTaskCompleted ? null : dayjs().format("YYYY-MM-DD"),
     };
-    toast.promise(updateTask.mutateAsync(updatedTask), {
+    toast.promise(updateTask.mutateAsync(data), {
       loading: "Updating task...",
       success: "Task updated successfully!",
       error: "Error updating task.",
     });
   };
 
-  if (isPending) {
-    return (
-      <IconButton sx={{ cursor: "not-allowed" }}>
-        <Skeleton variant="circular" width={24} height={24} />
-      </IconButton>
-    );
-  }
+  // if (isPending) {
+  //   return (
+  //     <IconButton sx={{ cursor: "not-allowed" }}>
+  //       <Skeleton variant="circular" width={24} height={24} />
+  //     </IconButton>
+  //   );
+  // }
 
-  if (isError) {
-    return (
-      <IconButton sx={{ cursor: "not-allowed" }}>
-        <ErrorOutlineIcon />
-      </IconButton>
-    );
-  }
+  // if (isError) {
+  //   return (
+  //     <IconButton sx={{ cursor: "not-allowed" }}>
+  //       <ErrorOutlineIcon />
+  //     </IconButton>
+  //   );
+  // }
 
   if (disabled) {
     return (
       <IconButton sx={{ cursor: "not-allowed" }}>
-        {data.completed ? (
+        {isTaskCompleted ? (
           <CheckCircleOutlineOutlinedIcon />
         ) : (
           <CircleOutlinedIcon />
@@ -64,7 +66,7 @@ export default function TaskCheckIcon({
 
   return (
     <IconButton onClick={handleClick}>
-      {data.completed ? (
+      {isTaskCompleted ? (
         <CheckCircleOutlineOutlinedIcon />
       ) : (
         <CircleOutlinedIcon />

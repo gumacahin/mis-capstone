@@ -34,8 +34,8 @@ factory-boy = "^3.3.3"
 profile = "black"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "upoutodo.settings"
-testpaths = ["upoutodo/api/tests"]
+DJANGO_SETTINGS_MODULE = "api.settings"
+testpaths = ["upoutodo/tests"]
 
 [build-system]
 requires = ["poetry-core"]

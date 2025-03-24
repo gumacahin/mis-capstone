@@ -11,17 +11,13 @@ export type jsonable =
   | { toJSON: () => jsonable };
 
 export interface ITask {
-  id: number;
+  id?: number;
   title: string;
-  assigned_to: string | null;
-  completed: boolean;
-  completed_date: string | null;
-  created_by: string;
-  created_date: string;
+  completion_date?: string | null;
+  description?: string | null;
   due_date: string | null;
-  note: string;
-  priority: number | null;
-  task_list: string;
+  priority?: number;
+  section?: number;
 }
 
 export interface IComment {
@@ -31,4 +27,36 @@ export interface IComment {
   author_name?: string;
   author_id?: number;
   task_id: number;
+}
+
+export type ProjectViewType = "list" | "board";
+export interface IProject {
+  id: number;
+  title: string;
+  view: ProjectViewType;
+  sections: ISection[];
+  is_default: boolean;
+}
+
+export interface ISection {
+  id: number;
+  title: string;
+  project: number;
+  is_default: boolean;
+  tasks: ITask[];
+  order: number;
+}
+
+export interface IPaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+export interface IProjectDetails {
+  id: number;
+  name: string;
+  view: "list" | "board";
+  sections: ISection[];
+  tasks: ITask[];
 }

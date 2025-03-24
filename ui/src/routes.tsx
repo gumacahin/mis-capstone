@@ -4,9 +4,31 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
+import ProjectsPage from "./pages/ProjectsPage";
 import SettingsPage from "./pages/SettingsPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
+
+const HOME = "home";
+const APP = "app";
+const TODAY = "today";
+const INBOX = "inbox";
+const UPCOMING = "upcoming";
+const PROJECTS = "projects";
+const PROJECT_DETAILS = "projectDetails";
+const SETTINGS = "settings";
+
+export const ROUTES = {
+  HOME,
+  APP,
+  TODAY,
+  INBOX,
+  UPCOMING,
+  PROJECTS,
+  PROJECT_DETAILS,
+  SETTINGS,
+};
 
 const routes = [
   {
@@ -16,36 +38,47 @@ const routes = [
       {
         index: true,
         element: <HomePage />,
-        name: "home",
+        name: ROUTES.HOME,
       },
       {
         path: "app",
-        name: "app",
+        name: ROUTES.APP,
         element: <ProtectedRoute />,
         children: [
           {
             index: true,
-            element: <Navigate to="/app/today" replace />,
+            element: <Navigate to="today" replace />,
           },
           {
             path: "today",
             element: <TodayPage />,
-            name: "today",
+            name: ROUTES.TODAY,
           },
           {
             path: "inbox",
             element: <InboxPage />,
-            name: "inbox",
+            name: ROUTES.INBOX,
           },
           {
             path: "upcoming",
             element: <UpcomingPage />,
-            name: "upcoming",
+            name: ROUTES.UPCOMING,
+          },
+          {
+            path: "projects",
+            element: <ProjectsPage />,
+            name: ROUTES.PROJECTS,
+            end: true,
+          },
+          {
+            path: "project/:projectId",
+            element: <ProjectDetailsPage />,
+            name: ROUTES.PROJECT_DETAILS,
           },
           {
             path: "settings",
             element: <SettingsPage />,
-            name: "settings",
+            name: ROUTES.SETTINGS,
           },
         ],
       },

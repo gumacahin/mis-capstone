@@ -2,7 +2,7 @@ import os
 
 from django.contrib import admin
 
-from upoutodo.api.models import Project, Task, UserProfile
+from upoutodo.models import Project, Task, UserProfile
 
 # Register your models here.
 admin.site.register(UserProfile)

@@ -121,8 +121,7 @@ function AddCommentForm({
             onChange={(e) => {
               setComment(e.target.value);
             }}
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
+            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
           />
           <Stack direction="row" spacing={1} justifyContent={"flex-end"}>
             <Button

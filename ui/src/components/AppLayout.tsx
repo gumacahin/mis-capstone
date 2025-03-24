@@ -1,148 +1,272 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import LogoutIcon from "@mui/icons-material/Logout";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import SettingsIcon from "@mui/icons-material/Settings";
 import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
-import { Typography, useMediaQuery } from "@mui/material";
+import { Alert, Skeleton } from "@mui/material";
 import MuiAppBar, {
   type AppBarProps as MuiAppBarProps,
 } from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
+import ListItemButton, {
+  ListItemButtonProps,
+} from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Stack from "@mui/material/Stack";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
-import { ReactNode, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import React, { ReactNode, useState } from "react";
+import {
+  generatePath,
+  NavLink,
+  NavLinkProps,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
-import AddTodoDialog from "./AddTodoDialog";
+import { useProjects } from "../api";
+import { ROUTES } from "../routes";
+import { IProject } from "../types/common";
+import AccountMenu from "./AccountMenu";
+import AddProjectDialog from "./AddProjectDialog";
+import AddTaskDialog from "./AddTaskDialog";
 
 const drawerWidth = 240;
+
+type RouterLinkProps = React.PropsWithChildren<{
+  to: string;
+  text: string;
+  icon?: ReactNode;
+  disablePadding?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  secondaryAction?: ReactNode;
+  showProjectAddIcon?: boolean;
+  handleAddProjectClick?: () => void;
+  handleExpandProjectClick?: () => void;
+  isProjectListOpen?: boolean;
+}> &
+  Omit<ListItemButtonProps, "component">;
+
+const RouterLink = (props: RouterLinkProps) => {
+  type MyNavLinkProps = Omit<NavLinkProps, "to">;
+  const location = useLocation();
+  const isAddingTask = location.hash === "#add-task";
+  const MemoedNavLink = React.useMemo(
+    () =>
+      // eslint-disable-next-line react/display-name
+      React.forwardRef<HTMLAnchorElement, MyNavLinkProps>(
+        (navLinkProps, ref) => {
+          const { className: previousClasses, ...rest } = navLinkProps;
+          const elementClasses = previousClasses?.toString() ?? "";
+          return (
+            <NavLink
+              {...rest}
+              ref={ref}
+              to={props.to}
+              end
+              className={({ isActive }) =>
+                // FIXME: these are unnecessary
+                !isAddingTask && isActive
+                  ? elementClasses + " Mui-selected"
+                  : elementClasses
+              }
+            />
+          );
+        },
+      ),
+    [props.to, isAddingTask],
+  );
+
+  MemoedNavLink.displayName = "MemoedNavLink";
+
+  return (
+    <ListItem
+      disablePadding
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
+      secondaryAction={props.secondaryAction}
+    >
+      <ListItemButton component={MemoedNavLink}>
+        {props.icon && (
+          <ListItemIcon
+            sx={{
+              ".Mui-selected > &": {
+                color: (theme) => theme.palette.primary.main,
+              },
+            }}
+          >
+            {props.icon}
+          </ListItemIcon>
+        )}
+        <ListItemText primary={props.text} />
+      </ListItemButton>
+    </ListItem>
+  );
+};
+
+RouterLink.displayName = "RouterLink";
+
+const ProjectListSkeleton = () => {
+  return Array.from({ length: 6 }).map((_, index) => (
+    <ListItem key={index} sx={{ pb: 2 }}>
+      <Skeleton variant="rectangular" width={230} height={10} />
+    </ListItem>
+  ));
+};
+
+const ProjectListError = () => {
+  return <Alert severity="error">Error loading projects</Alert>;
+};
 
 function DrawerContents({
   theme,
   handleDrawerClose,
-  handleAddTodoDialogOpen,
+  handleAddTaskDialogOpen,
   isLargeDisplay,
 }: {
   handleDrawerClose: () => void;
-  handleAddTodoDialogOpen: () => void;
+  handleAddTaskDialogOpen: () => void;
+  isLargeDisplay: boolean;
   theme: Theme;
-  isLargeDisplay?: boolean;
 }) {
-  const { logout } = useAuth0();
+  const [isProjectListOpen, setProjectListOpen] = useState(false);
+  const [isAddProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
+  const [projectsMenuItemHovered, setProjectsMenuItemHovered] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<
+    "add-task" | "projects" | "add-project" | null
+  >(null);
+  // TODO: use a reducer here
+  const [isAddingTask, setAddingTask] = useState(false);
   const navigate = useNavigate();
-  const handleClick = (callback: () => void) => {
-    return () => {
-      callback();
-      if (!isLargeDisplay) {
-        handleDrawerClose();
-      }
-    };
+  const {
+    isPending: isProjectsPending,
+    isError: isProjectsError,
+    data: projectsData,
+  } = useProjects();
+
+  const projects: IProject[] = projectsData?.results ?? [];
+  const handleAddTaskClick = () => {
+    handleAddTaskDialogOpen();
+    setAddingTask(true);
   };
+  const handleAddProjectClick = () => {
+    setAddProjectDialogOpen(true);
+    setSelectedMenuItem("add-project");
+  };
+  const handleExpandProjectClick = () => {
+    setProjectListOpen(!isProjectListOpen);
+  };
+
   return (
     <>
+      <AddProjectDialog
+        open={isAddProjectDialogOpen}
+        handleClose={() => {
+          setAddProjectDialogOpen(false);
+        }}
+      />
       <DrawerHeader>
-        <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "ltr" ? (
-            <ChevronLeftIcon />
-          ) : (
-            <ChevronRightIcon />
-          )}
-        </IconButton>
+        <Box
+          sx={{
+            width: "100%",
+            justifyContent: "space-between",
+            display: "flex",
+          }}
+        >
+          <AccountMenu />
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === "ltr" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
+          </IconButton>
+        </Box>
       </DrawerHeader>
       <Divider />
       <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => {
-              handleAddTodoDialogOpen();
-            }}
-          >
-            <ListItemIcon>
-              <AddCircleIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Add Task"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(() => {
-              navigate("inbox");
-            })}
-          >
-            <ListItemIcon>
-              <InboxIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Inbox"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(() => {
-              navigate("today");
-            })}
-          >
-            <ListItemIcon>
-              <TodayIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Today"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(() => {
-              navigate("upcoming");
-            })}
-          >
-            <ListItemIcon>
-              <UpcomingIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Upcoming"} />
-          </ListItemButton>
-        </ListItem>
+        <ListItemButton onClick={handleAddTaskClick}>
+          <ListItemIcon>
+            <AddCircleIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Add Task"} />
+        </ListItemButton>
+        <RouterLink to={ROUTES.INBOX} text="Inbox" icon={<InboxIcon />} />
+        <RouterLink to={ROUTES.TODAY} text="Today" icon={<TodayIcon />} />
+        <RouterLink
+          to={ROUTES.UPCOMING}
+          text="Upcoming"
+          icon={<UpcomingIcon />}
+        />
         <Divider />
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(() => {
-              navigate("settings");
-            })}
-          >
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Settings"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleClick(async () => {
-              await logout();
-            })}
-          >
-            <ListItemIcon>
-              <LogoutIcon />
-            </ListItemIcon>
-            <ListItemText primary={"Logout"} />
-          </ListItemButton>
-        </ListItem>
+        <RouterLink
+          to={ROUTES.PROJECTS}
+          text="My Projects"
+          disablePadding
+          handleAddProjectClick={handleAddProjectClick}
+          handleExpandProjectClick={handleExpandProjectClick}
+          isProjectListOpen={isProjectListOpen}
+          showProjectAddIcon={projectsMenuItemHovered}
+          onMouseEnter={() => setProjectsMenuItemHovered(true)}
+          onMouseLeave={() => setProjectsMenuItemHovered(false)}
+          secondaryAction={
+            <Stack direction="row" spacing={1}>
+              <IconButton
+                onClick={handleAddProjectClick}
+                edge="end"
+                aria-label="add project"
+              >
+                <AddIcon />
+              </IconButton>
+              <IconButton
+                onClick={handleExpandProjectClick}
+                edge="end"
+                aria-label="expand projects list"
+              >
+                {isProjectListOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Stack>
+          }
+        />
+        <Collapse in={isProjectListOpen} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {isProjectsPending && <ProjectListSkeleton />}
+            {isProjectsError && <ProjectListError />}
+            {projects &&
+              projects.map((project: IProject) => (
+                <RouterLink
+                  to={generatePath("project/:projectId", {
+                    projectId: `${project.id}`,
+                  })}
+                  text={project.title}
+                  key={project.id}
+                  disablePadding
+                />
+              ))}
+          </List>
+        </Collapse>
       </List>
     </>
   );
 }
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
+const Main = styled("main", {
+  shouldForwardProp: (prop: string) => !["open", "sx"].includes(prop),
+})<{
   open?: boolean;
 }>(({ theme }) => ({
   overflow: "hidden",
@@ -202,15 +326,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-export default function AuthenticatedLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function AppLayout({ children }: { children: ReactNode }) {
   const theme = useTheme();
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
-  const [isAddTodoDialogOpen, setIsAddTodoDialogOpen] = useState(false);
+  const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -222,10 +342,10 @@ export default function AuthenticatedLayout({
 
   return (
     <>
-      <AddTodoDialog
-        open={isAddTodoDialogOpen}
+      <AddTaskDialog
+        open={isAddTaskDialogOpen}
         handleClose={() => {
-          setIsAddTodoDialogOpen(false);
+          setIsAddTaskDialogOpen(false);
         }}
       />
       <Box sx={{ display: "flex" }}>
@@ -242,6 +362,7 @@ export default function AuthenticatedLayout({
               onClick={handleDrawerOpen}
               edge="start"
               sx={[
+                // TODO: do we need this?
                 {
                   mr: 2,
                 },
@@ -250,7 +371,6 @@ export default function AuthenticatedLayout({
             >
               <MenuIcon />
             </IconButton>
-            <Typography> </Typography>
           </Toolbar>
         </AppBar>
         {!isLargeDisplay && (
@@ -267,10 +387,11 @@ export default function AuthenticatedLayout({
             open={open}
           >
             <DrawerContents
+              isLargeDisplay={isLargeDisplay}
               theme={theme}
               handleDrawerClose={handleDrawerClose}
-              handleAddTodoDialogOpen={() => {
-                setIsAddTodoDialogOpen(true);
+              handleAddTaskDialogOpen={() => {
+                setIsAddTaskDialogOpen(true);
               }}
             />
           </Drawer>
@@ -292,15 +413,29 @@ export default function AuthenticatedLayout({
             <DrawerContents
               theme={theme}
               handleDrawerClose={handleDrawerClose}
-              isLargeDisplay
-              handleAddTodoDialogOpen={() => {
-                setIsAddTodoDialogOpen(true);
+              isLargeDisplay={isLargeDisplay}
+              handleAddTaskDialogOpen={() => {
+                setIsAddTaskDialogOpen(true);
               }}
             />
           </Drawer>
         )}
-        <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
-          <Box minHeight={`calc(100vh - 72px)`}>{children}</Box>
+        <Main
+          // FIXME: this sx is showing in the dom
+          sx={{
+            marginLeft: isLargeDisplay ? undefined : "unset",
+          }}
+          open={open}
+        >
+          {/* <Box minHeight={`calc(100vh - 72px)`}> */}
+          <Box
+            minHeight={(theme) =>
+              `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
+            }
+            pt={8}
+          >
+            {children}
+          </Box>
         </Main>
       </Box>
     </>
