@@ -1,0 +1,11 @@
+export const TASK_CARD_WIDTH = 300;
+export const TASK_CARD_HEIGHT = 100;
+export const SECTION_CARD_WIDTH = 350;
+export const SECTION_CARD_MIN_HEIGHT = 50;
+export const LIST_VIEW_MAX_WIDTH = 800;
+export const DATE_PAGER_HEIGHT = 48;
+export const TOOLBAR_HEIGHT = 13;
+export const DROPPABLE_MIN_HEIGHT = 50;
+export const DROPPABLE_TYPE_TASK = "TASK";
+export const DROPPABLE_TYPE_SECTION = "SECTION";
+export const MAX_LABEL_LENGTH = 60;

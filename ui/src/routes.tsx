@@ -4,8 +4,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
-import ProjectDetailsPage from "./pages/ProjectDetailsPage";
-import ProjectsPage from "./pages/ProjectsPage";
+import LabelsListPage from "./pages/LabelsListPage";
+import LabelTasksPage from "./pages/LabelTasksPage";
+import ProjectPage from "./pages/ProjectPage";
+import ProjectsListPage from "./pages/ProjectsListPage";
 import SettingsPage from "./pages/SettingsPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
@@ -16,7 +18,9 @@ const TODAY = "today";
 const INBOX = "inbox";
 const UPCOMING = "upcoming";
 const PROJECTS = "projects";
+const LABELS = "labels";
 const PROJECT_DETAILS = "projectDetails";
+const LABEL_TASKS = "labelTasks";
 const SETTINGS = "settings";
 
 export const ROUTES = {
@@ -26,6 +30,8 @@ export const ROUTES = {
   INBOX,
   UPCOMING,
   PROJECTS,
+  LABELS,
+  LABEL_TASKS,
   PROJECT_DETAILS,
   SETTINGS,
 };
@@ -66,14 +72,24 @@ const routes = [
           },
           {
             path: "projects",
-            element: <ProjectsPage />,
+            element: <ProjectsListPage />,
             name: ROUTES.PROJECTS,
             end: true,
           },
           {
             path: "project/:projectId",
-            element: <ProjectDetailsPage />,
+            element: <ProjectPage />,
             name: ROUTES.PROJECT_DETAILS,
+          },
+          {
+            path: "labels",
+            element: <LabelsListPage />,
+            name: ROUTES.LABELS,
+          },
+          {
+            path: "label/:slug",
+            element: <LabelTasksPage />,
+            name: ROUTES.LABEL_TASKS,
           },
           {
             path: "settings",

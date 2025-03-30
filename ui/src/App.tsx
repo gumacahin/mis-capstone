@@ -2,20 +2,30 @@ import "./App.css";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { Box } from "@mui/material";
+import Alert from "@mui/material/Alert";
 import { Toaster } from "react-hot-toast";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import Spinner from "./components/Spinner";
+import ProfileContext from "./contexts/profileContext";
+import { useProfile } from "./hooks/queries";
 import routes from "./routes";
 
 function App() {
-  const { isLoading, error } = useAuth0();
+  const { isLoading, error, user } = useAuth0();
+  const {
+    isLoading: profileLoading,
+    error: profileError,
+    data: profile,
+  } = useProfile(!!user);
 
-  if (error) {
-    return <div>Oops... {error.message}</div>;
+  if (error || profileError) {
+    return (
+      <Alert severity="error">{error?.message ?? profileError?.message}</Alert>
+    );
   }
 
-  if (isLoading) {
+  if (isLoading || profileLoading) {
     return (
       <Box
         display="flex"
@@ -29,10 +39,10 @@ function App() {
   }
 
   return (
-    <>
+    <ProfileContext.Provider value={profile}>
       <Toaster />
       <RouterProvider router={createBrowserRouter(routes)} />
-    </>
+    </ProfileContext.Provider>
   );
 }
 

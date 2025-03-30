@@ -12,7 +12,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import App from "./App.tsx";
-import { ThemeContextProvider } from "./components/ThemeContext.tsx";
+import ThemeContextProvider from "./components/ThemeContextProvider.tsx";
+import ToolbarContextProvider from "./components/ToolbarContextProvider.tsx";
 import {
   AUTH0_AUDIENCE,
   AUTH0_CLIENT_ID,
@@ -37,7 +38,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         cacheLocation="localstorage"
       >
         <QueryClientProvider client={queryClient}>
-          <App />
+          <ToolbarContextProvider>
+            <App />
+          </ToolbarContextProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </Auth0Provider>

@@ -17,34 +17,36 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-import { useAddProject } from "../api";
-import type { IProject } from "../types/common";
+import { useAddProject } from "../hooks/queries";
+import type { Project, ProjectViewType } from "../types/common";
+
+type FormValues = {
+  title: string;
+  view: ProjectViewType;
+};
 
 export default function AddProjectDialog({
   open,
   handleClose,
+  referenceProjectId,
+  position,
 }: {
   open: boolean;
   handleClose: () => void;
+  referenceProjectId?: number;
+  position?: "above" | "below";
 }) {
-  const addProject = useAddProject();
+  const addProject = useAddProject(referenceProjectId, position);
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
-  const {
-    register,
-    setValue,
-    handleSubmit,
-    watch,
-    reset,
-    // formState: { errors },
-  } = useForm<IProject>({
-    defaultValues: {
-      title: "",
-      view: "list",
-    },
-  });
+  const defaultValues = {
+    title: "",
+    view: "list" as ProjectViewType,
+  };
+  const { register, setValue, handleSubmit, watch, reset } =
+    useForm<FormValues>({ defaultValues });
   const view = watch("view");
-  const onSubmit: SubmitHandler<IProject> = async (data) => {
+  const onSubmit: SubmitHandler<Project> = async (data) => {
     setLoading(true);
     try {
       const project = await toast.promise(addProject.mutateAsync(data), {

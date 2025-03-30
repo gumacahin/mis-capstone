@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Skeleton from "@mui/material/Skeleton";
 export default function SkeletonList({
   count,
-  width = 300,
+  width = 200,
 }: {
   count: number;
   width?: number;

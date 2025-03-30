@@ -6,8 +6,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { toast } from "react-hot-toast";
 
-import { useDeleteProject } from "../api";
-import { IProject } from "../types/common";
+import { useDeleteProject } from "../hooks/queries";
+import { Project } from "../types/common";
 
 export default function ProjectDeleteDialog({
   open,
@@ -15,7 +15,7 @@ export default function ProjectDeleteDialog({
   handleClose,
 }: {
   open: boolean;
-  project: IProject;
+  project: Project;
   handleClose: () => void;
 }) {
   const deleteProject = useDeleteProject(project);
@@ -28,10 +28,6 @@ export default function ProjectDeleteDialog({
     });
     handleClose();
   };
-
-  if (!project) {
-    return null;
-  }
 
   return (
     <Dialog open={open} onClose={handleClose}>

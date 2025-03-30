@@ -1,33 +1,39 @@
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import IconButton from "@mui/material/IconButton";
-import Skeleton from "@mui/material/Skeleton";
 import dayjs from "dayjs";
 import { MouseEvent } from "react";
 import toast from "react-hot-toast";
 
-import { useUpdateTask } from "../api";
-import type { ITask } from "../types/common";
+import { useUpdateTask } from "../hooks/queries";
+import type { Task } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
-  projectId,
   disabled,
 }: {
-  task: ITask;
+  task: Task;
   disabled?: boolean;
-  projectId: number;
 }) {
-  const updateTask = useUpdateTask(task, projectId);
+  const priorityColorMap: Record<
+    "NONE" | "LOW" | "MEDIUM" | "HIGH",
+    "inherit" | "info" | "warning" | "error"
+  > = {
+    NONE: "inherit",
+    LOW: "info",
+    MEDIUM: "warning",
+    HIGH: "error",
+  };
+
+  const updateTask = useUpdateTask(task);
 
   const isTaskCompleted = task.completion_date !== null;
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
-    const data: Pick<ITask, "completion_date"> = {
-      completion_date: isTaskCompleted ? null : dayjs().format("YYYY-MM-DD"),
+    const data = {
+      completion_date: isTaskCompleted ? null : dayjs(),
     };
     toast.promise(updateTask.mutateAsync(data), {
       loading: "Updating task...",
@@ -36,25 +42,11 @@ export default function TaskCheckIcon({
     });
   };
 
-  // if (isPending) {
-  //   return (
-  //     <IconButton sx={{ cursor: "not-allowed" }}>
-  //       <Skeleton variant="circular" width={24} height={24} />
-  //     </IconButton>
-  //   );
-  // }
-
-  // if (isError) {
-  //   return (
-  //     <IconButton sx={{ cursor: "not-allowed" }}>
-  //       <ErrorOutlineIcon />
-  //     </IconButton>
-  //   );
-  // }
-
   if (disabled) {
     return (
-      <IconButton sx={{ cursor: "not-allowed" }}>
+      <IconButton
+        sx={[{ cursor: "not-allowed" }, { ".MuiButton-root": { padding: 0 } }]}
+      >
         {isTaskCompleted ? (
           <CheckCircleOutlineOutlinedIcon />
         ) : (
@@ -69,7 +61,7 @@ export default function TaskCheckIcon({
       {isTaskCompleted ? (
         <CheckCircleOutlineOutlinedIcon />
       ) : (
-        <CircleOutlinedIcon />
+        <CircleOutlinedIcon color={priorityColorMap[task.priority ?? "NONE"]} />
       )}
     </IconButton>
   );

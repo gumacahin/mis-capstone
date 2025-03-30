@@ -25,5 +25,5 @@ def test_create_default_project():
         default_project is not None
     ), "Default project should be created for the new user"
     assert (
-        default_project.title == user.username
-    ), f"Default project name should be the {user.username}"
+        default_project.title == Project.DEFAULT_PROJECT_TITLE
+    ), f"Default project name should be the {Project.DEFAULT_PROJECT_TITLE}"

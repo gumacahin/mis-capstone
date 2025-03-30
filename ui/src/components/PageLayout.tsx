@@ -5,5 +5,5 @@ export default function PageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <Box px={2}>{children}</Box>;
+  return <Box p={2}>{children}</Box>;
 }

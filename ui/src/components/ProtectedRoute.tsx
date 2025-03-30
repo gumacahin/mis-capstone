@@ -6,11 +6,14 @@ import AppLayout from "./AppLayout";
 import Spinner from "./Spinner";
 
 const ProtectedRoute = withAuthenticationRequired(
-  () => (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
-  ),
+  () => {
+    // const queryClient = useQueryClient();
+    return (
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    );
+  },
   {
     onRedirecting: () => (
       <Box

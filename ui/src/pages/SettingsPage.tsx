@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -17,7 +18,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { useState } from "react";
 
-import { useThemeContext } from "../components/ThemeContext";
+import useThemeContext from "../hooks/useThemeContext";
 
 function ConfirmDeleteDialog({
   open,
@@ -83,7 +84,7 @@ function ThemeSelect() {
 export default function SettingsPage() {
   const [open, setOpen] = useState<boolean>(false);
   return (
-    <>
+    <Container>
       <Box maxWidth={600}>
         <Typography variant="h5" my={3} component={"h2"}>
           Settings
@@ -120,6 +121,6 @@ export default function SettingsPage() {
           setOpen(false);
         }}
       />
-    </>
+    </Container>
   );
 }

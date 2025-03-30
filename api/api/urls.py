@@ -6,10 +6,12 @@ from rest_framework import routers
 from upoutodo import views
 
 router = routers.DefaultRouter()
-router.register(r"users", views.UserViewSet)
-router.register(r"tasks", views.TaskViewSet)
-router.register(r"projects", views.ProjectViewSet)
 router.register(r"project_sections", views.ProjectSectionViewSet)
+router.register(r"projects", views.ProjectViewSet)
+router.register(r"tags", views.TagViewSet)
+router.register(r"comments", views.CommentViewSet)
+router.register(r"tasks", views.TaskViewSet)
+router.register(r"users", views.UserViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

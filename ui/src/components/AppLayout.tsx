@@ -1,14 +1,21 @@
+import {
+  DragDropContext,
+  Draggable,
+  DraggableLocation,
+  Droppable,
+} from "@hello-pangea/dnd";
 import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LabelIcon from "@mui/icons-material/Label";
 import MenuIcon from "@mui/icons-material/Menu";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
-import { Alert, Skeleton } from "@mui/material";
+import Alert from "@mui/material/Alert";
 import MuiAppBar, {
   type AppBarProps as MuiAppBarProps,
 } from "@mui/material/AppBar";
@@ -19,106 +26,32 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton, {
-  ListItemButtonProps,
-} from "@mui/material/ListItemButton";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { ReactNode, useState } from "react";
-import {
-  generatePath,
-  NavLink,
-  NavLinkProps,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { MouseEvent, ReactNode, useState } from "react";
+import toast from "react-hot-toast";
+import { generatePath } from "react-router-dom";
 
-import { useProjects } from "../api";
+import { useProjects, useReorderProjects } from "../hooks/queries";
+import useToolbarContext from "../hooks/useToolbarContext";
 import { ROUTES } from "../routes";
-import { IProject } from "../types/common";
+import { Project } from "../types/common";
 import AccountMenu from "./AccountMenu";
 import AddProjectDialog from "./AddProjectDialog";
 import AddTaskDialog from "./AddTaskDialog";
+import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
+import ListItemNavLink from "./ListItemNavLink";
+import ProjectMenu from "./ProjectMenu";
+import TodayIcon from "./TodayIcon";
+import UpdateTaskDialogProvider from "./UpdateTaskDialogProvider";
 
-const drawerWidth = 240;
-
-type RouterLinkProps = React.PropsWithChildren<{
-  to: string;
-  text: string;
-  icon?: ReactNode;
-  disablePadding?: boolean;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-  secondaryAction?: ReactNode;
-  showProjectAddIcon?: boolean;
-  handleAddProjectClick?: () => void;
-  handleExpandProjectClick?: () => void;
-  isProjectListOpen?: boolean;
-}> &
-  Omit<ListItemButtonProps, "component">;
-
-const RouterLink = (props: RouterLinkProps) => {
-  type MyNavLinkProps = Omit<NavLinkProps, "to">;
-  const location = useLocation();
-  const isAddingTask = location.hash === "#add-task";
-  const MemoedNavLink = React.useMemo(
-    () =>
-      // eslint-disable-next-line react/display-name
-      React.forwardRef<HTMLAnchorElement, MyNavLinkProps>(
-        (navLinkProps, ref) => {
-          const { className: previousClasses, ...rest } = navLinkProps;
-          const elementClasses = previousClasses?.toString() ?? "";
-          return (
-            <NavLink
-              {...rest}
-              ref={ref}
-              to={props.to}
-              end
-              className={({ isActive }) =>
-                // FIXME: these are unnecessary
-                !isAddingTask && isActive
-                  ? elementClasses + " Mui-selected"
-                  : elementClasses
-              }
-            />
-          );
-        },
-      ),
-    [props.to, isAddingTask],
-  );
-
-  MemoedNavLink.displayName = "MemoedNavLink";
-
-  return (
-    <ListItem
-      disablePadding
-      onMouseEnter={props.onMouseEnter}
-      onMouseLeave={props.onMouseLeave}
-      secondaryAction={props.secondaryAction}
-    >
-      <ListItemButton component={MemoedNavLink}>
-        {props.icon && (
-          <ListItemIcon
-            sx={{
-              ".Mui-selected > &": {
-                color: (theme) => theme.palette.primary.main,
-              },
-            }}
-          >
-            {props.icon}
-          </ListItemIcon>
-        )}
-        <ListItemText primary={props.text} />
-      </ListItemButton>
-    </ListItem>
-  );
-};
-
-RouterLink.displayName = "RouterLink";
+const DRAWER_WIDTH = 240;
 
 const ProjectListSkeleton = () => {
   return Array.from({ length: 6 }).map((_, index) => (
@@ -146,33 +79,99 @@ function DrawerContents({
   const [isProjectListOpen, setProjectListOpen] = useState(false);
   const [isAddProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
   const [projectsMenuItemHovered, setProjectsMenuItemHovered] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<
-    "add-task" | "projects" | "add-project" | null
-  >(null);
-  // TODO: use a reducer here
-  const [isAddingTask, setAddingTask] = useState(false);
-  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [project, setProject] = useState<Project | null>(null);
+  const reorderProjects = useReorderProjects();
+
   const {
     isPending: isProjectsPending,
     isError: isProjectsError,
     data: projectsData,
   } = useProjects();
 
-  const projects: IProject[] = projectsData?.results ?? [];
+  const projects = projectsData?.results || [];
+
+  const handleOpenProjectMenu = (
+    event: MouseEvent<HTMLButtonElement>,
+    project: Project,
+  ) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setProject(project);
+  };
+
+  const handleCloseProjectMenu = () => {
+    setAnchorEl(null);
+  };
+
   const handleAddTaskClick = () => {
     handleAddTaskDialogOpen();
-    setAddingTask(true);
+    handleNavItemClick();
   };
   const handleAddProjectClick = () => {
     setAddProjectDialogOpen(true);
-    setSelectedMenuItem("add-project");
   };
   const handleExpandProjectClick = () => {
     setProjectListOpen(!isProjectListOpen);
   };
 
+  const handleNavItemClick = () => {
+    if (!isLargeDisplay) {
+      handleDrawerClose();
+    }
+  };
+
+  const handleDragEnd = async ({
+    destination,
+    source,
+  }: {
+    destination: DraggableLocation | null;
+    source: DraggableLocation;
+  }) => {
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const newProjectList = Array.from(projects) as Project[];
+    const [removed] = newProjectList.splice(source.index, 1);
+    newProjectList.splice(destination.index, 0, removed);
+    const reorderedProjects = newProjectList.map(
+      (project: Project, index: number) => ({
+        ...project,
+        order: index + 1,
+      }),
+    );
+    await toast.promise(reorderProjects.mutateAsync(reorderedProjects), {
+      loading: "Reordering projects...",
+      error: "Failed reordering projects.",
+      success: "Projects reordered successfully!",
+    });
+  };
+
+  const listItemIconStyle: {
+    [key: string]: {
+      color: (theme: Theme) => string;
+    };
+  } = {
+    ".Mui-selected > &": {
+      color: (theme) => theme.palette.primary.main,
+    },
+  };
+
   return (
     <>
+      {project && (
+        <ProjectMenu
+          anchorEl={anchorEl}
+          project={project}
+          handleClose={handleCloseProjectMenu}
+        />
+      )}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         handleClose={() => {
@@ -198,66 +197,131 @@ function DrawerContents({
         </Box>
       </DrawerHeader>
       <Divider />
-      <List>
-        <ListItemButton onClick={handleAddTaskClick}>
-          <ListItemIcon>
-            <AddCircleIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Add Task"} />
-        </ListItemButton>
-        <RouterLink to={ROUTES.INBOX} text="Inbox" icon={<InboxIcon />} />
-        <RouterLink to={ROUTES.TODAY} text="Today" icon={<TodayIcon />} />
-        <RouterLink
-          to={ROUTES.UPCOMING}
-          text="Upcoming"
-          icon={<UpcomingIcon />}
-        />
+      <List component="nav">
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemButton onClick={handleAddTaskClick}>
+            <ListItemIcon>
+              <AddCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Add task"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.INBOX} onClick={handleNavItemClick}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Inbox"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.TODAY} onClick={handleNavItemClick}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <TodayIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Today"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.UPCOMING} onClick={handleNavItemClick}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <UpcomingIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Upcoming"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.LABELS} onClick={handleNavItemClick}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <LabelIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Labels"} />
+          </ListItemNavLink>
+        </ListItem>
         <Divider />
-        <RouterLink
-          to={ROUTES.PROJECTS}
-          text="My Projects"
+        <ListItem
+          component={"div"}
+          disableGutters
           disablePadding
-          handleAddProjectClick={handleAddProjectClick}
-          handleExpandProjectClick={handleExpandProjectClick}
-          isProjectListOpen={isProjectListOpen}
-          showProjectAddIcon={projectsMenuItemHovered}
           onMouseEnter={() => setProjectsMenuItemHovered(true)}
           onMouseLeave={() => setProjectsMenuItemHovered(false)}
           secondaryAction={
-            <Stack direction="row" spacing={1}>
+            <>
               <IconButton
                 onClick={handleAddProjectClick}
-                edge="end"
                 aria-label="add project"
+                sx={[!projectsMenuItemHovered && { display: "none" }]}
               >
                 <AddIcon />
               </IconButton>
               <IconButton
                 onClick={handleExpandProjectClick}
-                edge="end"
                 aria-label="expand projects list"
               >
                 {isProjectListOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
-            </Stack>
+            </>
           }
-        />
+        >
+          <ListItemNavLink to={ROUTES.PROJECTS} onClick={handleNavItemClick}>
+            <ListItemText primary={"My Projects"} />
+          </ListItemNavLink>
+        </ListItem>
         <Collapse in={isProjectListOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {isProjectsPending && <ProjectListSkeleton />}
-            {isProjectsError && <ProjectListError />}
-            {projects &&
-              projects.map((project: IProject) => (
-                <RouterLink
-                  to={generatePath("project/:projectId", {
-                    projectId: `${project.id}`,
-                  })}
-                  text={project.title}
-                  key={project.id}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided) => (
+                <List
                   disablePadding
-                />
-              ))}
-          </List>
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {isProjectsPending && <ProjectListSkeleton />}
+                  {isProjectsError && <ProjectListError />}
+                  {projects.map((project: Project, index: number) => (
+                    <Draggable
+                      key={project.id}
+                      draggableId={`${project.id}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <ListItem
+                          sx={{
+                            backgroundColor: (theme) =>
+                              theme.palette.background.paper,
+                          }}
+                          key={project.id}
+                          disableGutters
+                          disablePadding
+                          secondaryAction={
+                            <IconButton
+                              onClick={(e) => handleOpenProjectMenu(e, project)}
+                              aria-label="project options"
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                          }
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                        >
+                          <ListItemNavLink
+                            to={generatePath("project/:projectId", {
+                              projectId: `${project.id}`,
+                            })}
+                            onClick={handleNavItemClick}
+                          >
+                            <ListItemText primary={project.title} />
+                          </ListItemNavLink>
+                        </ListItem>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </List>
+              )}
+            </Droppable>
+          </DragDropContext>
         </Collapse>
       </List>
     </>
@@ -271,12 +335,11 @@ const Main = styled("main", {
 }>(({ theme }) => ({
   overflow: "hidden",
   flexGrow: 1,
-  // padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
+  marginLeft: `-${DRAWER_WIDTH}px`,
   variants: [
     {
       props: ({ open }) => open,
@@ -306,8 +369,8 @@ const AppBar = styled(MuiAppBar, {
     {
       props: ({ open }) => open,
       style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+        marginLeft: `${DRAWER_WIDTH}px`,
         transition: theme.transitions.create(["margin", "width"], {
           easing: theme.transitions.easing.easeOut,
           duration: theme.transitions.duration.enteringScreen,
@@ -331,6 +394,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
+  const { toolbarAdditionalIcons, toolbarIcons, toolbarTitle, toolbarBottom } =
+    useToolbarContext();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -342,44 +407,58 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <AddTaskDialog
-        open={isAddTaskDialogOpen}
-        handleClose={() => {
-          setIsAddTaskDialogOpen(false);
-        }}
-      />
-      <Box sx={{ display: "flex" }}>
+      <InboxDefaultSectionProvider>
+        {isAddTaskDialogOpen && (
+          <AddTaskDialog
+            open={true}
+            handleClose={() => {
+              setIsAddTaskDialogOpen(false);
+            }}
+          />
+        )}
+      </InboxDefaultSectionProvider>
+      <Box sx={{ display: "flex" }} height="100vh" id="app-layout">
         <AppBar
           position="fixed"
           open={open}
           elevation={0}
-          sx={{ backgroundColor: "transparent" }}
+          sx={{ backgroundColor: "background.default" }}
         >
-          <Toolbar>
-            <IconButton
-              color="default"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={[
-                // TODO: do we need this?
-                {
-                  mr: 2,
-                },
-                open && { display: "none" },
-              ]}
+          <Stack>
+            <Toolbar
+              id="toolbar"
+              sx={{
+                justifyContent: "space-between",
+                width: "100%",
+              }}
             >
-              <MenuIcon />
-            </IconButton>
-          </Toolbar>
+              <Box>
+                <IconButton
+                  color="default"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={[open && { display: "none" }]}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Box>
+              <Box width="100%">{toolbarTitle}</Box>
+              <Stack direction="row" spacing={1}>
+                {toolbarAdditionalIcons && <Box>{toolbarAdditionalIcons}</Box>}
+                <Box>{toolbarIcons}</Box>
+              </Stack>
+            </Toolbar>
+            {toolbarBottom}
+          </Stack>
         </AppBar>
         {!isLargeDisplay && (
           <Drawer
             sx={{
-              width: drawerWidth,
+              width: DRAWER_WIDTH,
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: drawerWidth,
+                width: DRAWER_WIDTH,
                 boxSizing: "border-box",
               },
             }}
@@ -399,10 +478,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {isLargeDisplay && (
           <Drawer
             sx={{
-              width: drawerWidth,
+              width: DRAWER_WIDTH,
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: drawerWidth,
+                width: DRAWER_WIDTH,
                 boxSizing: "border-box",
               },
             }}
@@ -420,21 +499,19 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             />
           </Drawer>
         )}
-        <Main
-          // FIXME: this sx is showing in the dom
-          sx={{
-            marginLeft: isLargeDisplay ? undefined : "unset",
-          }}
-          open={open}
-        >
-          {/* <Box minHeight={`calc(100vh - 72px)`}> */}
+        <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
           <Box
-            minHeight={(theme) =>
-              `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
-            }
-            pt={8}
+            sx={{
+              overflowY: "hidden",
+              maxHeight: (theme) =>
+                `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+              height: (theme) =>
+                `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+            }}
+            mt={8}
+            id="main-content-wrapper"
           >
-            {children}
+            <UpdateTaskDialogProvider>{children}</UpdateTaskDialogProvider>
           </Box>
         </Main>
       </Box>

@@ -16,8 +16,8 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-import { useUpdateProject } from "../api";
-import type { IProject } from "../types/common";
+import { useUpdateProject } from "../hooks/queries";
+import type { ProjectDetail } from "../types/common";
 
 export default function ProjectEditDialog({
   open,
@@ -26,7 +26,7 @@ export default function ProjectEditDialog({
 }: {
   open: boolean;
   handleClose: () => void;
-  project: IProject;
+  project: ProjectDetail;
 }) {
   const updateProject = useUpdateProject(project.id);
   const [isLoading, setLoading] = useState(false);
@@ -37,9 +37,9 @@ export default function ProjectEditDialog({
     },
   };
   const { register, setValue, handleSubmit, watch, reset } =
-    useForm<IProject>(defaultValues);
+    useForm<ProjectDetail>(defaultValues);
   const view = watch("view");
-  const onSubmit: SubmitHandler<IProject> = async (data) => {
+  const onSubmit: SubmitHandler<ProjectDetail> = async (data) => {
     setLoading(true);
     try {
       await toast.promise(updateProject.mutateAsync(data), {

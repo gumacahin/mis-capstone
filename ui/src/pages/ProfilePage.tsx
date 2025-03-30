@@ -1,7 +1,7 @@
-import { useAuth } from "../api";
+import { useProfile } from "../hooks/queries";
 
 export const ProfilePage = () => {
-  const { data, isPending, isError } = useAuth();
+  const { data, isPending, isError } = useProfile();
 
   if (isPending) {
     return <div>Loading...</div>;

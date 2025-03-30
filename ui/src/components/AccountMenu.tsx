@@ -38,7 +38,6 @@ export default function AccountMenu() {
   };
 
   const handleProfileClick = () => {
-    console.log("Profile clicked. Opening users stats page");
     handleClose();
   };
 
@@ -72,7 +71,7 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleProfileClick}>
+        <MenuItem onClick={handleProfileClick} disabled>
           <ListItemIcon>
             <TrendingUpIcon />
           </ListItemIcon>

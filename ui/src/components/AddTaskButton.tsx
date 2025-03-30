@@ -5,15 +5,15 @@ import { useState } from "react";
 
 import TaskForm from "./TaskForm";
 
+export interface AddTaskButtonProps {
+  presetDueDate?: Dayjs;
+  presetLabel?: string;
+}
+
 export default function AddTaskButton({
-  presetDueDate = null,
-  sectionId,
-  projectId,
-}: {
-  presetDueDate?: Dayjs | null;
-  sectionId?: number;
-  projectId: number;
-}) {
+  presetDueDate,
+  presetLabel,
+}: AddTaskButtonProps) {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -21,8 +21,7 @@ export default function AddTaskButton({
       {open ? (
         <TaskForm
           presetDueDate={presetDueDate}
-          sectionId={sectionId}
-          projectId={projectId}
+          presetLabel={presetLabel}
           handleClose={() => {
             setOpen(false);
           }}

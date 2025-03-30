@@ -1,35 +1,62 @@
 import ListIcon from "@mui/icons-material/List";
 import TuneIcon from "@mui/icons-material/Tune";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { debounce } from "@mui/material";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import { debounce } from "@mui/material/utils";
-import { MouseEvent, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { MouseEvent, useMemo, useState } from "react";
 
-import { useUpdateProjectView } from "../api";
-import type { IProject, ProjectViewType } from "../types/common";
+import { useUpdateProjectView } from "../hooks/queries";
+import type { ProjectDetail, ProjectViewType } from "../types/common";
 
-export default function ProjectViewMenu({ project }: { project: IProject }) {
+export default function ProjectViewMenu({
+  project,
+}: {
+  project: ProjectDetail;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const queryClient = useQueryClient();
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const updateProjectView = useUpdateProjectView(project);
+  const { mutateAsync } = useUpdateProjectView(project);
+  const updateProjectViewType = useMemo(
+    () =>
+      debounce(async (view: ProjectViewType) => {
+        await mutateAsync(view);
+      }, 1000),
+    [mutateAsync],
+  );
 
-  const handleChange = debounce((_: unknown, value: ProjectViewType) => {
-    console.log("handleChange", value);
+  const handleChange = async (
+    _: MouseEvent<HTMLElement>,
+    value: ProjectViewType,
+  ) => {
     if (value !== project.view) {
-      updateProjectView.mutateAsync(value);
+      queryClient.setQueryData(
+        ["project", { projectId: project.id }],
+        (oldProject: ProjectDetail | undefined) => {
+          if (!oldProject) {
+            return oldProject;
+          }
+          return {
+            ...oldProject,
+            view: value,
+          };
+        },
+      );
+      updateProjectViewType(value);
     }
-  }, 300);
+  };
 
   return (
     <div>
@@ -52,7 +79,7 @@ export default function ProjectViewMenu({ project }: { project: IProject }) {
           "aria-labelledby": "view-menu-button",
         }}
       >
-        <MenuItem>
+        <MenuItem disableRipple>
           <ToggleButtonGroup
             id="view-options-label"
             exclusive
@@ -61,13 +88,21 @@ export default function ProjectViewMenu({ project }: { project: IProject }) {
             value={project.view}
             onChange={handleChange}
           >
-            <ToggleButton value="list" aria-label="list view">
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              disabled={project.view === "list"}
+            >
               <Stack alignItems={"center"}>
                 <ListIcon />
                 <small>List</small>
               </Stack>
             </ToggleButton>
-            <ToggleButton value="board" aria-label="board view">
+            <ToggleButton
+              value="board"
+              aria-label="board view"
+              disabled={project.view === "board"}
+            >
               <Stack alignItems={"center"}>
                 <ViewModuleIcon />
                 <small>Board</small>

@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "taggit",
+    "django_comments",
+    "django_filters",
     "upoutodo.apps.ApiConfig",
 ]
 
@@ -142,6 +144,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -171,3 +174,5 @@ JWT_AUTH = {
     "JWT_ISSUER": AUTH0["AUTH0_DOMAIN"],
     "JWT_AUTH_HEADER_PREFIX": "Bearer",
 }
+
+TAGGIT_CASE_INSENSITIVE = True
