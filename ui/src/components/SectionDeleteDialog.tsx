@@ -4,37 +4,40 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useContext } from "react";
 import { toast } from "react-hot-toast";
 
-import { useDeleteProject } from "../api";
-import { IProject } from "../types/common";
+import { useDeleteSection } from "../api";
+import ProjectContext from "../contexts/projectContext";
+import { ISection } from "../types/common";
 
-export default function ProjectDeleteDialog({
+export default function SectionDeleteDialog({
   open,
-  project,
+  section,
   handleClose,
 }: {
   open: boolean;
-  project: IProject;
+  section: ISection;
   handleClose: () => void;
 }) {
-  const deleteProject = useDeleteProject(project);
+  const project = useContext(ProjectContext)!;
+  const deleteSection = useDeleteSection(project.id, section.id);
 
   const handleDelete = async () => {
-    await toast.promise(deleteProject.mutateAsync(), {
-      loading: "Deleting project...",
-      success: "Project deleted successfully!",
-      error: "Failed deleting project.",
+    await toast.promise(deleteSection.mutateAsync(), {
+      loading: "Deleting section...",
+      success: "Section deleted successfully!",
+      error: "Failed deleting setion.",
     });
     handleClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Delete Project</DialogTitle>
+      <DialogTitle>Delete Section</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete the project &quot;{project.title}
+          Are you sure you want to delete the section &quot;{section.title}
           &quot;?
         </DialogContentText>
       </DialogContent>

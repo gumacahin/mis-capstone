@@ -7,26 +7,24 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import dayjs from "dayjs";
-import { useContext, useState } from "react";
+import { useState } from "react";
 
-import SectionContext from "../contexts/sectionContext";
 import type { ISection, ITask } from "../types/common";
 import TaskCheckIcon from "./TaskCheckIcon";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
-export default function TaskList({
-  // tasks,
+export default function ProjectSectionTaskList({
+  section,
   hideDueDates,
 }: {
-  // tasks: ITask[];
+  section: ISection;
   hideDueDates?: boolean;
 }) {
   const [taskForUpdating, setTaskForUpdating] = useState<ITask | null>(null);
+  const tasks = section.tasks;
   const handleOpenTask = (task: ITask) => {
     setTaskForUpdating(task);
   };
-  const section = useContext<ISection | null>(SectionContext);
-  const tasks = section?.tasks || [];
 
   const handleClose = () => {
     setTaskForUpdating(null);
@@ -40,7 +38,6 @@ export default function TaskList({
             task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
           return (
             <ListItem
-              sx={{ width: "100%", maxWidth: "100%" }}
               key={task.id}
               // NOTE: We use disabled padding there because of the stacked secondary actions
               // we have at teach ListItem. Without it the last icon button gets pushed
@@ -49,6 +46,7 @@ export default function TaskList({
               disableGutters
             >
               <UpdateTaskDialog
+                section={section}
                 open={task.id === taskForUpdating?.id}
                 handleClose={handleClose}
                 task={task}
@@ -59,7 +57,7 @@ export default function TaskList({
                 }}
               >
                 <ListItemIcon>
-                  <TaskCheckIcon task={task} />
+                  <TaskCheckIcon task={task} projectId={section.project} />
                 </ListItemIcon>
                 <ListItemText
                   primary={

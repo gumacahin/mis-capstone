@@ -5,6 +5,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
@@ -43,6 +44,7 @@ import { IProject } from "../types/common";
 import AccountMenu from "./AccountMenu";
 import AddProjectDialog from "./AddProjectDialog";
 import AddTaskDialog from "./AddTaskDialog";
+import ProjectMenu from "./ProjectMenu";
 
 const drawerWidth = 240;
 
@@ -151,12 +153,27 @@ function DrawerContents({
   >(null);
   // TODO: use a reducer here
   const [isAddingTask, setAddingTask] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [project, setProject] = useState<IProject | null>(null);
   const navigate = useNavigate();
   const {
     isPending: isProjectsPending,
     isError: isProjectsError,
     data: projectsData,
   } = useProjects();
+
+  const handleOpenProjectMenu = (
+    event: MouseEvent<HTMLButtonElement>,
+    project: IProjectOption,
+  ) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setProject(project);
+  };
+
+  const handleCloseProjectMenu = () => {
+    setAnchorEl(null);
+  };
 
   const projects: IProject[] = projectsData?.results ?? [];
   const handleAddTaskClick = () => {
@@ -173,6 +190,13 @@ function DrawerContents({
 
   return (
     <>
+      {project && (
+        <ProjectMenu
+          anchorEl={anchorEl}
+          project={project}
+          handleClose={handleCloseProjectMenu}
+        />
+      )}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         handleClose={() => {
@@ -255,6 +279,15 @@ function DrawerContents({
                   text={project.title}
                   key={project.id}
                   disablePadding
+                  secondaryAction={
+                    <IconButton
+                      onClick={(e) => handleOpenProjectMenu(e, project)}
+                      edge="end"
+                      aria-label="project options"
+                    >
+                      <MoreHorizIcon />
+                    </IconButton>
+                  }
                 />
               ))}
           </List>

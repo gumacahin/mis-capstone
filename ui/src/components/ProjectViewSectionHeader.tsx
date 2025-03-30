@@ -1,27 +1,137 @@
-import Box from "@mui/material/Box";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { MouseEvent, useContext, useState } from "react";
 
+import SectionContext from "../contexts/sectionContext";
 import { ISection } from "../types/common";
+import SectionDeleteDialog from "./SectionDeleteDialog";
+import SectionEditDialog from "./SectionEditDialog";
 
-export default function ProjectSectionHeader({
-  section,
-}: {
-  section: ISection;
-}) {
+export default function ProjectSectionHeader() {
+  const section = useContext<ISection | null>(SectionContext)!;
+  const [sectionForEdit, setSectionForEdit] = useState<ISection | null>(null);
+  const [sectionForDelete, setSectionForDelete] = useState<ISection | null>(
+    null,
+  );
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpenSectionMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseSectionMenu = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <Box>
-      <Box component={"header"}>
-        <Typography fontWeight={600} variant="h3" fontSize={16}>
-          {section.title}{" "}
-          <Typography
-            sx={{ display: "inline-block", marginLeft: 1 }}
-            component={"span"}
-            fontWeight="normal"
+    <>
+      {sectionForDelete && (
+        <SectionDeleteDialog
+          open={!!sectionForDelete}
+          section={sectionForDelete}
+          handleClose={() => setSectionForDelete(null)}
+        />
+      )}
+      {sectionForEdit && (
+        <SectionEditDialog
+          open={!!sectionForEdit}
+          section={sectionForEdit}
+          handleClose={() => setSectionForEdit(null)}
+        />
+      )}
+      <Menu
+        id="section-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleCloseSectionMenu}
+      >
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setSectionForEdit(section);
+            handleCloseSectionMenu();
+          }}
+        >
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Edit" />
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setSectionForDelete(section);
+            handleCloseSectionMenu();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Delete" />
+        </MenuItem>
+      </Menu>
+      <Tooltip title={section.title}>
+        <Stack
+          direction={"row"}
+          spacing={1}
+          alignItems="center"
+          justifyContent={"space-between"}
+          maxWidth="100%"
+        >
+          <Stack
+            direction={"row"}
+            spacing={1}
+            alignItems="center"
+            component="h3"
+            maxWidth="100%"
+            width="100%"
+            overflow={"hidden"}
           >
-            {section.tasks.length}
-          </Typography>
-        </Typography>
-      </Box>
-    </Box>
+            <Typography
+              sx={{
+                flexShrink: 1,
+                textWrap: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              fontWeight={500}
+              fontSize={16}
+            >
+              {section.is_default ? "(No Section)" : section.title}{" "}
+            </Typography>
+            <Typography
+              sx={{
+                flexShrink: 0,
+                textWrap: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {section.tasks.length}
+            </Typography>
+          </Stack>
+          <IconButton
+            onClick={handleOpenSectionMenu}
+            edge="end"
+            aria-label="comments"
+            sx={{ visibility: section.is_default ? "hidden" : "visible" }}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        </Stack>
+      </Tooltip>
+    </>
   );
 }

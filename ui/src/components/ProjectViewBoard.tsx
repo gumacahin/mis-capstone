@@ -3,23 +3,29 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useAddSection } from "../api";
+import ProjectContext from "../contexts/projectContext";
+import SectionContext from "../contexts/sectionContext";
 import { IProject, ISection } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
 import ProjectViewSectionHeader from "./ProjectViewSectionHeader";
-import TaskList from "./TaskList";
+import ProjectSectionTaskList from "./TaskList";
 
 type FormValues = {
   title: string;
 };
 
-const AddSectionButton = ({ section }: { section: ISection }) => {
+const AddSectionButton = ({
+  precedingSection,
+}: {
+  precedingSection: ISection;
+}) => {
   const [open, setOpen] = useState<boolean>(false);
-  const { mutateAsync } = useAddSection(section.project, section.order);
+  const { mutateAsync } = useAddSection(precedingSection);
   const defaultValues = { title: "" };
   const { register, handleSubmit, watch, reset } = useForm<FormValues>({
     defaultValues,
@@ -39,6 +45,7 @@ const AddSectionButton = ({ section }: { section: ISection }) => {
       {open ? (
         <Stack spacing={1} component={"form"} onSubmit={handleSubmit(onSubmit)}>
           <TextField
+            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
             size="small"
             id="section-title"
             aria-label="Section Name"
@@ -78,33 +85,37 @@ const AddSectionButton = ({ section }: { section: ISection }) => {
 export default function ProjectViewBoard({ project }: { project: IProject }) {
   const lastSection = project.sections[project.sections.length - 1];
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      sx={{
-        height: "100vh",
-        overflowX: "auto",
-        flex: "0 1 auto",
-        minWidth: 300,
-        alignItems: "start",
-        justifyContent: "start",
-      }}
-    >
-      {project.sections.map((section) => (
-        <Stack
-          key={section.id}
-          sx={{
-            minWidth: 300,
-            alignItems: "start",
-            justifyContent: "start",
-          }}
-        >
-          <ProjectViewSectionHeader section={section} />
-          <TaskList section={section} />
-          <AddTaskButton sectionId={section.id} projectId={project.id} />
-        </Stack>
-      ))}
-      <AddSectionButton section={lastSection} />
-    </Stack>
+    <ProjectContext.Provider value={project}>
+      <Stack
+        direction="row"
+        spacing={4}
+        sx={{
+          height: "100vh",
+          overflowX: "auto",
+          flex: "0 1 auto",
+          minWidth: 300,
+          alignItems: "start",
+          justifyContent: "start",
+        }}
+      >
+        {project.sections.map((section: ISection) => (
+          <SectionContext.Provider key={section.id} value={section}>
+            <Stack
+              key={section.id}
+              sx={{
+                minWidth: 300,
+                alignItems: "start",
+                justifyContent: "start",
+              }}
+            >
+              <ProjectViewSectionHeader />
+              <ProjectSectionTaskList />
+              <AddTaskButton />
+            </Stack>
+          </SectionContext.Provider>
+        ))}
+        <AddSectionButton precedingSection={lastSection} />
+      </Stack>
+    </ProjectContext.Provider>
   );
 }

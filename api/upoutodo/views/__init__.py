@@ -1,4 +1,5 @@
-from .ProjectSectionViewSet import ProjectSectionViewSet  # noqa: F401
-from .ProjectViewSet import ProjectViewSet  # noqa: F401
-from .TaskViewSet import TaskViewSet  # noqa: F401
-from .UserViewSet import UserViewSet  # noqa: F401
+from .project import ProjectViewSet  # noqa: F401
+from .project_section import ProjectSectionViewSet  # noqa: F401
+from .tag import TagViewSet  # noqa: F401
+from .task import TaskViewSet  # noqa: F401
+from .user import UserViewSet  # noqa: F401

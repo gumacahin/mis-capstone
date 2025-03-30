@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useAddSection } from "../api";
+import ProjectContext from "../contexts/projectContext";
+import SectionContext from "../contexts/sectionContext";
 import { IProject, ISection } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
 import ProjectSectionHeader from "./ProjectViewSectionHeader";
@@ -16,9 +18,13 @@ type FormValues = {
   title: string;
 };
 
-const AddSectionButton = ({ section }: { section: ISection }) => {
+const AddSectionButton = ({
+  precedingSection,
+}: {
+  precedingSection: ISection;
+}) => {
   const [open, setOpen] = useState<boolean>(false);
-  const { mutateAsync } = useAddSection(section.project, section.order);
+  const { mutateAsync } = useAddSection(precedingSection);
   const defaultValues = { title: "" };
   const { register, handleSubmit, watch, reset } = useForm<FormValues>({
     defaultValues,
@@ -42,6 +48,7 @@ const AddSectionButton = ({ section }: { section: ISection }) => {
       {open ? (
         <Stack spacing={1} component={"form"} onSubmit={handleSubmit(onSubmit)}>
           <TextField
+            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
             size="small"
             id="section-title"
             aria-label="Section Name"
@@ -91,15 +98,19 @@ const AddSectionButton = ({ section }: { section: ISection }) => {
 
 export default function ProjectViewList({ project }: { project: IProject }) {
   return (
-    <Stack>
-      {project.sections.map((section: ISection) => (
-        <Box key={section.id} mb={3}>
-          {!section.is_default && <ProjectSectionHeader section={section} />}
-          <TaskList section={section} />
-          <AddTaskButton sectionId={section.id} projectId={project.id} />
-          <AddSectionButton section={section} />
-        </Box>
-      ))}
-    </Stack>
+    <ProjectContext.Provider value={project}>
+      <Stack>
+        {project.sections.map((section: ISection) => (
+          <SectionContext.Provider value={section} key={section.id}>
+            <Box key={section.id} mb={3}>
+              <ProjectSectionHeader />
+              <TaskList tasks={section.tasks} />
+              <AddTaskButton />
+              <AddSectionButton precedingSection={section} />
+            </Box>
+          </SectionContext.Provider>
+        ))}
+      </Stack>
+    </ProjectContext.Provider>
   );
 }

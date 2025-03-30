@@ -1,4 +1,5 @@
-from .ProjectSectionSerializer import ProjectSectionSerializer  # noqa F401
-from .ProjectSerializer import ProjectDetailSerializer, ProjectSerializer  # noqa F401
-from .TaskSerializer import TaskSerializer  # noqa F401
-from .UserSerializer import UserProfileSerializer, UserSerializer  # noqa F401
+from .project_section import ProjectSectionSerializer  # noqa F401
+from .project import ProjectDetailSerializer, ProjectSerializer  # noqa F401
+from .tag import TagSerializer  # noqa F401
+from .task import TaskSerializer  # noqa F401
+from .user import UserProfileSerializer, UserSerializer  # noqa F401

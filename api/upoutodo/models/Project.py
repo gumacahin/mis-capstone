@@ -11,6 +11,7 @@ class ProjectViewMode(models.TextChoices):
 
 class Project(models.Model):
     DEFAULT_PROJECT_SECTION_TITLE = "(No Section)"
+    DEFAULT_PROJECT_TITLE = "Inbox"
 
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_projects"
@@ -42,4 +43,4 @@ class Project(models.Model):
         return f'"{self.title}" created by {self.created_by}'
 
     class Meta:
-        ordering = ["order", "-created_at"]
+        ordering = ["order", "created_at"]

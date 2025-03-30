@@ -1,22 +1,22 @@
 import { Alert, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import { useParams } from "react-router-dom";
 
-import { useInboxTasks, useProfile } from "../api";
+import { useProject } from "../api";
 import PageLayout from "../components/PageLayout";
 import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
 
-export default function InboxPage() {
-  const { data } = useProfile();
-  const { isPending, isError, data: project } = useInboxTasks(data?.inbox_id);
-  const pageTitle = "Inbox";
+export default function ProjectPage() {
+  const { projectId } = useParams();
+  const { isPending, isError, data: project } = useProject(Number(projectId));
 
   if (isError) {
     return (
       <PageLayout>
-        <Alert severity="error">Failed to load inbox</Alert>
+        <Alert severity="error">Failed to load project</Alert>
       </PageLayout>
     );
   }
@@ -29,18 +29,15 @@ export default function InboxPage() {
     );
   }
 
-  return (
-    <PageLayout>
-      <p>inbox</p>
-    </PageLayout>
-  );
+  const projectTitle = project?.title || "";
+
   return (
     <PageLayout>
       <Stack spacing={2}>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Box display={"flex"} alignItems={"center"}>
             <Typography fontSize={32} variant={"h1"}>
-              {pageTitle}
+              {projectTitle}
             </Typography>
           </Box>
           <ProjectViewMenu project={project} />

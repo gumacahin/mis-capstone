@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from taggit.managers import TaggableManager
 
-from .ProjectSection import ProjectSection
+from .project_section import ProjectSection
 
 
 class Task(models.Model):
@@ -21,7 +21,7 @@ class Task(models.Model):
         MEDIUM = 2, "Medium"
         HIGH = 3, "High"
 
-    priority = models.IntegerField(choices=Priority.choices, default=Priority.MEDIUM)
+    priority = models.IntegerField(choices=Priority.choices, default=Priority.NONE)
 
     tags = TaggableManager()
 

@@ -10,9 +10,11 @@ from upoutodo.models import Project, ProjectSection, UserProfile
 def setup_user_inbox(sender, instance, created, **kwargs):
     """The default project is the user's inbox."""
     if created:
-        username = instance.username
         Project.objects.create(
-            title=username, is_default=True, created_by=instance, updated_by=instance
+            title=Project.DEFAULT_PROJECT_TITLE,
+            is_default=True,
+            created_by=instance,
+            updated_by=instance,
         )
 
 

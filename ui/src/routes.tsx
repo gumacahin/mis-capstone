@@ -4,8 +4,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
-import ProjectDetailsPage from "./pages/ProjectDetailsPage";
-import ProjectsPage from "./pages/ProjectsPage";
+import ProjectPage from "./pages/ProjectPage";
+import ProjectsListPage from "./pages/ProjectsListPage";
 import SettingsPage from "./pages/SettingsPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
@@ -66,13 +66,13 @@ const routes = [
           },
           {
             path: "projects",
-            element: <ProjectsPage />,
+            element: <ProjectsListPage />,
             name: ROUTES.PROJECTS,
             end: true,
           },
           {
             path: "project/:projectId",
-            element: <ProjectDetailsPage />,
+            element: <ProjectPage />,
             name: ROUTES.PROJECT_DETAILS,
           },
           {

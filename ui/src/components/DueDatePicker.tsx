@@ -1,3 +1,4 @@
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CloseIcon from "@mui/icons-material/Close";
 import NextWeekIcon from "@mui/icons-material/NextWeek";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
@@ -13,6 +14,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
+import Tooltip from "@mui/material/Tooltip";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   DateCalendar,
@@ -23,10 +25,10 @@ import dayjs, { Dayjs } from "dayjs";
 import { MouseEvent, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
-import type { FormValues } from "./AddTaskDialog";
+import type { IAddTaskFields } from "../types/common";
 
 type DueDatePickerProps = DateCalendarProps<Dayjs> & {
-  control: Control<FormValues>;
+  control: Control<IAddTaskFields>;
   dueDate: Dayjs | null;
 };
 
@@ -45,9 +47,8 @@ export default function DueDatePicker(props: DueDatePickerProps) {
   const id = open ? "calendar-popover" : undefined;
 
   const formatDayOfWeek = (date: Dayjs | null) => {
-    console.log("formatDayOfWeek", date);
     if (date === null) {
-      return "No due date";
+      return "Date";
     }
     const givenDate = dayjs(date).startOf("day");
     const today = dayjs().startOf("day");
@@ -72,18 +73,28 @@ export default function DueDatePicker(props: DueDatePickerProps) {
       render={({ field }) => (
         <>
           <ButtonGroup variant="outlined" size="small">
-            <Button variant="outlined" onClick={handleClick} size="small">
-              {formatDayOfWeek(props.dueDate)}
-            </Button>
-            {field.value && (
+            <Tooltip title="Set due date">
               <Button
+                startIcon={<CalendarTodayIcon />}
                 variant="outlined"
-                onClick={() => {
-                  field.onChange(null);
-                }}
+                onClick={handleClick}
+                size="small"
               >
-                <CloseIcon />
+                {formatDayOfWeek(props.dueDate)}
               </Button>
+            </Tooltip>
+            {field.value && (
+              <Tooltip title="Remove due date">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    field.onChange(null);
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </Button>
+              </Tooltip>
             )}
           </ButtonGroup>
           <Popover

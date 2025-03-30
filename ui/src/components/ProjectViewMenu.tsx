@@ -7,7 +7,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import { debounce } from "@mui/material/utils";
 import { MouseEvent, useState } from "react";
 
 import { useUpdateProjectView } from "../api";
@@ -24,12 +23,12 @@ export default function ProjectViewMenu({ project }: { project: IProject }) {
   };
   const updateProjectView = useUpdateProjectView(project);
 
-  const handleChange = debounce((_: unknown, value: ProjectViewType) => {
-    console.log("handleChange", value);
+  // TODO: throttle this
+  const handleChange = async (_: unknown, value: ProjectViewType) => {
     if (value !== project.view) {
-      updateProjectView.mutateAsync(value);
+      await updateProjectView.mutateAsync(value);
     }
-  }, 300);
+  };
 
   return (
     <div>
@@ -61,13 +60,21 @@ export default function ProjectViewMenu({ project }: { project: IProject }) {
             value={project.view}
             onChange={handleChange}
           >
-            <ToggleButton value="list" aria-label="list view">
+            <ToggleButton
+              value="list"
+              aria-label="list view"
+              disabled={project.view === "list"}
+            >
               <Stack alignItems={"center"}>
                 <ListIcon />
                 <small>List</small>
               </Stack>
             </ToggleButton>
-            <ToggleButton value="board" aria-label="board view">
+            <ToggleButton
+              value="board"
+              aria-label="board view"
+              disabled={project.view === "board"}
+            >
               <Stack alignItems={"center"}>
                 <ViewModuleIcon />
                 <small>Board</small>

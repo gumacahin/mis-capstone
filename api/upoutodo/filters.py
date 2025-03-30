@@ -19,6 +19,9 @@ class TaskFilter(FilterSet):
         super().__init__(*args, **kwargs)
         self.start_date_value = None
         self.end_date_value = None
+        self.inbox = None
+        self.today = None
+        self.upcoming = None
 
     def filter_start_end_date(self, queryset, name, value):
         if name == "start_date":

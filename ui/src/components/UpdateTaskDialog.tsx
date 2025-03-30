@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import { FormEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
-import { useAddComment, useAuth, useTask, useUpdateTask } from "../api";
+import { useAddComment, useProfile, useTask, useUpdateTask } from "../api";
 import type { ITask } from "../types/common";
 import CommentList from "./CommentList";
 import DueDatePicker from "./DueDatePicker";
@@ -150,15 +150,16 @@ export default function UpdateTaskDialog({
   open,
   handleClose,
   task,
+  section,
 }: {
   open: boolean;
   handleClose: () => void;
   task: ITask;
 }) {
-  const { data: user } = useAuth();
+  const { data: user } = useProfile();
   const userId = user?.id;
   const [formActive, setFormActive] = useState(false);
-  const updateTask = useUpdateTask(task);
+  const updateTask = useUpdateTask(task, section);
   const { isError, data } = useTask(task);
 
   const userDisplayName = user

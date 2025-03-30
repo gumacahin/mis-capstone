@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 export type AnyJSON = string | number | AnyJSON[] | { [key: string]: AnyJSON };
 
 export type jsonable =
@@ -10,14 +11,43 @@ export type jsonable =
   | { [key: string]: jsonable }
   | { toJSON: () => jsonable };
 
+export interface IProfileProject {
+  id: number;
+  title: string;
+  is_default: boolean;
+  sections: {
+    id: number;
+    title: string;
+    is_default: boolean;
+  }[];
+}
+export interface IProfile {
+  name: string;
+  email: string;
+  picture: string;
+  projects: IProfileProject[];
+}
+
+export type TTaskPriority = "NONE" | "LOW" | "MEDIUM" | "HIGH";
+export interface IAddTaskFields {
+  title: string;
+  description: string | null;
+  due_date: Dayjs | null;
+  priority: TTaskPriority;
+  section_id: number;
+  project_id: number;
+  labels: string[];
+}
+
 export interface ITask {
   id?: number;
   title: string;
   completion_date?: string | null;
   description?: string | null;
-  due_date: string | null;
+  due_date?: string | null;
   priority?: number;
-  section?: number;
+  section_id: number;
+  project_id: number;
 }
 
 export interface IComment {
@@ -30,13 +60,6 @@ export interface IComment {
 }
 
 export type ProjectViewType = "list" | "board";
-export interface IProject {
-  id: number;
-  title: string;
-  view: ProjectViewType;
-  sections: ISection[];
-  is_default: boolean;
-}
 
 export interface ISection {
   id: number;
@@ -59,4 +82,11 @@ export interface IProjectDetails {
   view: "list" | "board";
   sections: ISection[];
   tasks: ITask[];
+}
+
+export interface IProjectOption {
+  id: number;
+  title: string;
+  is_default: boolean;
+  sections: { title: string; id: number; is_default: boolean }[];
 }

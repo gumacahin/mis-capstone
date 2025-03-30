@@ -1,25 +1,23 @@
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import IconButton from "@mui/material/IconButton";
-import Skeleton from "@mui/material/Skeleton";
 import dayjs from "dayjs";
-import { MouseEvent } from "react";
+import { MouseEvent, useContext } from "react";
 import toast from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
-import type { ITask } from "../types/common";
+import ProjectContext from "../contexts/projectContext";
+import type { IProject, ITask } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
-  projectId,
   disabled,
 }: {
   task: ITask;
   disabled?: boolean;
-  projectId: number;
 }) {
-  const updateTask = useUpdateTask(task, projectId);
+  const project = useContext<IProject | null>(ProjectContext);
+  const updateTask = useUpdateTask(task, project);
 
   const isTaskCompleted = task.completion_date !== null;
 
@@ -35,22 +33,6 @@ export default function TaskCheckIcon({
       error: "Error updating task.",
     });
   };
-
-  // if (isPending) {
-  //   return (
-  //     <IconButton sx={{ cursor: "not-allowed" }}>
-  //       <Skeleton variant="circular" width={24} height={24} />
-  //     </IconButton>
-  //   );
-  // }
-
-  // if (isError) {
-  //   return (
-  //     <IconButton sx={{ cursor: "not-allowed" }}>
-  //       <ErrorOutlineIcon />
-  //     </IconButton>
-  //   );
-  // }
 
   if (disabled) {
     return (

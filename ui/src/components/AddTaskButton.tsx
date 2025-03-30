@@ -7,12 +7,8 @@ import TaskForm from "./TaskForm";
 
 export default function AddTaskButton({
   presetDueDate = null,
-  sectionId,
-  projectId,
 }: {
   presetDueDate?: Dayjs | null;
-  sectionId?: number;
-  projectId: number;
 }) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -21,8 +17,6 @@ export default function AddTaskButton({
       {open ? (
         <TaskForm
           presetDueDate={presetDueDate}
-          sectionId={sectionId}
-          projectId={projectId}
           handleClose={() => {
             setOpen(false);
           }}

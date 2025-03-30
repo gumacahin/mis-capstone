@@ -1,58 +1,65 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { Dayjs } from "dayjs";
+import { useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useAddTask } from "../api";
-import type { ITask } from "../types/common";
+import ProfileContext from "../contexts/profileContext";
+import ProjectContext from "../contexts/projectContext";
+import SectionContext from "../contexts/sectionContext";
+import type { IAddTaskFields, ITask, TTaskPriority } from "../types/common";
 import DueDatePicker from "./DueDatePicker";
-
-export type FormValues = {
-  title: string;
-  description: string | null;
-  due_date: Dayjs | null;
-  section: number | null;
-};
+import TaskLabelsMenu from "./TaskLabelsMenu";
+import TaskPriorityMenu from "./TaskPriorityMenu";
+import TaskProjectMenu from "./TaskProjectMenu";
 
 export default function TaskForm({
   presetDueDate = null,
-  task,
-  sectionId,
-  projectId,
   handleClose,
 }: {
   presetDueDate?: Dayjs | null;
   task?: ITask;
   handleClose: () => void;
-  sectionId?: number;
-  projectId?: number;
 }) {
-  console.log("projectId", projectId, typeof projectId);
-  const addTask = useAddTask(projectId);
+  const project = useContext(ProjectContext)!;
+  const section = useContext(SectionContext);
+  const { projects } = useContext(ProfileContext)!;
+  const inbox = projects.find((p) => p.is_default)!;
+  const inboxDefaultSection = inbox.sections.find((s) => s.is_default);
 
-  // TODO: add updating of tasks
-  console.log("task", task);
+  const addTask = useAddTask(project.id);
+  const defaultValues = {
+    title: "",
+    description: "",
+    due_date: presetDueDate,
+    project_id: project ? project.id : inbox?.id,
+    section_id: section ? section.id : inboxDefaultSection?.id,
+    priority: "NONE" as TTaskPriority,
+    labels: [],
+  };
 
-  const { control, register, handleSubmit, watch } = useForm<FormValues>({
-    defaultValues: {
-      title: "",
-      description: "",
-      due_date: presetDueDate,
-    },
+  const { control, register, handleSubmit, watch } = useForm<IAddTaskFields>({
+    defaultValues,
   });
 
-  const onSubmit: SubmitHandler<FormValues> = async (formValues) => {
+  const onSubmit: SubmitHandler<IAddTaskFields> = async ({
+    title,
+    description,
+    due_date,
+    section_id,
+    project_id,
+  }) => {
     const data: ITask = {
-      title: formValues.title,
-      description: formValues.description,
-      section: sectionId,
-      due_date:
-        formValues.due_date != null
-          ? formValues.due_date.format("YYYY-MM-DD")
-          : null,
+      title,
+      description,
+      section_id,
+      due_date: due_date != null ? due_date.format("YYYY-MM-DD") : null,
+      project_id,
     };
     toast.promise(addTask.mutateAsync(data), {
       loading: "Adding task...",
@@ -63,12 +70,17 @@ export default function TaskForm({
   };
 
   const dueDate = watch("due_date");
+  const priority = watch("priority");
+  const labels = watch("labels");
+  const sectionId = watch("section_id");
+
   return (
     <Stack
+      overflow="hidden"
+      maxWidth={"100%"}
       spacing={2}
       component="form"
       onSubmit={handleSubmit(onSubmit)}
-      sx={{ maxWidth: "100%" }}
     >
       <TextField
         required
@@ -90,13 +102,18 @@ export default function TaskForm({
         variant="standard"
         {...register("description")}
       />
-      <DueDatePicker control={control} dueDate={dueDate} />
-      <Box display="flex" justifyContent={"flex-end"}>
+      <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
+        <TaskProjectMenu control={control} sectionId={sectionId} />
+        <DueDatePicker control={control} dueDate={dueDate} />
+        <TaskPriorityMenu control={control} priority={priority} />
+        <TaskLabelsMenu control={control} labels={labels} />
+      </Stack>
+      <Stack spacing={1} direction="row" justifyContent={"end"}>
         <Button onClick={handleClose}>Cancel</Button>
         <Button type="submit" variant="outlined">
           Save
         </Button>
-      </Box>
+      </Stack>
     </Stack>
   );
 }

@@ -36,12 +36,24 @@ const useApiClient = () => {
   return apiClient;
 };
 
-export const useAuth = () => {
+export const useProfile = (enabled: boolean = true) => {
   const apiClient = useApiClient();
   return useQuery({
     queryKey: ["me"],
     queryFn: async () => {
       const { data } = await apiClient.get("users/me/");
+      return data;
+    },
+    enabled,
+  });
+};
+
+export const useLabels = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["labels"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("tags/");
       return data;
     },
   });
@@ -58,14 +70,16 @@ export const useTasksToday = () => {
   });
 };
 
-export const useInboxTasks = () => {
+export const useInboxTasks = (projectId?: number) => {
+  console.log("useInboxTasks", projectId);
   const apiClient = useApiClient();
   return useQuery({
-    queryKey: ["projects", "inbox"],
+    queryKey: ["project", { projectId }],
     queryFn: async () => {
-      const { data } = await apiClient.get("projects/inbox/");
+      const { data } = await apiClient.get(`projects/${projectId}/`);
       return data;
     },
+    enabled: !!projectId,
   });
 };
 
@@ -107,7 +121,7 @@ export const useTasks = (start: Date, end: Date) => {
   });
 };
 
-export const useAddTask = (projectId?: number) => {
+export const useAddTask = (projectId: number) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
@@ -118,19 +132,16 @@ export const useAddTask = (projectId?: number) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-      if (projectId) {
-        console.log("Invalidating project", ["project", { projectId }]);
-        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
     },
   });
 };
 
-export const useUpdateTask = (task: ITask, projectId?: number) => {
+export const useUpdateTask = (task: ITask, project: IProject | null) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   const taskId = task.id;
+  const projectId = project?.id;
   return useMutation({
     mutationKey: ["updateTask", { taskId }],
     mutationFn: async (updatedTask: Partial<ITask>) => {
@@ -138,11 +149,7 @@ export const useUpdateTask = (task: ITask, projectId?: number) => {
       return result.data;
     },
     onSettled: () => {
-      if (projectId) {
-        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["projects", "inbox"] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
       queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
     },
   });
@@ -336,27 +343,21 @@ export const useDeleteProject = (project: IProject) => {
 export const useUpdateProjectView = (project: IProject) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
+  const projectId = project.id;
   return useMutation({
-    mutationKey: ["updateProjectView", { projectId: project.id }],
+    mutationKey: ["updateProjectView", { projectId }],
     mutationFn: async (view: ProjectViewType) => {
-      const response = await apiClient.patch(`/projects/${project.id}/`, {
+      const response = await apiClient.patch(`/projects/${projectId}/`, {
         view,
       });
       return response.data;
     },
     onMutate: async (view: ProjectViewType) => {
-      await queryClient.cancelQueries({ queryKey: ["projects", "inbox"] });
-      if (project.is_default) {
-        queryClient.setQueryData(["projects", "inbox"], {
-          ...project,
-          view,
-        });
-      } else {
-        queryClient.setQueryData(["project", { projectId: project.id }], {
-          ...project,
-          view,
-        });
-      }
+      await queryClient.cancelQueries({ queryKey: ["project"] });
+      queryClient.setQueryData(["project", { projectId }], {
+        ...project,
+        view,
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -364,8 +365,9 @@ export const useUpdateProjectView = (project: IProject) => {
   });
 };
 
-export const useAddSection = (projectId: number, order: number) => {
-  console.log("useAddSection", projectId, order);
+export const useAddSection = (preceedingSection: ISection) => {
+  const projectId = preceedingSection.project;
+
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
@@ -374,17 +376,61 @@ export const useAddSection = (projectId: number, order: number) => {
       const data = {
         title: project.title,
         project: projectId,
-        order: order,
+        preceding_section: preceedingSection.id,
       };
       const response = await apiClient.post("/project_sections/", data);
       return response.data;
     },
     onSettled: () => {
-      if (projectId) {
-        queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["projects", "inbox"] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+    },
+  });
+};
+
+export const useDeleteSection = (projectId: number, sectionId: number) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["deleteSection", { sectionId }],
+    mutationFn: async () => {
+      const result = await apiClient.delete(`/project_sections/${sectionId}/`);
+      return result.data;
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["project", { projectId }] });
+      queryClient.setQueryData(
+        ["project", { projectId }],
+        (project: IProject) => {
+          const newProject = {
+            ...project,
+            sections: project.sections.filter(
+              (s: ISection) => s.id !== sectionId,
+            ),
+          };
+          return newProject;
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+    },
+  });
+};
+
+export const useUpdateSection = (projectId: number, sectionId: number) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateSection", { sectionId }],
+    mutationFn: async (data: Partial<ISection>) => {
+      const result = await apiClient.patch(
+        `/project_sections/${sectionId}/`,
+        data,
+      );
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
     },
   });
 };
