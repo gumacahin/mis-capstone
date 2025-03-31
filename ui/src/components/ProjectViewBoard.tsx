@@ -3,14 +3,14 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useAddSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import { IProject, ISection } from "../types/common";
+import { IProjectDetail, ISection } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
 import ProjectViewSectionHeader from "./ProjectViewSectionHeader";
 import ProjectSectionTaskList from "./TaskList";
@@ -82,7 +82,11 @@ const AddSectionButton = ({
   );
 };
 
-export default function ProjectViewBoard({ project }: { project: IProject }) {
+export default function ProjectViewBoard({
+  project,
+}: {
+  project: IProjectDetail;
+}) {
   const lastSection = project.sections[project.sections.length - 1];
   return (
     <ProjectContext.Provider value={project}>

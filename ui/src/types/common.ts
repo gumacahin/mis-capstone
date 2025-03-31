@@ -76,17 +76,18 @@ export interface IPaginatedResponse<T> {
   previous: string | null;
   results: T[];
 }
-export interface IProjectDetails {
+export interface IProjectDetail {
   id: number;
-  name: string;
+  title: string;
   view: "list" | "board";
   sections: ISection[];
   tasks: ITask[];
 }
 
-export interface IProjectOption {
+export interface IProject {
   id: number;
   title: string;
   is_default: boolean;
+  order: number;
   sections: { title: string; id: number; is_default: boolean }[];
 }

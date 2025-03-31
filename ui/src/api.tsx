@@ -7,6 +7,7 @@ import type {
   IComment,
   IPaginatedResponse,
   IProject,
+  IProjectDetail,
   ISection,
   ITask,
   ProjectViewType,
@@ -71,7 +72,6 @@ export const useTasksToday = () => {
 };
 
 export const useInboxTasks = (projectId?: number) => {
-  console.log("useInboxTasks", projectId);
   const apiClient = useApiClient();
   return useQuery({
     queryKey: ["project", { projectId }],
@@ -137,7 +137,7 @@ export const useAddTask = (projectId: number) => {
   });
 };
 
-export const useUpdateTask = (task: ITask, project: IProject | null) => {
+export const useUpdateTask = (task: ITask, project: IProjectDetail | null) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   const taskId = task.id;
@@ -282,12 +282,25 @@ export const useProject = (projectId: number) => {
   });
 };
 
-export const useAddProject = () => {
+export const useAddProject = (
+  referenceProjectId?: number,
+  position?: "above" | "below",
+) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addProject"],
-    mutationFn: async (project: IProject) => {
+    mutationFn: async (
+      project: IProject & {
+        above_project_id?: number;
+        below_project_id?: number;
+      },
+    ) => {
+      if (position === "above") {
+        project["above_project_id"] = referenceProjectId;
+      } else if (position === "below") {
+        project["below_project_id"] = referenceProjectId;
+      }
       const response = await apiClient.post("/projects/", project);
       return response.data;
     },
@@ -340,7 +353,7 @@ export const useDeleteProject = (project: IProject) => {
   });
 };
 
-export const useUpdateProjectView = (project: IProject) => {
+export const useUpdateProjectView = (project: IProjectDetail) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   const projectId = project.id;
@@ -404,7 +417,7 @@ export const useDeleteSection = (projectId: number, sectionId: number) => {
           const newProject = {
             ...project,
             sections: project.sections.filter(
-              (s: ISection) => s.id !== sectionId,
+              (s: { id: number }) => s.id !== sectionId,
             ),
           };
           return newProject;

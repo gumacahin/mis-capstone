@@ -12,7 +12,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import App from "./App.tsx";
-import { ThemeContextProvider } from "./components/ThemeContext.tsx";
+import ThemeContextProvider from "./components/ThemeContextProvider.tsx";
 import {
   AUTH0_AUDIENCE,
   AUTH0_CLIENT_ID,

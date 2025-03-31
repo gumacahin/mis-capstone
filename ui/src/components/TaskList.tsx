@@ -15,10 +15,10 @@ import TaskCheckIcon from "./TaskCheckIcon";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
 export default function TaskList({
-  // tasks,
+  tasks,
   hideDueDates,
 }: {
-  // tasks: ITask[];
+  tasks?: ITask[];
   hideDueDates?: boolean;
 }) {
   const [taskForUpdating, setTaskForUpdating] = useState<ITask | null>(null);
@@ -26,7 +26,7 @@ export default function TaskList({
     setTaskForUpdating(task);
   };
   const section = useContext<ISection | null>(SectionContext);
-  const tasks = section?.tasks || [];
+  tasks = tasks ?? section?.tasks ?? [];
 
   const handleClose = () => {
     setTaskForUpdating(null);

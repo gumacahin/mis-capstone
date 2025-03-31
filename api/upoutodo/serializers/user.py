@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from upoutodo.models import UserProfile, Project, ProjectSection
+from upoutodo.models import Project, ProjectSection, UserProfile
 
 User = get_user_model()
 

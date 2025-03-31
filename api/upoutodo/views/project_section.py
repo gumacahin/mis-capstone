@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from rest_framework import permissions, viewsets, serializers
+from rest_framework import permissions, serializers, viewsets
 
 from upoutodo.models import ProjectSection
 from upoutodo.serializers import ProjectSectionSerializer
@@ -18,31 +18,16 @@ class ProjectSectionViewSet(viewsets.ModelViewSet):
         with transaction.atomic():
             # see ProjectSectionSerializer.validate
             requested_order = serializer.validated_data["order"]
+            project = serializer.validated_data["project"]
 
             # Shift existing items down
-            ProjectSection.objects.filter(order__gte=requested_order).update(
-                order=models.F("order") + 1
-            )
+            ProjectSection.objects.filter(
+                order__gte=requested_order, project=project
+            ).update(order=models.F("order") + 1)
             serializer.save(order=requested_order)
 
     def perform_update(self, serializer):
         instance = serializer.instance
         if instance.is_default:
-            raise serializers.ValidationError("Cannot update default section")
-
-        with transaction.atomic():
-            new_order = serializer.validated_data.get("order")
-
-            if new_order and new_order != instance.order:
-                if new_order > instance.order:
-                    # Move down: Shift items up
-                    ProjectSection.objects.filter(
-                        order__gt=instance.order, order__lte=new_order
-                    ).update(order=models.F("order") - 1)
-                else:
-                    # Move up: Shift items down
-                    ProjectSection.objects.filter(
-                        order__lt=instance.order, order__gte=new_order
-                    ).update(order=models.F("order") + 1)
-
-            serializer.save(order=new_order)
+            raise serializers.ValidationError("Cannot update default section.")
+        super().perform_update(serializer)

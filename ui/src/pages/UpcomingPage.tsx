@@ -17,6 +17,7 @@ import { MouseEvent, useState } from "react";
 
 import { useTasks, useTasksToday } from "../api";
 import AddTaskButton from "../components/AddTaskButton";
+import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
@@ -248,7 +249,9 @@ export default function UpcomingPage() {
                       dayjs(task.due_date).isSame(dayjs(date)),
                     )}
                   />
-                  <AddTaskButton dueDate={date} />
+                  <InboxDefaultSectionProvider>
+                    <AddTaskButton presetDueDate={dayjs(date)} />
+                  </InboxDefaultSectionProvider>
                 </>
               )}
             </Box>

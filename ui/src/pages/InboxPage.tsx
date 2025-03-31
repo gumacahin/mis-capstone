@@ -7,10 +7,12 @@ import PageLayout from "../components/PageLayout";
 import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
+import { IProject } from "../types/common";
 
 export default function InboxPage() {
   const { data } = useProfile();
-  const { isPending, isError, data: project } = useInboxTasks(data?.inbox_id);
+  const inbox = data?.projects.find((p: IProject) => p.is_default);
+  const { isPending, isError, data: project } = useInboxTasks(inbox?.id);
   const pageTitle = "Inbox";
 
   if (isError) {
@@ -29,11 +31,6 @@ export default function InboxPage() {
     );
   }
 
-  return (
-    <PageLayout>
-      <p>inbox</p>
-    </PageLayout>
-  );
   return (
     <PageLayout>
       <Stack spacing={2}>

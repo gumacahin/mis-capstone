@@ -10,9 +10,13 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { MouseEvent, useState } from "react";
 
 import { useUpdateProjectView } from "../api";
-import type { IProject, ProjectViewType } from "../types/common";
+import type { IProjectDetail, ProjectViewType } from "../types/common";
 
-export default function ProjectViewMenu({ project }: { project: IProject }) {
+export default function ProjectViewMenu({
+  project,
+}: {
+  project: IProjectDetail;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {

@@ -32,7 +32,7 @@ type DueDatePickerProps = DateCalendarProps<Dayjs> & {
   dueDate: Dayjs | null;
 };
 
-export default function DueDatePicker(props: DueDatePickerProps) {
+export default function DatePicker(props: DueDatePickerProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {

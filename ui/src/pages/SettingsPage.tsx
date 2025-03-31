@@ -17,7 +17,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { useState } from "react";
 
-import { useThemeContext } from "../components/ThemeContext";
+import useThemeContext from "../hooks/useThemeContext";
 
 function ConfirmDeleteDialog({
   open,

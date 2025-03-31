@@ -1,6 +1,4 @@
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { Dayjs } from "dayjs";
@@ -13,7 +11,7 @@ import ProfileContext from "../contexts/profileContext";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
 import type { IAddTaskFields, ITask, TTaskPriority } from "../types/common";
-import DueDatePicker from "./DueDatePicker";
+import DatePicker from "./DatePicker";
 import TaskLabelsMenu from "./TaskLabelsMenu";
 import TaskPriorityMenu from "./TaskPriorityMenu";
 import TaskProjectMenu from "./TaskProjectMenu";
@@ -104,7 +102,7 @@ export default function TaskForm({
       />
       <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
         <TaskProjectMenu control={control} sectionId={sectionId} />
-        <DueDatePicker control={control} dueDate={dueDate} />
+        <DatePicker control={control} dueDate={dueDate} />
         <TaskPriorityMenu control={control} priority={priority} />
         <TaskLabelsMenu control={control} labels={labels} />
       </Stack>

@@ -8,7 +8,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { useProfile } from "./api";
 import Spinner from "./components/Spinner";
-import TaskForm from "./components/TaskForm";
 import ProfileContext from "./contexts/profileContext";
 import routes from "./routes";
 

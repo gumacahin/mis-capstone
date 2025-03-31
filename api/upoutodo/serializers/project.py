@@ -18,7 +18,22 @@ class BaseProjectSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProjectSerializer(BaseProjectSerializer):
-    pass
+    above_project_id = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects.all(),
+        required=False,
+        source="id",
+    )
+    below_project_id = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects.all(),
+        required=False,
+        source="id",
+    )
+
+    class Meta(BaseProjectSerializer.Meta):
+        fields = BaseProjectSerializer.Meta.fields + [
+            "above_project_id",
+            "below_project_id",
+        ]
 
 
 class ProjectDetailSerializer(BaseProjectSerializer):

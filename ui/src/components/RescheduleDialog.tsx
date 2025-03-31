@@ -38,7 +38,6 @@ export default function RescheduleDialog({ tasks }: { tasks: ITask[] }) {
     }
     const updatedTasks = tasks.map((task: ITask) => {
       task.due_date = dayjs(date).format("YYYY-MM-DD");
-      task.completed_date = "";
       return task;
     });
     toast.promise(rescheduleTasks.mutateAsync(updatedTasks), {

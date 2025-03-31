@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
 import ProjectContext from "../contexts/projectContext";
-import type { IProject, ITask } from "../types/common";
+import type { IProjectDetail, ITask } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
@@ -16,7 +16,7 @@ export default function TaskCheckIcon({
   task: ITask;
   disabled?: boolean;
 }) {
-  const project = useContext<IProject | null>(ProjectContext);
+  const project = useContext<IProjectDetail | null>(ProjectContext);
   const updateTask = useUpdateTask(task, project);
 
   const isTaskCompleted = task.completion_date !== null;

@@ -1,8 +1,8 @@
-import { IProject } from "../types/common";
+import { IProjectDetail } from "../types/common";
 import ProjectViewBoard from "./ProjectViewBoard";
 import ProjectViewList from "./ProjectViewList";
 
-export default function ProjectView({ project }: { project: IProject }) {
+export default function ProjectView({ project }: { project: IProjectDetail }) {
   const isListView = project.view === "list";
   return (
     <div>

@@ -9,7 +9,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
-import { Alert, Skeleton } from "@mui/material";
+import Alert from "@mui/material/Alert";
 import MuiAppBar, {
   type AppBarProps as MuiAppBarProps,
 } from "@mui/material/AppBar";
@@ -20,23 +20,15 @@ import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton, {
-  ListItemButtonProps,
-} from "@mui/material/ListItemButton";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import Stack from "@mui/material/Stack";
+import Skeleton from "@mui/material/Skeleton";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import React, { ReactNode, useState } from "react";
-import {
-  generatePath,
-  NavLink,
-  NavLinkProps,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { MouseEvent, ReactNode, useState } from "react";
+import { generatePath } from "react-router-dom";
 
 import { useProjects } from "../api";
 import { ROUTES } from "../routes";
@@ -44,83 +36,11 @@ import { IProject } from "../types/common";
 import AccountMenu from "./AccountMenu";
 import AddProjectDialog from "./AddProjectDialog";
 import AddTaskDialog from "./AddTaskDialog";
+import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
+import ListItemNavLink from "./ListItemNavLink";
 import ProjectMenu from "./ProjectMenu";
 
-const drawerWidth = 240;
-
-type RouterLinkProps = React.PropsWithChildren<{
-  to: string;
-  text: string;
-  icon?: ReactNode;
-  disablePadding?: boolean;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-  secondaryAction?: ReactNode;
-  showProjectAddIcon?: boolean;
-  handleAddProjectClick?: () => void;
-  handleExpandProjectClick?: () => void;
-  isProjectListOpen?: boolean;
-}> &
-  Omit<ListItemButtonProps, "component">;
-
-const RouterLink = (props: RouterLinkProps) => {
-  type MyNavLinkProps = Omit<NavLinkProps, "to">;
-  const location = useLocation();
-  const isAddingTask = location.hash === "#add-task";
-  const MemoedNavLink = React.useMemo(
-    () =>
-      // eslint-disable-next-line react/display-name
-      React.forwardRef<HTMLAnchorElement, MyNavLinkProps>(
-        (navLinkProps, ref) => {
-          const { className: previousClasses, ...rest } = navLinkProps;
-          const elementClasses = previousClasses?.toString() ?? "";
-          return (
-            <NavLink
-              {...rest}
-              ref={ref}
-              to={props.to}
-              end
-              className={({ isActive }) =>
-                // FIXME: these are unnecessary
-                !isAddingTask && isActive
-                  ? elementClasses + " Mui-selected"
-                  : elementClasses
-              }
-            />
-          );
-        },
-      ),
-    [props.to, isAddingTask],
-  );
-
-  MemoedNavLink.displayName = "MemoedNavLink";
-
-  return (
-    <ListItem
-      disablePadding
-      onMouseEnter={props.onMouseEnter}
-      onMouseLeave={props.onMouseLeave}
-      secondaryAction={props.secondaryAction}
-    >
-      <ListItemButton component={MemoedNavLink}>
-        {props.icon && (
-          <ListItemIcon
-            sx={{
-              ".Mui-selected > &": {
-                color: (theme) => theme.palette.primary.main,
-              },
-            }}
-          >
-            {props.icon}
-          </ListItemIcon>
-        )}
-        <ListItemText primary={props.text} />
-      </ListItemButton>
-    </ListItem>
-  );
-};
-
-RouterLink.displayName = "RouterLink";
+const DRAWER_WIDTH = 240;
 
 const ProjectListSkeleton = () => {
   return Array.from({ length: 6 }).map((_, index) => (
@@ -148,23 +68,22 @@ function DrawerContents({
   const [isProjectListOpen, setProjectListOpen] = useState(false);
   const [isAddProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
   const [projectsMenuItemHovered, setProjectsMenuItemHovered] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<
-    "add-task" | "projects" | "add-project" | null
-  >(null);
-  // TODO: use a reducer here
-  const [isAddingTask, setAddingTask] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [project, setProject] = useState<IProject | null>(null);
-  const navigate = useNavigate();
+
+  console.log("isLargeDisplay", isLargeDisplay);
+
   const {
     isPending: isProjectsPending,
     isError: isProjectsError,
     data: projectsData,
   } = useProjects();
 
+  const projects = projectsData?.results || [];
+
   const handleOpenProjectMenu = (
     event: MouseEvent<HTMLButtonElement>,
-    project: IProjectOption,
+    project: IProject,
   ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -175,17 +94,24 @@ function DrawerContents({
     setAnchorEl(null);
   };
 
-  const projects: IProject[] = projectsData?.results ?? [];
   const handleAddTaskClick = () => {
     handleAddTaskDialogOpen();
-    setAddingTask(true);
   };
   const handleAddProjectClick = () => {
     setAddProjectDialogOpen(true);
-    setSelectedMenuItem("add-project");
   };
   const handleExpandProjectClick = () => {
     setProjectListOpen(!isProjectListOpen);
+  };
+
+  const listItemIconStyle: {
+    [key: string]: {
+      color: (theme: Theme) => string;
+    };
+  } = {
+    ".Mui-selected > &": {
+      color: (theme) => theme.palette.primary.main,
+    },
   };
 
   return (
@@ -222,74 +148,95 @@ function DrawerContents({
         </Box>
       </DrawerHeader>
       <Divider />
-      <List>
-        <ListItemButton onClick={handleAddTaskClick}>
-          <ListItemIcon>
-            <AddCircleIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Add Task"} />
-        </ListItemButton>
-        <RouterLink to={ROUTES.INBOX} text="Inbox" icon={<InboxIcon />} />
-        <RouterLink to={ROUTES.TODAY} text="Today" icon={<TodayIcon />} />
-        <RouterLink
-          to={ROUTES.UPCOMING}
-          text="Upcoming"
-          icon={<UpcomingIcon />}
-        />
+      <List component="nav">
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemButton onClick={handleAddTaskClick}>
+            <ListItemIcon>
+              <AddCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Add task"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.INBOX}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Inbox"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.TODAY}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <TodayIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Today"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.UPCOMING}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <UpcomingIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Upcoming"} />
+          </ListItemNavLink>
+        </ListItem>
         <Divider />
-        <RouterLink
-          to={ROUTES.PROJECTS}
-          text="My Projects"
+        <ListItem
+          component={"div"}
+          disableGutters
           disablePadding
-          handleAddProjectClick={handleAddProjectClick}
-          handleExpandProjectClick={handleExpandProjectClick}
-          isProjectListOpen={isProjectListOpen}
-          showProjectAddIcon={projectsMenuItemHovered}
           onMouseEnter={() => setProjectsMenuItemHovered(true)}
           onMouseLeave={() => setProjectsMenuItemHovered(false)}
           secondaryAction={
-            <Stack direction="row" spacing={1}>
+            <>
               <IconButton
                 onClick={handleAddProjectClick}
-                edge="end"
                 aria-label="add project"
+                sx={[!projectsMenuItemHovered && { display: "none" }]}
               >
                 <AddIcon />
               </IconButton>
               <IconButton
                 onClick={handleExpandProjectClick}
-                edge="end"
                 aria-label="expand projects list"
               >
                 {isProjectListOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
-            </Stack>
+            </>
           }
-        />
+        >
+          <ListItemNavLink to={ROUTES.PROJECTS}>
+            <ListItemText primary={"My Projects"} />
+          </ListItemNavLink>
+        </ListItem>
         <Collapse in={isProjectListOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+          <List disablePadding>
             {isProjectsPending && <ProjectListSkeleton />}
             {isProjectsError && <ProjectListError />}
-            {projects &&
-              projects.map((project: IProject) => (
-                <RouterLink
+            {projects.map((project: IProject) => (
+              <ListItem
+                key={project.id}
+                disableGutters
+                disablePadding
+                secondaryAction={
+                  <IconButton
+                    onClick={(e) => handleOpenProjectMenu(e, project)}
+                    aria-label="project options"
+                  >
+                    <MoreHorizIcon />
+                  </IconButton>
+                }
+              >
+                <ListItemNavLink
                   to={generatePath("project/:projectId", {
                     projectId: `${project.id}`,
                   })}
-                  text={project.title}
-                  key={project.id}
-                  disablePadding
-                  secondaryAction={
-                    <IconButton
-                      onClick={(e) => handleOpenProjectMenu(e, project)}
-                      edge="end"
-                      aria-label="project options"
-                    >
-                      <MoreHorizIcon />
-                    </IconButton>
-                  }
-                />
-              ))}
+                >
+                  <ListItemText primary={project.title} />
+                </ListItemNavLink>
+              </ListItem>
+            ))}
           </List>
         </Collapse>
       </List>
@@ -309,7 +256,7 @@ const Main = styled("main", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
+  marginLeft: `-${DRAWER_WIDTH}px`,
   variants: [
     {
       props: ({ open }) => open,
@@ -339,8 +286,8 @@ const AppBar = styled(MuiAppBar, {
     {
       props: ({ open }) => open,
       style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+        marginLeft: `${DRAWER_WIDTH}px`,
         transition: theme.transitions.create(["margin", "width"], {
           easing: theme.transitions.easing.easeOut,
           duration: theme.transitions.duration.enteringScreen,
@@ -375,12 +322,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <AddTaskDialog
-        open={isAddTaskDialogOpen}
-        handleClose={() => {
-          setIsAddTaskDialogOpen(false);
-        }}
-      />
+      <InboxDefaultSectionProvider>
+        <AddTaskDialog
+          open={isAddTaskDialogOpen}
+          handleClose={() => {
+            setIsAddTaskDialogOpen(false);
+          }}
+        />
+      </InboxDefaultSectionProvider>
       <Box sx={{ display: "flex" }}>
         <AppBar
           position="fixed"
@@ -394,13 +343,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
-              sx={[
-                // TODO: do we need this?
-                {
-                  mr: 2,
-                },
-                open && { display: "none" },
-              ]}
+              sx={[open && { display: "none" }]}
             >
               <MenuIcon />
             </IconButton>
@@ -409,10 +352,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {!isLargeDisplay && (
           <Drawer
             sx={{
-              width: drawerWidth,
+              width: DRAWER_WIDTH,
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: drawerWidth,
+                width: DRAWER_WIDTH,
                 boxSizing: "border-box",
               },
             }}
@@ -432,10 +375,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {isLargeDisplay && (
           <Drawer
             sx={{
-              width: drawerWidth,
+              width: DRAWER_WIDTH,
               flexShrink: 0,
               "& .MuiDrawer-paper": {
-                width: drawerWidth,
+                width: DRAWER_WIDTH,
                 boxSizing: "border-box",
               },
             }}
@@ -453,13 +396,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             />
           </Drawer>
         )}
-        <Main
-          // FIXME: this sx is showing in the dom
-          sx={{
-            marginLeft: isLargeDisplay ? undefined : "unset",
-          }}
-          open={open}
-        >
+        <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
           {/* <Box minHeight={`calc(100vh - 72px)`}> */}
           <Box
             minHeight={(theme) =>

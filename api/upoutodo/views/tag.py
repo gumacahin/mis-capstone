@@ -1,8 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from taggit.models import Tag
+
 from upoutodo.models import Task
 from upoutodo.serializers import TagSerializer
-from taggit.models import Tag
 
 
 class TagViewSet(viewsets.ModelViewSet):

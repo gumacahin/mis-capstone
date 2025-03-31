@@ -15,7 +15,6 @@ import {
   type Control,
   Controller,
   type ControllerRenderProps,
-  set,
 } from "react-hook-form";
 
 import { useLabels } from "../api";

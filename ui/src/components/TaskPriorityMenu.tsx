@@ -120,10 +120,7 @@ export default function TaskPriorityMenu({
                 <ListItemIcon>
                   <CheckIcon
                     fontSize="small"
-                    sx={{
-                      visibility:
-                        priority === option.value ? "visible" : "hidden",
-                    }}
+                    sx={[priority !== option.value && { display: "none" }]}
                   />
                 </ListItemIcon>
               </MenuItem>

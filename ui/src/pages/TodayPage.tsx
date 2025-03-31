@@ -22,6 +22,7 @@ import useLocalStorage from "use-local-storage";
 
 import { useTasksToday } from "../api";
 import AddTaskButton from "../components/AddTaskButton";
+import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
@@ -71,7 +72,7 @@ function ViewMenu({
             aria-label="view options"
             aria-labelledby="view-options-label"
             value={view}
-            onChange={handleViewChange}
+            onChange={() => handleViewChange(view)}
           >
             <ToggleButton
               value="list"
@@ -167,7 +168,7 @@ function TaskListToday({
             <TaskList tasks={todayTasks} />
           </>
         )}
-        <AddTaskButton dueDate={dayjs().toDate()} />
+        <AddTaskButton presetDueDate={dayjs()} />
       </>
     );
   }
@@ -177,10 +178,6 @@ function TaskListToday({
   }
 
   return null;
-}
-
-function Skeleton() {
-  return <div>Loading...</div>;
 }
 
 export default function TodayPage() {
@@ -200,7 +197,7 @@ export default function TodayPage() {
   if (isPending) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center">
-        <Skeleton />
+        <SkeletonList count={10} />
       </Box>
     );
   }
@@ -230,7 +227,9 @@ export default function TodayPage() {
         </Box>
         <Box overflow={"auto"}>
           <Box maxWidth={600} mx={"auto"}>
-            <TaskListToday view={view} tasks={tasks} />
+            <InboxDefaultSectionProvider>
+              <TaskListToday view={view} tasks={tasks} />
+            </InboxDefaultSectionProvider>
           </Box>
         </Box>
       </Box>

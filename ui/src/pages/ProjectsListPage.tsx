@@ -19,19 +19,19 @@ import AddProjectButton from "../components/AddProjectButton";
 import PageLayout from "../components/PageLayout";
 import ProjectMenu from "../components/ProjectMenu";
 import SkeletonList from "../components/SkeletonList";
-import type { IProjectOption } from "../types/common";
+import type { IProject } from "../types/common";
 
 export default function ProjectsListPage() {
   const { isPending, isError, data } = useProjects();
 
-  const projects: IProjectOption[] = data?.results ?? [];
+  const projects: IProject[] = data?.results ?? [];
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const [project, setProject] = useState<IProjectOption | null>(null);
+  const [project, setProject] = useState<IProject | null>(null);
 
   const handleOpenProjectMenu = (
     event: MouseEvent<HTMLButtonElement>,
-    project: IProjectOption,
+    project: IProject,
   ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);

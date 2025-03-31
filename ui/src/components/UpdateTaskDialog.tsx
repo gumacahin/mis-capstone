@@ -21,7 +21,7 @@ import { toast } from "react-hot-toast";
 import { useAddComment, useProfile, useTask, useUpdateTask } from "../api";
 import type { ITask } from "../types/common";
 import CommentList from "./CommentList";
-import DueDatePicker from "./DueDatePicker";
+import DatePicker from "./DatePicker";
 import TaskCheckIcon from "./TaskCheckIcon";
 
 function DescriptionIcon() {
@@ -258,7 +258,7 @@ export default function UpdateTaskDialog({
                     fullWidth
                     variant="standard"
                   />
-                  <DueDatePicker
+                  <DatePicker
                     defaultValue={
                       data.due_date ? dayjs(data.due_date).toDate() : undefined
                     }

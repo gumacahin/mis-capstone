@@ -9,8 +9,9 @@ import { toast } from "react-hot-toast";
 import { useAddSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import { IProject, ISection } from "../types/common";
+import { IProjectDetail, ISection } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
+import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import ProjectSectionHeader from "./ProjectViewSectionHeader";
 import TaskList from "./TaskList";
 
@@ -96,7 +97,11 @@ const AddSectionButton = ({
   );
 };
 
-export default function ProjectViewList({ project }: { project: IProject }) {
+export default function ProjectViewList({
+  project,
+}: {
+  project: IProjectDetail;
+}) {
   return (
     <ProjectContext.Provider value={project}>
       <Stack>
@@ -104,8 +109,10 @@ export default function ProjectViewList({ project }: { project: IProject }) {
           <SectionContext.Provider value={section} key={section.id}>
             <Box key={section.id} mb={3}>
               <ProjectSectionHeader />
-              <TaskList tasks={section.tasks} />
-              <AddTaskButton />
+              <TaskList />
+              <InboxDefaultSectionProvider>
+                <AddTaskButton />
+              </InboxDefaultSectionProvider>
               <AddSectionButton precedingSection={section} />
             </Box>
           </SectionContext.Provider>

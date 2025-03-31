@@ -1,9 +1,8 @@
 from django.utils import timezone
 from rest_framework import serializers
+from taggit.serializers import TaggitSerializer, TagListSerializerField
 
 from upoutodo.models import ProjectSection, Task
-
-from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 
 class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
