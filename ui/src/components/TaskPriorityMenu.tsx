@@ -3,7 +3,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FlagIcon from "@mui/icons-material/Flag";
 import OutlinedFlagIcon from "@mui/icons-material/OutlinedFlag";
 import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
+import ButtonGroup, { type ButtonGroupProps } from "@mui/material/ButtonGroup";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
@@ -12,16 +12,22 @@ import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 import { type Control, Controller } from "react-hook-form";
 
-import type { IAddTaskFields, TTaskPriority } from "../types/common";
+import type { ITaskFormFields, TaskPriority } from "../types/common";
 
-const options: { value: TTaskPriority; label: string }[] = [
+const options: { value: TaskPriority; label: string }[] = [
   { value: "NONE", label: "None" },
   { value: "LOW", label: "Low" },
   { value: "MEDIUM", label: "Mid" },
   { value: "HIGH", label: "High" },
 ];
 
-function ButtonIcon({ priority }: { priority: TTaskPriority }) {
+function ButtonIcon({
+  priority,
+  disabled,
+}: {
+  priority: TaskPriority;
+  disabled?: boolean;
+}) {
   switch (priority) {
     case "LOW":
       return <FlagIcon fontSize="small" color="info" />;
@@ -37,10 +43,13 @@ function ButtonIcon({ priority }: { priority: TTaskPriority }) {
 export default function TaskPriorityMenu({
   control,
   priority,
+  compact, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ...props
 }: {
-  control: Control<IAddTaskFields>;
-  priority: TTaskPriority;
-}) {
+  control: Control<ITaskFormFields>;
+  priority: TaskPriority;
+  compact?: boolean;
+} & ButtonGroupProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClickMenuButton = (event: React.MouseEvent<HTMLElement>) => {
@@ -58,7 +67,18 @@ export default function TaskPriorityMenu({
       defaultValue={priority}
       render={({ field }) => (
         <>
-          <ButtonGroup variant="outlined" size="small">
+          <ButtonGroup
+            size="small"
+            {...props}
+            sx={{
+              "& .MuiButtonGroup-grouped:not(:last-of-type)": {
+                borderRight: props.variant === "text" ? "none" : undefined, // Remove dividers for text variant
+              },
+              "& .MuiButtonGroup-grouped:not(:first-of-type)": {
+                marginLeft: props.variant === "text" ? 0 : undefined, // Remove spacing for text variant
+              },
+            }}
+          >
             <Tooltip
               title={
                 field.value === "NONE"
@@ -75,7 +95,15 @@ export default function TaskPriorityMenu({
                 aria-expanded={open ? "true" : undefined}
                 onClick={handleClickMenuButton}
                 size="small"
-                variant="outlined"
+                variant={props.variant ? props.variant : "outlined"}
+                sx={{
+                  flexGrow: 1, // Allow this button to grow and occupy remaining space
+                  flexShrink: 1, // Allow it to shrink if needed
+                  textOverflow: "ellipsis", // Handle overflow gracefully
+                  overflow: "hidden", // Hide overflowing text
+                  whiteSpace: "nowrap", // Prevent text wrapping
+                  ...(props.fullWidth && { justifyContent: "start" }),
+                }}
               >
                 {options.find((option) => option.value === priority)?.label}
               </Button>
@@ -84,9 +112,14 @@ export default function TaskPriorityMenu({
               <Tooltip title="Remove task priority">
                 <Button
                   size="small"
-                  variant="outlined"
+                  variant={props.variant ? props.variant : "outlined"}
                   onClick={() => {
                     field.onChange("NONE");
+                  }}
+                  sx={{
+                    flexGrow: 0, // Prevent this button from growing
+                    flexShrink: 0, // Prevent this button from shrinking
+                    width: "auto", // Ensure it only takes up the space it needs
                   }}
                 >
                   <CloseIcon fontSize="small" />

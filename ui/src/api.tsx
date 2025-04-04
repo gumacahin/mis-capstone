@@ -4,13 +4,14 @@ import axios from "axios";
 import dayjs from "dayjs";
 
 import type {
-  IComment,
-  IPaginatedResponse,
-  IProject,
-  IProjectDetail,
-  ISection,
-  ITask,
+  Comment,
+  ITaskFormFields,
+  PaginatedResponse,
+  Project,
+  ProjectDetail,
   ProjectViewType,
+  Section,
+  Task,
 } from "./types/common";
 
 const useApiClient = () => {
@@ -49,10 +50,10 @@ export const useProfile = (enabled: boolean = true) => {
   });
 };
 
-export const useLabels = () => {
+export const useTags = () => {
   const apiClient = useApiClient();
   return useQuery({
-    queryKey: ["labels"],
+    queryKey: ["tags"],
     queryFn: async () => {
       const { data } = await apiClient.get("tags/");
       return data;
@@ -94,7 +95,7 @@ export const useUpcomingTasks = () => {
   });
 };
 
-export const useTask = (task: ITask) => {
+export const useTask = (task: Task) => {
   const apiClient = useApiClient();
   return useQuery({
     initialData: task,
@@ -121,13 +122,38 @@ export const useTasks = (start: Date, end: Date) => {
   });
 };
 
-export const useAddTask = (projectId: number) => {
+export const useAddTask = ({
+  projectId,
+  belowTaskId,
+  aboveTaskId,
+}: {
+  projectId: number;
+  belowTaskId?: number;
+  aboveTaskId?: number;
+}) => {
+  console.log(
+    "useAddTask",
+    projectId,
+    "below",
+    belowTaskId,
+    "above",
+    aboveTaskId,
+  );
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addTask"],
-    mutationFn: async (task: ITask) => {
-      const response = await apiClient.post("/tasks/", task);
+    mutationFn: async (task: Partial<ITaskFormFields>) => {
+      const data = {
+        ...task,
+        below_task: belowTaskId,
+        above_task: aboveTaskId,
+        ...(dayjs.isDayjs(task.due_date) && {
+          due_date: task.due_date.format("YYYY-MM-DD"),
+        }),
+      };
+      console.log("data", data);
+      const response = await apiClient.post("/tasks/", data);
       return response.data;
     },
     onSettled: () => {
@@ -137,30 +163,40 @@ export const useAddTask = (projectId: number) => {
   });
 };
 
-export const useUpdateTask = (task: ITask, project: IProjectDetail | null) => {
+export const useUpdateTask = (task: Task, project: ProjectDetail) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   const taskId = task.id;
-  const projectId = project?.id;
+  const projectId = project.id;
   return useMutation({
     mutationKey: ["updateTask", { taskId }],
-    mutationFn: async (updatedTask: Partial<ITask>) => {
-      const result = await apiClient.patch(`/tasks/${task.id}/`, updatedTask);
+    mutationFn: async (updatedTask: Partial<ITaskFormFields>) => {
+      const data = {
+        ...updatedTask,
+        ...(dayjs.isDayjs(updatedTask.completion_date) && {
+          completion_date: updatedTask.completion_date.format("YYYY-MM-DD"),
+        }),
+        ...(dayjs.isDayjs(updatedTask.due_date) && {
+          due_date: updatedTask.due_date.format("YYYY-MM-DD"),
+        }),
+      };
+      const result = await apiClient.patch(`/tasks/${taskId}/`, data);
       return result.data;
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
     },
   });
 };
 
-export const useAddComment = (task: ITask) => {
+export const useAddComment = (task: Task) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addComment"],
-    mutationFn: async (comment: IComment) => {
+    mutationFn: async (comment: Comment) => {
       const response = await apiClient.post("/comments/", comment);
       return response.data;
     },
@@ -172,7 +208,7 @@ export const useAddComment = (task: ITask) => {
   });
 };
 
-export const useComments = (task: ITask) => {
+export const useComments = (task: Task) => {
   const apiClient = useApiClient();
   return useQuery({
     queryKey: ["comments", { taskId: task.id }],
@@ -183,7 +219,7 @@ export const useComments = (task: ITask) => {
   });
 };
 
-export const useDeleteComment = (comment: IComment) => {
+export const useDeleteComment = (comment: Comment) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
@@ -202,12 +238,12 @@ export const useDeleteComment = (comment: IComment) => {
   });
 };
 
-export const useUpdateComment = (comment: IComment) => {
+export const useUpdateComment = (comment: Comment) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateComment", { commentId: comment.id }],
-    mutationFn: async (updatedComment: IComment) => {
+    mutationFn: async (updatedComment: Comment) => {
       const result = await apiClient.put(
         `/comments/${comment.id}/?task_id=${comment.task_id}`,
         updatedComment,
@@ -222,15 +258,15 @@ export const useUpdateComment = (comment: IComment) => {
   });
 };
 
-export const useRescheduleTasks = (tasks: ITask[]) => {
+export const useRescheduleTasks = (tasks: Task[]) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: [
       "rescheduleTasks",
-      { taskIds: tasks.map((task: ITask) => task.id) },
+      { taskIds: tasks.map((task: Task) => task.id) },
     ],
-    mutationFn: async (rescheduledTasks: ITask[]) => {
+    mutationFn: async (rescheduledTasks: Task[]) => {
       const result = await apiClient.put(
         `/tasks/bulk_update/`,
         rescheduledTasks,
@@ -243,7 +279,7 @@ export const useRescheduleTasks = (tasks: ITask[]) => {
   });
 };
 
-export const useDeleteTask = (task: ITask) => {
+export const useDeleteTask = (task: Task) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
@@ -253,6 +289,9 @@ export const useDeleteTask = (task: ITask) => {
       return result.data;
     },
     onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["project", { projectId: task.project }],
+      });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
@@ -274,8 +313,8 @@ export const useProject = (projectId: number) => {
   return useQuery({
     queryKey: ["project", { projectId }],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/projects/${projectId}`);
-      return data as IProject;
+      const { data } = await apiClient.get(`/projects/${projectId}/`);
+      return data as ProjectDetail;
     },
     // FIXME: we will fix this when we migrate to tanstack/router
     enabled: !!projectId,
@@ -291,7 +330,7 @@ export const useAddProject = (
   return useMutation({
     mutationKey: ["addProject"],
     mutationFn: async (
-      project: IProject & {
+      project: Project & {
         above_project_id?: number;
         below_project_id?: number;
       },
@@ -315,7 +354,7 @@ export const useUpdateProject = (projectId: number) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateProject", { projectId }],
-    mutationFn: async (data: Partial<IProject>) => {
+    mutationFn: async (data: Partial<Project>) => {
       const result = await apiClient.patch(`/projects/${projectId}/`, data);
       return result.data;
     },
@@ -326,7 +365,36 @@ export const useUpdateProject = (projectId: number) => {
   });
 };
 
-export const useDeleteProject = (project: IProject) => {
+export const useReorderProjects = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["reorderProjects"],
+    mutationFn: async (projects: Partial<Project>[]) => {
+      const data = projects.map((project) => ({
+        id: project.id,
+        order: project.order,
+      }));
+      const result = await apiClient.put(`/projects/bulk_update/`, data);
+      return result.data;
+    },
+    onMutate: async (reorderedProjects: Project[]) => {
+      await queryClient.cancelQueries({ queryKey: ["projects"] });
+      queryClient.setQueryData(
+        ["projects"],
+        (oldData: PaginatedResponse<Project>) => ({
+          ...oldData,
+          results: reorderedProjects,
+        }),
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+};
+
+export const useDeleteProject = (project: Project) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
@@ -339,7 +407,7 @@ export const useDeleteProject = (project: IProject) => {
       await queryClient.cancelQueries({ queryKey: ["projects"] });
       queryClient.setQueryData(
         ["projects"],
-        (oldProjects: IPaginatedResponse<IProject> | undefined) => {
+        (oldProjects: PaginatedResponse<Project> | undefined) => {
           const newProjects = oldProjects?.results.filter(
             (p) => p.id !== project.id,
           );
@@ -353,7 +421,7 @@ export const useDeleteProject = (project: IProject) => {
   });
 };
 
-export const useUpdateProjectView = (project: IProjectDetail) => {
+export const useUpdateProjectView = (project: ProjectDetail) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   const projectId = project.id;
@@ -378,14 +446,14 @@ export const useUpdateProjectView = (project: IProjectDetail) => {
   });
 };
 
-export const useAddSection = (preceedingSection: ISection) => {
+export const useAddSection = (preceedingSection: Section) => {
   const projectId = preceedingSection.project;
 
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addSection", { projectId }],
-    mutationFn: async (project: Partial<ISection>) => {
+    mutationFn: async (project: Partial<Section>) => {
       const data = {
         title: project.title,
         project: projectId,
@@ -396,6 +464,7 @@ export const useAddSection = (preceedingSection: ISection) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      queryClient.invalidateQueries({ queryKey: ["me"] });
     },
   });
 };
@@ -413,7 +482,7 @@ export const useDeleteSection = (projectId: number, sectionId: number) => {
       await queryClient.cancelQueries({ queryKey: ["project", { projectId }] });
       queryClient.setQueryData(
         ["project", { projectId }],
-        (project: IProject) => {
+        (project: Project) => {
           const newProject = {
             ...project,
             sections: project.sections.filter(
@@ -435,7 +504,7 @@ export const useUpdateSection = (projectId: number, sectionId: number) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["updateSection", { sectionId }],
-    mutationFn: async (data: Partial<ISection>) => {
+    mutationFn: async (data: Partial<Section>) => {
       const result = await apiClient.patch(
         `/project_sections/${sectionId}/`,
         data,
@@ -444,6 +513,43 @@ export const useUpdateSection = (projectId: number, sectionId: number) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+    },
+  });
+};
+
+export const useReorderSections = (projectId: number) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["reorderSections"],
+    mutationFn: async (sections: Section[]) => {
+      const data = sections.map((section) => ({
+        id: section.id,
+        order: section.order,
+      }));
+      const result = await apiClient.put(
+        `/project_sections/bulk_update/`,
+        data,
+      );
+      return result.data;
+    },
+    onMutate: async (reorderedSections: Section[]) => {
+      queryClient.setQueryData(
+        ["project", { projectId }],
+        (oldData: Partial<ProjectDetail> | undefined) => {
+          if (!oldData) {
+            return oldData;
+          }
+          const inbox = oldData.sections!.find((s) => s.is_default);
+          return {
+            ...oldData,
+            sections: [inbox, ...reorderedSections],
+          };
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 };

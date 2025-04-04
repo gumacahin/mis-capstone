@@ -7,21 +7,24 @@ from .project_section import ProjectSection
 
 class Task(models.Model):
     section = models.ForeignKey(
-        ProjectSection, on_delete=models.CASCADE, related_name="tasks", null=True
+        ProjectSection, on_delete=models.CASCADE, related_name="tasks"
     )
 
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     completion_date = models.DateField(blank=True, null=True)
     due_date = models.DateField(blank=True, null=True)
+    order = models.PositiveIntegerField(default=1)
 
-    class Priority(models.IntegerChoices):
-        NONE = 0, "None"
-        LOW = 1, "Low"
-        MEDIUM = 2, "Medium"
-        HIGH = 3, "High"
+    class Priority(models.TextChoices):
+        NONE = "NONE", "None"
+        LOW = "LOW", "Low"
+        MEDIUM = "MEDIUM", "Medium"
+        HIGH = "HIGH", "High"
 
-    priority = models.IntegerField(choices=Priority.choices, default=Priority.NONE)
+    priority = models.CharField(
+        choices=Priority.choices, default=Priority.NONE, max_length=6
+    )
 
     tags = TaggableManager()
 
@@ -53,4 +56,4 @@ class Task(models.Model):
         self.save()
 
     class Meta:
-        ordering = ["due_date", "priority", "completion_date"]
+        ordering = ["order", "-due_date", "priority", "completion_date"]

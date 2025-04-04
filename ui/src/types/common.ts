@@ -1,17 +1,7 @@
 import { Dayjs } from "dayjs";
 export type AnyJSON = string | number | AnyJSON[] | { [key: string]: AnyJSON };
 
-export type jsonable =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | jsonable[]
-  | { [key: string]: jsonable }
-  | { toJSON: () => jsonable };
-
-export interface IProfileProject {
+export interface ProfileProject {
   id: number;
   title: string;
   is_default: boolean;
@@ -19,38 +9,43 @@ export interface IProfileProject {
     id: number;
     title: string;
     is_default: boolean;
+    project: number;
   }[];
 }
-export interface IProfile {
+export interface Profile {
+  id: number;
   name: string;
   email: string;
   picture: string;
-  projects: IProfileProject[];
+  projects: ProfileProject[];
 }
 
-export type TTaskPriority = "NONE" | "LOW" | "MEDIUM" | "HIGH";
-export interface IAddTaskFields {
+export type TaskPriority = "NONE" | "LOW" | "MEDIUM" | "HIGH";
+export interface ITaskFormFields {
   title: string;
   description: string | null;
+  completion_date: Dayjs | null;
   due_date: Dayjs | null;
-  priority: TTaskPriority;
-  section_id: number;
-  project_id: number;
-  labels: string[];
+  priority: TaskPriority;
+  section: number;
+  project: number;
+  tags: string[];
 }
 
-export interface ITask {
-  id?: number;
+export interface Task {
+  id: number;
   title: string;
   completion_date?: string | null;
   description?: string | null;
   due_date?: string | null;
-  priority?: number;
-  section_id: number;
-  project_id: number;
+  priority?: TaskPriority;
+  section: number;
+  project: number;
+  tags: string[];
+  order: number;
 }
 
-export interface IComment {
+export interface Comment {
   id?: number;
   body: string;
   date?: string | null;
@@ -61,30 +56,29 @@ export interface IComment {
 
 export type ProjectViewType = "list" | "board";
 
-export interface ISection {
+export interface Section {
   id: number;
   title: string;
   project: number;
   is_default: boolean;
-  tasks: ITask[];
+  tasks: Task[];
   order: number;
 }
 
-export interface IPaginatedResponse<T> {
+export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
   results: T[];
 }
-export interface IProjectDetail {
+export interface ProjectDetail {
   id: number;
   title: string;
   view: "list" | "board";
-  sections: ISection[];
-  tasks: ITask[];
+  sections: Section[];
 }
 
-export interface IProject {
+export interface Project {
   id: number;
   title: string;
   is_default: boolean;

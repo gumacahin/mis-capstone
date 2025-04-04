@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 
 import { useDeleteSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
-import { ISection } from "../types/common";
+import { Section } from "../types/common";
 
 export default function SectionDeleteDialog({
   open,
@@ -17,7 +17,7 @@ export default function SectionDeleteDialog({
   handleClose,
 }: {
   open: boolean;
-  section: ISection;
+  section: Section;
   handleClose: () => void;
 }) {
   const project = useContext(ProjectContext)!;
@@ -27,7 +27,7 @@ export default function SectionDeleteDialog({
     await toast.promise(deleteSection.mutateAsync(), {
       loading: "Deleting section...",
       success: "Section deleted successfully!",
-      error: "Failed deleting setion.",
+      error: "Failed deleting section.",
     });
     handleClose();
   };

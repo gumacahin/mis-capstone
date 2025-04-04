@@ -3,7 +3,7 @@ import { ReactNode, useContext } from "react";
 import ProfileContext from "../contexts/profileContext";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import { IProjectDetail, ISection } from "../types/common";
+import { ProjectDetail, Section } from "../types/common";
 
 export default function InboxDefaultSectionProvider({
   children,
@@ -15,9 +15,9 @@ export default function InboxDefaultSectionProvider({
   const inboxDefaultSection = inbox.sections.find((s) => s.is_default)!;
 
   return (
-    <ProjectContext.Provider value={inbox as unknown as IProjectDetail}>
+    <ProjectContext.Provider value={inbox as unknown as ProjectDetail}>
       <SectionContext.Provider
-        value={inboxDefaultSection as unknown as ISection}
+        value={inboxDefaultSection as unknown as Section}
       >
         {children}
       </SectionContext.Provider>

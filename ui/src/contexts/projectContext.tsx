@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
-import type { IProjectDetail } from "../types/common";
+import type { ProjectDetail } from "../types/common";
 
-const ProjectContext = createContext<IProjectDetail | null>(null);
+const ProjectContext = createContext<ProjectDetail | null>(null);
 
 export default ProjectContext;

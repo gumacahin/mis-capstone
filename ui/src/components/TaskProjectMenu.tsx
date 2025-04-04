@@ -2,9 +2,8 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CheckIcon from "@mui/icons-material/Check";
 import InboxIcon from "@mui/icons-material/Inbox";
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
-import WorkspacesIcon from "@mui/icons-material/Workspaces";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
+import TagIcon from "@mui/icons-material/Tag";
+import Button, { type ButtonProps } from "@mui/material/Button";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -16,13 +15,15 @@ import * as React from "react";
 import { type Control, Controller } from "react-hook-form";
 
 import ProfileContext from "../contexts/profileContext";
-import type { IAddTaskFields } from "../types/common";
+import type { ITaskFormFields } from "../types/common";
 
 interface IButtonLabelProps {
   selectedProject: { title: string; is_default: boolean } | undefined;
   selectedSection: { title: string; is_default: boolean } | undefined;
 }
 function ButtonLabel({ selectedProject, selectedSection }: IButtonLabelProps) {
+  console.log("selectedProject", selectedProject);
+  console.log("selectedSection", selectedSection);
   return (
     <>
       <Typography
@@ -49,14 +50,19 @@ function ButtonLabel({ selectedProject, selectedSection }: IButtonLabelProps) {
   );
 }
 
-interface ITaskProjectMenuProps {
-  control: Control<IAddTaskFields>;
+interface ITaskProjectMenuProps extends ButtonProps {
+  control: Control<ITaskFormFields>;
   sectionId: number;
+  projectId: number;
+  compact?: boolean;
 }
 
-export default function TaskPriorityMenu({
+export default function TaskProjectMenu({
   control,
   sectionId,
+  projectId,
+  compact, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ...buttonProps
 }: ITaskProjectMenuProps) {
   const profile = React.useContext(ProfileContext)!;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -72,69 +78,74 @@ export default function TaskPriorityMenu({
   const inbox = profile.projects.find((p) => p.is_default);
   const inboxDefaultSection = inbox?.sections.find((s) => s.is_default);
   const projects = profile.projects.filter((p) => !p.is_default);
-  const selectedSection = profile.projects
-    .reduce(
-      (acc, project) => {
-        acc = [...acc, ...project.sections];
-        return acc;
-      },
-      [] as { title: string; id: number; is_default: boolean }[],
-    )
-    .find((s) => s.id === sectionId)!;
+  const allSections = profile.projects.reduce(
+    (acc, project) => {
+      acc = [...acc, ...project.sections];
+      return acc;
+    },
+    [] as { title: string; id: number; is_default: boolean; project: number }[],
+  );
+  const selectedSection = allSections.find((s) => s.id === sectionId);
+  const defaultProjectSection = allSections.find(
+    (s) => s.is_default && s.project == projectId,
+  );
+  const defaultOrSelectedSection = selectedSection ?? defaultProjectSection;
+
   const selectedProject = profile.projects.find((p) =>
-    p.sections.some((s) => s.id === selectedSection?.id),
+    p.sections.some((s) => s.id === defaultOrSelectedSection?.id),
   );
 
   return (
     <Controller
-      name="section_id"
+      name="section"
       control={control}
       defaultValue={sectionId}
       render={({ field }) => (
         <>
           <Tooltip title="Select a project">
-            <ButtonGroup
-              variant="outlined"
+            <Button
+              {...buttonProps}
+              id="task-project-button"
+              aria-haspopup="listbox"
+              aria-controls="task-project-menu"
+              aria-label="task-project-button"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClickMenuButton}
               size="small"
+              startIcon={
+                selectedProject?.is_default ? (
+                  <InboxIcon fontSize="small" />
+                ) : (
+                  <TagIcon fontSize="small" />
+                )
+              }
+              endIcon={<ArrowDropDownIcon />}
+              // sx={{
+              //   display: "flex", // Use flexbox for layout
+              //   justifyContent: "space-between", // Space between startIcon+label and endIcon
+              //   alignItems: "center", // Vertically center content
+              //   flexGrow: 1, // Allow the button to grow to fill its parent
+              //   maxWidth: "100%", // Prevent the button from exceeding its container
+              //   overflow: "hidden", // Hide overflowing content
+              //   textOverflow: "ellipsis", // Add ellipsis for overflowing text
+              //   whiteSpace: "nowrap", // Prevent text from wrapping
+              // }}
               sx={{
+                ...buttonProps.sx,
                 display: "flex",
                 flexShrink: 1, // Allow the button to shrink
                 maxWidth: "100%", // Prevent it from growing beyond its container
+                overflow: "hidden", // Hide overflowing content
+                textOverflow: "ellipsis", // Add ellipsis for overflowing text
+                whiteSpace: "nowrap", // Prevent text from wrapping
+                justifyContent: "start",
               }}
             >
-              <Button
-                id="task-project-button"
-                aria-haspopup="listbox"
-                aria-controls="task-project-menu"
-                aria-label="when device is locked"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClickMenuButton}
-                size="small"
-                variant="outlined"
-                startIcon={
-                  selectedProject?.is_default ? (
-                    <InboxIcon fontSize="small" />
-                  ) : (
-                    <WorkspacesIcon fontSize="small" />
-                  )
-                }
-                endIcon={<ArrowDropDownIcon />}
-                sx={{
-                  display: "flex",
-                  flexShrink: 1, // Allow the button to shrink
-                  maxWidth: "100%", // Prevent it from growing beyond its container
-                  overflow: "hidden", // Hide overflowing content
-                  textOverflow: "ellipsis", // Add ellipsis for overflowing text
-                  whiteSpace: "nowrap", // Prevent text from wrapping
-                  justifyContent: "space-between", // Ensure icons and text are spaced properly
-                }}
-              >
-                <ButtonLabel
-                  selectedProject={selectedProject}
-                  selectedSection={selectedSection}
-                />
-              </Button>
-            </ButtonGroup>
+              <ButtonLabel
+                selectedProject={selectedProject}
+                selectedSection={selectedSection}
+              />
+            </Button>
           </Tooltip>
           <Menu
             id="task-project-menu"
@@ -217,7 +228,7 @@ export default function TaskPriorityMenu({
                     }}
                   >
                     <ListItemIcon>
-                      <WorkspacesIcon fontSize="small" />
+                      <TagIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>{project.title}</ListItemText>
                     <ListItemIcon>

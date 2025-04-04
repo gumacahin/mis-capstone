@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import dayjs from "dayjs";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useContext, useState } from "react";
 import useLocalStorage from "use-local-storage";
 
 import { useTasksToday } from "../api";
@@ -26,7 +26,10 @@ import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvid
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import type { ITask, ProjectViewType } from "../types/common";
+import ToolbarContext, {
+  ToolbarItemsContext,
+} from "../contexts/toolbarItemsContext";
+import type { Task, ProjectViewType } from "../types/common";
 
 function ViewMenu({
   view,
@@ -124,7 +127,7 @@ function TaskListToday({
   tasks,
   view,
 }: {
-  tasks: ITask[];
+  tasks: Task[];
   view: ProjectViewType;
 }) {
   const overdueTasks = tasks.filter(
@@ -184,7 +187,7 @@ export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();
   const [view, setView] = useLocalStorage<ProjectViewType>("todayView", "list");
 
-  const tasks: ITask[] = data?.results ?? [];
+  const tasks: Task[] = data?.results ?? [];
 
   if (isError) {
     return (
@@ -207,7 +210,7 @@ export default function TodayPage() {
   };
 
   return (
-    <>
+    <div style={{ position: "relative" }}>
       <Stack
         position={"relative"}
         zIndex={999}
@@ -217,7 +220,9 @@ export default function TodayPage() {
         direction="row"
         justifyContent="end"
       >
-        <ViewMenu view={view} handleViewChange={handleViewChange} />
+        <Box>
+          <ViewMenu view={view} handleViewChange={handleViewChange} />
+        </Box>
       </Stack>
       <Box display={"flex"} flexDirection={"column"} height="100vh">
         <Box padding={3} flex="0 1 auto">
@@ -233,6 +238,6 @@ export default function TodayPage() {
           </Box>
         </Box>
       </Box>
-    </>
+    </div>
   );
 }

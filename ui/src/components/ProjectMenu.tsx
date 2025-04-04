@@ -10,7 +10,7 @@ import { useState } from "react";
 
 import ProjectDeleteDialog from "../components/ProjectDeleteDialog";
 import ProjectEditDialog from "../components/ProjectEditDialog";
-import type { IProject } from "../types/common";
+import type { Project } from "../types/common";
 import AddProjectDialog from "./AddProjectDialog";
 
 export default function ProjectMenu({
@@ -19,15 +19,15 @@ export default function ProjectMenu({
   handleClose,
 }: {
   anchorEl: null | HTMLElement;
-  project: IProject;
+  project: Project;
   handleClose: () => void;
 }) {
-  const [projectForEdit, setProjectForEdit] = useState<IProject | null>(null);
-  const [projectForDelete, setProjectForDelete] = useState<IProject | null>(
+  const [projectForEdit, setProjectForEdit] = useState<Project | null>(null);
+  const [projectForDelete, setProjectForDelete] = useState<Project | null>(
     null,
   );
 
-  const [referenceProject, setReferenceProject] = useState<IProject | null>(
+  const [referenceProject, setReferenceProject] = useState<Project | null>(
     null,
   );
 
@@ -35,7 +35,7 @@ export default function ProjectMenu({
 
   const handleAddProject = (
     e: React.MouseEvent<HTMLElement>,
-    project: IProject,
+    project: Project,
     position: "above" | "below",
   ) => {
     e.stopPropagation();

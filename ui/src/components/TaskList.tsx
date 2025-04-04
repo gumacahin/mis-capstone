@@ -1,113 +1,97 @@
-import EventIcon from "@mui/icons-material/Event";
-import { Typography } from "@mui/material";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import dayjs from "dayjs";
-import { useContext, useState } from "react";
+import {
+  Draggable,
+  type DraggableProvided,
+  Droppable,
+} from "@hello-pangea/dnd";
+import CardContent from "@mui/material/CardContent";
+import Stack from "@mui/material/Stack";
+import { Fragment, useContext, useState } from "react";
 
+import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import type { ISection, ITask } from "../types/common";
-import TaskCheckIcon from "./TaskCheckIcon";
+import type { ProjectDetail, Section, Task } from "../types/common";
+import TaskCard from "./TaskCard";
+import TaskForm from "./TaskForm";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
-export default function TaskList({
-  tasks,
-  hideDueDates,
-}: {
-  tasks?: ITask[];
+export interface TaskListProps {
+  tasks?: Task[];
   hideDueDates?: boolean;
-}) {
-  const [taskForUpdating, setTaskForUpdating] = useState<ITask | null>(null);
-  const handleOpenTask = (task: ITask) => {
-    setTaskForUpdating(task);
-  };
-  const section = useContext<ISection | null>(SectionContext);
-  tasks = tasks ?? section?.tasks ?? [];
+}
 
-  const handleClose = () => {
-    setTaskForUpdating(null);
+export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
+  const [openTaskId, setOpenTaskId] = useState<number | null>(null);
+  const section = useContext<Section | null>(SectionContext);
+  const project = useContext<ProjectDetail | null>(ProjectContext)!;
+  const [addTaskAbove, setAddTaskAbove] = useState<number | undefined>(
+    undefined,
+  );
+  const [addTaskBelow, setAddTaskBelow] = useState<number | undefined>(
+    undefined,
+  );
+
+  const handleOpenTask = (taskId: number) => {
+    setOpenTaskId(taskId);
   };
+  const handleCloseTask = () => {
+    setOpenTaskId(null);
+  };
+  const handleCloseAddAboveTaskForm = () => {
+    setAddTaskAbove(undefined);
+  };
+  const handleCloseAddBelowTaskForm = () => {
+    setAddTaskBelow(undefined);
+  };
+
+  tasks = tasks ?? section?.tasks ?? [];
+  const openTask = tasks.find((task: Task) => task.id === openTaskId);
+
+  const hasTasks = tasks.length > 0;
+  const hasOpenTask = Boolean(openTask);
+  // TODO: fix this
+  const taskListId = section?.id ?? "some-id";
 
   return (
     <>
-      <List>
-        {tasks.map((task: ITask) => {
-          const isOverdue =
-            task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
-          return (
-            <ListItem
-              sx={{ width: "100%", maxWidth: "100%" }}
-              key={task.id}
-              // NOTE: We use disabled padding there because of the stacked secondary actions
-              // we have at teach ListItem. Without it the last icon button gets pushed
-              // out of the ListItem
-              disablePadding
-              disableGutters
-            >
-              <UpdateTaskDialog
-                open={task.id === taskForUpdating?.id}
-                handleClose={handleClose}
-                task={task}
-              />
-              <ListItemButton
-                onClick={() => {
-                  handleOpenTask(task);
-                }}
-              >
-                <ListItemIcon>
-                  <TaskCheckIcon task={task} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography
-                      sx={{
-                        textDecoration: task.completion_date
-                          ? "line-through"
-                          : "default",
-                      }}
-                    >
-                      {task.title}
-                    </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography
-                        sx={{
-                          textDecoration: task.completion_date
-                            ? "line-through"
-                            : "default",
-                        }}
-                      >
-                        {task.description}
-                      </Typography>
-                      {!hideDueDates && task.due_date && (
-                        <Box
-                          display={"flex"}
-                          alignItems={"center"}
-                          sx={isOverdue ? { color: "rgb(209, 69, 59)" } : {}}
-                        >
-                          <EventIcon fontSize="small" />
-                          <Typography ml="10px" variant={"caption"}>
-                            {dayjs(task.due_date).format("MMM D YYYY")}
-                          </Typography>
-                        </Box>
-                      )}
-                    </>
-                  }
-                  slotProps={{
-                    primary: { component: "div" },
-                    secondary: { component: "div" },
-                  }}
+      {hasOpenTask && (
+        <UpdateTaskDialog
+          open={hasOpenTask}
+          handleClose={handleCloseTask}
+          task={openTask!}
+          project={project}
+        />
+      )}
+      {hasTasks && (
+        <CardContent sx={{ width: "100%", maxWidth: "332px" }}>
+          <Stack component={"div"} spacing={1}>
+            {tasks.map((task: Task, index: number) => (
+              <Fragment key={task.id}>
+                {addTaskAbove === task.id && (
+                  <TaskForm
+                    compact={true}
+                    taskAbove={addTaskAbove}
+                    handleClose={handleCloseAddAboveTaskForm}
+                  />
+                )}
+                <TaskCard
+                  task={task}
+                  handleOpenTask={handleOpenTask}
+                  hideDueDates={hideDueDates}
+                  handleAddTaskAbove={() => setAddTaskAbove(task.id)}
+                  handleAddTaskBelow={() => setAddTaskBelow(task.id)}
                 />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List>
+                {addTaskBelow === task.id && (
+                  <TaskForm
+                    compact={true}
+                    taskBelow={addTaskBelow}
+                    handleClose={handleCloseAddBelowTaskForm}
+                  />
+                )}
+              </Fragment>
+            ))}
+          </Stack>
+        </CardContent>
+      )}
     </>
   );
 }

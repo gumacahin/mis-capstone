@@ -1,6 +1,8 @@
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.db import models, transaction
 from django.db.models import Max
-from rest_framework import permissions, serializers, viewsets
+from rest_framework import permissions, serializers, viewsets, status
 
 from upoutodo.models import Project
 from upoutodo.serializers import ProjectDetailSerializer, ProjectSerializer
@@ -23,6 +25,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             return super().get_serializer_class()
         return ProjectDetailSerializer
+
+    @action(methods=["put"], detail=False)
+    def bulk_update(self, request):
+        ids = [i["id"] for i in request.data]
+
+        # Fetch the corresponding objects from the database
+        projects = self.get_queryset().filter(id__in=ids)
+
+        # Create a mapping of id -> order from the request data
+        id_to_order_map = {item["id"]: item["order"] for item in request.data}
+
+        # Update the order field for each section
+        for project in projects:
+            project.order = id_to_order_map.get(project.id)
+
+        # Use bulk_update for efficient database updates
+        with transaction.atomic():
+            Project.objects.bulk_update(projects, ["order"])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_create(self, serializer):
         above_project_id = self.request.data.get("above_project_id", None)

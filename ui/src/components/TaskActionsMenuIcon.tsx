@@ -13,7 +13,7 @@ import { MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useDeleteTask } from "../api";
-import type { ITask } from "../types/common";
+import type { Task } from "../types/common";
 
 function DeleteTaskDialog({
   showDialog,
@@ -22,7 +22,7 @@ function DeleteTaskDialog({
 }: {
   showDialog: boolean;
   setShowDialog: (show: boolean) => void;
-  task: ITask;
+  task: Task;
 }) {
   const deleteTask = useDeleteTask(task);
   const handleDelete = () => {
@@ -70,7 +70,7 @@ function DeleteTaskDialog({
   );
 }
 
-export default function TaskActionsMenuIcon({ task }: { task: ITask }) {
+export default function TaskActionsMenuIcon({ task }: { task: Task }) {
   const [showDialog, setShowDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

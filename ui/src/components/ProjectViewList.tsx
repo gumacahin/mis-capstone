@@ -1,6 +1,9 @@
 import { TextField, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,9 +12,8 @@ import { toast } from "react-hot-toast";
 import { useAddSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import { IProjectDetail, ISection } from "../types/common";
+import { ProjectDetail, Section } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
-import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import ProjectSectionHeader from "./ProjectViewSectionHeader";
 import TaskList from "./TaskList";
 
@@ -22,7 +24,7 @@ type FormValues = {
 const AddSectionButton = ({
   precedingSection,
 }: {
-  precedingSection: ISection;
+  precedingSection: Section;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const { mutateAsync } = useAddSection(precedingSection);
@@ -77,6 +79,7 @@ const AddSectionButton = ({
             ...(isMobile
               ? {} // No styles for mobile
               : {
+                  textWrap: "nowrap",
                   opacity: 0,
                   transition: "opacity 0.3s ease-in-out",
                   "&:hover": { opacity: 1 },
@@ -100,21 +103,21 @@ const AddSectionButton = ({
 export default function ProjectViewList({
   project,
 }: {
-  project: IProjectDetail;
+  project: ProjectDetail;
 }) {
   return (
     <ProjectContext.Provider value={project}>
-      <Stack>
-        {project.sections.map((section: ISection) => (
+      <Stack spacing={1} maxWidth="800px" width="100%" mx="auto">
+        {project.sections.map((section: Section) => (
           <SectionContext.Provider value={section} key={section.id}>
-            <Box key={section.id} mb={3}>
+            <Card key={section.id} elevation={0}>
               <ProjectSectionHeader />
               <TaskList />
-              <InboxDefaultSectionProvider>
+              <CardActions>
                 <AddTaskButton />
-              </InboxDefaultSectionProvider>
-              <AddSectionButton precedingSection={section} />
-            </Box>
+              </CardActions>
+            </Card>
+            <AddSectionButton precedingSection={section} />
           </SectionContext.Provider>
         ))}
       </Stack>

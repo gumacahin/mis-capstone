@@ -1,3 +1,4 @@
+from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -15,22 +16,28 @@ class TaskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = TaskFilter
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    ordering = ["-priority", "due_date"]
+    ordering = ["order", "-due_date", "completion_date"]
 
     def get_queryset(self):
         user = self.request.user
         return super().get_queryset().filter(section__project__created_by=user)
 
     def perform_create(self, serializer):
-        """Assign default section if it is not provided."""
-
-        validated_section = serializer.validated_data.get("section")
-
-        if not validated_section:
-            inbox = self.request.user.profile.inbox
-            serializer.validated_data["section"] = inbox.default_section
-
-        serializer.save()
+        relative_to_task = serializer.context.get("relative_to_task")
+        section = serializer.validated_data.get("section")
+        order = serializer.validated_data.get("order")
+        if relative_to_task:
+            Task.objects.filter(section=section, order__gte=order).update(
+                order=models.F("order") + 1
+            )
+            serializer.save()
+        else:
+            max_order = Task.objects.filter(section__project=section.project).aggregate(
+                models.Max("order")
+            )["order__max"]
+            serializer.save(
+                order=max_order + 1 if max_order else 1,
+            )
 
     @action(detail=False, methods=["put", "patch"], url_path="bulk_update")
     def bulk_update(self, request):

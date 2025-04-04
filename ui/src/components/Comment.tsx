@@ -17,7 +17,7 @@ import { FormEvent, MouseEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useUpdateComment } from "../api";
-import type { IComment } from "../types/common";
+import type { Comment } from "../types/common";
 
 export default function Comment({
   comment,
@@ -27,7 +27,7 @@ export default function Comment({
   isEditing,
   userId,
 }: {
-  comment: IComment;
+  comment: Comment;
   handleDelete: () => void;
   handleEdit: () => void;
   handleCloseEdit: () => void;
@@ -52,7 +52,7 @@ export default function Comment({
     const formData = new FormData(event.currentTarget);
     const updatedComment = Object.fromEntries(
       formData.entries(),
-    ) as unknown as IComment;
+    ) as unknown as Comment;
     toast.promise(
       updateComment.mutateAsync(updatedComment, {
         onSettled: () => {

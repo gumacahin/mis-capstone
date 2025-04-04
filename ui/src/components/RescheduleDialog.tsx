@@ -18,9 +18,9 @@ import { type MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useRescheduleTasks } from "../api";
-import { ITask } from "../types/common";
+import { Task } from "../types/common";
 
-export default function RescheduleDialog({ tasks }: { tasks: ITask[] }) {
+export default function RescheduleDialog({ tasks }: { tasks: Task[] }) {
   const rescheduleTasks = useRescheduleTasks(tasks);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -36,7 +36,7 @@ export default function RescheduleDialog({ tasks }: { tasks: ITask[] }) {
     if (!date) {
       return;
     }
-    const updatedTasks = tasks.map((task: ITask) => {
+    const updatedTasks = tasks.map((task: Task) => {
       task.due_date = dayjs(date).format("YYYY-MM-DD");
       return task;
     });

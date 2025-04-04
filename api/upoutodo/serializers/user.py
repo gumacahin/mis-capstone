@@ -44,6 +44,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = [
+            "id",
             "profile",
             "projects",
         ]
+        read_only_fields = ["id", "profile", "projects"]

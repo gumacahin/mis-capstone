@@ -1,3 +1,9 @@
+import {
+  DragDropContext,
+  Draggable,
+  DraggableLocation,
+  Droppable,
+} from "@hello-pangea/dnd";
 import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -27,12 +33,14 @@ import Skeleton from "@mui/material/Skeleton";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useQueryClient } from "@tanstack/react-query";
 import { MouseEvent, ReactNode, useState } from "react";
+import toast from "react-hot-toast";
 import { generatePath } from "react-router-dom";
 
-import { useProjects } from "../api";
+import { useProjects, useReorderProjects } from "../api";
 import { ROUTES } from "../routes";
-import { IProject } from "../types/common";
+import { PaginatedResponse, Project } from "../types/common";
 import AccountMenu from "./AccountMenu";
 import AddProjectDialog from "./AddProjectDialog";
 import AddTaskDialog from "./AddTaskDialog";
@@ -69,7 +77,9 @@ function DrawerContents({
   const [isAddProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
   const [projectsMenuItemHovered, setProjectsMenuItemHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [project, setProject] = useState<IProject | null>(null);
+  const [project, setProject] = useState<Project | null>(null);
+  const queryClient = useQueryClient();
+  const reorderProjects = useReorderProjects();
 
   console.log("isLargeDisplay", isLargeDisplay);
 
@@ -83,7 +93,7 @@ function DrawerContents({
 
   const handleOpenProjectMenu = (
     event: MouseEvent<HTMLButtonElement>,
-    project: IProject,
+    project: Project,
   ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -102,6 +112,46 @@ function DrawerContents({
   };
   const handleExpandProjectClick = () => {
     setProjectListOpen(!isProjectListOpen);
+  };
+
+  const handleDragEnd = async ({
+    destination,
+    source,
+  }: {
+    destination: DraggableLocation | null;
+    source: DraggableLocation;
+  }) => {
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const newProjectList = Array.from(projects) as Project[];
+    const [removed] = newProjectList.splice(source.index, 1);
+    newProjectList.splice(destination.index, 0, removed);
+    console.log("newProjectList", newProjectList);
+    const reorderedProjects = newProjectList.map(
+      (project: Project, index: number) => ({
+        ...project,
+        order: index + 1,
+      }),
+    );
+    // queryClient.setQueryData(
+    //   ["projects"],
+    //   (oldData: IPaginatedResponse<IProject>) => ({
+    //     ...oldData,
+    //     results: reorderedProjects,
+    //   }),
+    // );
+    await toast.promise(reorderProjects.mutateAsync(reorderedProjects), {
+      loading: "Reordering projects...",
+      error: "Failed reordering projects.",
+      success: "Projects reordered successfully!",
+    });
   };
 
   const listItemIconStyle: {
@@ -211,33 +261,59 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <Collapse in={isProjectListOpen} timeout="auto" unmountOnExit>
-          <List disablePadding>
-            {isProjectsPending && <ProjectListSkeleton />}
-            {isProjectsError && <ProjectListError />}
-            {projects.map((project: IProject) => (
-              <ListItem
-                key={project.id}
-                disableGutters
-                disablePadding
-                secondaryAction={
-                  <IconButton
-                    onClick={(e) => handleOpenProjectMenu(e, project)}
-                    aria-label="project options"
-                  >
-                    <MoreHorizIcon />
-                  </IconButton>
-                }
-              >
-                <ListItemNavLink
-                  to={generatePath("project/:projectId", {
-                    projectId: `${project.id}`,
-                  })}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided) => (
+                <List
+                  disablePadding
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
                 >
-                  <ListItemText primary={project.title} />
-                </ListItemNavLink>
-              </ListItem>
-            ))}
-          </List>
+                  {isProjectsPending && <ProjectListSkeleton />}
+                  {isProjectsError && <ProjectListError />}
+                  {projects.map((project: Project, index: number) => (
+                    <Draggable
+                      key={project.id}
+                      draggableId={`${project.id}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <ListItem
+                          sx={{
+                            backgroundColor: (theme) =>
+                              theme.palette.background.paper,
+                          }}
+                          key={project.id}
+                          disableGutters
+                          disablePadding
+                          secondaryAction={
+                            <IconButton
+                              onClick={(e) => handleOpenProjectMenu(e, project)}
+                              aria-label="project options"
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                          }
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                        >
+                          <ListItemNavLink
+                            to={generatePath("project/:projectId", {
+                              projectId: `${project.id}`,
+                            })}
+                          >
+                            <ListItemText primary={project.title} />
+                          </ListItemNavLink>
+                        </ListItem>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </List>
+              )}
+            </Droppable>
+          </DragDropContext>
         </Collapse>
       </List>
     </>
@@ -311,6 +387,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
+  const [toolbarItems, setToolbarItems] = useState<ReactNode[]>([]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -337,7 +414,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           elevation={0}
           sx={{ backgroundColor: "transparent" }}
         >
-          <Toolbar>
+          <Toolbar
+            sx={{
+              justifyContent: "space-between",
+              // maxWidth: `calc(100% - ${DRAWER_WIDTH}px)`,
+              // maxWidth: "100%",
+              // overflow: "hidden",
+            }}
+          >
             <IconButton
               color="default"
               aria-label="open drawer"
@@ -347,6 +431,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             >
               <MenuIcon />
             </IconButton>
+            <Box>{toolbarItems}</Box>
           </Toolbar>
         </AppBar>
         {!isLargeDisplay && (
@@ -399,6 +484,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
           {/* <Box minHeight={`calc(100vh - 72px)`}> */}
           <Box
+            position={"relative"}
             minHeight={(theme) =>
               `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
             }

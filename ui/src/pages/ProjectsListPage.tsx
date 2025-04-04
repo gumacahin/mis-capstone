@@ -2,6 +2,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SearchIcon from "@mui/icons-material/Search";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import List from "@mui/material/List";
@@ -19,19 +20,19 @@ import AddProjectButton from "../components/AddProjectButton";
 import PageLayout from "../components/PageLayout";
 import ProjectMenu from "../components/ProjectMenu";
 import SkeletonList from "../components/SkeletonList";
-import type { IProject } from "../types/common";
+import type { Project } from "../types/common";
 
 export default function ProjectsListPage() {
   const { isPending, isError, data } = useProjects();
 
-  const projects: IProject[] = data?.results ?? [];
+  const projects: Project[] = data?.results ?? [];
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const [project, setProject] = useState<IProject | null>(null);
+  const [project, setProject] = useState<Project | null>(null);
 
   const handleOpenProjectMenu = (
     event: MouseEvent<HTMLButtonElement>,
-    project: IProject,
+    project: Project,
   ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
@@ -112,34 +113,36 @@ export default function ProjectsListPage() {
                     {projects.length} Project{projects.length !== 1 ? "s" : ""}
                   </Typography>
                   <List disablePadding>
+                    <Divider component="li" aria-hidden={true} />
                     {projects.map((project) => (
                       <>
-                        <ListItemButton
+                        <ListItem
+                          divider
                           key={project.id}
-                          sx={{ borderTop: "1px solid #e0e0e0" }}
-                          onClick={() => {
-                            navigate(`/app/project/${project.id}`);
-                          }}
+                          disablePadding
+                          secondaryAction={
+                            <>
+                              <IconButton
+                                onClick={(e) =>
+                                  handleOpenProjectMenu(e, project)
+                                }
+                                edge="end"
+                                aria-label="project-options"
+                                id={`project-options-button-${project.id}`}
+                              >
+                                <MoreHorizIcon />
+                              </IconButton>
+                            </>
+                          }
                         >
-                          <ListItem
-                            secondaryAction={
-                              <>
-                                <IconButton
-                                  onClick={(e) =>
-                                    handleOpenProjectMenu(e, project)
-                                  }
-                                  edge="end"
-                                  aria-label="project-options"
-                                  id={`project-options-button-${project.id}`}
-                                >
-                                  <MoreHorizIcon />
-                                </IconButton>
-                              </>
-                            }
+                          <ListItemButton
+                            onClick={() => {
+                              navigate(`/app/project/${project.id}`);
+                            }}
                           >
                             <ListItemText primary={project.title} />
-                          </ListItem>
-                        </ListItemButton>
+                          </ListItemButton>
+                        </ListItem>
                       </>
                     ))}
                   </List>

@@ -18,7 +18,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useAddProject } from "../api";
-import type { IProject, ProjectViewType } from "../types/common";
+import type { Project, ProjectViewType } from "../types/common";
 
 type FormValues = {
   title: string;
@@ -46,7 +46,7 @@ export default function AddProjectDialog({
   const { register, setValue, handleSubmit, watch, reset } =
     useForm<FormValues>({ defaultValues });
   const view = watch("view");
-  const onSubmit: SubmitHandler<IProject> = async (data) => {
+  const onSubmit: SubmitHandler<Project> = async (data) => {
     setLoading(true);
     try {
       const project = await toast.promise(addProject.mutateAsync(data), {

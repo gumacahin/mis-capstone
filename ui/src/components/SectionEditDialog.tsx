@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 
 import { useUpdateSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
-import type { ISection } from "../types/common";
+import type { Section } from "../types/common";
 
 export default function SectionEditDialog({
   open,
@@ -19,7 +19,7 @@ export default function SectionEditDialog({
 }: {
   open: boolean;
   handleClose: () => void;
-  section: ISection;
+  section: Section;
 }) {
   const project = useContext(ProjectContext)!;
   const updateSection = useUpdateSection(project.id, section.id);
@@ -29,8 +29,8 @@ export default function SectionEditDialog({
       title: section.title,
     },
   };
-  const { register, handleSubmit, reset } = useForm<ISection>(defaultValues);
-  const onSubmit: SubmitHandler<ISection> = async (data) => {
+  const { register, handleSubmit, reset } = useForm<Section>(defaultValues);
+  const onSubmit: SubmitHandler<Section> = async (data) => {
     setLoading(true);
     try {
       await toast.promise(updateSection.mutateAsync(data), {

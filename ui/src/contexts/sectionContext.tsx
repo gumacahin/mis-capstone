@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
-import type { ISection } from "../types/common";
+import type { Section } from "../types/common";
 
-const SectionContext = createContext<ISection | null>(null);
+const SectionContext = createContext<Section | null>(null);
 
 export default SectionContext;

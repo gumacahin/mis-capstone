@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
-import type { IProfile } from "../types/common";
+import type { Profile } from "../types/common";
 
-const ProfileContext = createContext<IProfile | null>(null);
+const ProfileContext = createContext<Profile | undefined>(undefined);
 
 export default ProfileContext;

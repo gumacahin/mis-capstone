@@ -15,11 +15,12 @@ import DialogTitle from "@mui/material/DialogTitle";
 import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useComments, useDeleteComment } from "../api";
-import type { IComment, ITask } from "../types/common";
+import ProfileContext from "../contexts/profileContext";
+import type { Comment, Profile, Task } from "../types/common";
 import Comment from "./Comment";
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
@@ -46,7 +47,7 @@ function DeleteCommentDialog({
   comment,
 }: {
   handleClose: () => void;
-  comment: IComment;
+  comment: Comment;
 }) {
   const deleteComment = useDeleteComment(comment);
   const handleDelete = () => {
@@ -73,18 +74,15 @@ function DeleteCommentDialog({
   );
 }
 
-export default function CommentList({
-  task,
-  userId,
-}: {
-  task: ITask;
-  userId: number;
-}) {
+export default function CommentList({ task }: { task: Task }) {
+  const profile = useContext<Profile>(ProfileContext)!;
+  const userId = profile.id;
+
   const { isPending, isError, data } = useComments(task);
-  const [commentForDeletion, setCommentForDeletion] = useState<IComment | null>(
+  const [commentForDeletion, setCommentForDeletion] = useState<Comment | null>(
     null,
   );
-  const [commentForEditing, setCommentForEditing] = useState<IComment | null>(
+  const [commentForEditing, setCommentForEditing] = useState<Comment | null>(
     null,
   );
 
@@ -119,7 +117,7 @@ export default function CommentList({
         </AccordionSummary>
         <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
           <List disablePadding sx={{ maxHeight: "40vh", overflowY: "scroll" }}>
-            {data.results.map((comment: IComment) => (
+            {data.results.map((comment: Comment) => (
               <Comment
                 comment={comment}
                 key={comment.id}

@@ -21,7 +21,7 @@ import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvid
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import type { ITask } from "../types/common";
+import type { Task } from "../types/common";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
@@ -180,84 +180,84 @@ export default function UpcomingPage() {
     return dayjs(date).format("dddd");
   };
 
-  const tasks: ITask[] = data?.results ?? [];
-  const tasksToday: ITask[] = tasksTodayData?.results ?? [];
+  const tasks: Task[] = data?.results ?? [];
+  const tasksToday: Task[] = tasksTodayData?.results ?? [];
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
 
   return (
-    <Box display={"flex"} flexDirection={"column"} height="100vh">
-      <Box padding={3} flex="0 1 auto">
-        <Typography my={3} variant={"h5"} component={"h2"}>
-          Upcoming
-        </Typography>
-        <Box width="100%" display={"flex"} justifyContent={"space-between"}>
-          <CalendarDialog
-            selectedDate={selectedDate}
-            handleDateSelect={handleDateSelect}
-          />
-          <DatePager
-            selectedDate={selectedDate}
-            handleDateSelect={handleDateSelect}
-          />
+    <InboxDefaultSectionProvider>
+      <Box display={"flex"} flexDirection={"column"} height="100vh">
+        <Box padding={3} flex="0 1 auto">
+          <Typography my={3} variant={"h5"} component={"h2"}>
+            Upcoming
+          </Typography>
+          <Box width="100%" display={"flex"} justifyContent={"space-between"}>
+            <CalendarDialog
+              selectedDate={selectedDate}
+              handleDateSelect={handleDateSelect}
+            />
+            <DatePager
+              selectedDate={selectedDate}
+              handleDateSelect={handleDateSelect}
+            />
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            flex: "1 1 auto",
+            width: "100%",
+            overflow: "auto",
+            paddingX: 3,
+          }}
+        >
+          <Stack direction="row" spacing={2}>
+            {tasksTodayIsError && (
+              <Alert severity="error">Failed to load tasks</Alert>
+            )}
+            {overdueTasks.length > 0 && (
+              <Box minWidth={300}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography fontWeight={500} component={"h4"}>
+                    Overdue
+                  </Typography>
+                  <RescheduleDialog tasks={overdueTasks} />
+                </Box>
+                <TaskList tasks={overdueTasks} />
+              </Box>
+            )}
+            {weekDates.map((date, i) => (
+              <Box minWidth={300} key={i}>
+                <Typography fontWeight={500} component={"h4"}>
+                  {`${dayjs(date).format("MMM D")} ‧ ${formatDayOfWeek(date)}`}
+                </Typography>
+                {isPending ? (
+                  <SkeletonList count={5} width={250} />
+                ) : isError ? (
+                  <Alert severity="error">Failed to load tasks</Alert>
+                ) : (
+                  <>
+                    <TaskList
+                      hideDueDates
+                      tasks={tasks.filter((task: Task) =>
+                        dayjs(task.due_date).isSame(dayjs(date)),
+                      )}
+                    />
+                    <AddTaskButton presetDueDate={dayjs(date)} />
+                  </>
+                )}
+              </Box>
+            ))}
+          </Stack>
         </Box>
       </Box>
-      <Box
-        sx={{
-          flex: "1 1 auto",
-          width: "100%",
-          overflow: "auto",
-          paddingX: 3,
-        }}
-      >
-        <Stack direction="row" spacing={2}>
-          {tasksTodayIsError && (
-            <Alert severity="error">Failed to load tasks</Alert>
-          )}
-          {overdueTasks.length > 0 && (
-            <Box minWidth={300}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography fontWeight={500} component={"h4"}>
-                  Overdue
-                </Typography>
-                <RescheduleDialog tasks={overdueTasks} />
-              </Box>
-              <TaskList tasks={overdueTasks} />
-            </Box>
-          )}
-          {weekDates.map((date, i) => (
-            <Box minWidth={300} key={i}>
-              <Typography fontWeight={500} component={"h4"}>
-                {`${dayjs(date).format("MMM D")} ‧ ${formatDayOfWeek(date)}`}
-              </Typography>
-              {isPending ? (
-                <SkeletonList count={5} width={250} />
-              ) : isError ? (
-                <Alert severity="error">Failed to load tasks</Alert>
-              ) : (
-                <>
-                  <TaskList
-                    hideDueDates
-                    tasks={tasks.filter((task: ITask) =>
-                      dayjs(task.due_date).isSame(dayjs(date)),
-                    )}
-                  />
-                  <InboxDefaultSectionProvider>
-                    <AddTaskButton presetDueDate={dayjs(date)} />
-                  </InboxDefaultSectionProvider>
-                </>
-              )}
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-    </Box>
+    </InboxDefaultSectionProvider>
   );
 }
