@@ -16,8 +16,13 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
     below_task = serializers.PrimaryKeyRelatedField(
         queryset=Task.objects.all(), required=False, write_only=True
     )
+    source_section = serializers.PrimaryKeyRelatedField(
+        queryset=ProjectSection.objects.all(),
+        write_only=True,
+        required=False,
+    )
 
-    labels = TagListSerializerField(required=False, source="tags")
+    tags = TagListSerializerField(required=False)
 
     class Meta:
         model = Task
@@ -27,13 +32,14 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "description",
             "due_date",
             "priority",
-            "labels",
+            "tags",
             "completion_date",
             "order",
             "section",
             "project",
             "above_task",
             "below_task",
+            "source_section",
         ]
 
     def validate_due_date(self, value):
@@ -44,6 +50,9 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
     def validate(self, data):
         above_task = data.pop("above_task", None)
         below_task = data.pop("below_task", None)
+        source_section = data.pop("source_section", None)
+        print("##############")
+        print(f"{source_section=}")
 
         if above_task and below_task:
             raise serializers.ValidationError(
@@ -51,6 +60,7 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             )
 
         self.context["relative_to_task"] = above_task or below_task
+        self.context["source_section"] = source_section
         if above_task:
             data["order"] = above_task.order
         elif below_task:

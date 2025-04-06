@@ -19,39 +19,13 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
-import type { ITaskFormFields, ProjectDetail, Task } from "../types/common";
+import type { ProjectDetail, Task, TaskFormFields } from "../types/common";
 import CommentList from "./CommentList";
 import DatePicker from "./DatePicker";
 import TaskCheckIcon from "./TaskCheckIcon";
 import TaskPriorityMenu from "./TaskPriorityMenu";
-import TaskProjectMenu from "./TaskProjectMenu";
-import UpdateTaskLabels from "./UpdateTaskLabels";
-
-function DescriptionIcon() {
-  return (
-    <Box
-      color="GrayText"
-      mr={1}
-      display={"flex"}
-      alignItems={"center"}
-      justifyContent={"center"}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="none"
-        viewBox="0 0 16 16"
-        aria-hidden="true"
-      >
-        <path
-          fill="currentColor"
-          d="M8.5 12a.5.5 0 1 1 0 1h-5a.5.5 0 0 1 0-1h5Zm3.864-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 9H3.636C3.285 9 3 8.777 3 8.5c0-.245.225-.45.522-.491L3.636 8h8.728Zm0-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 5H3.636C3.285 5 3 4.777 3 4.5c0-.245.225-.45.522-.491L3.636 4h8.728Z"
-        ></path>
-      </svg>
-    </Box>
-  );
-}
+import TaskProjectMenuButton from "./TaskProjectButton";
+import UpdateTaskTags from "./UpdateTaskTags";
 
 export default function UpdateTaskDialog({
   open,
@@ -72,14 +46,15 @@ export default function UpdateTaskDialog({
     ...task,
     due_date: task.due_date ? dayjs(task.due_date) : null,
   };
-  const { control, register, handleSubmit, watch } = useForm<ITaskFormFields>({
+  console.log("defaultValues", defaultValues);
+  const { control, register, handleSubmit, watch } = useForm<TaskFormFields>({
     defaultValues,
   });
 
-  const sectionId = watch("section_id");
+  const sectionId = watch("section");
   const dueDate = watch("due_date");
   const priority = watch("priority");
-  const labels = watch("labels");
+  const tags = watch("tags");
 
   // FIXME: Too clunky. Revisit this when you get the chance.
   useEffect(() => {
@@ -92,7 +67,7 @@ export default function UpdateTaskDialog({
     setShowDatePicker(true);
   };
 
-  const onSubmit: SubmitHandler<ITaskFormFields> = async (data) => {
+  const onSubmit: SubmitHandler<TaskFormFields> = async (data) => {
     try {
       await toast.promise(updateTask.mutateAsync(data), {
         loading: "Updating task...",
@@ -238,10 +213,11 @@ export default function UpdateTaskDialog({
             >
               Project
             </Typography>
-            <TaskProjectMenu
+            <TaskProjectMenuButton
               disabled={taskIsCompleted}
               fullWidth
               control={control}
+              projectId={project.id}
               sectionId={sectionId}
               variant="text"
               sx={{
@@ -307,8 +283,8 @@ export default function UpdateTaskDialog({
               }}
             />
             <Divider sx={{ my: 1 }} />
-            <UpdateTaskLabels
-              labels={labels}
+            <UpdateTaskTags
+              tags={tags}
               control={control}
               disabled={taskIsCompleted}
             />
@@ -316,5 +292,31 @@ export default function UpdateTaskDialog({
         </Grid>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function DescriptionIcon() {
+  return (
+    <Box
+      color="GrayText"
+      mr={1}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="none"
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M8.5 12a.5.5 0 1 1 0 1h-5a.5.5 0 0 1 0-1h5Zm3.864-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 9H3.636C3.285 9 3 8.777 3 8.5c0-.245.225-.45.522-.491L3.636 8h8.728Zm0-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 5H3.636C3.285 5 3 4.777 3 4.5c0-.245.225-.45.522-.491L3.636 4h8.728Z"
+        ></path>
+      </svg>
+    </Box>
   );
 }

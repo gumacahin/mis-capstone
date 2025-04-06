@@ -11,7 +11,7 @@ import { useDeleteSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import { Section } from "../types/common";
 
-export default function SectionDeleteDialog({
+export default function ProjectSectionDeleteDialog({
   open,
   section,
   handleClose,

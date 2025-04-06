@@ -12,7 +12,7 @@ import { useUpdateSection } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import type { Section } from "../types/common";
 
-export default function SectionEditDialog({
+export default function ProjectSectionEditDialog({
   open,
   handleClose,
   section,

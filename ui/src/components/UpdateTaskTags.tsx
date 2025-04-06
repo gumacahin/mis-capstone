@@ -11,18 +11,20 @@ import {
   type ControllerRenderProps,
 } from "react-hook-form";
 
-import type { ITaskFormFields } from "../types/common";
-import TaskLabelsMenu from "./TaskTagsMenu";
+import type { TaskFormFields } from "../types/common";
+import TaskTagsMenu from "./TaskTagsMenu";
 
-export default function UpdateTaskLabels({
-  control,
-  labels,
-  disabled,
-}: {
-  control: Control<ITaskFormFields>;
-  labels: string[];
+export interface UpdateTaskTagsProps {
+  control: Control<TaskFormFields>;
+  tags: string[];
   disabled: boolean;
-} & ButtonGroupProps) {
+}
+
+export default function UpdateTaskTags({
+  control,
+  tags,
+  disabled,
+}: UpdateTaskTagsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleOpenTagsMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,29 +34,29 @@ export default function UpdateTaskLabels({
     setAnchorEl(null);
   };
 
-  const handleClickLabel = (
-    field: ControllerRenderProps<ITaskFormFields, "labels">,
-    label: string,
+  const handleClickTag = (
+    field: ControllerRenderProps<TaskFormFields, "tags">,
+    tag: string,
   ) => {
-    if (labels.includes(label)) {
-      field.onChange(labels.filter((l) => l !== label));
+    if (tags.includes(tag)) {
+      field.onChange(tags.filter((t) => t !== tag));
     } else {
-      field.onChange([...labels, label]);
+      field.onChange([...tags, tag]);
     }
   };
 
   const handleDelete = (
-    field: ControllerRenderProps<ITaskFormFields, "labels">,
-    labelToDelete: string,
+    field: ControllerRenderProps<TaskFormFields, "tags">,
+    tagToDelete: string,
   ) => {
-    field.onChange(labels.filter((label: string) => label !== labelToDelete));
+    field.onChange(tags.filter((tag: string) => tag !== tagToDelete));
   };
 
   return (
     <Controller
-      name="labels"
+      name="tags"
       control={control}
-      defaultValue={labels}
+      defaultValue={tags}
       render={({ field }) => (
         <>
           <Tooltip title="Change labels">
@@ -78,14 +80,14 @@ export default function UpdateTaskLabels({
               </Typography>
             </Button>
           </Tooltip>
-          <TaskLabelsMenu
+          <TaskTagsMenu
             handleClose={handleClose}
             anchorEl={anchorEl}
             field={field}
-            handleClickLabel={handleClickLabel}
-            labels={labels}
+            handleClickTag={handleClickTag}
+            tags={tags}
           />
-          {labels.length > 1 && (
+          {tags.length > 1 && (
             <Stack
               direction={"row"}
               spacing={1}
@@ -93,12 +95,12 @@ export default function UpdateTaskLabels({
               useFlexGap
               my={1}
             >
-              {labels.map((label) => (
+              {tags.map((tag) => (
                 <Chip
-                  key={label}
-                  label={label}
+                  key={tag}
+                  label={tag}
                   variant="filled"
-                  onDelete={() => handleDelete(field, label)}
+                  onDelete={() => handleDelete(field, tag)}
                 />
               ))}
             </Stack>

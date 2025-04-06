@@ -1,6 +1,7 @@
 import { Alert, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import { useEffect } from "react";
 
 import { useInboxTasks, useProfile } from "../api";
 import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
@@ -8,6 +9,7 @@ import PageLayout from "../components/PageLayout";
 import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
+import useToolbarContext from "../hooks/useToolbarContext";
 import { Project } from "../types/common";
 
 export default function InboxPage() {
@@ -15,6 +17,21 @@ export default function InboxPage() {
   const inbox = data?.projects.find((p: Project) => p.is_default);
   const { isPending, isError, data: project } = useInboxTasks(inbox?.id);
   const pageTitle = "Inbox";
+  const { setToolbarItems } = useToolbarContext();
+
+  useEffect(() => {
+    setToolbarItems(
+      <Stack direction="row" width="100%" justifyContent="space-between">
+        <Box>
+          <Typography variant={"h5"} component={"h2"} color="text.primary">
+            {pageTitle}
+          </Typography>
+        </Box>
+        <ProjectViewMenu project={inbox} />
+      </Stack>,
+    );
+    return () => setToolbarItems(null);
+  }, [inbox, pageTitle, setToolbarItems]);
 
   if (isError) {
     return (
@@ -31,31 +48,10 @@ export default function InboxPage() {
       </PageLayout>
     );
   }
-  console.log("inbox", project);
 
   return (
-    <PageLayout>
-      <InboxDefaultSectionProvider>
-        <Stack spacing={2}>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Box display={"flex"} alignItems={"center"}>
-              <Typography fontSize={32} variant={"h1"}>
-                {pageTitle}
-              </Typography>
-            </Box>
-            <ProjectViewMenu project={project} />
-          </Box>
-          <Box
-            sx={[
-              project.view === "list" && {
-                mx: 6,
-              },
-            ]}
-          >
-            <ProjectView project={project} />
-          </Box>
-        </Stack>
-      </InboxDefaultSectionProvider>
-    </PageLayout>
+    <InboxDefaultSectionProvider>
+      <ProjectView project={project} />
+    </InboxDefaultSectionProvider>
   );
 }

@@ -1,17 +1,18 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { debounce } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs from "dayjs";
 
 import type {
   Comment,
-  ITaskFormFields,
   PaginatedResponse,
   Project,
   ProjectDetail,
   ProjectViewType,
   Section,
   Task,
+  TaskFormFields,
 } from "./types/common";
 
 const useApiClient = () => {
@@ -131,19 +132,11 @@ export const useAddTask = ({
   belowTaskId?: number;
   aboveTaskId?: number;
 }) => {
-  console.log(
-    "useAddTask",
-    projectId,
-    "below",
-    belowTaskId,
-    "above",
-    aboveTaskId,
-  );
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
   return useMutation({
     mutationKey: ["addTask"],
-    mutationFn: async (task: Partial<ITaskFormFields>) => {
+    mutationFn: async (task: Partial<TaskFormFields>) => {
       const data = {
         ...task,
         below_task: belowTaskId,
@@ -163,14 +156,14 @@ export const useAddTask = ({
   });
 };
 
-export const useUpdateTask = (task: Task, project: ProjectDetail) => {
+export const useUpdateTask = (task: Task) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   const taskId = task.id;
-  const projectId = project.id;
+  const projectId = task.project;
   return useMutation({
     mutationKey: ["updateTask", { taskId }],
-    mutationFn: async (updatedTask: Partial<ITaskFormFields>) => {
+    mutationFn: async (updatedTask: Partial<TaskFormFields>) => {
       const data = {
         ...updatedTask,
         ...(dayjs.isDayjs(updatedTask.completion_date) && {
@@ -187,6 +180,65 @@ export const useUpdateTask = (task: Task, project: ProjectDetail) => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
+    },
+  });
+};
+
+export const useReorderTasks = (projectId: number) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["projectReorderTask", { projectId }],
+    mutationFn: async ({
+      task,
+      sourceSectionId,
+    }: {
+      task: Task;
+      sourceSectionId: number;
+      reorderedSourceTasks: Task[];
+      destinationSectionId: number;
+      reorderedDestinationTasks: Task[];
+    }) => {
+      const data = {
+        task_id: task.id,
+        order: task.order,
+        section: task.section,
+        source_section: sourceSectionId,
+      };
+      const response = await apiClient.patch(`/tasks/${task.id}/`, data);
+      return response.data;
+    },
+    onMutate: ({
+      sourceSectionId,
+      reorderedSourceTasks,
+      destinationSectionId,
+      reorderedDestinationTasks,
+    }: {
+      task: Task;
+      sourceSectionId: number;
+      reorderedSourceTasks: Task[];
+      destinationSectionId: number;
+      reorderedDestinationTasks: Task[];
+    }) => {
+      queryClient.cancelQueries({ queryKey: ["project", { projectId }] });
+      queryClient.setQueryData(
+        ["project", { projectId }],
+        (project: ProjectDetail) => {
+          const sourceSectionIndex = project.sections.findIndex(
+            (s) => s.id === sourceSectionId,
+          );
+          const destinationSectionIndex = project.sections.findIndex(
+            (s) => s.id === destinationSectionId,
+          );
+          project.sections[sourceSectionIndex].tasks = reorderedSourceTasks;
+          project.sections[destinationSectionIndex].tasks =
+            reorderedDestinationTasks;
+          return project;
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
     },
   });
 };
@@ -316,7 +368,6 @@ export const useProject = (projectId: number) => {
       const { data } = await apiClient.get(`/projects/${projectId}/`);
       return data as ProjectDetail;
     },
-    // FIXME: we will fix this when we migrate to tanstack/router
     enabled: !!projectId,
   });
 };
@@ -379,7 +430,7 @@ export const useReorderProjects = () => {
       return result.data;
     },
     onMutate: async (reorderedProjects: Project[]) => {
-      await queryClient.cancelQueries({ queryKey: ["projects"] });
+      queryClient.cancelQueries({ queryKey: ["projects"] });
       queryClient.setQueryData(
         ["projects"],
         (oldData: PaginatedResponse<Project>) => ({
@@ -403,8 +454,8 @@ export const useDeleteProject = (project: Project) => {
       const result = await apiClient.delete(`/projects/${project.id}/`);
       return result.data;
     },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["projects"] });
+    onMutate: () => {
+      queryClient.cancelQueries({ queryKey: ["projects"] });
       queryClient.setQueryData(
         ["projects"],
         (oldProjects: PaginatedResponse<Project> | undefined) => {
@@ -433,12 +484,20 @@ export const useUpdateProjectView = (project: ProjectDetail) => {
       });
       return response.data;
     },
-    onMutate: async (view: ProjectViewType) => {
-      await queryClient.cancelQueries({ queryKey: ["project"] });
-      queryClient.setQueryData(["project", { projectId }], {
-        ...project,
-        view,
-      });
+    onMutate: (view: ProjectViewType) => {
+      queryClient.cancelQueries({ queryKey: ["project"] });
+      queryClient.setQueryData(
+        ["project", { projectId }],
+        (oldProject: ProjectDetail | undefined) => {
+          if (!oldProject) {
+            return oldProject;
+          }
+          return {
+            ...oldProject,
+            view,
+          };
+        },
+      );
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
@@ -478,8 +537,8 @@ export const useDeleteSection = (projectId: number, sectionId: number) => {
       const result = await apiClient.delete(`/project_sections/${sectionId}/`);
       return result.data;
     },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["project", { projectId }] });
+    onMutate: () => {
+      queryClient.cancelQueries({ queryKey: ["project", { projectId }] });
       queryClient.setQueryData(
         ["project", { projectId }],
         (project: Project) => {
@@ -549,7 +608,49 @@ export const useReorderSections = (projectId: number) => {
       );
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      // queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 };
+
+export function useMoveSection(sectionId: number, currentProjectId: number) {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["moveSection", { sectionId }],
+    mutationFn: async (destinationProjectId: number) => {
+      const result = await apiClient.patch(`/project_sections/${sectionId}/`, {
+        project: destinationProjectId,
+        source_project: currentProjectId,
+      });
+      return result.data;
+    },
+    onSettled: (destinationProjectId: number | undefined) => {
+      queryClient.invalidateQueries({
+        queryKey: ["project", { projectId: currentProjectId }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["project", { projectId: destinationProjectId }],
+      });
+    },
+  });
+}
+
+export function useDuplicateSection(sectionId: number, projectId: number) {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["duplicateSection", { sectionId }],
+    mutationFn: async () => {
+      const result = await apiClient.post(
+        `/project_sections/${sectionId}/duplicate/`,
+      );
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["project", { projectId }],
+      });
+    },
+  });
+}

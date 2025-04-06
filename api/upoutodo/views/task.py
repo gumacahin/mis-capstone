@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -21,6 +21,47 @@ class TaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return super().get_queryset().filter(section__project__created_by=user)
+
+    def perform_update(self, serializer):
+        new_order = serializer.validated_data.get("order", serializer.instance.order)
+        current_order = serializer.instance.order
+        destination_section = serializer.validated_data.get(
+            "section", serializer.instance.section
+        )
+        source_section = serializer.context.get(
+            "source_section", serializer.instance.section
+        )
+        is_sorting = destination_section != source_section or new_order != current_order
+        print(f"{source_section=}")
+        print(f"{destination_section=}")
+        print(f"{new_order=}")
+        print(f"{current_order=}")
+
+        with transaction.atomic():
+            serializer.save()
+            if is_sorting:
+                destination_section = (
+                    source_section
+                    if source_section == destination_section
+                    else destination_section
+                )
+                Task.objects.filter(
+                    section=source_section, order__gt=current_order
+                ).exclude(id=serializer.instance.id).update(order=models.F("order") - 1)
+                Task.objects.filter(
+                    section=destination_section,
+                    order__gte=new_order,
+                ).exclude(id=serializer.instance.id).update(order=models.F("order") + 1)
+
+    def perform_destroy(self, instance):
+        section = instance.section
+        order = instance.order
+
+        Task.objects.filter(section=section, order__gt=order).update(
+            order=models.F("order") - 1
+        )
+
+        instance.delete()
 
     def perform_create(self, serializer):
         relative_to_task = serializer.context.get("relative_to_task")

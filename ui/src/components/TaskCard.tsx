@@ -1,15 +1,15 @@
+import { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
 import AddCommentIcon from "@mui/icons-material/AddComment";
 import CreateIcon from "@mui/icons-material/Create";
 import EventIcon from "@mui/icons-material/Event";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
-import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 
 import { Task } from "../types/common";
 import TaskCheckIcon from "./TaskCheckIcon";
@@ -23,7 +23,8 @@ export interface TaskCardProps {
   hideDueDates?: boolean;
   handleAddTaskAbove: () => void;
   handleAddTaskBelow: () => void;
-  ref?: React.Ref<HTMLDivElement>;
+  provided: DraggableProvided;
+  snapshot: DraggableStateSnapshot;
 }
 
 export default function TaskCard({
@@ -32,17 +33,21 @@ export default function TaskCard({
   hideDueDates = false,
   handleAddTaskAbove,
   handleAddTaskBelow,
-  ref,
+  provided,
+  snapshot,
 }: TaskCardProps) {
   const isOverdue =
     task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
+
+  const [isDragging, setIsDragging] = useState(false);
 
   const [taskMenuAnchorEl, setTaskMenuAnchorEl] = useState<null | HTMLElement>(
     null,
   );
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
-  const handleTaskMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+
+  const handleTaskMenuClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setTaskMenuAnchorEl(event.currentTarget);
   };
@@ -64,6 +69,23 @@ export default function TaskCard({
   const handleCloseTaskDeleteDialog = () => {
     setDeletingTask(null);
   };
+
+  const handleClickCapture = (e: MouseEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      return;
+    }
+    if (
+      e.target instanceof HTMLElement &&
+      // FIXME: this will not fire when any text inside the card is clicked
+      e.target.classList.contains("MuiCardHeader-root")
+    ) {
+      handleOpenTask(task.id);
+    }
+  };
+
+  if (snapshot.isDragging !== isDragging) {
+    setIsDragging(snapshot.isDragging);
+  }
 
   const isEditingTask = editingTask != null;
   const isDeletingTask = deletingTask != null;
@@ -87,116 +109,95 @@ export default function TaskCard({
         taskMenuAnchorEl={taskMenuAnchorEl}
         task={task}
       />
-      <div ref={ref}>
+      {!isEditingTask && (
         <Card
-          component={"div"}
-          sx={{ width: "100%", maxWidth: "100%" }}
+          sx={{
+            width: "100%",
+            maxWidth: "100%",
+            "&:hover": {
+              cursor: "pointer",
+            },
+          }}
           key={task.id}
           variant="outlined"
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          onClickCapture={handleClickCapture}
         >
-          <CardActionArea
-            onClick={() => {
-              handleOpenTask(task.id);
-            }}
-          >
-            <CardHeader
-              avatar={<TaskCheckIcon task={task} />}
-              title={
-                <Stack direction={"row"}>
-                  <Stack>
-                    <Typography
-                      sx={{
-                        textDecoration: task.completion_date
-                          ? "line-through"
-                          : "default",
-                      }}
-                    >
-                      {task.title}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontSize: 14,
-                        fontWeight: 400,
-                        textDecoration: task.completion_date
-                          ? "line-through"
-                          : "default",
-                      }}
-                    >
-                      {task.description}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              }
-              subheader={
-                <Stack
-                  // pt={1}
-                  // pl={5}
-                  spacing={1}
-                  direction={"row"}
-                  alignItems={"center"}
-                >
-                  {!hideDueDates && task.due_date && (
-                    <Stack
-                      direction={"row"}
-                      spacing={1}
-                      alignItems={"center"}
-                      sx={isOverdue ? { color: "rgb(209, 69, 59)" } : {}}
-                    >
-                      <EventIcon fontSize="small" />
-                      <Typography
-                        ml="10px"
-                        variant={"caption"}
-                        sx={{
-                          textWrap: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {dayjs(task.due_date).format("MMM D YYYY")}
-                      </Typography>
-                    </Stack>
-                  )}
-                </Stack>
-              }
-              action={
-                <Stack direction={"row"} alignItems={"center"}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
+          <CardHeader
+            padding={0}
+            avatar={<TaskCheckIcon task={task} />}
+            sx={{ "& .MuiCardHeader-root": { padding: 0 } }}
+            title={
+              <Stack direction={"row"}>
+                <Stack>
+                  <Typography
+                    sx={{
+                      textDecoration: task.completion_date
+                        ? "line-through"
+                        : "default",
                     }}
                   >
-                    <CreateIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    {task.title}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 14,
+                      fontWeight: 400,
+                      textDecoration: task.completion_date
+                        ? "line-through"
+                        : "default",
                     }}
+                  >
+                    {task.description}
+                  </Typography>
+                </Stack>
+              </Stack>
+            }
+            subheader={
+              <Stack
+                // pt={1}
+                // pl={5}
+                spacing={1}
+                direction={"row"}
+                alignItems={"center"}
+              >
+                {!hideDueDates && task.due_date && (
+                  <Stack
+                    direction={"row"}
+                    spacing={1}
+                    alignItems={"center"}
+                    sx={isOverdue ? { color: "rgb(209, 69, 59)" } : {}}
                   >
                     <EventIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    <AddCommentIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    id={`task-options-button-${task.id}`}
-                    size="small"
-                    onClick={handleTaskMenuClick}
-                  >
-                    <MoreHorizIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
-              }
-            />
-          </CardActionArea>
+                    <Typography
+                      ml="10px"
+                      variant={"caption"}
+                      sx={{
+                        textWrap: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {dayjs(task.due_date).format("MMM D YYYY")}
+                    </Typography>
+                  </Stack>
+                )}
+              </Stack>
+            }
+            action={
+              <IconButton
+                id={`task-options-button-${task.id}`}
+                size="small"
+                onClick={handleTaskMenuClick}
+              >
+                <MoreHorizIcon fontSize="small" />
+              </IconButton>
+            }
+          />
         </Card>
-      </div>
+      )}
     </>
   );
 }

@@ -8,7 +8,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { type ControllerRenderProps } from "react-hook-form";
 
 import { useTags } from "../api";
-import { type ITaskFormFields } from "../types/common";
+import { type TaskFormFields } from "../types/common";
 
 export default function TaskTagsMenu({
   anchorEl,
@@ -20,10 +20,10 @@ export default function TaskTagsMenu({
   anchorEl: HTMLElement | null;
   handleClose: () => void;
   handleClickTag: (
-    field: ControllerRenderProps<ITaskFormFields, "tags">,
+    field: ControllerRenderProps<TaskFormFields, "tags">,
     tag: string,
   ) => void;
-  field: ControllerRenderProps<ITaskFormFields, "tags">;
+  field: ControllerRenderProps<TaskFormFields, "tags">;
   tags: string[];
 }) {
   const { data } = useTags();
@@ -52,7 +52,7 @@ export default function TaskTagsMenu({
   };
 
   const handleCreateTag = (
-    field: ControllerRenderProps<ITaskFormFields, "tags">,
+    field: ControllerRenderProps<TaskFormFields, "tags">,
   ) => {
     if (search.length > 0) {
       setTagOptions((prev) => [...prev, search]);

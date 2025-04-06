@@ -13,6 +13,7 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App.tsx";
 import ThemeContextProvider from "./components/ThemeContextProvider.tsx";
+import ToolbarContextProvider from "./components/ToolbarContextProvider.tsx";
 import {
   AUTH0_AUDIENCE,
   AUTH0_CLIENT_ID,
@@ -23,24 +24,26 @@ import {
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  // <React.StrictMode>
-  <ThemeContextProvider>
-    <CssBaseline />
-    <Auth0Provider
-      domain={AUTH0_DOMAIN}
-      clientId={AUTH0_CLIENT_ID}
-      authorizationParams={{
-        redirect_uri: AUTH0_REDIRECT_URL,
-        audience: AUTH0_AUDIENCE,
-        scope: AUTH0_SCOPE,
-      }}
-      cacheLocation="localstorage"
-    >
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </Auth0Provider>
-  </ThemeContextProvider>,
-  // </React.StrictMode>,
+  <React.StrictMode>
+    <ThemeContextProvider>
+      <CssBaseline />
+      <Auth0Provider
+        domain={AUTH0_DOMAIN}
+        clientId={AUTH0_CLIENT_ID}
+        authorizationParams={{
+          redirect_uri: AUTH0_REDIRECT_URL,
+          audience: AUTH0_AUDIENCE,
+          scope: AUTH0_SCOPE,
+        }}
+        cacheLocation="localstorage"
+      >
+        <QueryClientProvider client={queryClient}>
+          <ToolbarContextProvider>
+            <App />
+          </ToolbarContextProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </Auth0Provider>
+    </ThemeContextProvider>
+  </React.StrictMode>,
 );

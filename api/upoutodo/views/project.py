@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db import models, transaction
-from django.db.models import Max
 from rest_framework import permissions, serializers, viewsets, status
 
 from upoutodo.models import Project
@@ -64,7 +63,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         max_order = (
             Project.objects.filter(
                 is_default=False, created_by=self.request.user
-            ).aggregate(max_order=Max("order"))["max_order"]
+            ).aggregate(max_order=models.Max("order"))["max_order"]
             or 0
         )
         serializer.save(

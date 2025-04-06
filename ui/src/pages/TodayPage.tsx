@@ -17,7 +17,7 @@ import { styled } from "@mui/material/styles";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import dayjs from "dayjs";
-import { MouseEvent, useContext, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
 
 import { useTasksToday } from "../api";
@@ -26,10 +26,123 @@ import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvid
 import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
 import TaskList from "../components/TaskList";
-import ToolbarContext, {
-  ToolbarItemsContext,
-} from "../contexts/toolbarItemsContext";
-import type { Task, ProjectViewType } from "../types/common";
+import useToolbarContext from "../hooks/useToolbarContext";
+import type { ProjectViewType, Task } from "../types/common";
+
+export default function TodayPage() {
+  const { isPending, isError, data } = useTasksToday();
+  const [view, setView] = useLocalStorage<ProjectViewType>("todayView", "list");
+  const { setToolbarItems } = useToolbarContext();
+
+  const tasks: Task[] = data?.results ?? [];
+
+  const handleViewChange = useCallback(
+    (view: ProjectViewType) => {
+      setView(view);
+    },
+    [setView],
+  );
+
+  useEffect(() => {
+    setToolbarItems(
+      <Stack direction="row" width="100%" justifyContent="space-between">
+        <Box>
+          <Typography variant={"h5"} component={"h2"} color="text.primary">
+            Today
+          </Typography>
+        </Box>
+        <ViewMenu
+          key="view-menu"
+          view={view}
+          handleViewChange={handleViewChange}
+        />
+      </Stack>,
+    );
+    return () => setToolbarItems(null);
+  }, [handleViewChange, setToolbarItems, view]);
+
+  if (isError) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <Alert severity="error">Failed to load tasks</Alert>
+      </Box>
+    );
+  }
+
+  if (isPending) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <SkeletonList count={10} />
+      </Box>
+    );
+  }
+
+  return (
+    <InboxDefaultSectionProvider>
+      <TaskListToday view={view} tasks={tasks} />
+    </InboxDefaultSectionProvider>
+  );
+}
+
+function TaskListToday({
+  tasks,
+  view,
+}: {
+  tasks: Task[];
+  view: ProjectViewType;
+}) {
+  const overdueTasks = tasks.filter(
+    (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
+  );
+  const todayTasks = tasks.filter(
+    (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
+  );
+
+  if (view === "list") {
+    return (
+      <>
+        {overdueTasks.length > 0 && (
+          <Accordion disableGutters defaultExpanded elevation={0}>
+            <AccordionSummary
+              aria-controls="overdue-content"
+              id="overdue-header"
+            >
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent={"space-between"}
+                width={"100%"}
+              >
+                <Typography variant={"h6"} component={"h3"}>
+                  Overdue
+                </Typography>
+                <RescheduleDialog tasks={overdueTasks} />
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
+              <TaskList tasks={overdueTasks} />
+            </AccordionDetails>
+          </Accordion>
+        )}
+        {todayTasks.length > 0 && (
+          <>
+            <Typography mt={3} variant={"h6"} component={"h3"}>
+              {dayjs().format("MMM D")} ‧ Today ‧ {dayjs().format("dddd")}
+            </Typography>
+            <TaskList tasks={todayTasks} />
+          </>
+        )}
+        <AddTaskButton presetDueDate={dayjs()} />
+      </>
+    );
+  }
+
+  if (view === "board") {
+    return "board";
+  }
+
+  return null;
+}
 
 function ViewMenu({
   view,
@@ -122,122 +235,3 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     marginBottom: 0,
   },
 }));
-
-function TaskListToday({
-  tasks,
-  view,
-}: {
-  tasks: Task[];
-  view: ProjectViewType;
-}) {
-  const overdueTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
-  );
-  const todayTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
-  );
-
-  if (view === "list") {
-    return (
-      <>
-        {overdueTasks.length > 0 && (
-          <Accordion disableGutters defaultExpanded elevation={0}>
-            <AccordionSummary
-              aria-controls="overdue-content"
-              id="overdue-header"
-            >
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent={"space-between"}
-                width={"100%"}
-              >
-                <Typography variant={"h6"} component={"h3"}>
-                  Overdue
-                </Typography>
-                <RescheduleDialog tasks={overdueTasks} />
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
-              <TaskList tasks={overdueTasks} />
-            </AccordionDetails>
-          </Accordion>
-        )}
-        {todayTasks.length > 0 && (
-          <>
-            <Typography mt={3} variant={"h6"} component={"h3"}>
-              {dayjs().format("MMM D")} ‧ Today ‧ {dayjs().format("dddd")}
-            </Typography>
-            <TaskList tasks={todayTasks} />
-          </>
-        )}
-        <AddTaskButton presetDueDate={dayjs()} />
-      </>
-    );
-  }
-
-  if (view === "board") {
-    return "board";
-  }
-
-  return null;
-}
-
-export default function TodayPage() {
-  const { isPending, isError, data } = useTasksToday();
-  const [view, setView] = useLocalStorage<ProjectViewType>("todayView", "list");
-
-  const tasks: Task[] = data?.results ?? [];
-
-  if (isError) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <Alert severity="error">Failed to load tasks</Alert>
-      </Box>
-    );
-  }
-
-  if (isPending) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <SkeletonList count={10} />
-      </Box>
-    );
-  }
-
-  const handleViewChange = (view: ProjectViewType) => {
-    setView(view);
-  };
-
-  return (
-    <div style={{ position: "relative" }}>
-      <Stack
-        position={"relative"}
-        zIndex={999}
-        mt={-9}
-        spacing={1}
-        padding={3}
-        direction="row"
-        justifyContent="end"
-      >
-        <Box>
-          <ViewMenu view={view} handleViewChange={handleViewChange} />
-        </Box>
-      </Stack>
-      <Box display={"flex"} flexDirection={"column"} height="100vh">
-        <Box padding={3} flex="0 1 auto">
-          <Typography my={3} variant={"h5"} component={"h2"}>
-            Today
-          </Typography>
-        </Box>
-        <Box overflow={"auto"}>
-          <Box maxWidth={600} mx={"auto"}>
-            <InboxDefaultSectionProvider>
-              <TaskListToday view={view} tasks={tasks} />
-            </InboxDefaultSectionProvider>
-          </Box>
-        </Box>
-      </Box>
-    </div>
-  );
-}

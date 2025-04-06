@@ -12,7 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 import { type Control, Controller } from "react-hook-form";
 
-import type { ITaskFormFields, TaskPriority } from "../types/common";
+import type { TaskFormFields, TaskPriority } from "../types/common";
 
 const options: { value: TaskPriority; label: string }[] = [
   { value: "NONE", label: "None" },
@@ -46,7 +46,7 @@ export default function TaskPriorityMenu({
   compact, // eslint-disable-line @typescript-eslint/no-unused-vars
   ...props
 }: {
-  control: Control<ITaskFormFields>;
+  control: Control<TaskFormFields>;
   priority: TaskPriority;
   compact?: boolean;
 } & ButtonGroupProps) {

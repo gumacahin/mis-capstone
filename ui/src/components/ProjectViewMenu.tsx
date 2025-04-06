@@ -1,13 +1,15 @@
 import ListIcon from "@mui/icons-material/List";
 import TuneIcon from "@mui/icons-material/Tune";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { debounce } from "@mui/material";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import { MouseEvent, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { MouseEvent, useMemo, useState } from "react";
 
 import { useUpdateProjectView } from "../api";
 import type { ProjectDetail, ProjectViewType } from "../types/common";
@@ -22,15 +24,38 @@ export default function ProjectViewMenu({
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const queryClient = useQueryClient();
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const updateProjectView = useUpdateProjectView(project);
+  const { mutateAsync } = useUpdateProjectView(project);
+  const updateProjectViewType = useMemo(
+    () =>
+      debounce(async (view: ProjectViewType) => {
+        await mutateAsync(view);
+      }, 1000),
+    [mutateAsync],
+  );
 
   // TODO: throttle this
-  const handleChange = async (_: unknown, value: ProjectViewType) => {
+  const handleChange = async (
+    _: MouseEvent<HTMLElement>,
+    value: ProjectViewType,
+  ) => {
     if (value !== project.view) {
-      await updateProjectView.mutateAsync(value);
+      queryClient.setQueryData(
+        ["project", { projectId: project.id }],
+        (oldProject: ProjectDetail | undefined) => {
+          if (!oldProject) {
+            return oldProject;
+          }
+          return {
+            ...oldProject,
+            view: value,
+          };
+        },
+      );
+      updateProjectViewType(value);
     }
   };
 
@@ -55,7 +80,7 @@ export default function ProjectViewMenu({
           "aria-labelledby": "view-menu-button",
         }}
       >
-        <MenuItem>
+        <MenuItem disableRipple>
           <ToggleButtonGroup
             id="view-options-label"
             exclusive

@@ -20,21 +20,30 @@ class ProjectSectionViewSet(viewsets.ModelViewSet):
     def bulk_update(self, request):
         ids = [i["id"] for i in request.data]
 
-        # Fetch the corresponding objects from the database
         sections = self.get_queryset().filter(id__in=ids)
 
-        # Create a mapping of id -> order from the request data
         id_to_order_map = {item["id"]: item["order"] for item in request.data}
 
-        # Update the order field for each section
         for section in sections:
             section.order = id_to_order_map.get(section.id)
 
-        # Use bulk_update for efficient database updates
-        with transaction.atomic():
-            ProjectSection.objects.bulk_update(sections, ["order"])
+        ProjectSection.objects.bulk_update(sections, ["order"])
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=["post"], detail=True)
+    def duplicate(self, request, pk=None):
+        section = self.get_object()
+        section.pk = None
+        section.title = f"Copy of {section.title}"
+        section.save()
+        original_section = ProjectSection.objects.get(pk=pk)
+        for task in original_section.tasks.all():
+            task.pk = None
+            task.section = section
+            task.save()
+
+        return Response(status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
         with transaction.atomic():
@@ -53,6 +62,26 @@ class ProjectSectionViewSet(viewsets.ModelViewSet):
         if instance.is_default:
             raise serializers.ValidationError("Cannot update default section.")
         super().perform_update(serializer)
+
+        source_project = serializer.validated_data.get("source_project")
+        destination_project = serializer.validated_data.get("project")
+
+        source_project_sections = ProjectSection.objects.filter(
+            is_default=False, project=source_project
+        ).order_by("order")
+        for order, section in enumerate(source_project_sections, start=1):
+            section.order = order
+        ProjectSection.objects.bulk_update(source_project_sections, ["order"])
+        max_order = (
+            destination_project.sections.aggregate(max_order=models.Max("order"))[
+                "max_order"
+            ]
+            # The default section is always 0 but just in case
+            or 0
+        )
+        serializer.save(
+            order=max_order + 1,
+        )
 
     def perform_destroy(self, instance):
         if instance.is_default:

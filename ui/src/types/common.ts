@@ -21,7 +21,7 @@ export interface Profile {
 }
 
 export type TaskPriority = "NONE" | "LOW" | "MEDIUM" | "HIGH";
-export interface ITaskFormFields {
+export interface TaskFormFields {
   title: string;
   description: string | null;
   completion_date: Dayjs | null;
@@ -85,3 +85,5 @@ export interface Project {
   order: number;
   sections: { title: string; id: number; is_default: boolean }[];
 }
+
+export type DragType = "TASK" | "SECTION";

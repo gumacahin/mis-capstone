@@ -11,7 +11,7 @@ import {
   type ControllerRenderProps,
 } from "react-hook-form";
 
-import type { ITaskFormFields } from "../types/common";
+import type { TaskFormFields } from "../types/common";
 import TaskTagsMenu from "./TaskTagsMenu";
 
 export default function TaskTagsButton({
@@ -19,7 +19,7 @@ export default function TaskTagsButton({
   tags,
   compact, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: {
-  control: Control<ITaskFormFields>;
+  control: Control<TaskFormFields>;
   tags: string[];
   compact?: boolean;
 } & ButtonGroupProps) {
@@ -33,7 +33,7 @@ export default function TaskTagsButton({
   };
 
   const handleClickTag = (
-    field: ControllerRenderProps<ITaskFormFields, "tags">,
+    field: ControllerRenderProps<TaskFormFields, "tags">,
     tag: string,
   ) => {
     if (tags.includes(tag)) {

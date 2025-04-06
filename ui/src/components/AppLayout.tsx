@@ -39,8 +39,9 @@ import toast from "react-hot-toast";
 import { generatePath } from "react-router-dom";
 
 import { useProjects, useReorderProjects } from "../api";
+import useToolbarContext from "../hooks/useToolbarContext";
 import { ROUTES } from "../routes";
-import { PaginatedResponse, Project } from "../types/common";
+import { Project } from "../types/common";
 import AccountMenu from "./AccountMenu";
 import AddProjectDialog from "./AddProjectDialog";
 import AddTaskDialog from "./AddTaskDialog";
@@ -78,7 +79,6 @@ function DrawerContents({
   const [projectsMenuItemHovered, setProjectsMenuItemHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [project, setProject] = useState<Project | null>(null);
-  const queryClient = useQueryClient();
   const reorderProjects = useReorderProjects();
 
   console.log("isLargeDisplay", isLargeDisplay);
@@ -133,20 +133,12 @@ function DrawerContents({
     const newProjectList = Array.from(projects) as Project[];
     const [removed] = newProjectList.splice(source.index, 1);
     newProjectList.splice(destination.index, 0, removed);
-    console.log("newProjectList", newProjectList);
     const reorderedProjects = newProjectList.map(
       (project: Project, index: number) => ({
         ...project,
         order: index + 1,
       }),
     );
-    // queryClient.setQueryData(
-    //   ["projects"],
-    //   (oldData: IPaginatedResponse<IProject>) => ({
-    //     ...oldData,
-    //     results: reorderedProjects,
-    //   }),
-    // );
     await toast.promise(reorderProjects.mutateAsync(reorderedProjects), {
       loading: "Reordering projects...",
       error: "Failed reordering projects.",
@@ -387,7 +379,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
-  const [toolbarItems, setToolbarItems] = useState<ReactNode[]>([]);
+  const { toolbarItems } = useToolbarContext();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -412,14 +404,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           position="fixed"
           open={open}
           elevation={0}
-          sx={{ backgroundColor: "transparent" }}
+          sx={{ backgroundColor: "background.default" }}
         >
           <Toolbar
             sx={{
-              justifyContent: "space-between",
-              // maxWidth: `calc(100% - ${DRAWER_WIDTH}px)`,
-              // maxWidth: "100%",
-              // overflow: "hidden",
+              justifyContent: "start",
+              width: "100%",
             }}
           >
             <IconButton
@@ -431,7 +421,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             >
               <MenuIcon />
             </IconButton>
-            <Box>{toolbarItems}</Box>
+            <Box width="100%">{toolbarItems}</Box>
           </Toolbar>
         </AppBar>
         {!isLargeDisplay && (
@@ -482,9 +472,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </Drawer>
         )}
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
-          {/* <Box minHeight={`calc(100vh - 72px)`}> */}
           <Box
-            position={"relative"}
             minHeight={(theme) =>
               `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
             }

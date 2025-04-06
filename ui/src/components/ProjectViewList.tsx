@@ -1,3 +1,10 @@
+import {
+  DragDropContext,
+  Draggable,
+  DraggableLocation,
+  Droppable,
+  type DroppableProvided,
+} from "@hello-pangea/dnd";
 import { TextField, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -105,22 +112,40 @@ export default function ProjectViewList({
 }: {
   project: ProjectDetail;
 }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = async ({
+    destination,
+    source,
+    type,
+  }: {
+    destination: DraggableLocation | null;
+    source: DraggableLocation;
+    type: string;
+  }) => {
+    setIsDragging(false);
+  };
   return (
     <ProjectContext.Provider value={project}>
-      <Stack spacing={1} maxWidth="800px" width="100%" mx="auto">
-        {project.sections.map((section: Section) => (
-          <SectionContext.Provider value={section} key={section.id}>
-            <Card key={section.id} elevation={0}>
-              <ProjectSectionHeader />
-              <TaskList />
-              <CardActions>
-                <AddTaskButton />
-              </CardActions>
-            </Card>
-            <AddSectionButton precedingSection={section} />
-          </SectionContext.Provider>
-        ))}
-      </Stack>
+      <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+        <Stack spacing={1} maxWidth="800px" width="100%" mx="auto">
+          {project.sections.map((section: Section) => (
+            <SectionContext.Provider value={section} key={section.id}>
+              <Card key={section.id} elevation={0}>
+                <ProjectSectionHeader />
+                <TaskList />
+                <CardActions>
+                  <AddTaskButton />
+                </CardActions>
+              </Card>
+              <AddSectionButton precedingSection={section} />
+            </SectionContext.Provider>
+          ))}
+        </Stack>
+      </DragDropContext>
     </ProjectContext.Provider>
   );
 }

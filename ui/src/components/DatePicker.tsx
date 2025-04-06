@@ -25,15 +25,15 @@ import dayjs, { Dayjs } from "dayjs";
 import { forwardRef, MouseEvent, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
-import type { ITaskFormFields } from "../types/common";
+import type { TaskFormFields } from "../types/common";
 
-type DueDatePickerProps = DateCalendarProps<Dayjs> & {
-  control: Control<ITaskFormFields>;
+type DatePickerProps = DateCalendarProps<Dayjs> & {
+  control: Control<TaskFormFields>;
   onClose?: () => void;
   compact?: boolean;
 } & ButtonGroupProps;
 
-const DatePicker = forwardRef<HTMLButtonElement, DueDatePickerProps>(
+const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
   ({ control, sx, onClose, ...props }, ref) => {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -75,168 +75,173 @@ const DatePicker = forwardRef<HTMLButtonElement, DueDatePickerProps>(
       <Controller
         name="due_date"
         control={control}
-        render={({ field }) => (
-          <>
-            <ButtonGroup
-              size="small"
-              {...props}
-              sx={[
-                {
-                  "& .MuiButtonGroup-grouped:not(:last-of-type)": {
-                    borderRight: props.variant === "text" ? "none" : undefined, // Remove dividers for text variant
+        render={({ field }) => {
+          const today = dayjs().startOf("day");
+          const nextWeek = dayjs().add(7, "day");
+          const comingWeekend =
+            today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
+          return (
+            <>
+              <ButtonGroup
+                size="small"
+                {...props}
+                sx={[
+                  {
+                    "& .MuiButtonGroup-grouped:not(:last-of-type)": {
+                      borderRight:
+                        props.variant === "text" ? "none" : undefined, // Remove dividers for text variant
+                    },
+                    "& .MuiButtonGroup-grouped:not(:first-of-type)": {
+                      marginLeft: props.variant === "text" ? 0 : undefined, // Remove spacing for text variant
+                    },
                   },
-                  "& .MuiButtonGroup-grouped:not(:first-of-type)": {
-                    marginLeft: props.variant === "text" ? 0 : undefined, // Remove spacing for text variant
-                  },
-                },
-                ...(Array.isArray(sx) ? sx : [sx]), // Ensure sx is an array
-              ]}
-            >
-              <Tooltip title="Set due date">
-                <Button
-                  sx={{
-                    flexGrow: 1, // Allow this button to grow and occupy remaining space
-                    flexShrink: 1, // Allow it to shrink if needed
-                    textOverflow: "ellipsis", // Handle overflow gracefully
-                    overflow: "hidden", // Hide overflowing text
-                    whiteSpace: "nowrap", // Prevent text wrapping
-                    ...(props.fullWidth && { justifyContent: "start" }),
-                  }}
-                  startIcon={<CalendarTodayIcon />}
-                  variant={props.variant ?? "outlined"}
-                  onClick={handleClick}
-                  ref={ref}
-                  size="small"
-                >
-                  {formatDayOfWeek(field.value)}
-                </Button>
-              </Tooltip>
-              {field.value && (
-                <Tooltip title="Remove due date">
+                  ...(Array.isArray(sx) ? sx : [sx]), // Ensure sx is an array
+                ]}
+              >
+                <Tooltip title="Set due date">
                   <Button
                     sx={{
-                      flexGrow: 0, // Prevent this button from growing
-                      flexShrink: 0, // Prevent this button from shrinking
-                      width: "auto", // Ensure it only takes up the space it needs
+                      flexGrow: 1, // Allow this button to grow and occupy remaining space
+                      flexShrink: 1, // Allow it to shrink if needed
+                      textOverflow: "ellipsis", // Handle overflow gracefully
+                      overflow: "hidden", // Hide overflowing text
+                      whiteSpace: "nowrap", // Prevent text wrapping
+                      ...(props.fullWidth && { justifyContent: "start" }),
                     }}
-                    size="small"
+                    startIcon={<CalendarTodayIcon />}
                     variant={props.variant ?? "outlined"}
-                    onClick={() => {
-                      field.onChange(null);
-                    }}
+                    onClick={handleClick}
+                    ref={ref}
+                    size="small"
                   >
-                    <CloseIcon fontSize="small" />
+                    {formatDayOfWeek(field.value)}
                   </Button>
                 </Tooltip>
-              )}
-            </ButtonGroup>
-            <Popover
-              id={id}
-              open={open}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-            >
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      field.onChange(dayjs());
-                      handleClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <TodayIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={"Today"} />
-                    <ListItemSecondaryAction>
-                      {dayjs().format("ddd")}
-                    </ListItemSecondaryAction>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      const tomorrow = dayjs().add(1, "day");
-                      field.onChange(tomorrow);
-                      handleClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <WbSunnyIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={"Tomorrow"} />
-                    <ListItemSecondaryAction>
-                      {dayjs().add(1, "day").format("ddd")}
-                    </ListItemSecondaryAction>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      const weekend = dayjs().startOf("week").add(6, "day");
-                      field.onChange(weekend);
-                      handleClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <WeekendIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={"This weekend"} />
-                    <ListItemSecondaryAction>
-                      {dayjs().startOf("week").add(6, "day").format("ddd")}
-                    </ListItemSecondaryAction>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      const nextWeek = dayjs().add(7, "day");
-                      field.onChange(nextWeek);
-                      handleClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <NextWeekIcon />
-                    </ListItemIcon>
-                    <ListItemText primary={"Next Week"} />
-                    <ListItemSecondaryAction>
-                      {dayjs().add(7, "day").format("ddd MMM D")}{" "}
-                    </ListItemSecondaryAction>
-                  </ListItemButton>
-                </ListItem>
                 {field.value && (
+                  <Tooltip title="Remove due date">
+                    <Button
+                      sx={{
+                        flexGrow: 0, // Prevent this button from growing
+                        flexShrink: 0, // Prevent this button from shrinking
+                        width: "auto", // Ensure it only takes up the space it needs
+                      }}
+                      size="small"
+                      variant={props.variant ?? "outlined"}
+                      onClick={() => {
+                        field.onChange(null);
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </Button>
+                  </Tooltip>
+                )}
+              </ButtonGroup>
+              <Popover
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+              >
+                <List>
                   <ListItem disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        field.onChange(null);
+                        field.onChange(dayjs());
                         handleClose();
                       }}
                     >
                       <ListItemIcon>
-                        <NotInterestedIcon />
+                        <TodayIcon />
                       </ListItemIcon>
-                      <ListItemText primary={"No date"} />
+                      <ListItemText primary={"Today"} />
+                      <ListItemSecondaryAction>
+                        {dayjs().format("ddd")}
+                      </ListItemSecondaryAction>
                     </ListItemButton>
                   </ListItem>
-                )}
-              </List>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateCalendar
-                  disablePast
-                  value={field.value}
-                  onChange={(newDate: Dayjs | null) => {
-                    field.onChange(newDate);
-                    handleClose();
-                  }}
-                />
-              </LocalizationProvider>
-            </Popover>
-          </>
-        )}
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        const tomorrow = dayjs().add(1, "day");
+                        field.onChange(tomorrow);
+                        handleClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <WbSunnyIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={"Tomorrow"} />
+                      <ListItemSecondaryAction>
+                        {dayjs().add(1, "day").format("ddd")}
+                      </ListItemSecondaryAction>
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        handleClose();
+                        field.onChange(comingWeekend);
+                      }}
+                    >
+                      <ListItemIcon>
+                        <WeekendIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={"This weekend"} />
+                      <ListItemSecondaryAction>
+                        {comingWeekend.format("ddd")}
+                      </ListItemSecondaryAction>
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        field.onChange(nextWeek);
+                        handleClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <NextWeekIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={"Next Week"} />
+                      <ListItemSecondaryAction>
+                        {nextWeek.format("ddd MMM D")}
+                      </ListItemSecondaryAction>
+                    </ListItemButton>
+                  </ListItem>
+                  {field.value && (
+                    <ListItem disablePadding>
+                      <ListItemButton
+                        onClick={() => {
+                          field.onChange(null);
+                          handleClose();
+                        }}
+                      >
+                        <ListItemIcon>
+                          <NotInterestedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={"No date"} />
+                      </ListItemButton>
+                    </ListItem>
+                  )}
+                </List>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateCalendar
+                    disablePast
+                    value={field.value}
+                    onChange={(newDate: Dayjs | null) => {
+                      field.onChange(newDate);
+                      handleClose();
+                    }}
+                  />
+                </LocalizationProvider>
+              </Popover>
+            </>
+          );
+        }}
       />
     );
   },

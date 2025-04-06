@@ -13,10 +13,10 @@ import { useAddTask } from "../api";
 import ProfileContext from "../contexts/profileContext";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import type { ITaskFormFields, TaskPriority, Task } from "../types/common";
+import type { Task, TaskFormFields, TaskPriority } from "../types/common";
 import DatePicker from "./DatePicker";
 import TaskPriorityMenu from "./TaskPriorityMenu";
-import TaskProjectMenu from "./TaskProjectMenu";
+import TaskProjectButton from "./TaskProjectButton";
 import TaskTagsButton from "./TaskTagsButton";
 
 export default function TaskForm({
@@ -56,18 +56,18 @@ export default function TaskForm({
     tags: task?.tags ?? [],
   };
 
-  const { control, register, handleSubmit, watch } = useForm<ITaskFormFields>({
+  const { control, register, handleSubmit, watch } = useForm<TaskFormFields>({
     defaultValues,
   });
 
-  const onSubmit: SubmitHandler<ITaskFormFields> = async ({
+  const onSubmit: SubmitHandler<TaskFormFields> = async ({
     title,
     description,
     due_date,
     section,
     project,
   }) => {
-    const data: Partial<ITaskFormFields> = {
+    const data: Partial<TaskFormFields> = {
       title,
       description,
       section,
@@ -124,7 +124,7 @@ export default function TaskForm({
         </Stack>
       </CardContent>
       <CardActions sx={{ justifyContent: "space-between" }}>
-        <TaskProjectMenu
+        <TaskProjectButton
           control={control}
           projectId={project.id}
           sectionId={sectionId}
