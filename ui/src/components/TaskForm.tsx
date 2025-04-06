@@ -88,7 +88,12 @@ export default function TaskForm({
   const sectionId = watch("section");
 
   return (
-    <Card component="form" onSubmit={handleSubmit(onSubmit)} variant="outlined">
+    <Card
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      variant="outlined"
+      sx={{ width: "100%", maxWidth: "100%" }}
+    >
       <CardContent>
         <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
           <TextField

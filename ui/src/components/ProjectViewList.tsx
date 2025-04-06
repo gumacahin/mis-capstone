@@ -1,16 +1,9 @@
-import {
-  DragDropContext,
-  Draggable,
-  DraggableLocation,
-  Droppable,
-  type DroppableProvided,
-} from "@hello-pangea/dnd";
+import { DragDropContext, DraggableLocation } from "@hello-pangea/dnd";
 import { TextField, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

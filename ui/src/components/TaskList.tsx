@@ -21,10 +21,19 @@ const TASK = "TASK";
 export interface TaskListProps {
   tasks?: Task[];
   hideDueDates?: boolean;
-  isDragging?: boolean;
+  taskListId?: string;
+  isDragDisabled?: boolean;
+  showAddTaskMenuItems?: boolean;
 }
 
-export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
+export default function TaskList({
+  tasks,
+  hideDueDates,
+  taskListId,
+  isDragDisabled,
+  showAddTaskMenuItems = true,
+}: TaskListProps) {
+  const DROPPABLE_MIN_HEIGHT = 50;
   const [openTaskId, setOpenTaskId] = useState<number | null>(null);
   const section = useContext<Section | null>(SectionContext);
   const project = useContext<ProjectDetail | null>(ProjectContext)!;
@@ -52,10 +61,8 @@ export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
   const openTask = tasks.find((task: Task) => task.id === openTaskId);
 
   const hasOpenTask = Boolean(openTask);
-  // TODO: fix this
-  const taskListId = section?.id.toString()
-    ? `tasklist-${section.id}`
-    : "some-id";
+
+  const droppableId = taskListId ? taskListId : `tasklist-${section?.id}`;
 
   return (
     <>
@@ -68,11 +75,10 @@ export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
         />
       )}
       <CardContent>
-        {/* <CardContent sx={{ width: "100%", maxWidth: "332px" }}> */}
-        <Droppable droppableId={taskListId} type={TASK}>
+        <Droppable droppableId={droppableId!} type={TASK}>
           {(provided: DroppableProvided) => (
             <Stack
-              minHeight={100}
+              minHeight={DROPPABLE_MIN_HEIGHT}
               spacing={1}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -86,7 +92,11 @@ export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
                       handleClose={handleCloseAddAboveTaskForm}
                     />
                   )}
-                  <Draggable draggableId={`task-${task.id}`} index={index}>
+                  <Draggable
+                    isDragDisabled={isDragDisabled}
+                    draggableId={`task-${task.id}`}
+                    index={index}
+                  >
                     {(
                       provided: DraggableProvided,
                       snapshot: DraggableStateSnapshot,
@@ -97,6 +107,7 @@ export default function TaskList({ tasks, hideDueDates }: TaskListProps) {
                         hideDueDates={hideDueDates}
                         handleAddTaskAbove={() => setAddTaskAbove(task.id)}
                         handleAddTaskBelow={() => setAddTaskBelow(task.id)}
+                        showAddTaskMenuItems={showAddTaskMenuItems}
                         provided={provided}
                         snapshot={snapshot}
                       />

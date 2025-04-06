@@ -1,6 +1,4 @@
 import { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
-import AddCommentIcon from "@mui/icons-material/AddComment";
-import CreateIcon from "@mui/icons-material/Create";
 import EventIcon from "@mui/icons-material/Event";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Card from "@mui/material/Card";
@@ -25,6 +23,7 @@ export interface TaskCardProps {
   handleAddTaskBelow: () => void;
   provided: DraggableProvided;
   snapshot: DraggableStateSnapshot;
+  showAddTaskMenuItems?: boolean;
 }
 
 export default function TaskCard({
@@ -35,6 +34,7 @@ export default function TaskCard({
   handleAddTaskBelow,
   provided,
   snapshot,
+  showAddTaskMenuItems = true,
 }: TaskCardProps) {
   const isOverdue =
     task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
@@ -76,8 +76,7 @@ export default function TaskCard({
     }
     if (
       e.target instanceof HTMLElement &&
-      // FIXME: this will not fire when any text inside the card is clicked
-      e.target.classList.contains("MuiCardHeader-root")
+      e.target.closest(".MuiCardHeader-root")
     ) {
       handleOpenTask(task.id);
     }
@@ -107,6 +106,7 @@ export default function TaskCard({
         handleDeleteTask={handleDeleteTask}
         handleCloseTaskMenu={handleCloseTaskMenu}
         taskMenuAnchorEl={taskMenuAnchorEl}
+        showAddTaskMenuItems={showAddTaskMenuItems}
         task={task}
       />
       {!isEditingTask && (

@@ -160,7 +160,7 @@ export default function ProjectSectionHeader() {
               fontWeight={500}
               fontSize={16}
             >
-              {section.is_default ? "(No Section)" : section.title}{" "}
+              {section.is_default ? "(No Section)" : section.title}
             </Typography>
             <Typography
               sx={{

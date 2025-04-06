@@ -1,6 +1,7 @@
 import { Alert, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import { useProject } from "../api";
@@ -9,10 +10,28 @@ import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
 import ProjectContext from "../contexts/projectContext";
+import useToolbarContext from "../hooks/useToolbarContext";
 
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { isPending, isError, data: project } = useProject(Number(projectId));
+  const { setToolbarItems } = useToolbarContext();
+
+  const projectTitle = project?.title || "";
+
+  useEffect(() => {
+    setToolbarItems(
+      <Stack direction="row" width="100%" justifyContent="space-between">
+        <Box>
+          <Typography variant={"h5"} component={"h2"} color="text.primary">
+            {projectTitle}
+          </Typography>
+        </Box>
+        {project && <ProjectViewMenu project={project} />}
+      </Stack>,
+    );
+    return () => setToolbarItems(null);
+  }, [project, projectTitle, setToolbarItems]);
 
   if (isError) {
     return (
@@ -23,38 +42,12 @@ export default function ProjectPage() {
   }
 
   if (isPending) {
-    return (
-      <PageLayout>
-        <SkeletonList count={5} width={250} />
-      </PageLayout>
-    );
+    return <SkeletonList count={5} width={250} />;
   }
 
-  const projectTitle = project?.title || "";
-
   return (
-    <PageLayout>
-      <Stack spacing={2}>
-        <ProjectContext.Provider value={project}>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Box display={"flex"} alignItems={"center"}>
-              <Typography fontSize={32} variant={"h1"}>
-                {projectTitle}
-              </Typography>
-            </Box>
-            <ProjectViewMenu project={project} />
-          </Box>
-          <Box
-            sx={[
-              project.view === "list" && {
-                mx: 6,
-              },
-            ]}
-          >
-            <ProjectView project={project} />
-          </Box>
-        </ProjectContext.Provider>
-      </Stack>
-    </PageLayout>
+    <ProjectContext.Provider value={project}>
+      <ProjectView project={project} />
+    </ProjectContext.Provider>
   );
 }

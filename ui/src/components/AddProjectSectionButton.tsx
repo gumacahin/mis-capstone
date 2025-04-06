@@ -16,7 +16,7 @@ export default function AddProjectSectionButton({
     setOpen(false);
   };
   return (
-    <Box>
+    <Box padding={2}>
       {open ? (
         <AddProjectSectionForm
           precedingSection={precedingSection}

@@ -1,8 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { debounce } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 
 import type {
   Comment,
@@ -180,6 +179,25 @@ export const useUpdateTask = (task: Task) => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
+    },
+  });
+};
+
+export const useRescheduleTask = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    // mutationKey: ["resheduleTask", { taskId }],
+    mutationFn: async ({ task, dueDate }: { task: Task; dueDate: Dayjs }) => {
+      const data = {
+        due_date: dueDate.format("YYYY-MM-DD"),
+      };
+      const taskId = task.id;
+      const result = await apiClient.patch(`/tasks/${taskId}/`, data);
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", "today"] });
     },
   });
 };

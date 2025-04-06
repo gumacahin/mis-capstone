@@ -37,7 +37,6 @@ export default function ProjectViewMenu({
     [mutateAsync],
   );
 
-  // TODO: throttle this
   const handleChange = async (
     _: MouseEvent<HTMLElement>,
     value: ProjectViewType,

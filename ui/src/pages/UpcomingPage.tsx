@@ -167,19 +167,6 @@ export default function UpcomingPage() {
     setSelectedDate(date);
   };
 
-  const formatDayOfWeek = (date: Date) => {
-    const givenDate = dayjs(date).startOf("day");
-    const today = dayjs().startOf("day");
-    const tomorrow = dayjs().add(1, "day").startOf("day");
-    if (givenDate.isSame(today)) {
-      return "Today";
-    }
-    if (givenDate.isSame(tomorrow)) {
-      return "Tomorrow";
-    }
-    return dayjs(date).format("dddd");
-  };
-
   const tasks: Task[] = data?.results ?? [];
   const tasksToday: Task[] = tasksTodayData?.results ?? [];
   const overdueTasks = tasksToday.filter(

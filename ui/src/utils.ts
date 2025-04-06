@@ -1,3 +1,5 @@
+import dayjs, { Dayjs } from "dayjs";
+
 import { Profile } from "./types/common";
 
 export function stringToColor(string: string) {
@@ -30,4 +32,17 @@ export function stringAvatar(name: string) {
 export function getUserDisplayName(user: Profile) {
   const userDisplayName = user.name ?? "Todo User";
   return userDisplayName;
+}
+
+export function formatDayOfWeek(date: Date | Dayjs) {
+  const givenDate = dayjs(date).startOf("day");
+  const today = dayjs().startOf("day");
+  const tomorrow = dayjs().add(1, "day").startOf("day");
+  if (givenDate.isSame(today)) {
+    return "Today";
+  }
+  if (givenDate.isSame(tomorrow)) {
+    return "Tomorrow";
+  }
+  return dayjs(date).format("dddd");
 }

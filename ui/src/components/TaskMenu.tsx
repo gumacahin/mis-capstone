@@ -28,6 +28,7 @@ import TaskMenuDatePicker from "./TaskMenuDatePicker";
 export interface TaskMenuProps {
   taskMenuAnchorEl: null | HTMLElement;
   task: Task;
+  showAddTaskMenuItems?: boolean;
   handleAddTaskAbove: () => void;
   handleAddTaskBelow: () => void;
   handleCloseTaskMenu: () => void;
@@ -36,6 +37,7 @@ export interface TaskMenuProps {
 }
 
 export default function TaskMenu({
+  showAddTaskMenuItems = true,
   taskMenuAnchorEl,
   task,
   handleAddTaskAbove,
@@ -148,31 +150,35 @@ export default function TaskMenu({
           "aria-labelledby": `task-options-button-${task.id}`,
         }}
       >
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            handleAddTaskAbove();
-            handleCloseTaskMenu();
-          }}
-        >
-          <ListItemIcon>
-            <VerticalAlignTopIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Add task above" />
-        </MenuItem>
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            handleAddTaskBelow();
-            handleCloseTaskMenu();
-          }}
-        >
-          <ListItemIcon>
-            <VerticalAlignBottomIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Add task below" />
-        </MenuItem>
-        <Divider component="li" />
+        {showAddTaskMenuItems && (
+          <>
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddTaskAbove();
+                handleCloseTaskMenu();
+              }}
+            >
+              <ListItemIcon>
+                <VerticalAlignTopIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Add task above" />
+            </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddTaskBelow();
+                handleCloseTaskMenu();
+              }}
+            >
+              <ListItemIcon>
+                <VerticalAlignBottomIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Add task below" />
+            </MenuItem>
+            <Divider component="li" />
+          </>
+        )}
         <MenuItem
           onClick={(e) => {
             e.stopPropagation();

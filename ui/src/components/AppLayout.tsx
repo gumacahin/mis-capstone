@@ -399,7 +399,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           }}
         />
       </InboxDefaultSectionProvider>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex" }} height="100vh" id="app-layout">
         <AppBar
           position="fixed"
           open={open}
@@ -477,6 +477,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
             }
             pt={8}
+            id="main-content-wrapper"
           >
             {children}
           </Box>

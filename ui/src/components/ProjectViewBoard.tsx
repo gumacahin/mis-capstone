@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useReorderSections, useReorderTasks } from "../api";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
+import useScrollbarWidth from "../hooks/useScrollbarWidth";
 import { ProjectDetail, Section, Task } from "../types/common";
 import AddProjectSectionButton from "./AddProjectSectionButton";
 import AddTaskButton from "./AddTaskButton";
@@ -31,6 +32,7 @@ export default function ProjectViewBoard({
   const { mutateAsync: reorderSections } = useReorderSections(project.id);
   const { mutateAsync: reorderTasks } = useReorderTasks(project.id);
   const [isDragging, setIsDragging] = useState(false);
+  const scrollbarWidth = useScrollbarWidth();
 
   const handleDragStart = () => {
     setIsDragging(true);
@@ -157,12 +159,14 @@ export default function ProjectViewBoard({
         >
           {(provided: DroppableProvided) => (
             <Stack
+              id="project-sections-board-view-container"
               direction="row"
               sx={{
-                height: "100vh",
+                minHeight: (theme) =>
+                  `calc(100vh - ${theme.mixins.toolbar.minHeight}px - ${scrollbarWidth}px)`,
                 overflowX: "auto",
                 flex: "0 1 auto",
-                minWidth: 300,
+                // minWidth: 300,
                 alignItems: "start",
                 justifyContent: "start",
               }}

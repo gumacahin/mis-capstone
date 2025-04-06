@@ -1,31 +1,21 @@
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import ListIcon from "@mui/icons-material/List";
 import TuneIcon from "@mui/icons-material/Tune";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { Alert, Typography } from "@mui/material";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import MuiAccordionSummary, {
-  type AccordionSummaryProps,
-} from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
-import { styled } from "@mui/material/styles";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import dayjs from "dayjs";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
 
 import { useTasksToday } from "../api";
-import AddTaskButton from "../components/AddTaskButton";
 import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import RescheduleDialog from "../components/RescheduleDialog";
 import SkeletonList from "../components/SkeletonList";
-import TaskList from "../components/TaskList";
+import TodayView from "../components/TodayView";
 import useToolbarContext from "../hooks/useToolbarContext";
 import type { ProjectViewType, Task } from "../types/common";
 
@@ -38,6 +28,7 @@ export default function TodayPage() {
 
   const handleViewChange = useCallback(
     (view: ProjectViewType) => {
+      console.log("view", view);
       setView(view);
     },
     [setView],
@@ -79,69 +70,9 @@ export default function TodayPage() {
 
   return (
     <InboxDefaultSectionProvider>
-      <TaskListToday view={view} tasks={tasks} />
+      <TodayView view={view} tasks={tasks} />
     </InboxDefaultSectionProvider>
   );
-}
-
-function TaskListToday({
-  tasks,
-  view,
-}: {
-  tasks: Task[];
-  view: ProjectViewType;
-}) {
-  const overdueTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
-  );
-  const todayTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
-  );
-
-  if (view === "list") {
-    return (
-      <>
-        {overdueTasks.length > 0 && (
-          <Accordion disableGutters defaultExpanded elevation={0}>
-            <AccordionSummary
-              aria-controls="overdue-content"
-              id="overdue-header"
-            >
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent={"space-between"}
-                width={"100%"}
-              >
-                <Typography variant={"h6"} component={"h3"}>
-                  Overdue
-                </Typography>
-                <RescheduleDialog tasks={overdueTasks} />
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails id="overdue-content" sx={{ padding: 0 }}>
-              <TaskList tasks={overdueTasks} />
-            </AccordionDetails>
-          </Accordion>
-        )}
-        {todayTasks.length > 0 && (
-          <>
-            <Typography mt={3} variant={"h6"} component={"h3"}>
-              {dayjs().format("MMM D")} ‧ Today ‧ {dayjs().format("dddd")}
-            </Typography>
-            <TaskList tasks={todayTasks} />
-          </>
-        )}
-        <AddTaskButton presetDueDate={dayjs()} />
-      </>
-    );
-  }
-
-  if (view === "board") {
-    return "board";
-  }
-
-  return null;
 }
 
 function ViewMenu({
@@ -181,14 +112,14 @@ function ViewMenu({
           "aria-labelledby": "view-menu-button",
         }}
       >
-        <MenuItem>
+        <MenuItem disableRipple>
           <ToggleButtonGroup
             id="view-options-label"
             exclusive
             aria-label="view options"
             aria-labelledby="view-options-label"
             value={view}
-            onChange={() => handleViewChange(view)}
+            onChange={(_, value) => handleViewChange(value)}
           >
             <ToggleButton
               value="list"
@@ -216,22 +147,3 @@ function ViewMenu({
     </>
   );
 }
-
-const AccordionSummary = styled((props: AccordionSummaryProps) => (
-  <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
-    {...props}
-  />
-))(({ theme }) => ({
-  flexDirection: "row-reverse",
-  padding: 0,
-  margin: 0,
-  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
-    transform: "rotate(90deg)",
-  },
-  "& .MuiAccordionSummary-content": {
-    marginLeft: theme.spacing(1),
-    marginTop: 0,
-    marginBottom: 0,
-  },
-}));
