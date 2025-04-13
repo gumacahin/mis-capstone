@@ -15,23 +15,19 @@ import useToolbarContext from "../hooks/useToolbarContext";
 export default function ProjectPage() {
   const { projectId } = useParams();
   const { isPending, isError, data: project } = useProject(Number(projectId));
-  const { setToolbarItems } = useToolbarContext();
+  const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   const projectTitle = project?.title || "";
 
   useEffect(() => {
-    setToolbarItems(
-      <Stack direction="row" width="100%" justifyContent="space-between">
-        <Box>
-          <Typography variant={"h5"} component={"h2"} color="text.primary">
-            {projectTitle}
-          </Typography>
-        </Box>
-        {project && <ProjectViewMenu project={project} />}
-      </Stack>,
+    setToolbarTitle(
+      <Typography variant={"h5"} component={"h2"} color="text.primary">
+        {projectTitle}
+      </Typography>,
     );
-    return () => setToolbarItems(null);
-  }, [project, projectTitle, setToolbarItems]);
+    setToolbarIcons(<>{project && <ProjectViewMenu project={project} />}</>);
+    return () => setToolbarIcons(null);
+  }, [project, projectTitle, setToolbarTitle, setToolbarIcons]);
 
   if (isError) {
     return (

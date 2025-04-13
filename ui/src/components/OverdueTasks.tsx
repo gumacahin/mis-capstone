@@ -7,8 +7,10 @@ import MuiAccordionSummary, {
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
+import Portal from "@mui/material/Portal";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import { forwardRef } from "react";
 
 import { Task } from "../types/common";
 import RescheduleDialog from "./RescheduleDialog";
@@ -16,36 +18,51 @@ import TaskList from "./TaskList";
 
 export const OVERDUE_TASK_LIST_ID = "overdue-tasks";
 
-export default function OverdueTasks({
-  overdueTasks,
-}: {
-  overdueTasks: Task[];
-}) {
+const OverdueTasks = forwardRef<
+  HTMLDivElement,
+  { overdueTasks: Task[]; headerRef: React.RefObject<HTMLDivElement | null> }
+>(({ overdueTasks, headerRef }, ref) => {
   if (overdueTasks.length === 0) {
     return null;
   }
+  const cardHeader = (
+    <CardHeader
+      title={
+        <Typography
+          sx={{
+            flexShrink: 1,
+            textWrap: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+          fontWeight={500}
+          fontSize={16}
+        >
+          Overdue
+        </Typography>
+      }
+      component={AccordionSummary}
+      aria-controls="overdue-content"
+      id="overdue-header"
+      action={<RescheduleDialog tasks={overdueTasks} />}
+    />
+  );
   return (
-    <Card component={Accordion} disableGutters defaultExpanded elevation={0}>
-      <CardHeader
-        title={
-          <Typography
-            sx={{
-              flexShrink: 1,
-              textWrap: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-            fontWeight={500}
-            fontSize={16}
-          >
-            Overdue
-          </Typography>
-        }
-        component={AccordionSummary}
-        aria-controls="overdue-content"
-        id="overdue-header"
-        action={<RescheduleDialog tasks={overdueTasks} />}
-      ></CardHeader>
+    <Card
+      sx={{ minWidth: 300 }}
+      component={Accordion}
+      disableGutters
+      defaultExpanded
+      elevation={0}
+      ref={ref}
+    >
+      {headerRef.current ? (
+        <Portal container={() => headerRef.current || null}>
+          {cardHeader}
+        </Portal>
+      ) : (
+        cardHeader
+      )}
       <CardContent
         component={AccordionDetails}
         id="overdue-content"
@@ -59,7 +76,9 @@ export default function OverdueTasks({
       </CardContent>
     </Card>
   );
-}
+});
+OverdueTasks.displayName = "OverdueTasks";
+export default OverdueTasks;
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary

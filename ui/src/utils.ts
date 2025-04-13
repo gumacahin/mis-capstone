@@ -46,3 +46,16 @@ export function formatDayOfWeek(date: Date | Dayjs) {
   }
   return dayjs(date).format("dddd");
 }
+
+export function getWeekDatesFromDate(date: Date | Dayjs) {
+  const startOfWeek = dayjs(date).startOf("week");
+  const today = dayjs();
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const currentDate = startOfWeek.add(i, "day");
+    if (currentDate.isAfter(today, "day") || currentDate.isSame(today, "day")) {
+      dates.push(currentDate.toDate());
+    }
+  }
+  return dates;
+}

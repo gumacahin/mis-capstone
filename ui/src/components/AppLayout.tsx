@@ -30,10 +30,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useQueryClient } from "@tanstack/react-query";
 import { MouseEvent, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
 import { generatePath } from "react-router-dom";
@@ -317,7 +317,10 @@ const Main = styled("main", {
 })<{
   open?: boolean;
 }>(({ theme }) => ({
+  // scrollbarGutter: "stable",
   overflow: "hidden",
+  // overflowY: "auto",
+  // overflowX: "hidden",
   flexGrow: 1,
   // padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
@@ -379,7 +382,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
-  const { toolbarItems } = useToolbarContext();
+  const {
+    toolbarAdditionalIcons,
+    toolbarIcons,
+    toolbarTitle,
+    toolbarSubtitle,
+  } = useToolbarContext();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -406,23 +414,31 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           elevation={0}
           sx={{ backgroundColor: "background.default" }}
         >
-          <Toolbar
-            sx={{
-              justifyContent: "start",
-              width: "100%",
-            }}
-          >
-            <IconButton
-              color="default"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={[open && { display: "none" }]}
+          <Stack>
+            <Toolbar
+              id="toolbar"
+              sx={{
+                justifyContent: "space-between",
+                width: "100%",
+              }}
             >
-              <MenuIcon />
-            </IconButton>
-            <Box width="100%">{toolbarItems}</Box>
-          </Toolbar>
+              <IconButton
+                color="default"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={[open && { visibility: "hidden" }]}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Box width="100%">{toolbarTitle}</Box>
+              <Stack direction="row" spacing={1}>
+                {toolbarAdditionalIcons && <Box>{toolbarAdditionalIcons}</Box>}
+                <Box>{toolbarIcons}</Box>
+              </Stack>
+            </Toolbar>
+            {toolbarSubtitle}
+          </Stack>
         </AppBar>
         {!isLargeDisplay && (
           <Drawer
@@ -473,10 +489,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         )}
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
           <Box
-            minHeight={(theme) =>
-              `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`
-            }
-            pt={8}
+            sx={{
+              scrollbarGutter: "stable",
+              overflowY: "auto",
+              maxHeight: (theme) =>
+                `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+              height: (theme) =>
+                `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
+            }}
+            mt={8}
             id="main-content-wrapper"
           >
             {children}

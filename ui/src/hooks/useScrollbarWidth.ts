@@ -26,7 +26,5 @@ export default function useScrollbarWidth(): number {
   didCompute.current = true;
   widthRef.current = scrollbarWidth;
 
-  console.log("scrollbarWidth", scrollbarWidth);
-
   return scrollbarWidth;
 }

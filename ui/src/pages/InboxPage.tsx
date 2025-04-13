@@ -17,21 +17,20 @@ export default function InboxPage() {
   const inbox = data?.projects.find((p: Project) => p.is_default);
   const { isPending, isError, data: project } = useInboxTasks(inbox?.id);
   const pageTitle = "Inbox";
-  const { setToolbarItems } = useToolbarContext();
+  const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   useEffect(() => {
-    setToolbarItems(
-      <Stack direction="row" width="100%" justifyContent="space-between">
-        <Box>
-          <Typography variant={"h5"} component={"h2"} color="text.primary">
-            {pageTitle}
-          </Typography>
-        </Box>
-        <ProjectViewMenu project={inbox} />
-      </Stack>,
+    setToolbarTitle(
+      <Typography variant={"h5"} component={"h2"} color="text.primary">
+        {pageTitle}
+      </Typography>,
     );
-    return () => setToolbarItems(null);
-  }, [inbox, pageTitle, setToolbarItems]);
+    setToolbarIcons(<ProjectViewMenu project={inbox} />);
+    return () => {
+      setToolbarIcons(null);
+      setToolbarTitle(null);
+    };
+  }, [inbox, pageTitle, setToolbarTitle, setToolbarIcons]);
 
   if (isError) {
     return (

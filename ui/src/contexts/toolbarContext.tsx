@@ -1,8 +1,14 @@
 import { createContext, Dispatch, ReactNode, SetStateAction } from "react";
 
-interface ToolbarContextType {
-  toolbarItems: ReactNode;
-  setToolbarItems: Dispatch<SetStateAction<ReactNode>>;
+export interface ToolbarContextType {
+  toolbarIcons: ReactNode;
+  toolbarAdditionalIcons: ReactNode;
+  toolbarTitle: ReactNode;
+  toolbarSubtitle: ReactNode;
+  setToolbarIcons: Dispatch<SetStateAction<ReactNode>>;
+  setToolbarTitle: Dispatch<SetStateAction<ReactNode>>;
+  setToolbarSubtitle: Dispatch<SetStateAction<ReactNode>>;
+  setToolbarAdditionalIcons: Dispatch<SetStateAction<ReactNode>>;
 }
 
 const ToolbarContext = createContext<ToolbarContextType | null>(null);

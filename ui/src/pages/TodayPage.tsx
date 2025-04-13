@@ -22,7 +22,7 @@ import type { ProjectViewType, Task } from "../types/common";
 export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();
   const [view, setView] = useLocalStorage<ProjectViewType>("todayView", "list");
-  const { setToolbarItems } = useToolbarContext();
+  const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   const tasks: Task[] = data?.results ?? [];
 
@@ -35,22 +35,23 @@ export default function TodayPage() {
   );
 
   useEffect(() => {
-    setToolbarItems(
-      <Stack direction="row" width="100%" justifyContent="space-between">
-        <Box>
-          <Typography variant={"h5"} component={"h2"} color="text.primary">
-            Today
-          </Typography>
-        </Box>
-        <ViewMenu
-          key="view-menu"
-          view={view}
-          handleViewChange={handleViewChange}
-        />
-      </Stack>,
+    setToolbarIcons(
+      <ViewMenu
+        key="view-menu"
+        view={view}
+        handleViewChange={handleViewChange}
+      />,
     );
-    return () => setToolbarItems(null);
-  }, [handleViewChange, setToolbarItems, view]);
+    setToolbarTitle(
+      <Typography variant={"h5"} component={"h2"} color="text.primary">
+        Today
+      </Typography>,
+    );
+    return () => {
+      setToolbarIcons(null);
+      setToolbarTitle(null);
+    };
+  }, [handleViewChange, setToolbarIcons, setToolbarTitle, view]);
 
   if (isError) {
     return (
