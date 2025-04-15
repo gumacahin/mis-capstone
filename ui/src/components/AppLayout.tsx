@@ -34,7 +34,7 @@ import Stack from "@mui/material/Stack";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { MouseEvent, ReactNode, useState } from "react";
+import { MouseEvent, ReactNode, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { generatePath } from "react-router-dom";
 
@@ -67,11 +67,11 @@ function DrawerContents({
   theme,
   handleDrawerClose,
   handleAddTaskDialogOpen,
-  isLargeDisplay,
+  // isLargeDisplay,
 }: {
   handleDrawerClose: () => void;
   handleAddTaskDialogOpen: () => void;
-  isLargeDisplay: boolean;
+  // isLargeDisplay: boolean;
   theme: Theme;
 }) {
   const [isProjectListOpen, setProjectListOpen] = useState(false);
@@ -81,7 +81,8 @@ function DrawerContents({
   const [project, setProject] = useState<Project | null>(null);
   const reorderProjects = useReorderProjects();
 
-  console.log("isLargeDisplay", isLargeDisplay);
+  // TODO: use isLargeDisplay to autoclose drawer in small displays
+  // console.log("isLargeDisplay", isLargeDisplay);
 
   const {
     isPending: isProjectsPending,
@@ -387,7 +388,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     toolbarIcons,
     toolbarTitle,
     toolbarSubtitle,
+    toolbarHeight,
   } = useToolbarContext();
+
+  const toolbarHeightValue = toolbarHeight || 8;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -497,7 +501,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               height: (theme) =>
                 `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
             }}
-            mt={8}
+            mt={toolbarHeightValue}
             id="main-content-wrapper"
           >
             {children}

@@ -107,10 +107,10 @@ export const useTask = (task: Task) => {
   });
 };
 
-export const useTasks = (start: Date, end: Date) => {
+export const useTasks = (start: Dayjs, end: Dayjs) => {
   const apiClient = useApiClient();
-  const startStr = dayjs(start).format("YYYY-MM-DD");
-  const endStr = dayjs(end).format("YYYY-MM-DD");
+  const startStr = start.format("YYYY-MM-DD");
+  const endStr = end.format("YYYY-MM-DD");
   return useQuery({
     queryKey: ["tasks", { start: startStr, end: endStr }],
     queryFn: async () => {

@@ -20,7 +20,10 @@ export const OVERDUE_TASK_LIST_ID = "overdue-tasks";
 
 const OverdueTasks = forwardRef<
   HTMLDivElement,
-  { overdueTasks: Task[]; headerRef: React.RefObject<HTMLDivElement | null> }
+  {
+    overdueTasks: Task[];
+    headerRef: React.RefObject<HTMLDivElement | null> | null;
+  }
 >(({ overdueTasks, headerRef }, ref) => {
   if (overdueTasks.length === 0) {
     return null;
@@ -43,7 +46,6 @@ const OverdueTasks = forwardRef<
       }
       component={AccordionSummary}
       aria-controls="overdue-content"
-      id="overdue-header"
       action={<RescheduleDialog tasks={overdueTasks} />}
     />
   );
@@ -54,9 +56,10 @@ const OverdueTasks = forwardRef<
       disableGutters
       defaultExpanded
       elevation={0}
+      data-id="overdue"
       ref={ref}
     >
-      {headerRef.current ? (
+      {headerRef?.current ? (
         <Portal container={() => headerRef.current || null}>
           {cardHeader}
         </Portal>

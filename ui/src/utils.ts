@@ -47,14 +47,15 @@ export function formatDayOfWeek(date: Date | Dayjs) {
   return dayjs(date).format("dddd");
 }
 
-export function getWeekDatesFromDate(date: Date | Dayjs) {
+export function getWeekDatesFromDate(date: Date | Dayjs, weekExtension = 0) {
   const startOfWeek = dayjs(date).startOf("week");
   const today = dayjs();
   const dates = [];
-  for (let i = 0; i < 7; i++) {
+  const daysCount = 7 * (weekExtension + 1);
+  for (let i = 0; i < daysCount; i++) {
     const currentDate = startOfWeek.add(i, "day");
     if (currentDate.isAfter(today, "day") || currentDate.isSame(today, "day")) {
-      dates.push(currentDate.toDate());
+      dates.push(currentDate);
     }
   }
   return dates;
