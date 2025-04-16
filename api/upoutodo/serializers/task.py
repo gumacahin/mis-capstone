@@ -51,8 +51,6 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
         above_task = data.pop("above_task", None)
         below_task = data.pop("below_task", None)
         source_section = data.pop("source_section", None)
-        print("##############")
-        print(f"{source_section=}")
 
         if above_task and below_task:
             raise serializers.ValidationError(

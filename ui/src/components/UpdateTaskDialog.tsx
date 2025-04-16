@@ -181,9 +181,7 @@ export default function UpdateTaskDialog({
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" variant="contained">
-                        Save Task
-                      </Button>
+                      <Button type="submit">Save Task</Button>
                     </Stack>
                   </Stack>
                 )}
@@ -197,7 +195,8 @@ export default function UpdateTaskDialog({
             sx={[
               {
                 minHeight: "100%",
-                backgroundColor: (theme: Theme) => theme.palette.grey[100],
+                backgroundColor: (theme: Theme) =>
+                  theme.palette.background.paper,
                 padding: 2,
               },
               taskIsCompleted && { cursor: "not-allowed" },

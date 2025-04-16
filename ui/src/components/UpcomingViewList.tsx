@@ -39,8 +39,10 @@ dayjs.extend(relativeTime);
 
 export default function UpcomingViewList() {
   const DATE_PAGER_HEIGHT = 48;
+  const TOOLBAR_HEIGHT = 13;
   const scrollbarWidth = useScrollbarWidth();
-  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+  const today = dayjs();
+  const [weekOffset, setWeekOffset] = useState(0);
   const [weekDates, setWeekDates] = useState<Dayjs[]>(
     getWeekDatesFromDate(dayjs()),
   );
@@ -72,8 +74,21 @@ export default function UpcomingViewList() {
 
   const { isError: tasksTodayIsError, data: tasksTodayData } = useTasksToday();
 
-  const handleDateSelect = (date: Dayjs) => {
-    setSelectedDate(date);
+  const handleDateSelect = (selectedDate: Dayjs) => {
+    const today = dayjs();
+    const weeksBetween = selectedDate.diff(today, "week");
+    setWeekOffset(weeksBetween);
+  };
+
+  const handlePageWeek = (value: -1 | 0 | 1) => {
+    if (value === 1) {
+      setWeekOffset((prev) => prev + value);
+      setWeekExtension((prev) => prev + value);
+    } else if (value === 0) {
+      setWeekOffset(0);
+    } else {
+      setWeekOffset((prev) => prev + value);
+    }
   };
 
   const tasksToday: Task[] = useMemo(
@@ -86,16 +101,13 @@ export default function UpcomingViewList() {
   );
 
   useEffect(() => {
-    setToolbarHeight(13);
+    setToolbarHeight(TOOLBAR_HEIGHT);
   }, [setToolbarHeight]);
 
   useEffect(() => {
-    const weekdates: Dayjs[] = getWeekDatesFromDate(
-      selectedDate,
-      weekExtension,
-    );
+    const weekdates: Dayjs[] = getWeekDatesFromDate(today, weekExtension);
     setWeekDates(weekdates);
-  }, [selectedDate, weekExtension]);
+  }, [weekExtension, today]);
 
   useEffect(() => {
     const mainContentWrapper = document.querySelector(
@@ -159,39 +171,40 @@ export default function UpcomingViewList() {
             Upcoming
           </Typography>
           <CalendarDialog
-            selectedDate={selectedDate}
+            selectedDate={today}
+            weekOffset={weekOffset}
             handleDateSelect={handleDateSelect}
           />
         </Stack>,
       );
       setToolbarAdditionalIcons(
-        <DatePager
-          selectedDate={selectedDate}
-          handleDateSelect={handleDateSelect}
-        />,
+        <WeekPager weekOffset={weekOffset} handlePageWeek={handlePageWeek} />,
       );
     } else {
       restoreToolbar();
     }
     return () => restoreToolbar();
   }, [
-    topCard,
-    setToolbarSubtitle,
+    today,
     setToolbarAdditionalIcons,
-    selectedDate,
+    setToolbarSubtitle,
     setToolbarTitle,
+    topCard,
+    weekOffset,
   ]);
 
   useEffect(() => {
     setToolbarSubtitle(
       <>
-        <WeekPager
+        <WeekDisplay
           selectedDate={dayjs(topCard).isValid() ? dayjs(topCard) : dayjs()}
+          weekOffset={weekOffset}
         />
         <Divider />
       </>,
     );
-  }, [setToolbarSubtitle, topCard]);
+    return () => setToolbarSubtitle(null);
+  }, [setToolbarSubtitle, topCard, weekOffset]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -222,19 +235,6 @@ export default function UpcomingViewList() {
     return () => observer.disconnect();
   }, [overdueTasks, cards, setToolbarTitle]);
 
-  // useEffect(() => {
-  //   if (!topCard) {
-  //     return;
-  //   }
-  //   if (topCard === "overdue") {
-  //     console.log("OVERDUE");
-  //     setSelectedDate(dayjs());
-  //     return;
-  //   }
-  //   console.log("TOP CARD", topCard);
-  //   setSelectedDate(dayjs(topCard));
-  // }, [topCard]);
-
   return (
     <InboxDefaultSectionProvider>
       {!topCard && (
@@ -249,13 +249,11 @@ export default function UpcomingViewList() {
           mx="auto"
         >
           <CalendarDialog
-            selectedDate={selectedDate}
+            selectedDate={today}
+            weekOffset={weekOffset}
             handleDateSelect={handleDateSelect}
           />
-          <DatePager
-            selectedDate={selectedDate}
-            handleDateSelect={handleDateSelect}
-          />
+          <WeekPager weekOffset={weekOffset} handlePageWeek={handlePageWeek} />
         </Box>
       )}
       {topCard && (
@@ -363,12 +361,15 @@ export default function UpcomingViewList() {
   );
 }
 
-interface WeekPagerProps {
+interface WeekDisplayProps {
   selectedDate: Dayjs;
+  weekOffset: number;
 }
-function WeekPager({ selectedDate }: WeekPagerProps) {
-  const startOfWeek = dayjs(selectedDate).startOf("week");
-  const endOfWeek = dayjs(selectedDate).endOf("week");
+function WeekDisplay({ selectedDate, weekOffset }: WeekDisplayProps) {
+  const startOfWeek = dayjs(selectedDate)
+    .startOf("week")
+    .add(weekOffset, "week");
+  const endOfWeek = startOfWeek.endOf("week");
   const weekDates = [];
 
   for (
@@ -417,74 +418,43 @@ function WeekPager({ selectedDate }: WeekPagerProps) {
   );
 }
 
-interface DatePagerProps {
-  selectedDate: Dayjs;
-  handleDateSelect: (date: Dayjs) => void;
+interface WeekPagerProps {
+  handlePageWeek: (value: -1 | 0 | 1) => void;
+  weekOffset: number;
 }
-function DatePager({ selectedDate, handleDateSelect }: DatePagerProps) {
-  const getStartOfNextWeek = (currentDate: Dayjs) => {
-    const currentDay = dayjs(currentDate);
-    const startOfNextWeek = currentDay.add(1, "week").startOf("week");
-    return startOfNextWeek;
-  };
-
-  const getStartOfPreviousWeek = (currentDate: Dayjs) => {
-    const currentDay = dayjs(currentDate);
-    const startOfPreviousWeek = currentDay.subtract(1, "week").startOf("week");
-    return startOfPreviousWeek;
-  };
-
-  const isDateInSelectedWeek = (selectedDate: Dayjs) => {
-    const startOfWeek = dayjs(selectedDate).startOf("week").add(1, "day"); // Start from Monday
-    const endOfWeek = dayjs(selectedDate).endOf("week").add(1, "day"); // End on Sunday
-    const givenDate = dayjs();
-
-    return givenDate.isBetween(startOfWeek, endOfWeek, null, "[]");
-  };
+function WeekPager({ handlePageWeek, weekOffset = 0 }: WeekPagerProps) {
   return (
     <ButtonGroup variant="outlined" aria-label="calendar pager" size="small">
       <Button
         size="small"
         aria-label="previous"
-        disabled={isDateInSelectedWeek(selectedDate)}
-        onClick={() => {
-          const startOfPreviousWeek = getStartOfPreviousWeek(selectedDate);
-          handleDateSelect(startOfPreviousWeek);
-        }}
+        disabled={weekOffset === 0}
+        onClick={() => handlePageWeek(-1)}
       >
         <ChevronLeftIcon fontSize="small" />
       </Button>
-      <Button
-        size="small"
-        variant="outlined"
-        onClick={() => {
-          handleDateSelect(dayjs());
-        }}
-      >
+      <Button size="small" variant="outlined" onClick={() => handlePageWeek(0)}>
         Today
       </Button>
-      <Button
-        size="small"
-        aria-label="next"
-        onClick={() => {
-          const startOfNextWeek = getStartOfNextWeek(selectedDate);
-          handleDateSelect(startOfNextWeek);
-        }}
-      >
+      <Button size="small" aria-label="next" onClick={() => handlePageWeek(1)}>
         <ChevronRightIcon fontSize="small" />
       </Button>
     </ButtonGroup>
   );
 }
 
-function CalendarDialog({
-  handleDateSelect,
-  selectedDate,
-}: {
+interface CalendarDialogProps {
+  weekOffset: number;
   handleDateSelect: (date: Dayjs) => void;
   selectedDate: Dayjs;
-}) {
+}
+function CalendarDialog({
+  handleDateSelect,
+  weekOffset,
+  selectedDate,
+}: CalendarDialogProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const calendarValue = selectedDate.add(weekOffset, "week").startOf("week");
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -495,8 +465,8 @@ function CalendarDialog({
   };
 
   const open = Boolean(anchorEl);
-
   const id = open ? "calendar-popover" : undefined;
+  const dateDisplay = dayjs().add(weekOffset, "week").startOf("week");
 
   return (
     <>
@@ -506,7 +476,7 @@ function CalendarDialog({
         endIcon={<ArrowDropDownIcon />}
         sx={{ textWrap: "nowrap" }}
       >
-        {selectedDate.format("MMMM YYYY")}
+        {dateDisplay.format("MMMM YYYY")}
       </Button>
       <Popover
         id={id}
@@ -525,7 +495,7 @@ function CalendarDialog({
               handleDateSelect(date);
               handleClose();
             }}
-            referenceDate={selectedDate}
+            referenceDate={calendarValue}
           />
         </LocalizationProvider>
       </Popover>

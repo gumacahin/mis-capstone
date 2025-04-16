@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 import { useAddComment } from "../api";
 import type { Task } from "../types/common";
-import { stringAvatar } from "../utils.tsx";
+import { stringAvatar } from "../utils.ts";
 
 export default function AddCommentForm({
   task,
@@ -96,11 +96,7 @@ export default function AddCommentForm({
             >
               Cancel
             </Button>
-            <Button
-              disabled={isLoading}
-              onClick={handleSubmit}
-              variant="contained"
-            >
+            <Button disabled={isLoading} onClick={handleSubmit}>
               Add Comment
             </Button>
           </Stack>
