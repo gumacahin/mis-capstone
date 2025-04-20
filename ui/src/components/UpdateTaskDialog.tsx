@@ -46,7 +46,6 @@ export default function UpdateTaskDialog({
     ...task,
     due_date: task.due_date ? dayjs(task.due_date) : null,
   };
-  console.log("defaultValues", defaultValues);
   const { control, register, handleSubmit, watch } = useForm<TaskFormFields>({
     defaultValues,
   });

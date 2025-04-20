@@ -12,7 +12,6 @@ export default function ToolBarContextProvider({
     useState<React.ReactNode>(null);
   const [toolbarTitle, setToolbarTitle] = useState<React.ReactNode>(null);
   const [toolbarSubtitle, setToolbarSubtitle] = useState<React.ReactNode>(null);
-  const [toolbarHeight, setToolbarHeight] = useState<number | null>(null);
 
   return (
     <ToolbarContext.Provider
@@ -25,8 +24,6 @@ export default function ToolBarContextProvider({
         setToolbarSubtitle,
         setToolbarAdditionalIcons,
         toolbarAdditionalIcons,
-        setToolbarHeight,
-        toolbarHeight,
       }}
     >
       {children}

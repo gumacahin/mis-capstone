@@ -114,6 +114,7 @@ export default function TaskCard({
           sx={{
             width: "100%",
             maxWidth: "100%",
+            // height: TASK_CARD_HEIGHT,
             "&:hover": {
               cursor: "pointer",
             },
@@ -126,7 +127,6 @@ export default function TaskCard({
           onClickCapture={handleClickCapture}
         >
           <CardHeader
-            padding={0}
             avatar={<TaskCheckIcon task={task} />}
             sx={{ "& .MuiCardHeader-root": { padding: 0 } }}
             title={
@@ -143,6 +143,9 @@ export default function TaskCard({
                   </Typography>
                   <Typography
                     sx={{
+                      textWrap: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                       fontSize: 14,
                       fontWeight: 400,
                       textDecoration: task.completion_date
@@ -156,13 +159,7 @@ export default function TaskCard({
               </Stack>
             }
             subheader={
-              <Stack
-                // pt={1}
-                // pl={5}
-                spacing={1}
-                direction={"row"}
-                alignItems={"center"}
-              >
+              <Stack spacing={1} direction={"row"} alignItems={"center"}>
                 {!hideDueDates && task.due_date && (
                   <Stack
                     direction={"row"}
@@ -178,6 +175,7 @@ export default function TaskCard({
                         textWrap: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        maxWidth: "100%",
                       }}
                     >
                       {dayjs(task.due_date).format("MMM D YYYY")}

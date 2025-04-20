@@ -28,7 +28,6 @@ export default function TodayPage() {
 
   const handleViewChange = useCallback(
     (view: ProjectViewType) => {
-      console.log("view", view);
       setView(view);
     },
     [setView],

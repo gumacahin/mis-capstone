@@ -144,7 +144,6 @@ export const useAddTask = ({
           due_date: task.due_date.format("YYYY-MM-DD"),
         }),
       };
-      console.log("data", data);
       const response = await apiClient.post("/tasks/", data);
       return response.data;
     },
@@ -187,7 +186,7 @@ export const useRescheduleTask = () => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
-    // mutationKey: ["resheduleTask", { taskId }],
+    mutationKey: ["rescheduleTask"],
     mutationFn: async ({ task, dueDate }: { task: Task; dueDate: Dayjs }) => {
       const data = {
         due_date: dueDate.format("YYYY-MM-DD"),
@@ -197,7 +196,7 @@ export const useRescheduleTask = () => {
       return result.data;
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", "today"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 };

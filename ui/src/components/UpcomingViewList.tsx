@@ -21,27 +21,33 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useTasks, useTasksToday } from "../api";
-import useScrollbarWidth from "../hooks/useScrollbarWidth";
+import { LIST_VIEW_MAX_WIDTH } from "../constants/ui";
 import useToolbarContext from "../hooks/useToolbarContext";
 import type { Task } from "../types/common";
-import { formatDayOfWeek, getWeekDatesFromDate } from "../utils";
+import { getWeekDatesFromDate } from "../utils";
 import AddTaskButton from "./AddTaskButton";
 import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
-import OverdueTasks from "./OverdueTasks";
+import ListOverdueTasks from "./ListOverdueTasks";
+import ListProjectSectionCard from "./ListProjectSectionCard";
+import ListTaskList from "./ListTaskList";
+import ListViewContainer from "./ListViewContainer";
 import SkeletonList from "./SkeletonList";
-import TaskList from "./TaskList";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
 
 export default function UpcomingViewList() {
-  const DATE_PAGER_HEIGHT = 48;
-  const TOOLBAR_HEIGHT = 13;
-  const scrollbarWidth = useScrollbarWidth();
-  const today = dayjs();
+  const [initialDataFetch, setInitialDataFetch] = useState(true);
   const [weekOffset, setWeekOffset] = useState(0);
   const [weekDates, setWeekDates] = useState<Dayjs[]>(
     getWeekDatesFromDate(dayjs()),
@@ -65,20 +71,36 @@ export default function UpcomingViewList() {
   const stickyHeaderRef = useRef<HTMLDivElement | null>(null);
   const stickyHeaderOffset = 64;
 
-  const {
-    setToolbarHeight,
-    setToolbarTitle,
-    setToolbarSubtitle,
-    setToolbarAdditionalIcons,
-  } = useToolbarContext();
+  const { setToolbarTitle, setToolbarSubtitle, setToolbarAdditionalIcons } =
+    useToolbarContext();
 
   const { isError: tasksTodayIsError, data: tasksTodayData } = useTasksToday();
 
-  const handleDateSelect = (selectedDate: Dayjs) => {
+  const scrollToDate = (date: Dayjs) => {
+    const element = document.querySelector(
+      `[data-id="${date.format("YYYY-MM-DD")}"]`,
+    ) as HTMLDivElement;
+    if (element) {
+      element.scrollIntoView({
+        behavior: "instant",
+        block: "start",
+      });
+      // This is to ensure that the sticky header is not covered by the AppBar.
+      // Scrolling scrolls the parent for some reason.
+      document
+        .querySelector("#list-view-container")!
+        .parentElement!.scrollTo({ top: 0 });
+    }
+  };
+
+  const handleDateSelect = useCallback((selectedDate: Dayjs) => {
     const today = dayjs();
     const weeksBetween = selectedDate.diff(today, "week");
     setWeekOffset(weeksBetween);
-  };
+    setTimeout(() => {
+      scrollToDate(selectedDate);
+    }, 0);
+  }, []);
 
   const handlePageWeek = (value: -1 | 0 | 1) => {
     if (value === 1) {
@@ -95,23 +117,68 @@ export default function UpcomingViewList() {
     () => tasksTodayData?.results ?? [],
     [tasksTodayData],
   );
-  const tasks: Task[] = data?.results ?? [];
+  const tasks: Task[] = useMemo(() => data?.results ?? [], [data]);
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
 
   useEffect(() => {
-    setToolbarHeight(TOOLBAR_HEIGHT);
-  }, [setToolbarHeight]);
+    if (data?.results) {
+      setInitialDataFetch(false);
+    }
+  }, [data]);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastCard = cards[cards.length - 1];
+        const lastCardVisible = entries.find(
+          (entry) =>
+            entry.isIntersecting &&
+            entry.target.getAttribute("data-id") === lastCard,
+        );
+        if (lastCardVisible) {
+          setWeekExtension((prev) => prev + 1);
+        }
+      },
+      {
+        root: document.querySelector("#list-view-container"),
+        rootMargin: `-${stickyHeaderOffset}px 0px 0px 0px`,
+      },
+    );
+
+    cards.forEach((card) => {
+      if (refs.current[card]) {
+        observer.observe(refs.current[card]!);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [overdueTasks, cards, setToolbarTitle]);
+
+  useEffect(() => {
+    const today = dayjs();
     const weekdates: Dayjs[] = getWeekDatesFromDate(today, weekExtension);
     setWeekDates(weekdates);
-  }, [weekExtension, today]);
+  }, [weekExtension]);
+
+  useEffect(() => {
+    setToolbarSubtitle(
+      <>
+        <WeekDisplay
+          selectedDate={dayjs(topCard).isValid() ? dayjs(topCard) : dayjs()}
+          weekOffset={weekOffset}
+          scrollToDate={scrollToDate}
+        />
+        <Divider />
+      </>,
+    );
+    return () => setToolbarSubtitle(null);
+  }, [setToolbarSubtitle, topCard, weekOffset]);
 
   useEffect(() => {
     const mainContentWrapper = document.querySelector(
-      "#main-content-wrapper",
+      "#list-view-container",
     ) as HTMLDivElement;
     const parent = mainContentWrapper.getBoundingClientRect();
     const handleScroll = () => {
@@ -125,6 +192,8 @@ export default function UpcomingViewList() {
             return false;
           }
           if (
+            // child.top < parent.top &&
+            // child.bottom > parent.top
             child.top < parent.top + stickyHeaderOffset &&
             child.bottom > parent.top + stickyHeaderOffset
           ) {
@@ -151,6 +220,7 @@ export default function UpcomingViewList() {
   }, [refs, setTopCard]);
 
   useEffect(() => {
+    const today = dayjs();
     const restoreToolbar = () => {
       setToolbarTitle(
         <Typography variant={"h5"} component={"h2"} color="text.primary">
@@ -172,6 +242,7 @@ export default function UpcomingViewList() {
           </Typography>
           <CalendarDialog
             selectedDate={today}
+            topCard={topCard}
             weekOffset={weekOffset}
             handleDateSelect={handleDateSelect}
           />
@@ -185,108 +256,58 @@ export default function UpcomingViewList() {
     }
     return () => restoreToolbar();
   }, [
-    today,
     setToolbarAdditionalIcons,
     setToolbarSubtitle,
     setToolbarTitle,
     topCard,
     weekOffset,
+    handleDateSelect,
   ]);
-
-  useEffect(() => {
-    setToolbarSubtitle(
-      <>
-        <WeekDisplay
-          selectedDate={dayjs(topCard).isValid() ? dayjs(topCard) : dayjs()}
-          weekOffset={weekOffset}
-        />
-        <Divider />
-      </>,
-    );
-    return () => setToolbarSubtitle(null);
-  }, [setToolbarSubtitle, topCard, weekOffset]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const lastCard = cards[cards.length - 1];
-        const lastCardVisible = entries.find(
-          (entry) =>
-            entry.isIntersecting &&
-            entry.target.getAttribute("data-id") === lastCard,
-        );
-        if (lastCardVisible) {
-          setWeekExtension((prev) => prev + 1);
-        }
-      },
-      {
-        root: document.querySelector("#main-content-wrapper"),
-        rootMargin: `-${stickyHeaderOffset}px 0px 0px 0px`, // Adjust to your AppBar height
-        // threshold: 0.1,
-      },
-    );
-
-    cards.forEach((card) => {
-      if (refs.current[card]) {
-        observer.observe(refs.current[card]!);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [overdueTasks, cards, setToolbarTitle]);
 
   return (
     <InboxDefaultSectionProvider>
-      {!topCard && (
-        <Box
-          px={2}
-          pb={2}
-          pt={{ xs: 0, sm: 2 }}
-          width="100%"
-          display={"flex"}
-          justifyContent={"space-between"}
-          maxWidth={800}
-          mx="auto"
-        >
-          <CalendarDialog
-            selectedDate={today}
-            weekOffset={weekOffset}
-            handleDateSelect={handleDateSelect}
-          />
-          <WeekPager weekOffset={weekOffset} handlePageWeek={handlePageWeek} />
-        </Box>
-      )}
-      {topCard && (
-        <Box
-          sx={{
-            position: "sticky",
-            top: {
-              xs: -5,
-              sm: 0,
-            },
-            zIndex: 1,
-            backgroundColor: (theme) => theme.palette.background.paper,
-          }}
-        >
-          <Box ref={stickyHeaderRef} />
-          <Divider />
-        </Box>
-      )}
-      <DragDropContext onDragEnd={() => {}}>
-        <Stack
-          direction="column"
-          sx={{
-            maxWidth: 800,
-            mx: "auto",
-            minHeight: (theme) =>
-              `calc(100vh - ${theme.mixins.toolbar.minHeight}px - ${scrollbarWidth}px - ${DATE_PAGER_HEIGHT}px)`,
-            overflowX: "auto",
-            flex: "0 1 auto",
-            // minWidth: 300,
-            alignItems: "start",
-            justifyContent: "start",
-          }}
-        >
+      <ListViewContainer id="list-view-container" mt={5}>
+        {topCard && (
+          <Box
+            sx={{
+              position: "sticky",
+              top: {
+                xs: -5,
+                sm: 0,
+              },
+              zIndex: 1,
+              backgroundColor: (theme) => theme.palette.background.paper,
+              width: "100%",
+            }}
+          >
+            <Box ref={stickyHeaderRef} />
+            <Divider />
+          </Box>
+        )}
+        {!topCard && (
+          <Box
+            px={2}
+            pb={2}
+            pt={{ xs: 0, sm: 2 }}
+            width="100%"
+            display={"flex"}
+            justifyContent={"space-between"}
+            maxWidth={LIST_VIEW_MAX_WIDTH}
+            mx="auto"
+          >
+            <CalendarDialog
+              selectedDate={dayjs()}
+              weekOffset={weekOffset}
+              handleDateSelect={handleDateSelect}
+              topCard={topCard}
+            />
+            <WeekPager
+              weekOffset={weekOffset}
+              handlePageWeek={handlePageWeek}
+            />
+          </Box>
+        )}
+        <DragDropContext onDragEnd={() => {}}>
           {tasksTodayIsError && (
             <Card sx={{ minWidth: 320 }} elevation={0}>
               <CardContent>
@@ -295,7 +316,7 @@ export default function UpcomingViewList() {
             </Card>
           )}
           {overdueTasks.length > 0 && (
-            <OverdueTasks
+            <ListOverdueTasks
               overdueTasks={overdueTasks}
               key={0}
               ref={(el: HTMLDivElement | null) => {
@@ -307,20 +328,28 @@ export default function UpcomingViewList() {
             />
           )}
           {weekDates.map((date) => {
+            const isToday = date.isSame(dayjs(), "day");
+            const cardTitle = `${date.format("MMM D")} ${isToday ? "‧ Today" : ""} ‧ ${date.format("dddd")}`;
             const cardHeader = (
               <CardHeader
                 title={
-                  <Typography fontWeight={500} component={"h4"}>
-                    {`${dayjs(date).format("MMM D")} ‧ ${formatDayOfWeek(date)}`}
+                  <Typography
+                    sx={{
+                      textWrap: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                    fontWeight={500}
+                    fontSize={16}
+                  >
+                    {cardTitle}
                   </Typography>
                 }
               />
             );
             return (
-              <Card
-                sx={{ minWidth: 320 }}
+              <ListProjectSectionCard
                 key={dayjs(date).format("YYYY-MM-DD")}
-                elevation={0}
                 ref={(el) => {
                   refs.current[dayjs(date).format("YYYY-MM-DD")] = el;
                 }}
@@ -333,7 +362,7 @@ export default function UpcomingViewList() {
                 ) : (
                   cardHeader
                 )}
-                {isTasksPending ? (
+                {initialDataFetch && isTasksPending ? (
                   <CardContent>
                     <SkeletonList count={5} width={180} />
                   </CardContent>
@@ -342,7 +371,7 @@ export default function UpcomingViewList() {
                     <Alert severity="error">Failed to load tasks</Alert>
                   </CardContent>
                 ) : (
-                  <TaskList
+                  <ListTaskList
                     hideDueDates
                     tasks={tasks.filter((task: Task) =>
                       dayjs(task.due_date).isSame(dayjs(date)),
@@ -352,11 +381,11 @@ export default function UpcomingViewList() {
                 <CardActions>
                   <AddTaskButton presetDueDate={dayjs(date)} />
                 </CardActions>
-              </Card>
+              </ListProjectSectionCard>
             );
           })}
-        </Stack>
-      </DragDropContext>
+        </DragDropContext>
+      </ListViewContainer>
     </InboxDefaultSectionProvider>
   );
 }
@@ -364,8 +393,13 @@ export default function UpcomingViewList() {
 interface WeekDisplayProps {
   selectedDate: Dayjs;
   weekOffset: number;
+  scrollToDate: (date: Dayjs) => void;
 }
-function WeekDisplay({ selectedDate, weekOffset }: WeekDisplayProps) {
+function WeekDisplay({
+  selectedDate,
+  scrollToDate,
+  weekOffset,
+}: WeekDisplayProps) {
   const startOfWeek = dayjs(selectedDate)
     .startOf("week")
     .add(weekOffset, "week");
@@ -379,22 +413,6 @@ function WeekDisplay({ selectedDate, weekOffset }: WeekDisplayProps) {
   ) {
     weekDates.push(date);
   }
-  const scrollToDate = (date: Dayjs) => {
-    const element = document.querySelector(
-      `[data-id="${date.format("YYYY-MM-DD")}"]`,
-    ) as HTMLDivElement;
-    if (element) {
-      element.scrollIntoView({
-        behavior: "instant",
-        block: "start",
-      });
-      // This is to ensure that the sticky header is not covered by the AppBar.
-      // Scrolling scrolls the parent for some reason.
-      document
-        .querySelector("#main-content-wrapper")!
-        .parentElement!.scrollTo({ top: 0 });
-    }
-  };
 
   return (
     <Stack direction="row" mx="auto" mb={1}>
@@ -447,14 +465,22 @@ interface CalendarDialogProps {
   weekOffset: number;
   handleDateSelect: (date: Dayjs) => void;
   selectedDate: Dayjs;
+  topCard: string | null;
 }
 function CalendarDialog({
   handleDateSelect,
   weekOffset,
   selectedDate,
+  topCard,
 }: CalendarDialogProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const calendarValue = selectedDate.add(weekOffset, "week").startOf("week");
+  const topCardDate = dayjs(topCard);
+  const calendarValueByWeekOffset = selectedDate
+    .add(weekOffset, "week")
+    .startOf("week");
+  const calendarValue = topCardDate.isValid()
+    ? topCardDate
+    : calendarValueByWeekOffset;
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -466,7 +492,7 @@ function CalendarDialog({
 
   const open = Boolean(anchorEl);
   const id = open ? "calendar-popover" : undefined;
-  const dateDisplay = dayjs().add(weekOffset, "week").startOf("week");
+  const dateDisplay = calendarValue;
 
   return (
     <>

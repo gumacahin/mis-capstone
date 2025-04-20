@@ -23,7 +23,7 @@ import ProjectSectionDeleteDialog from "./ProjectSectionDeleteDialog";
 import ProjectSectionEditDialog from "./ProjectSectionEditDialog";
 import ProjectSectionMoveMenu from "./ProjectSectionMoveMenu";
 
-export default function ProjectSectionHeader() {
+export default function ProjectSectionCardHeader() {
   const section = useContext<Section | null>(SectionContext)!;
   const project = useContext<ProjectDetail | null>(ProjectContext)!;
   const [sectionForEdit, setSectionForEdit] = useState<Section | null>(null);

@@ -1,20 +1,19 @@
 import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
-import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useRescheduleTask } from "../api";
 import { Task } from "../types/common";
-import DateTasks from "./DateTasks";
-import OverdueTasks, { OVERDUE_TASK_LIST_ID } from "./OverdueTasks";
+import ListDateTasks from "./ListDateTasks";
+import ListOverdueTasks, { OVERDUE_TASK_LIST_ID } from "./ListOverdueTasks";
+import ListViewContainer from "./ListViewContainer";
 
 export type TodayViewListProps = {
   tasks: Task[];
 };
 
 export default function TodayViewList({ tasks }: TodayViewListProps) {
-  const MAX_WIDTH = 800;
   const { mutateAsync: reschedTask } = useRescheduleTask();
   const overdueTasks = tasks.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
@@ -60,10 +59,10 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <Box maxWidth={MAX_WIDTH} mx={"auto"}>
-        <OverdueTasks overdueTasks={overdueTaskList} />
-        <DateTasks date={dayjs()} tasks={todayTaskList} isDragDisabled />
-      </Box>
+      <ListViewContainer>
+        <ListOverdueTasks overdueTasks={overdueTaskList} />
+        <ListDateTasks date={dayjs()} tasks={todayTaskList} isDragDisabled />
+      </ListViewContainer>
     </DragDropContext>
   );
 }

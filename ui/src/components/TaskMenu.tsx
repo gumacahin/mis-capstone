@@ -1,9 +1,6 @@
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import NextWeekIcon from "@mui/icons-material/NextWeek";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
 import TodayIcon from "@mui/icons-material/Today";
 import VerticalAlignBottomIcon from "@mui/icons-material/VerticalAlignBottom";
@@ -29,8 +26,8 @@ export interface TaskMenuProps {
   taskMenuAnchorEl: null | HTMLElement;
   task: Task;
   showAddTaskMenuItems?: boolean;
-  handleAddTaskAbove: () => void;
-  handleAddTaskBelow: () => void;
+  handleAddTaskAbove?: () => void;
+  handleAddTaskBelow?: () => void;
   handleCloseTaskMenu: () => void;
   handleEditTask: (task: Task) => void;
   handleDeleteTask: (task: Task) => void;
@@ -155,7 +152,9 @@ export default function TaskMenu({
             <MenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                handleAddTaskAbove();
+                if (handleAddTaskAbove) {
+                  handleAddTaskAbove();
+                }
                 handleCloseTaskMenu();
               }}
             >
@@ -167,7 +166,9 @@ export default function TaskMenu({
             <MenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                handleAddTaskBelow();
+                if (handleAddTaskBelow) {
+                  handleAddTaskBelow();
+                }
                 handleCloseTaskMenu();
               }}
             >

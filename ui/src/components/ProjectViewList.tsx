@@ -1,21 +1,29 @@
-import { DragDropContext, DraggableLocation } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Draggable,
+  DraggableLocation,
+  Droppable,
+  DroppableProvided,
+} from "@hello-pangea/dnd";
 import { TextField, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import Stack from "@mui/material/Stack";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-import { useAddSection } from "../api";
+import { useAddSection, useReorderSections, useReorderTasks } from "../api";
+import { DROPPABLE_TYPE_SECTION, DROPPABLE_TYPE_TASK } from "../constants/ui";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import { ProjectDetail, Section } from "../types/common";
+import { ProjectDetail, Section, Task } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
-import ProjectSectionHeader from "./ProjectViewSectionHeader";
-import TaskList from "./TaskList";
+import ListProjectSectionCard from "./ListProjectSectionCard";
+import ListTaskList from "./ListTaskList";
+import ListViewContainer from "./ListViewContainer";
+import ProjectSectionCardHeader from "./ProjectSectionCardHeader";
 
 type FormValues = {
   title: string;
@@ -105,9 +113,99 @@ export default function ProjectViewList({
 }: {
   project: ProjectDetail;
 }) {
-  const [isDragging, setIsDragging] = useState(false);
-  const handleDragStart = () => {
-    setIsDragging(true);
+  const { mutateAsync: reorderSections } = useReorderSections(project.id);
+  const { mutateAsync: reorderTasks } = useReorderTasks(project.id);
+
+  const handleSectionDragEnd = async (
+    source: DraggableLocation,
+    destination: DraggableLocation | null,
+  ) => {
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const projectSections = project.sections.filter((s) => !s.is_default);
+    const newSectionList = Array.from(projectSections) as Section[];
+    const [removed] = newSectionList.splice(source.index, 1);
+    newSectionList.splice(destination.index, 0, removed);
+    const reorderedSections = newSectionList.map(
+      (section: Section, index: number) => ({
+        ...section,
+        order: index + 1,
+      }),
+    );
+    await toast.promise(reorderSections(reorderedSections), {
+      loading: "Reordering sections...",
+      error: "Failed reordering sections.",
+      success: "Sections reordered successfully!",
+    });
+  };
+
+  const handleTaskDragEnd = async (
+    source: DraggableLocation,
+    destination: DraggableLocation | null,
+  ) => {
+    if (!destination) {
+      return;
+    }
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+    const sourceSection = project.sections.find(
+      (s) => s.id === Number(source.droppableId.split("-")[1]),
+    );
+    const destinationSection = project.sections.find(
+      (s) => s.id === Number(destination.droppableId.split("-")[1]),
+    );
+
+    if (!sourceSection || !destinationSection) {
+      return;
+    }
+
+    const isSameSection = sourceSection.id === destinationSection.id;
+    const newSourceTaskList = Array.from(sourceSection.tasks);
+    const newDestinationTaskList = isSameSection
+      ? newSourceTaskList
+      : Array.from(destinationSection.tasks);
+    const [removed] = newSourceTaskList.splice(source.index, 1);
+    newDestinationTaskList.splice(destination.index, 0, removed);
+    const reorderedSourceTasks = newSourceTaskList.map(
+      (task: Task, index: number) => ({
+        ...task,
+        order: index + 1,
+      }),
+    );
+    const reorderedDestinationTasks = newDestinationTaskList.map(
+      (task: Task, index: number) => ({
+        ...task,
+        order: index + 1,
+      }),
+    );
+    const updatedTask = reorderedDestinationTasks[destination.index];
+    updatedTask.section = destinationSection.id;
+
+    await toast.promise(
+      reorderTasks({
+        sourceSectionId: sourceSection.id,
+        reorderedSourceTasks,
+        destinationSectionId: destinationSection.id,
+        reorderedDestinationTasks,
+        task: updatedTask,
+      }),
+      {
+        loading: "Reordering tasks...",
+        error: "Failed reordering tasks.",
+        success: "Tasks reordered successfully!",
+      },
+    );
   };
 
   const handleDragEnd = async ({
@@ -119,25 +217,70 @@ export default function ProjectViewList({
     source: DraggableLocation;
     type: string;
   }) => {
-    setIsDragging(false);
+    if (type === DROPPABLE_TYPE_SECTION) {
+      await handleSectionDragEnd(source, destination);
+    } else if (type === DROPPABLE_TYPE_TASK) {
+      await handleTaskDragEnd(source, destination);
+    }
   };
+
   return (
     <ProjectContext.Provider value={project}>
-      <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-        <Stack spacing={1} maxWidth="800px" width="100%" mx="auto">
-          {project.sections.map((section: Section) => (
-            <SectionContext.Provider value={section} key={section.id}>
-              <Card key={section.id} elevation={0}>
-                <ProjectSectionHeader />
-                <TaskList />
-                <CardActions>
-                  <AddTaskButton />
-                </CardActions>
-              </Card>
-              <AddSectionButton precedingSection={section} />
-            </SectionContext.Provider>
-          ))}
-        </Stack>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable
+          droppableId={`project-${project.id}`}
+          direction="vertical"
+          type={DROPPABLE_TYPE_SECTION}
+        >
+          {(provided: DroppableProvided) => (
+            <ListViewContainer
+              id="project-sections-list-view-container"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {project.sections.map((section: Section, index: number) => (
+                <SectionContext.Provider value={section} key={section.id}>
+                  {section.is_default ? (
+                    <ListProjectSectionCard key={section.id}>
+                      <ProjectSectionCardHeader />
+                      <ListTaskList />
+                      <CardActions>
+                        <AddTaskButton />
+                      </CardActions>
+                    </ListProjectSectionCard>
+                  ) : (
+                    <Draggable
+                      draggableId={`draggable-section-${section.id}`}
+                      // Adjust index to because of non-draggable default section
+                      index={index - 1}
+                    >
+                      {(provided, snapshot) => (
+                        <Fragment key={section.id}>
+                          <ListProjectSectionCard
+                            key={section.id}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                            variant={
+                              snapshot.isDragging ? "outlined" : "elevation"
+                            }
+                          >
+                            <ProjectSectionCardHeader />
+                            <ListTaskList />
+                            <CardActions>
+                              <AddTaskButton />
+                            </CardActions>
+                          </ListProjectSectionCard>
+                          <AddSectionButton precedingSection={section} />
+                        </Fragment>
+                      )}
+                    </Draggable>
+                  )}
+                </SectionContext.Provider>
+              ))}
+            </ListViewContainer>
+          )}
+        </Droppable>
       </DragDropContext>
     </ProjectContext.Provider>
   );

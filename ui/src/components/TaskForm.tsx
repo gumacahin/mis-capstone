@@ -41,7 +41,7 @@ export default function TaskForm({
   const inboxDefaultSection = inbox.sections.find((s) => s.is_default);
   console.log("compact", compact);
 
-  const addTask = useAddTask({
+  const { mutateAsync: addTask } = useAddTask({
     projectId: project.id,
     aboveTaskId: taskAbove,
     belowTaskId: taskBelow,
@@ -75,7 +75,7 @@ export default function TaskForm({
       priority,
       project,
     };
-    toast.promise(addTask.mutateAsync(data), {
+    toast.promise(addTask(data), {
       loading: "Adding task...",
       success: "Task added successfully!",
       error: "Error adding task.",

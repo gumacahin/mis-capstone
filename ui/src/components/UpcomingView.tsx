@@ -7,5 +7,6 @@ export type UpcomingViewProps = {
 };
 
 export default function UpcomingView({ view }: UpcomingViewProps) {
-  return <>{view === "list" ? <UpcomingViewList /> : <UpcomingViewBoard />}</>;
+  const isListView = view === "list";
+  return <>{isListView ? <UpcomingViewList /> : <UpcomingViewBoard />}</>;
 }

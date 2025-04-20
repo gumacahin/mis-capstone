@@ -13,7 +13,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import TodayIcon from "@mui/icons-material/Today";
 import UpcomingIcon from "@mui/icons-material/Upcoming";
 import Alert from "@mui/material/Alert";
 import MuiAppBar, {
@@ -34,7 +33,7 @@ import Stack from "@mui/material/Stack";
 import { styled, type Theme, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { MouseEvent, ReactNode, useEffect, useState } from "react";
+import { MouseEvent, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
 import { generatePath } from "react-router-dom";
 
@@ -48,6 +47,7 @@ import AddTaskDialog from "./AddTaskDialog";
 import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import ListItemNavLink from "./ListItemNavLink";
 import ProjectMenu from "./ProjectMenu";
+import TodayIcon from "./TodayIcon";
 
 const DRAWER_WIDTH = 240;
 
@@ -67,11 +67,11 @@ function DrawerContents({
   theme,
   handleDrawerClose,
   handleAddTaskDialogOpen,
-  // isLargeDisplay,
+  isLargeDisplay,
 }: {
   handleDrawerClose: () => void;
   handleAddTaskDialogOpen: () => void;
-  // isLargeDisplay: boolean;
+  isLargeDisplay: boolean;
   theme: Theme;
 }) {
   const [isProjectListOpen, setProjectListOpen] = useState(false);
@@ -80,9 +80,6 @@ function DrawerContents({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [project, setProject] = useState<Project | null>(null);
   const reorderProjects = useReorderProjects();
-
-  // TODO: use isLargeDisplay to autoclose drawer in small displays
-  // console.log("isLargeDisplay", isLargeDisplay);
 
   const {
     isPending: isProjectsPending,
@@ -113,6 +110,13 @@ function DrawerContents({
   };
   const handleExpandProjectClick = () => {
     setProjectListOpen(!isProjectListOpen);
+  };
+
+  const handleNavItemClick = () => {
+    console.log("here");
+    if (!isLargeDisplay) {
+      handleDrawerClose();
+    }
   };
 
   const handleDragEnd = async ({
@@ -201,7 +205,7 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.INBOX}>
+          <ListItemNavLink to={ROUTES.INBOX} onClick={handleNavItemClick}>
             <ListItemIcon sx={listItemIconStyle}>
               <InboxIcon />
             </ListItemIcon>
@@ -209,7 +213,7 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.TODAY}>
+          <ListItemNavLink to={ROUTES.TODAY} onClick={handleNavItemClick}>
             <ListItemIcon sx={listItemIconStyle}>
               <TodayIcon />
             </ListItemIcon>
@@ -217,7 +221,7 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.UPCOMING}>
+          <ListItemNavLink to={ROUTES.UPCOMING} onClick={handleNavItemClick}>
             <ListItemIcon sx={listItemIconStyle}>
               <UpcomingIcon />
             </ListItemIcon>
@@ -249,7 +253,7 @@ function DrawerContents({
             </>
           }
         >
-          <ListItemNavLink to={ROUTES.PROJECTS}>
+          <ListItemNavLink to={ROUTES.PROJECTS} onClick={handleNavItemClick}>
             <ListItemText primary={"My Projects"} />
           </ListItemNavLink>
         </ListItem>
@@ -295,6 +299,7 @@ function DrawerContents({
                             to={generatePath("project/:projectId", {
                               projectId: `${project.id}`,
                             })}
+                            onClick={handleNavItemClick}
                           >
                             <ListItemText primary={project.title} />
                           </ListItemNavLink>
@@ -318,12 +323,8 @@ const Main = styled("main", {
 })<{
   open?: boolean;
 }>(({ theme }) => ({
-  // scrollbarGutter: "stable",
   overflow: "hidden",
-  // overflowY: "auto",
-  // overflowX: "hidden",
   flexGrow: 1,
-  // padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -388,10 +389,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     toolbarIcons,
     toolbarTitle,
     toolbarSubtitle,
-    toolbarHeight,
   } = useToolbarContext();
-
-  const toolbarHeightValue = toolbarHeight || 8;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -494,14 +492,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Main sx={[!isLargeDisplay && { marginLeft: "unset" }]} open={open}>
           <Box
             sx={{
-              scrollbarGutter: "stable",
-              overflowY: "auto",
+              overflowY: "hidden",
               maxHeight: (theme) =>
                 `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
               height: (theme) =>
                 `calc(100vh - ${theme.mixins.toolbar.minHeight}px)`,
             }}
-            mt={toolbarHeightValue}
+            mt={8}
             id="main-content-wrapper"
           >
             {children}

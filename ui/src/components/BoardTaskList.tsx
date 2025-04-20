@@ -5,20 +5,20 @@ import {
   Droppable,
   DroppableProvided,
 } from "@hello-pangea/dnd";
-import CardContent from "@mui/material/CardContent";
+import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import { Fragment, useContext, useState } from "react";
 
+import { DROPPABLE_MIN_HEIGHT, DROPPABLE_TYPE_TASK } from "../constants/ui";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
+import useScrollbarWidth from "../hooks/useScrollbarWidth";
 import type { ProjectDetail, Section, Task } from "../types/common";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
-const TASK = "TASK";
-
-export interface TaskListProps {
+export interface TaskListProps extends CardContentProps {
   tasks?: Task[];
   hideDueDates?: boolean;
   taskListId?: string;
@@ -26,14 +26,14 @@ export interface TaskListProps {
   showAddTaskMenuItems?: boolean;
 }
 
-export default function TaskList({
+export default function BoardTaskList({
   tasks,
   hideDueDates,
   taskListId,
   isDragDisabled,
   showAddTaskMenuItems = true,
+  ...rest
 }: TaskListProps) {
-  const DROPPABLE_MIN_HEIGHT = 50;
   const [openTaskId, setOpenTaskId] = useState<number | null>(null);
   const section = useContext<Section | null>(SectionContext);
   const project = useContext<ProjectDetail | null>(ProjectContext)!;
@@ -43,6 +43,9 @@ export default function TaskList({
   const [addTaskBelow, setAddTaskBelow] = useState<number | undefined>(
     undefined,
   );
+  const [hideScrollbar, setHideScrollbar] = useState(true);
+  const scrollbarWidth = useScrollbarWidth();
+  const isScrollbarAutoHiding = scrollbarWidth === 0;
 
   const handleOpenTask = (taskId: number) => {
     setOpenTaskId(taskId);
@@ -74,8 +77,23 @@ export default function TaskList({
           project={project}
         />
       )}
-      <CardContent>
-        <Droppable droppableId={droppableId!} type={TASK}>
+      <CardContent
+        sx={{
+          maxHeight: "100%",
+          flexGrow: 0,
+          overflowY: isScrollbarAutoHiding
+            ? "auto"
+            : hideScrollbar
+              ? "hidden"
+              : "auto",
+          scrollbarGutter: "stable",
+          paddingRight: `${scrollbarWidth - 12}px`,
+        }}
+        onMouseEnter={() => setHideScrollbar(false)}
+        onMouseLeave={() => setHideScrollbar(true)}
+        {...rest}
+      >
+        <Droppable droppableId={droppableId!} type={DROPPABLE_TYPE_TASK}>
           {(provided: DroppableProvided) => (
             <Stack
               minHeight={DROPPABLE_MIN_HEIGHT}

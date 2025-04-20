@@ -34,7 +34,12 @@ export default function ListItemNavLink(props: ListItemNavLinkProps) {
   MemoedNavLink.displayName = "MemoedNavLink";
 
   return (
-    <ListItemButton component={MemoedNavLink}>{props.children}</ListItemButton>
+    <ListItemButton
+      component={MemoedNavLink}
+      {...(props as ListItemButtonProps)}
+    >
+      {props.children}
+    </ListItemButton>
   );
 }
 

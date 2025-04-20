@@ -1,11 +1,9 @@
 import { Alert, Typography } from "@mui/material";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
+import Container from "@mui/material/Container";
 import { useEffect } from "react";
 
 import { useInboxTasks, useProfile } from "../api";
 import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import PageLayout from "../components/PageLayout";
 import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
@@ -34,17 +32,17 @@ export default function InboxPage() {
 
   if (isError) {
     return (
-      <PageLayout>
+      <Container maxWidth="lg">
         <Alert severity="error">Failed to load inbox</Alert>
-      </PageLayout>
+      </Container>
     );
   }
 
   if (isPending) {
     return (
-      <PageLayout>
-        <SkeletonList count={5} width={250} />
-      </PageLayout>
+      <Container maxWidth="lg">
+        <SkeletonList count={10} width={300} />
+      </Container>
     );
   }
 

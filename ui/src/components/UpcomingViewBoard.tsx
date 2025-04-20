@@ -1,4 +1,4 @@
-import { DragDropContext } from "@hello-pangea/dnd";
+import { DragDropContext, DraggableLocation } from "@hello-pangea/dnd";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -7,54 +7,103 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import Popover from "@mui/material/Popover";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { MouseEvent, useState } from "react";
+import { Fragment, MouseEvent, useState } from "react";
+import { toast } from "react-hot-toast";
 
-import { useTasks, useTasksToday } from "../api";
+import { useRescheduleTask, useTasks, useTasksToday } from "../api";
+import { DATE_PAGER_HEIGHT, TASK_CARD_WIDTH } from "../constants/ui";
 import useScrollbarWidth from "../hooks/useScrollbarWidth";
 import type { Task } from "../types/common";
-import { formatDayOfWeek, getWeekDatesFromDate } from "../utils";
-import AddTaskButton from "./AddTaskButton";
+import { getWeekDatesFromDate } from "../utils";
+import BoardDateTasks from "./BoardDateTasks";
+import BoardOverdueTasks from "./BoardOverdueTasks";
+import BoardViewContainer from "./BoardViewContainer";
 import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
-import OverdueTasks from "./OverdueTasks";
 import SkeletonList from "./SkeletonList";
-import TaskList from "./TaskList";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
 
 export default function UpcomingViewBoard() {
-  const DATE_PAGER_HEIGHT = 48;
   const scrollbarWidth = useScrollbarWidth();
-  const [selectedDate, setSelectedDate] = useState<Date>(dayjs().toDate());
+  const { mutateAsync: rescheduleTask } = useRescheduleTask();
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const weekDates = getWeekDatesFromDate(selectedDate);
   const { isPending, isError, data } = useTasks(
     weekDates[0],
     weekDates[weekDates.length - 1],
   );
+  const selectedWeekIncludesToday = dayjs(selectedDate).isSame(dayjs(), "week");
 
   const { isError: tasksTodayIsError, data: tasksTodayData } = useTasksToday();
-
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-  };
 
   const tasks: Task[] = data?.results ?? [];
   const tasksToday: Task[] = tasksTodayData?.results ?? [];
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
+
+  const handleDateSelect = (date: Dayjs) => {
+    setSelectedDate(date);
+  };
+
+  const handleDragEnd = async ({
+    source,
+    destination,
+  }: {
+    destination: DraggableLocation | null;
+    source: DraggableLocation;
+  }) => {
+    if (!destination) {
+      return;
+    }
+    if (destination.droppableId === source.droppableId) {
+      return;
+    }
+    const sourceDate = dayjs(source.droppableId.split("-")[1]);
+    const sourceIsOverdue = source.droppableId === "overdue-tasks";
+    const destinationDate = dayjs(destination.droppableId.split("-")[1]);
+
+    if (!destinationDate.isValid()) {
+      return;
+    }
+
+    const newSourceTaskList = Array.from(
+      sourceIsOverdue
+        ? overdueTasks
+        : tasks.filter((task: Task) =>
+            dayjs(task.due_date).isSame(sourceDate, "day"),
+          ),
+    );
+    const newDestinationTaskList = Array.from(
+      tasks.filter((task: Task) =>
+        dayjs(task.due_date).isSame(destinationDate, "day"),
+      ),
+    );
+    // TODO: Handle optimistic updates.
+    const [task] = newSourceTaskList.splice(source.index, 1);
+    newDestinationTaskList.splice(destination.index, 0, task);
+
+    await toast.promise(
+      rescheduleTask({
+        task,
+        dueDate: destinationDate,
+      }),
+      {
+        loading: "Rescheduling task...",
+        error: "Failed to reschedule task.",
+        success: "Task rescheduled successfully!",
+      },
+    );
+  };
 
   return (
     <InboxDefaultSectionProvider>
@@ -74,60 +123,49 @@ export default function UpcomingViewBoard() {
           handleDateSelect={handleDateSelect}
         />
       </Box>
-      <DragDropContext onDragEnd={() => {}}>
-        <Stack
-          direction="row"
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <BoardViewContainer
           sx={{
-            minHeight: (theme) =>
+            maxHeight: (theme) =>
               `calc(100vh - ${theme.mixins.toolbar.minHeight}px - ${scrollbarWidth}px - ${DATE_PAGER_HEIGHT}px)`,
-            overflowX: "auto",
-            flex: "0 1 auto",
-            // minWidth: 300,
-            alignItems: "start",
-            justifyContent: "start",
           }}
         >
-          {tasksTodayIsError && (
-            <Card sx={{ minWidth: 320 }} elevation={0}>
+          {selectedWeekIncludesToday && tasksTodayIsError && (
+            <Card sx={{ minWidth: TASK_CARD_WIDTH }} elevation={0}>
               <CardContent>
                 <Alert severity="error">Failed to load tasks</Alert>
               </CardContent>
             </Card>
           )}
-          {overdueTasks.length > 0 && (
-            <OverdueTasks overdueTasks={overdueTasks} />
+          {selectedWeekIncludesToday && overdueTasks.length > 0 && (
+            <BoardOverdueTasks overdueTasks={overdueTasks} />
           )}
           {weekDates.map((date, i) => (
-            <Card sx={{ minWidth: 320 }} key={i} elevation={0}>
-              <CardHeader
-                title={
-                  <Typography fontWeight={500} component={"h4"}>
-                    {`${dayjs(date).format("MMM D")} ‧ ${formatDayOfWeek(date)}`}
-                  </Typography>
-                }
-              />
+            <Fragment key={i}>
               {isPending ? (
-                <CardContent>
-                  <SkeletonList count={5} width={180} />
-                </CardContent>
+                <Card sx={{ minWidth: TASK_CARD_WIDTH }} elevation={0}>
+                  <CardContent>
+                    <SkeletonList count={5} width={180} />
+                  </CardContent>
+                </Card>
               ) : isError ? (
-                <CardContent>
-                  <Alert severity="error">Failed to load tasks</Alert>
-                </CardContent>
+                <Card sx={{ minWidth: TASK_CARD_WIDTH }} elevation={0}>
+                  <CardContent>
+                    <Alert severity="error">Failed to load tasks</Alert>
+                  </CardContent>
+                </Card>
               ) : (
-                <TaskList
+                <BoardDateTasks
+                  date={dayjs(date)}
                   hideDueDates
                   tasks={tasks.filter((task: Task) =>
                     dayjs(task.due_date).isSame(dayjs(date)),
                   )}
                 />
               )}
-              <CardActions>
-                <AddTaskButton presetDueDate={dayjs(date)} />
-              </CardActions>
-            </Card>
+            </Fragment>
           ))}
-        </Stack>
+        </BoardViewContainer>
       </DragDropContext>
     </InboxDefaultSectionProvider>
   );
@@ -137,8 +175,8 @@ function DatePager({
   selectedDate,
   handleDateSelect,
 }: {
-  selectedDate: Date;
-  handleDateSelect: (date: Date) => void;
+  selectedDate: Dayjs;
+  handleDateSelect: (date: Dayjs) => void;
 }) {
   const getStartOfNextWeek = (currentDate: Date) => {
     const currentDay = dayjs(currentDate);
@@ -196,8 +234,8 @@ function CalendarDialog({
   handleDateSelect,
   selectedDate,
 }: {
-  handleDateSelect: (date: Date) => void;
-  selectedDate: Date;
+  handleDateSelect: (date: Dayjs) => void;
+  selectedDate: Dayjs;
 }) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 

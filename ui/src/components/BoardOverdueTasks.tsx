@@ -4,8 +4,6 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
   type AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Portal from "@mui/material/Portal";
 import { styled } from "@mui/material/styles";
@@ -13,16 +11,17 @@ import Typography from "@mui/material/Typography";
 import { forwardRef } from "react";
 
 import { Task } from "../types/common";
+import BoardProjectSectionCard from "./BoardProjectSectionCard";
+import BoardTaskList from "./BoardTaskList";
 import RescheduleDialog from "./RescheduleDialog";
-import TaskList from "./TaskList";
 
 export const OVERDUE_TASK_LIST_ID = "overdue-tasks";
 
-const OverdueTasks = forwardRef<
+const BoardOverdueTasks = forwardRef<
   HTMLDivElement,
   {
     overdueTasks: Task[];
-    headerRef: React.RefObject<HTMLDivElement | null> | null;
+    headerRef?: React.RefObject<HTMLDivElement | null> | null;
   }
 >(({ overdueTasks, headerRef }, ref) => {
   if (overdueTasks.length === 0) {
@@ -50,14 +49,25 @@ const OverdueTasks = forwardRef<
     />
   );
   return (
-    <Card
-      sx={{ minWidth: 300 }}
+    <BoardProjectSectionCard
       component={Accordion}
+      // FIXME: Why is this not valid when defaultExpanded is (both from Accordion)?
       disableGutters
       defaultExpanded
       elevation={0}
       data-id="overdue"
       ref={ref}
+      sx={{
+        "& .MuiCollapse-root": {
+          height: "100%",
+        },
+        "& .MuiCollapse-wrapper": {
+          height: "100%",
+        },
+        "& .MuiAccordion-region": {
+          height: "100%",
+        },
+      }}
     >
       {headerRef?.current ? (
         <Portal container={() => headerRef.current || null}>
@@ -66,22 +76,18 @@ const OverdueTasks = forwardRef<
       ) : (
         cardHeader
       )}
-      <CardContent
+      <BoardTaskList
+        tasks={overdueTasks}
+        taskListId={OVERDUE_TASK_LIST_ID}
+        showAddTaskMenuItems={false}
         component={AccordionDetails}
         id="overdue-content"
-        sx={{ padding: 0 }}
-      >
-        <TaskList
-          tasks={overdueTasks}
-          taskListId={OVERDUE_TASK_LIST_ID}
-          showAddTaskMenuItems={false}
-        />
-      </CardContent>
-    </Card>
+      />
+    </BoardProjectSectionCard>
   );
 });
-OverdueTasks.displayName = "OverdueTasks";
-export default OverdueTasks;
+BoardOverdueTasks.displayName = "BoardOverdueTasks";
+export default BoardOverdueTasks;
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary

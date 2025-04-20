@@ -1,13 +1,13 @@
 import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
-import Stack from "@mui/material/Stack";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useRescheduleTask } from "../api";
 import { Task } from "../types/common";
-import DateTasks from "./DateTasks";
-import OverdueTasks, { OVERDUE_TASK_LIST_ID } from "./OverdueTasks";
+import BoardDateTasks from "./BoardDateTasks";
+import BoardOverdueTasks, { OVERDUE_TASK_LIST_ID } from "./BoardOverdueTasks";
+import BoardViewContainer from "./BoardViewContainer";
 
 export type TodayViewListProps = {
   tasks: Task[];
@@ -58,10 +58,10 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
   };
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <Stack direction={"row"} spacing={2}>
-        <OverdueTasks overdueTasks={overdueTaskList} />
-        <DateTasks date={dayjs()} tasks={todayTaskList} isDragDisabled />
-      </Stack>
+      <BoardViewContainer>
+        <BoardOverdueTasks overdueTasks={overdueTasks} />
+        <BoardDateTasks date={dayjs()} tasks={todayTasks} isDragDisabled />
+      </BoardViewContainer>
     </DragDropContext>
   );
 }

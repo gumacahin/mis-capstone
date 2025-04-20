@@ -1,4 +1,3 @@
-import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
@@ -6,24 +5,28 @@ import dayjs from "dayjs";
 
 import { Task } from "../types/common";
 import AddTaskButton from "./AddTaskButton";
-import TaskList from "./TaskList";
+import BoardProjectSectionCard from "./BoardProjectSectionCard";
+import BoardTaskList from "./BoardTaskList";
 
 export interface DateTasksProps {
   date: dayjs.Dayjs;
   tasks: Task[];
   isDragDisabled?: boolean;
+  hideDueDates?: boolean;
 }
 
-export default function DateTasks({
+export default function BoardDateTasks({
   date,
   tasks,
+  hideDueDates = false,
   isDragDisabled,
 }: DateTasksProps) {
   const isToday = date.isSame(dayjs(), "day");
-  const cardTitle = `${date.format("MMM D")} ${isToday ? "‧ Today" : ""} ‧ ${date.format("dddd")}`;
+  const isTomorrow = date.isSame(dayjs().add(1, "day"), "day");
+  const cardTitle = `${date.format("MMM D")} ${isToday ? "‧ Today" : isTomorrow ? "‧ Tomorrow" : ""} ‧ ${date.format("dddd")}`;
   const taskListId = `datetasks-${date.format("YYYYMMDD")}`;
   return (
-    <Card elevation={0}>
+    <BoardProjectSectionCard>
       <CardHeader
         title={
           <Typography
@@ -40,15 +43,16 @@ export default function DateTasks({
           </Typography>
         }
       />
-      <TaskList
+      <BoardTaskList
         tasks={tasks}
         taskListId={taskListId}
         isDragDisabled={isDragDisabled}
+        hideDueDates={hideDueDates}
         showAddTaskMenuItems={false}
       />
-      <CardActions sx={{ padding: 2 }}>
-        <AddTaskButton presetDueDate={dayjs()} />
+      <CardActions>
+        <AddTaskButton presetDueDate={date} />
       </CardActions>
-    </Card>
+    </BoardProjectSectionCard>
   );
 }

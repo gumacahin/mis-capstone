@@ -5,24 +5,22 @@ import {
   Droppable,
   type DroppableProvided,
 } from "@hello-pangea/dnd";
-import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
-import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useReorderSections, useReorderTasks } from "../api";
+import { DROPPABLE_TYPE_SECTION, DROPPABLE_TYPE_TASK } from "../constants/ui";
 import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import useScrollbarWidth from "../hooks/useScrollbarWidth";
 import { ProjectDetail, Section, Task } from "../types/common";
 import AddProjectSectionButton from "./AddProjectSectionButton";
 import AddTaskButton from "./AddTaskButton";
+import BoardProjectSectionCard from "./BoardProjectSectionCard";
+import BoardTaskList from "./BoardTaskList";
+import BoardViewContainer from "./BoardViewContainer";
+import ProjectViewSectionHeader from "./ProjectSectionCardHeader";
 import ProjectSectionDivider from "./ProjectSectionDivider";
-import ProjectViewSectionHeader from "./ProjectViewSectionHeader";
-import TaskList from "./TaskList";
-
-const SECTION = "SECTION";
 
 export default function ProjectViewBoard({
   project,
@@ -32,7 +30,6 @@ export default function ProjectViewBoard({
   const { mutateAsync: reorderSections } = useReorderSections(project.id);
   const { mutateAsync: reorderTasks } = useReorderTasks(project.id);
   const [isDragging, setIsDragging] = useState(false);
-  const scrollbarWidth = useScrollbarWidth();
 
   const handleDragStart = () => {
     setIsDragging(true);
@@ -140,9 +137,9 @@ export default function ProjectViewBoard({
     type: string;
   }) => {
     setIsDragging(false);
-    if (type === SECTION) {
+    if (type === DROPPABLE_TYPE_SECTION) {
       await handleSectionDragEnd(source, destination);
-    } else if (type === "TASK") {
+    } else if (type === DROPPABLE_TYPE_TASK) {
       await handleTaskDragEnd(source, destination);
     }
   };
@@ -155,38 +152,24 @@ export default function ProjectViewBoard({
         <Droppable
           droppableId={`project-${project.id}`}
           direction="horizontal"
-          type={SECTION}
+          type={DROPPABLE_TYPE_SECTION}
         >
           {(provided: DroppableProvided) => (
-            <Stack
+            <BoardViewContainer
               id="project-sections-board-view-container"
-              direction="row"
-              sx={{
-                minHeight: (theme) =>
-                  `calc(100vh - ${theme.mixins.toolbar.minHeight}px - ${scrollbarWidth}px)`,
-                overflowX: "auto",
-                flex: "0 1 auto",
-                // minWidth: 300,
-                alignItems: "start",
-                justifyContent: "start",
-              }}
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
               {project.sections.map((section: Section, index) => (
                 <SectionContext.Provider key={section.id} value={section}>
                   {section.is_default ? (
-                    <Card
-                      sx={{ minWidth: "300px", width: "100%" }}
-                      key={section.id}
-                      elevation={0}
-                    >
+                    <BoardProjectSectionCard key={section.id}>
                       <ProjectViewSectionHeader />
-                      <TaskList />
+                      <BoardTaskList />
                       <CardActions>
                         <AddTaskButton />
                       </CardActions>
-                    </Card>
+                    </BoardProjectSectionCard>
                   ) : (
                     <Draggable
                       draggableId={`draggable-section-${section.id}`}
@@ -194,10 +177,8 @@ export default function ProjectViewBoard({
                       index={index - 1}
                     >
                       {(provided, snapshot) => (
-                        <Card
-                          sx={{ minWidth: "300px", width: "100%" }}
+                        <BoardProjectSectionCard
                           key={section.id}
-                          elevation={0}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           ref={provided.innerRef}
@@ -206,11 +187,11 @@ export default function ProjectViewBoard({
                           }
                         >
                           <ProjectViewSectionHeader />
-                          <TaskList />
+                          <BoardTaskList />
                           <CardActions>
                             <AddTaskButton />
                           </CardActions>
-                        </Card>
+                        </BoardProjectSectionCard>
                       )}
                     </Draggable>
                   )}
@@ -224,7 +205,7 @@ export default function ProjectViewBoard({
               ))}
               {provided.placeholder}
               <AddProjectSectionButton precedingSection={lastSection} />
-            </Stack>
+            </BoardViewContainer>
           )}
         </Droppable>
       </DragDropContext>
