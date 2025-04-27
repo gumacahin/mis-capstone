@@ -1,6 +1,6 @@
 import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useRescheduleTask } from "../api";
@@ -15,14 +15,28 @@ export type TodayViewListProps = {
 
 export default function TodayViewList({ tasks }: TodayViewListProps) {
   const { mutateAsync: reschedTask } = useRescheduleTask();
-  const overdueTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
+  const overdueTasks = useMemo(
+    () =>
+      tasks.filter(
+        (task) =>
+          task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
+      ),
+    [tasks],
   );
-  const todayTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
+  const todayTasks = useMemo(
+    () =>
+      tasks.filter(
+        (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
+      ),
+    [tasks],
   );
   const [overdueTaskList, setOverdueTaskList] = useState<Task[]>(overdueTasks);
   const [todayTaskList, setTodayTaskList] = useState<Task[]>(todayTasks);
+
+  useEffect(() => {
+    setOverdueTaskList(overdueTasks);
+    setTodayTaskList(todayTasks);
+  }, [overdueTasks, todayTasks, setOverdueTaskList, setTodayTaskList]);
 
   const handleDragEnd = async ({
     destination,

@@ -32,10 +32,6 @@ class TaskViewSet(viewsets.ModelViewSet):
             "source_section", serializer.instance.section
         )
         is_sorting = destination_section != source_section or new_order != current_order
-        print(f"{source_section=}")
-        print(f"{destination_section=}")
-        print(f"{new_order=}")
-        print(f"{current_order=}")
 
         with transaction.atomic():
             serializer.save()

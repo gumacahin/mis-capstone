@@ -1,53 +1,15 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import CheckIcon from "@mui/icons-material/Check";
 import InboxIcon from "@mui/icons-material/Inbox";
-import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import TagIcon from "@mui/icons-material/Tag";
 import Button, { type ButtonProps } from "@mui/material/Button";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-import * as React from "react";
+import { type MouseEvent, useContext, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 import ProfileContext from "../contexts/profileContext";
 import type { TaskFormFields } from "../types/common";
+import TaskProjectButtonLabel from "./TaskProjectButtonLabel";
 import TaskProjectMenu from "./TaskProjectMenu";
-
-interface ButtonLabelProps {
-  selectedProject: { title: string; is_default: boolean } | undefined;
-  selectedSection: { title: string; is_default: boolean } | undefined;
-}
-function ButtonLabel({ selectedProject, selectedSection }: ButtonLabelProps) {
-  return (
-    <>
-      <Typography
-        fontSize={"small"}
-        textOverflow={"ellipsis"}
-        overflow={"hidden"}
-      >
-        {selectedProject?.title}
-      </Typography>
-      {!selectedSection?.is_default && (
-        <>
-          <Typography>&nbsp;/&nbsp;</Typography>
-          <SplitscreenIcon fontSize="small" />
-          <Typography
-            fontSize={"small"}
-            textOverflow={"ellipsis"}
-            overflow={"hidden"}
-          >
-            {selectedSection?.title}
-          </Typography>
-        </>
-      )}
-    </>
-  );
-}
 
 interface TaskProjectButtonProps extends ButtonProps {
   control: Control<TaskFormFields>;
@@ -63,10 +25,10 @@ export default function TaskProjectButton({
   compact, // eslint-disable-line @typescript-eslint/no-unused-vars
   ...buttonProps
 }: TaskProjectButtonProps) {
-  const profile = React.useContext(ProfileContext)!;
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const profile = useContext(ProfileContext)!;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClickMenuButton = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClickMenuButton = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -119,28 +81,18 @@ export default function TaskProjectButton({
                 )
               }
               endIcon={<ArrowDropDownIcon />}
-              // sx={{
-              //   display: "flex", // Use flexbox for layout
-              //   justifyContent: "space-between", // Space between startIcon+label and endIcon
-              //   alignItems: "center", // Vertically center content
-              //   flexGrow: 1, // Allow the button to grow to fill its parent
-              //   maxWidth: "100%", // Prevent the button from exceeding its container
-              //   overflow: "hidden", // Hide overflowing content
-              //   textOverflow: "ellipsis", // Add ellipsis for overflowing text
-              //   whiteSpace: "nowrap", // Prevent text from wrapping
-              // }}
               sx={{
                 ...buttonProps.sx,
                 display: "flex",
-                flexShrink: 1, // Allow the button to shrink
-                maxWidth: "100%", // Prevent it from growing beyond its container
-                overflow: "hidden", // Hide overflowing content
-                textOverflow: "ellipsis", // Add ellipsis for overflowing text
-                whiteSpace: "nowrap", // Prevent text from wrapping
+                flexShrink: 1,
+                maxWidth: "100%",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
                 justifyContent: "start",
               }}
             >
-              <ButtonLabel
+              <TaskProjectButtonLabel
                 selectedProject={selectedProject}
                 selectedSection={selectedSection}
               />

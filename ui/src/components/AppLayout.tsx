@@ -113,7 +113,6 @@ function DrawerContents({
   };
 
   const handleNavItemClick = () => {
-    console.log("here");
     if (!isLargeDisplay) {
       handleDrawerClose();
     }

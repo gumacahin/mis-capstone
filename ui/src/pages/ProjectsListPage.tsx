@@ -115,35 +115,31 @@ export default function ProjectsListPage() {
                   <List disablePadding>
                     <Divider component="li" aria-hidden={true} />
                     {projects.map((project) => (
-                      <>
-                        <ListItem
-                          divider
-                          key={project.id}
-                          disablePadding
-                          secondaryAction={
-                            <>
-                              <IconButton
-                                onClick={(e) =>
-                                  handleOpenProjectMenu(e, project)
-                                }
-                                edge="end"
-                                aria-label="project-options"
-                                id={`project-options-button-${project.id}`}
-                              >
-                                <MoreHorizIcon />
-                              </IconButton>
-                            </>
-                          }
+                      <ListItem
+                        divider
+                        key={project.id}
+                        disablePadding
+                        secondaryAction={
+                          <>
+                            <IconButton
+                              onClick={(e) => handleOpenProjectMenu(e, project)}
+                              edge="end"
+                              aria-label="project-options"
+                              id={`project-options-button-${project.id}`}
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                          </>
+                        }
+                      >
+                        <ListItemButton
+                          onClick={() => {
+                            navigate(`/app/project/${project.id}`);
+                          }}
                         >
-                          <ListItemButton
-                            onClick={() => {
-                              navigate(`/app/project/${project.id}`);
-                            }}
-                          >
-                            <ListItemText primary={project.title} />
-                          </ListItemButton>
-                        </ListItem>
-                      </>
+                          <ListItemText primary={project.title} />
+                        </ListItemButton>
+                      </ListItem>
                     ))}
                   </List>
                 </Stack>
