@@ -43,12 +43,10 @@ function ButtonIcon({
 export default function TaskPriorityMenu({
   control,
   priority,
-  compact, // eslint-disable-line @typescript-eslint/no-unused-vars
   ...props
 }: {
   control: Control<TaskFormFields>;
   priority: TaskPriority;
-  compact?: boolean;
 } & ButtonGroupProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

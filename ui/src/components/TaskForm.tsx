@@ -3,62 +3,68 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import { Dayjs } from "dayjs";
-import { useContext } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-import { useAddTask } from "../api";
-import ProfileContext from "../contexts/profileContext";
-import ProjectContext from "../contexts/projectContext";
-import SectionContext from "../contexts/sectionContext";
+import { useAddTask, useUpdateTask } from "../api";
+import useProfileContext from "../hooks/useProfileContext";
+import useProjectContext from "../hooks/useProjectContext";
+import useSectionContext from "../hooks/useSectionContext";
 import type { Task, TaskFormFields, TaskPriority } from "../types/common";
 import DatePicker from "./DatePicker";
+import DescriptionField from "./DescriptionField";
 import TaskPriorityMenu from "./TaskPriorityMenu";
 import TaskProjectButton from "./TaskProjectButton";
 import TaskTagsButton from "./TaskTagsButton";
+import TitleField from "./TitleField";
+
+export interface TaskFormProps {
+  presetDueDate?: Dayjs;
+  presetLabel?: string;
+  taskAbove?: number;
+  taskBelow?: number;
+  handleClose: () => void;
+  task?: Task;
+}
 
 export default function TaskForm({
   taskAbove,
   taskBelow,
-  compact,
-  presetDueDate = null,
+  presetDueDate,
+  presetLabel,
   handleClose,
   task,
-}: {
-  presetDueDate?: Dayjs | null;
-  taskAbove?: number;
-  taskBelow?: number;
-  handleClose: () => void;
-  compact?: boolean;
-  task?: Task;
-}) {
-  const project = useContext(ProjectContext)!;
-  const section = useContext(SectionContext);
-  const { projects } = useContext(ProfileContext)!;
+}: TaskFormProps) {
+  const project = useProjectContext();
+  const section = useSectionContext();
+  const { projects } = useProfileContext();
   const inbox = projects.find((p) => p.is_default)!;
   const inboxDefaultSection = inbox.sections.find((s) => s.is_default);
-  console.log("compact", compact);
+  const [loading, setLoading] = useState(false);
 
   const { mutateAsync: addTask } = useAddTask({
     projectId: project.id,
     aboveTaskId: taskAbove,
     belowTaskId: taskBelow,
   });
+  const { mutateAsync: updateTask } = useUpdateTask(task);
   const defaultValues = {
     title: task?.title ?? "",
     description: task?.description ?? "",
-    due_date: task?.due_date ?? presetDueDate,
+    due_date: task?.due_date ?? presetDueDate ?? null,
     project: task ? task.project : (project?.id ?? inbox?.id),
     section: task ? task.section : (section?.id ?? inboxDefaultSection?.id),
     priority: task?.priority ?? ("NONE" as TaskPriority),
-    tags: task?.tags ?? [],
+    tags: task?.tags ?? (presetLabel ? [presetLabel] : []),
   };
 
-  const { control, register, handleSubmit, watch } = useForm<TaskFormFields>({
+  const { control, handleSubmit, watch } = useForm<TaskFormFields>({
     defaultValues,
   });
+
+  const isAdding = !task;
 
   const onSubmit: SubmitHandler<TaskFormFields> = async ({
     title,
@@ -66,21 +72,40 @@ export default function TaskForm({
     due_date,
     section,
     project,
+    tags,
+    priority,
   }) => {
     const data: Partial<TaskFormFields> = {
       title,
       description,
       section,
       due_date,
+      tags,
       priority,
       project,
     };
-    toast.promise(addTask(data), {
-      loading: "Adding task...",
-      success: "Task added successfully!",
-      error: "Error adding task.",
-    });
-    handleClose();
+
+    setLoading(true);
+    try {
+      if (isAdding) {
+        await toast.promise(addTask(data), {
+          loading: "Adding task...",
+          success: "Task added successfully!",
+          error: "Failed to add task.",
+        });
+      } else {
+        await toast.promise(updateTask(data), {
+          loading: "Updating task...",
+          success: "Task updated successfully!",
+          error: "Failed to update task.",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding/updating task:", error);
+    } finally {
+      setLoading(false);
+      handleClose();
+    }
   };
 
   const priority = watch("priority");
@@ -96,35 +121,12 @@ export default function TaskForm({
     >
       <CardContent>
         <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
-          <TextField
-            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-            required
-            margin="dense"
-            id="title"
-            label="Task name"
-            type="text"
-            fullWidth
-            variant="standard"
-            {...register("title")}
-          />
-          <TextField
-            multiline
-            margin="dense"
-            id="desciption"
-            label="Description"
-            type="text"
-            fullWidth
-            variant="standard"
-            {...register("description")}
-          />
+          <TitleField control={control} onEnter={handleSubmit(onSubmit)} />
+          <DescriptionField control={control} hideDescriptionIcon />
           <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
-            <DatePicker control={control} compact={compact} />
-            <TaskPriorityMenu
-              control={control}
-              priority={priority}
-              compact={compact}
-            />
-            <TaskTagsButton control={control} tags={tags} compact={compact} />
+            <DatePicker control={control} />
+            <TaskPriorityMenu control={control} priority={priority} />
+            <TaskTagsButton control={control} tags={tags} />
           </Stack>
         </Stack>
       </CardContent>
@@ -133,11 +135,12 @@ export default function TaskForm({
           control={control}
           projectId={project.id}
           sectionId={sectionId}
-          compact={compact}
         />
         <Stack spacing={1} direction="row">
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="outlined">
+          <Button disabled={loading} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button loading={loading} type="submit" variant="outlined">
             Save
           </Button>
         </Stack>

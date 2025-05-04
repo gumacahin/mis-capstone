@@ -3,6 +3,7 @@ from django.utils import timezone
 from taggit.managers import TaggableManager
 
 from .project_section import ProjectSection
+from .tag import TaggedItem
 
 
 class Task(models.Model):
@@ -26,7 +27,7 @@ class Task(models.Model):
         choices=Priority.choices, default=Priority.NONE, max_length=6
     )
 
-    tags = TaggableManager()
+    tags = TaggableManager(through=TaggedItem)
 
     @property
     def project(self):

@@ -2,7 +2,9 @@ from django.utils import timezone
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
-from upoutodo.models import ProjectSection, Task
+from upoutodo.models import Project, ProjectSection, Task
+
+from .tag import Tag
 
 
 class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
@@ -21,6 +23,8 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
+    project_title = serializers.SerializerMethodField(read_only=True)
+    section_title = serializers.SerializerMethodField(read_only=True)
 
     tags = TagListSerializerField(required=False)
 
@@ -40,7 +44,18 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "above_task",
             "below_task",
             "source_section",
+            "section_title",
+            "project_title",
         ]
+
+    def get_project_title(self, obj):
+        return obj.section.project.title
+
+    def get_section_title(self, obj):
+        section_title = obj.section.title
+        if section_title == Project.DEFAULT_PROJECT_SECTION_TITLE:
+            return None
+        return section_title
 
     def validate_due_date(self, value):
         if value and value < timezone.now().date():
@@ -65,3 +80,22 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             data["order"] = below_task.order + 1
 
         return data
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        tags_data = validated_data.pop("tags", None)
+
+        # Update other fields
+        instance = super().update(instance, validated_data)
+
+        # Handle tags if provided
+        if tags_data is not None:
+            tag_objects = []
+            for tag_name in tags_data:
+                tag, _ = Tag.objects.get_or_create(
+                    name=tag_name, created_by=request.user
+                )
+                tag_objects.append(tag)
+            instance.tags.set(tag_objects)
+
+        return instance

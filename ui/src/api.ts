@@ -10,9 +10,11 @@ import type {
   ProjectDetail,
   ProjectViewType,
   Section,
+  Tag,
   Task,
   TaskFormFields,
 } from "./types/common";
+import { slugify } from "./utils";
 
 const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
@@ -95,15 +97,16 @@ export const useUpcomingTasks = () => {
   });
 };
 
-export const useTask = (task: Task) => {
+export const useTask = (task: Task | null, enabled: boolean = true) => {
   const apiClient = useApiClient();
   return useQuery({
     initialData: task,
-    queryKey: ["task", { task }],
+    queryKey: ["task", { taskId: task?.id }],
     queryFn: async () => {
-      const { data } = await apiClient.get(`tasks/${task.id}/`);
+      const { data } = await apiClient.get(`tasks/${task?.id}/`);
       return data;
     },
+    enabled,
   });
 };
 
@@ -150,15 +153,16 @@ export const useAddTask = ({
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
+      queryClient.invalidateQueries({ queryKey: ["tag"] });
     },
   });
 };
 
-export const useUpdateTask = (task: Task) => {
+export const useUpdateTask = (task?: Task) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
-  const taskId = task.id;
-  const projectId = task.project;
+  const taskId = task?.id;
+  const projectId = task?.project;
   return useMutation({
     mutationKey: ["updateTask", { taskId }],
     mutationFn: async (updatedTask: Partial<TaskFormFields>) => {
@@ -171,13 +175,33 @@ export const useUpdateTask = (task: Task) => {
           due_date: updatedTask.due_date.format("YYYY-MM-DD"),
         }),
       };
+
       const result = await apiClient.patch(`/tasks/${taskId}/`, data);
       return result.data;
     },
-    onSettled: () => {
+    onMutate: (updatedTask: Partial<TaskFormFields>) => {
+      queryClient.cancelQueries({ queryKey: ["task", { taskId }] });
+      queryClient.setQueryData(["task", { taskId }], (task: Task) => ({
+        ...task,
+        ...updatedTask,
+      }));
+    },
+    onSettled: (data, __, vars) => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["task", { taskId }] });
+      if (vars.tags) {
+        queryClient.invalidateQueries({ queryKey: ["tags"] });
+      }
+
+      if (data.tags) {
+        for (const tagName of data.tags) {
+          console.log("tagName", tagName, "slug", slugify(tagName));
+          queryClient.invalidateQueries({
+            queryKey: ["tag", { slug: slugify(tagName) }],
+          });
+        }
+      }
     },
   });
 };
@@ -362,6 +386,11 @@ export const useDeleteTask = (task: Task) => {
         queryKey: ["project", { projectId: task.project }],
       });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      for (const tag of task.tags) {
+        queryClient.invalidateQueries({
+          queryKey: ["tag", { slug: slugify(tag) }],
+        });
+      }
     },
   });
 };
@@ -671,3 +700,71 @@ export function useDuplicateSection(sectionId: number, projectId: number) {
     },
   });
 }
+
+export const useLabel = (slug: string) => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["tag", { slug }],
+    queryFn: async () => {
+      const { data } = await apiClient.get(`tags/${slug}`);
+      return data;
+    },
+  });
+};
+
+export const useAddTag = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["addTag"],
+    mutationFn: async (name: string) => {
+      return await apiClient.post(`tags/`, { name });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+    },
+  });
+};
+
+export const useDeleteLabel = (label: Tag) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  const slug = slugify(label.name);
+  return useMutation({
+    mutationKey: ["deleteLabel", { slug }],
+    mutationFn: async () => {
+      const result = await apiClient.delete(`/tags/${slug}/`);
+      return result.data;
+    },
+    onMutate: () => {
+      queryClient.cancelQueries({ queryKey: ["tags"] });
+      queryClient.setQueryData(
+        ["tags"],
+        (oldTags: PaginatedResponse<Tag> | undefined) => {
+          const newTags = oldTags?.results.filter((t) => t.name !== label.name);
+          return { ...oldTags, results: newTags };
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+};
+
+export const useUpdateLabel = (label: Tag) => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  const slug = slugify(label.name);
+  return useMutation({
+    mutationKey: ["updateLabel", { slug }],
+    mutationFn: async (data: Partial<Tag>) => {
+      const result = await apiClient.patch(`/tags/${slug}/`, data);
+      return result.data;
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ["tag", { slug }] });
+    },
+  });
+};

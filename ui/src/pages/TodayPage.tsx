@@ -16,6 +16,7 @@ import { useTasksToday } from "../api";
 import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
 import SkeletonList from "../components/SkeletonList";
 import TodayView from "../components/TodayView";
+import ViewPageTitle from "../components/ViewPageTitle";
 import useToolbarContext from "../hooks/useToolbarContext";
 import type { ProjectViewType, Task } from "../types/common";
 
@@ -41,11 +42,7 @@ export default function TodayPage() {
         handleViewChange={handleViewChange}
       />,
     );
-    setToolbarTitle(
-      <Typography variant={"h5"} component={"h2"} color="text.primary">
-        Today
-      </Typography>,
-    );
+    setToolbarTitle(<ViewPageTitle title={"Today"} />);
     return () => {
       setToolbarIcons(null);
       setToolbarTitle(null);

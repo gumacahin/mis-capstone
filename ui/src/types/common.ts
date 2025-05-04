@@ -41,6 +41,8 @@ export interface Task {
   priority?: TaskPriority;
   section: number;
   project: number;
+  project_title: string;
+  section_title?: string | null;
   tags: string[];
   order: number;
 }
@@ -87,3 +89,13 @@ export interface Project {
 }
 
 export type DragType = "TASK" | "SECTION";
+
+export interface Tag {
+  name: string;
+}
+
+export interface TagDetail {
+  name: string;
+  id: number;
+  tasks: Task[];
+}

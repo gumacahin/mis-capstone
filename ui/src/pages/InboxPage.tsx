@@ -7,6 +7,7 @@ import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvid
 import ProjectView from "../components/ProjectView";
 import ProjectViewMenu from "../components/ProjectViewMenu";
 import SkeletonList from "../components/SkeletonList";
+import ViewPageTitle from "../components/ViewPageTitle";
 import useToolbarContext from "../hooks/useToolbarContext";
 import { Project } from "../types/common";
 
@@ -18,11 +19,7 @@ export default function InboxPage() {
   const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   useEffect(() => {
-    setToolbarTitle(
-      <Typography variant={"h5"} component={"h2"} color="text.primary">
-        {pageTitle}
-      </Typography>,
-    );
+    setToolbarTitle(<ViewPageTitle title={pageTitle} />);
     setToolbarIcons(<ProjectViewMenu project={inbox} />);
     return () => {
       setToolbarIcons(null);

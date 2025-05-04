@@ -10,6 +10,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LabelIcon from "@mui/icons-material/Label";
 import MenuIcon from "@mui/icons-material/Menu";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
@@ -48,6 +49,7 @@ import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import ListItemNavLink from "./ListItemNavLink";
 import ProjectMenu from "./ProjectMenu";
 import TodayIcon from "./TodayIcon";
+import UpdateTaskDialogProvider from "./UpdateTaskDialogProvider";
 
 const DRAWER_WIDTH = 240;
 
@@ -227,6 +229,14 @@ function DrawerContents({
             <ListItemText primary={"Upcoming"} />
           </ListItemNavLink>
         </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink to={ROUTES.LABELS} onClick={handleNavItemClick}>
+            <ListItemIcon sx={listItemIconStyle}>
+              <LabelIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Labels"} />
+          </ListItemNavLink>
+        </ListItem>
         <Divider />
         <ListItem
           component={"div"}
@@ -383,12 +393,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const isLargeDisplay = useMediaQuery("(min-width:751px)");
   const [open, setOpen] = useState(isLargeDisplay);
   const [isAddTaskDialogOpen, setIsAddTaskDialogOpen] = useState(false);
-  const {
-    toolbarAdditionalIcons,
-    toolbarIcons,
-    toolbarTitle,
-    toolbarSubtitle,
-  } = useToolbarContext();
+  const { toolbarAdditionalIcons, toolbarIcons, toolbarTitle, toolbarBottom } =
+    useToolbarContext();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -401,12 +407,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <InboxDefaultSectionProvider>
-        <AddTaskDialog
-          open={isAddTaskDialogOpen}
-          handleClose={() => {
-            setIsAddTaskDialogOpen(false);
-          }}
-        />
+        {isAddTaskDialogOpen && (
+          <AddTaskDialog
+            open={true}
+            handleClose={() => {
+              setIsAddTaskDialogOpen(false);
+            }}
+          />
+        )}
       </InboxDefaultSectionProvider>
       <Box sx={{ display: "flex" }} height="100vh" id="app-layout">
         <AppBar
@@ -423,22 +431,24 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 width: "100%",
               }}
             >
-              <IconButton
-                color="default"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={[open && { visibility: "hidden" }]}
-              >
-                <MenuIcon />
-              </IconButton>
+              <Box>
+                <IconButton
+                  color="default"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={[open && { display: "none" }]}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </Box>
               <Box width="100%">{toolbarTitle}</Box>
               <Stack direction="row" spacing={1}>
                 {toolbarAdditionalIcons && <Box>{toolbarAdditionalIcons}</Box>}
                 <Box>{toolbarIcons}</Box>
               </Stack>
             </Toolbar>
-            {toolbarSubtitle}
+            {toolbarBottom}
           </Stack>
         </AppBar>
         {!isLargeDisplay && (
@@ -500,7 +510,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             mt={8}
             id="main-content-wrapper"
           >
-            {children}
+            <UpdateTaskDialogProvider>{children}</UpdateTaskDialogProvider>
           </Box>
         </Main>
       </Box>

@@ -5,6 +5,6 @@ interface ThemeContextType {
   setMode: (mode: "light" | "dark" | "system") => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export default ThemeContext;

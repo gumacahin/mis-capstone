@@ -2,12 +2,11 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import IconButton from "@mui/material/IconButton";
 import dayjs from "dayjs";
-import { MouseEvent, useContext } from "react";
+import { MouseEvent } from "react";
 import toast from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
-import ProjectContext from "../contexts/projectContext";
-import type { ProjectDetail, Task } from "../types/common";
+import type { Task } from "../types/common";
 
 export default function TaskCheckIcon({
   task,
@@ -16,8 +15,7 @@ export default function TaskCheckIcon({
   task: Task;
   disabled?: boolean;
 }) {
-  const project = useContext<ProjectDetail | null>(ProjectContext)!;
-  const updateTask = useUpdateTask(task, project);
+  const updateTask = useUpdateTask(task);
 
   const isTaskCompleted = task.completion_date !== null;
 

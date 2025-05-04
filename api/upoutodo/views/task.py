@@ -106,6 +106,4 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-        return Response(
-            {"status": "Tasks updated successfully"}, status=status.HTTP_200_OK
-        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

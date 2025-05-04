@@ -10,15 +10,14 @@ import Stack from "@mui/material/Stack";
 import { Fragment, useContext, useState } from "react";
 
 import { DROPPABLE_MIN_HEIGHT, DROPPABLE_TYPE_TASK } from "../constants/ui";
-import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
 import useScrollbarWidth from "../hooks/useScrollbarWidth";
-import type { ProjectDetail, Section, Task } from "../types/common";
+import type { Section, Task } from "../types/common";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
 import UpdateTaskDialog from "./UpdateTaskDialog";
 
-export interface TaskListProps extends CardContentProps {
+export interface BoardTaskListProps extends CardContentProps {
   tasks?: Task[];
   hideDueDates?: boolean;
   taskListId?: string;
@@ -33,10 +32,9 @@ export default function BoardTaskList({
   isDragDisabled,
   showAddTaskMenuItems = true,
   ...rest
-}: TaskListProps) {
+}: BoardTaskListProps) {
   const [openTaskId, setOpenTaskId] = useState<number | null>(null);
   const section = useContext<Section | null>(SectionContext);
-  const project = useContext<ProjectDetail | null>(ProjectContext)!;
   const [addTaskAbove, setAddTaskAbove] = useState<number | undefined>(
     undefined,
   );
@@ -47,9 +45,6 @@ export default function BoardTaskList({
   const scrollbarWidth = useScrollbarWidth();
   const isScrollbarAutoHiding = scrollbarWidth === 0;
 
-  const handleOpenTask = (taskId: number) => {
-    setOpenTaskId(taskId);
-  };
   const handleCloseTask = () => {
     setOpenTaskId(null);
   };
@@ -70,12 +65,7 @@ export default function BoardTaskList({
   return (
     <>
       {hasOpenTask && (
-        <UpdateTaskDialog
-          open={hasOpenTask}
-          handleClose={handleCloseTask}
-          task={openTask!}
-          project={project}
-        />
+        <UpdateTaskDialog onClose={handleCloseTask} task={openTask!} />
       )}
       <CardContent
         sx={{
@@ -105,7 +95,6 @@ export default function BoardTaskList({
                 <Fragment key={task.id}>
                   {addTaskAbove === task.id && (
                     <TaskForm
-                      compact={true}
                       taskAbove={addTaskAbove}
                       handleClose={handleCloseAddAboveTaskForm}
                     />
@@ -121,7 +110,6 @@ export default function BoardTaskList({
                     ) => (
                       <TaskCard
                         task={task}
-                        handleOpenTask={handleOpenTask}
                         hideDueDates={hideDueDates}
                         handleAddTaskAbove={() => setAddTaskAbove(task.id)}
                         handleAddTaskBelow={() => setAddTaskBelow(task.id)}
@@ -133,7 +121,6 @@ export default function BoardTaskList({
                   </Draggable>
                   {addTaskBelow === task.id && (
                     <TaskForm
-                      compact={true}
                       taskBelow={addTaskBelow}
                       handleClose={handleCloseAddBelowTaskForm}
                     />

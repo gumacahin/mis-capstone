@@ -4,10 +4,10 @@ export interface ToolbarContextType {
   toolbarIcons: ReactNode;
   toolbarAdditionalIcons: ReactNode;
   toolbarTitle: ReactNode;
-  toolbarSubtitle: ReactNode;
+  toolbarBottom: ReactNode;
   setToolbarIcons: Dispatch<SetStateAction<ReactNode>>;
   setToolbarTitle: Dispatch<SetStateAction<ReactNode>>;
-  setToolbarSubtitle: Dispatch<SetStateAction<ReactNode>>;
+  setToolbarBottom: Dispatch<SetStateAction<ReactNode>>;
   setToolbarAdditionalIcons: Dispatch<SetStateAction<ReactNode>>;
 }
 

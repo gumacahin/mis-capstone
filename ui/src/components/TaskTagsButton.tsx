@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import ButtonGroup, { type ButtonGroupProps } from "@mui/material/ButtonGroup";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useRef, useState } from "react";
 import {
   type Control,
   Controller,
@@ -17,15 +17,19 @@ import TaskTagsMenu from "./TaskTagsMenu";
 export default function TaskTagsButton({
   control,
   tags,
-  compact, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: {
   control: Control<TaskFormFields>;
   tags: string[];
-  compact?: boolean;
 } & ButtonGroupProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const ref = useRef<HTMLButtonElement>(null);
+
   const handleClickMenuButton = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleClickAltMenuButton = () => {
+    setAnchorEl(ref.current);
   };
 
   const handleClose = () => {
@@ -53,13 +57,20 @@ export default function TaskTagsButton({
       defaultValue={tags}
       render={({ field }) => (
         <>
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} overflow={"hidden"}>
             <ButtonGroup variant="outlined" size="small">
               <Tooltip title="Add labels">
                 <Button
+                  ref={ref}
                   startIcon={<LabelIcon />}
                   variant="outlined"
                   size="small"
+                  sx={{
+                    textWrap: "nowrap",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
                   onClick={handleClickMenuButton}
                 >
                   {hasTags ? tags[0] : "Labels"}
@@ -86,7 +97,7 @@ export default function TaskTagsButton({
                     startIcon={<LabelIcon />}
                     variant="outlined"
                     size="small"
-                    onClick={handleClickMenuButton}
+                    onClick={handleClickAltMenuButton}
                   >
                     {tags.slice(1).length}
                   </Button>

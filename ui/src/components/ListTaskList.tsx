@@ -10,14 +10,12 @@ import Stack from "@mui/material/Stack";
 import { Fragment, useContext, useState } from "react";
 
 import { DROPPABLE_MIN_HEIGHT, DROPPABLE_TYPE_TASK } from "../constants/ui";
-import ProjectContext from "../contexts/projectContext";
 import SectionContext from "../contexts/sectionContext";
-import type { ProjectDetail, Section, Task } from "../types/common";
+import type { Section, Task } from "../types/common";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
-import UpdateTaskDialog from "./UpdateTaskDialog";
 
-export interface TaskListProps extends CardContentProps {
+export interface ListTaskListProps extends CardContentProps {
   tasks?: Task[];
   hideDueDates?: boolean;
   taskListId?: string;
@@ -32,10 +30,8 @@ export default function ListTaskList({
   isDragDisabled,
   showAddTaskMenuItems = true,
   ...rest
-}: TaskListProps) {
-  const [openTaskId, setOpenTaskId] = useState<number | null>(null);
+}: ListTaskListProps) {
   const section = useContext<Section | null>(SectionContext);
-  const project = useContext<ProjectDetail | null>(ProjectContext)!;
   const [addTaskAbove, setAddTaskAbove] = useState<number | undefined>(
     undefined,
   );
@@ -43,12 +39,6 @@ export default function ListTaskList({
     undefined,
   );
 
-  const handleOpenTask = (taskId: number) => {
-    setOpenTaskId(taskId);
-  };
-  const handleCloseTask = () => {
-    setOpenTaskId(null);
-  };
   const handleCloseAddAboveTaskForm = () => {
     setAddTaskAbove(undefined);
   };
@@ -57,22 +47,10 @@ export default function ListTaskList({
   };
 
   tasks = tasks ?? section?.tasks ?? [];
-  const openTask = tasks.find((task: Task) => task.id === openTaskId);
-
-  const hasOpenTask = Boolean(openTask);
-
   const droppableId = taskListId ? taskListId : `tasklist-${section?.id}`;
 
   return (
     <>
-      {hasOpenTask && (
-        <UpdateTaskDialog
-          open={hasOpenTask}
-          handleClose={handleCloseTask}
-          task={openTask!}
-          project={project}
-        />
-      )}
       <CardContent {...rest}>
         <Droppable droppableId={droppableId!} type={DROPPABLE_TYPE_TASK}>
           {(provided: DroppableProvided) => (
@@ -86,7 +64,6 @@ export default function ListTaskList({
                 <Fragment key={task.id}>
                   {addTaskAbove === task.id && (
                     <TaskForm
-                      compact={true}
                       taskAbove={addTaskAbove}
                       handleClose={handleCloseAddAboveTaskForm}
                     />
@@ -102,7 +79,6 @@ export default function ListTaskList({
                     ) => (
                       <TaskCard
                         task={task}
-                        handleOpenTask={handleOpenTask}
                         hideDueDates={hideDueDates}
                         handleAddTaskAbove={() => setAddTaskAbove(task.id)}
                         handleAddTaskBelow={() => setAddTaskBelow(task.id)}
@@ -114,7 +90,6 @@ export default function ListTaskList({
                   </Draggable>
                   {addTaskBelow === task.id && (
                     <TaskForm
-                      compact={true}
                       taskBelow={addTaskBelow}
                       handleClose={handleCloseAddBelowTaskForm}
                     />

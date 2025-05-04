@@ -26,10 +26,12 @@ export default function TaskTagsMenu({
   field: ControllerRenderProps<TaskFormFields, "tags">;
   tags: string[];
 }) {
+  const ITEM_HEIGHT = 48;
   const { data } = useTags();
   const results = useMemo(() => data?.results ?? [], [data]);
   const [tagOptions, setTagOptions] = useState<string[]>([]);
   const [filteredTagOptions, setFilteredTagOptions] = useState<string[]>([]);
+
   useEffect(() => {
     const options = results.map(({ name }: { name: string }) => name);
     setFilteredTagOptions(options);
@@ -61,6 +63,11 @@ export default function TaskTagsMenu({
     }
   };
 
+  const onClose = () => {
+    setSearch("");
+    handleClose();
+  };
+
   const canCreateTag =
     search.length > 0 &&
     (!tagOptions.includes(search) || filteredTagOptions.length === 0);
@@ -71,13 +78,20 @@ export default function TaskTagsMenu({
       id="task-labels-menu"
       anchorEl={anchorEl}
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       MenuListProps={{
         "aria-labelledby": "task-labels-button",
         role: "listbox",
       }}
+      slotProps={{
+        paper: {
+          style: {
+            maxHeight: ITEM_HEIGHT * 6.5,
+          },
+        },
+      }}
     >
-      <MenuItem>
+      <MenuItem disableRipple>
         <TextField
           id="task-labels-search"
           aria-label="Search for labels"
@@ -105,7 +119,7 @@ export default function TaskTagsMenu({
           />
         </MenuItem>
       ))}
-      {filteredTagOptions.length === 0 && (
+      {search && filteredTagOptions.length === 0 && (
         <MenuItem disabled>Label not found</MenuItem>
       )}
       {canCreateTag && (

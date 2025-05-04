@@ -71,7 +71,7 @@ export default function UpcomingViewList() {
   const stickyHeaderRef = useRef<HTMLDivElement | null>(null);
   const stickyHeaderOffset = 64;
 
-  const { setToolbarTitle, setToolbarSubtitle, setToolbarAdditionalIcons } =
+  const { setToolbarTitle, setToolbarBottom, setToolbarAdditionalIcons } =
     useToolbarContext();
 
   const { isError: tasksTodayIsError, data: tasksTodayData } = useTasksToday();
@@ -163,7 +163,7 @@ export default function UpcomingViewList() {
   }, [weekExtension]);
 
   useEffect(() => {
-    setToolbarSubtitle(
+    setToolbarBottom(
       <>
         <WeekDisplay
           selectedDate={dayjs(topCard).isValid() ? dayjs(topCard) : dayjs()}
@@ -173,8 +173,11 @@ export default function UpcomingViewList() {
         <Divider />
       </>,
     );
-    return () => setToolbarSubtitle(null);
-  }, [setToolbarSubtitle, topCard, weekOffset]);
+    return () => {
+      setToolbarBottom(null);
+      setToolbarTitle(null);
+    };
+  }, [setToolbarBottom, setToolbarTitle, topCard, weekOffset]);
 
   useEffect(() => {
     const mainContentWrapper = document.querySelector(
@@ -257,7 +260,7 @@ export default function UpcomingViewList() {
     return () => restoreToolbar();
   }, [
     setToolbarAdditionalIcons,
-    setToolbarSubtitle,
+    setToolbarBottom,
     setToolbarTitle,
     topCard,
     weekOffset,

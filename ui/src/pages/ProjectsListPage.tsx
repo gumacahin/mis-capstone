@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SearchIcon from "@mui/icons-material/Search";
 import Alert from "@mui/material/Alert";
@@ -12,7 +13,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import Textfield from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { MouseEvent, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useProjects } from "../api";
@@ -20,16 +21,39 @@ import AddProjectButton from "../components/AddProjectButton";
 import PageLayout from "../components/PageLayout";
 import ProjectMenu from "../components/ProjectMenu";
 import SkeletonList from "../components/SkeletonList";
+import useToolbarContext from "../hooks/useToolbarContext";
 import type { Project } from "../types/common";
 
 export default function ProjectsListPage() {
   const { isPending, isError, data } = useProjects();
 
-  const projects: Project[] = data?.results ?? [];
+  const projects: Project[] = useMemo(() => data?.results ?? [], [data]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+  const [search, setSearch] = useState<string>("");
   const [project, setProject] = useState<Project | null>(null);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const { setToolbarTitle } = useToolbarContext();
 
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = event.target.value;
+    setSearch(searchTerm);
+  };
+
+  useEffect(() => {
+    setToolbarTitle(null);
+  }, [setToolbarTitle]);
+
+  useEffect(() => {
+    if (search) {
+      setFilteredProjects(
+        projects.filter((project) =>
+          project.title.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } else {
+      setFilteredProjects(projects);
+    }
+  }, [search, projects]);
   const handleOpenProjectMenu = (
     event: MouseEvent<HTMLButtonElement>,
     project: Project,
@@ -92,11 +116,26 @@ export default function ProjectsListPage() {
                   placeholder="Search projects"
                   aria-label="Search"
                   variant="outlined"
+                  onChange={handleSearch}
+                  value={search}
                   slotProps={{
                     input: {
                       startAdornment: (
                         <InputAdornment position="start">
                           <SearchIcon />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {search && (
+                            <IconButton
+                              onClick={() => {
+                                setSearch("");
+                              }}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          )}
                         </InputAdornment>
                       ),
                     },
@@ -110,11 +149,12 @@ export default function ProjectsListPage() {
                 </Box>
                 <Stack spacing={2}>
                   <Typography fontSize={16} variant="caption">
-                    {projects.length} Project{projects.length !== 1 ? "s" : ""}
+                    {filteredProjects.length} Project
+                    {filteredProjects.length !== 1 ? "s" : ""}
                   </Typography>
                   <List disablePadding>
                     <Divider component="li" aria-hidden={true} />
-                    {projects.map((project) => (
+                    {filteredProjects.map((project) => (
                       <ListItem
                         divider
                         key={project.id}

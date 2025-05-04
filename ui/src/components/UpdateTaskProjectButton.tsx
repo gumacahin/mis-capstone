@@ -12,13 +12,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { type MouseEvent, useContext, useState } from "react";
-import { type Control, Controller } from "react-hook-form";
-import { ControllerRenderProps, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
 import ProfileContext from "../contexts/profileContext";
-import type { ProfileProject, TaskFormFields } from "../types/common";
+import type { TaskFormFields } from "../types/common";
 import { Task } from "../types/common";
 import TaskProjectButtonLabel from "./TaskProjectButtonLabel";
 
@@ -77,6 +76,7 @@ export default function UpdateTaskProjectButton({ task }: { task: Task }) {
     );
     setIsSubmitting(false);
   };
+
   const taskIsCompleted = task.completion_date != null;
 
   return (
@@ -224,10 +224,11 @@ export default function UpdateTaskProjectButton({ task }: { task: Task }) {
                       <MenuItem
                         component={ListItem}
                         sx={{ pl: 4 }}
-                        key={section.id}
+                        key={`project-${project.id}--section-${section.id}`}
                         selected={section.id === task.section}
                         onClick={() => {
                           field.onChange(section.id);
+                          handleSubmit(onSubmit)();
                           handleClose();
                         }}
                       >

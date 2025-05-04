@@ -15,12 +15,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { type Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Fragment, MouseEvent, useState } from "react";
+import { Fragment, MouseEvent, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useRescheduleTask, useTasks, useTasksToday } from "../api";
 import { DATE_PAGER_HEIGHT, TASK_CARD_WIDTH } from "../constants/ui";
 import useScrollbarWidth from "../hooks/useScrollbarWidth";
+import useToolbarContext from "../hooks/useToolbarContext";
 import type { Task } from "../types/common";
 import { getWeekDatesFromDate } from "../utils";
 import BoardDateTasks from "./BoardDateTasks";
@@ -28,11 +29,13 @@ import BoardOverdueTasks from "./BoardOverdueTasks";
 import BoardViewContainer from "./BoardViewContainer";
 import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import SkeletonList from "./SkeletonList";
+import ViewPageTitle from "./ViewPageTitle";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
 
 export default function UpcomingViewBoard() {
+  const { setToolbarTitle } = useToolbarContext();
   const scrollbarWidth = useScrollbarWidth();
   const { mutateAsync: rescheduleTask } = useRescheduleTask();
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
@@ -105,15 +108,16 @@ export default function UpcomingViewBoard() {
     );
   };
 
+  useEffect(() => {
+    setToolbarTitle(<ViewPageTitle title="Upcoming" />);
+    return () => {
+      setToolbarTitle(null);
+    };
+  }, []);
+
   return (
     <InboxDefaultSectionProvider>
-      <Box
-        px={2}
-        pb={2}
-        width="100%"
-        display={"flex"}
-        justifyContent={"space-between"}
-      >
+      <Box p={2} width="100%" display={"flex"} justifyContent={"space-between"}>
         <CalendarDialog
           selectedDate={selectedDate}
           handleDateSelect={handleDateSelect}

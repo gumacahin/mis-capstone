@@ -15,14 +15,12 @@ interface TaskProjectButtonProps extends ButtonProps {
   control: Control<TaskFormFields>;
   sectionId: number;
   projectId: number;
-  compact?: boolean;
 }
 
 export default function TaskProjectButton({
   control,
   sectionId,
   projectId,
-  compact, // eslint-disable-line @typescript-eslint/no-unused-vars
   ...buttonProps
 }: TaskProjectButtonProps) {
   const profile = useContext(ProfileContext)!;

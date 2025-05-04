@@ -9,7 +9,9 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import { MouseEvent, useState } from "react";
 
+import useUpdateTaskDialogContext from "../hooks/useUpdateTaskDialogContext";
 import { Task } from "../types/common";
+import TaskCardDescription from "./TaskCardDescription";
 import TaskCheckIcon from "./TaskCheckIcon";
 import TaskDeleteDialog from "./TaskDeleteDialog";
 import TaskForm from "./TaskForm";
@@ -17,7 +19,6 @@ import TaskMenu from "./TaskMenu";
 
 export interface TaskCardProps {
   task: Task;
-  handleOpenTask: (taskId: number) => void;
   hideDueDates?: boolean;
   handleAddTaskAbove: () => void;
   handleAddTaskBelow: () => void;
@@ -28,7 +29,6 @@ export interface TaskCardProps {
 
 export default function TaskCard({
   task,
-  handleOpenTask,
   hideDueDates = false,
   handleAddTaskAbove,
   handleAddTaskBelow,
@@ -36,6 +36,7 @@ export default function TaskCard({
   snapshot,
   showAddTaskMenuItems = true,
 }: TaskCardProps) {
+  const { setTask } = useUpdateTaskDialogContext();
   const isOverdue =
     task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day");
 
@@ -78,7 +79,7 @@ export default function TaskCard({
       e.target instanceof HTMLElement &&
       e.target.closest(".MuiCardHeader-root")
     ) {
-      handleOpenTask(task.id);
+      setTask(task);
     }
   };
 
@@ -111,10 +112,10 @@ export default function TaskCard({
       />
       {!isEditingTask && (
         <Card
+          id={`task-${task.id}`}
           sx={{
             width: "100%",
             maxWidth: "100%",
-            // height: TASK_CARD_HEIGHT,
             "&:hover": {
               cursor: "pointer",
             },
@@ -128,34 +129,31 @@ export default function TaskCard({
         >
           <CardHeader
             avatar={<TaskCheckIcon task={task} />}
-            sx={{ "& .MuiCardHeader-root": { padding: 0 } }}
+            sx={{
+              "& .MuiCardHeader-root": { padding: 0 },
+              "& .MuiCardHeader-content": { overflow: "hidden" },
+            }}
             title={
-              <Stack direction={"row"}>
-                <Stack>
-                  <Typography
-                    sx={{
-                      textDecoration: task.completion_date
-                        ? "line-through"
-                        : "default",
-                    }}
-                  >
-                    {task.title}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      textWrap: "nowrap",
-                      overflow: "hidden",
+              <Stack maxWidth={"100%"}>
+                <Typography
+                  sx={{
+                    textWrap: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    textDecoration: task.completion_date
+                      ? "line-through"
+                      : "default",
+                    "& p": {
+                      margin: 0,
                       textOverflow: "ellipsis",
-                      fontSize: 14,
-                      fontWeight: 400,
-                      textDecoration: task.completion_date
-                        ? "line-through"
-                        : "default",
-                    }}
-                  >
-                    {task.description}
-                  </Typography>
-                </Stack>
+                      overflow: "hidden",
+                    },
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: task.title,
+                  }}
+                />
+                {task.description && <TaskCardDescription task={task} />}
               </Stack>
             }
             subheader={

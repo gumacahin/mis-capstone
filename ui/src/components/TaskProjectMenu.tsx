@@ -36,13 +36,14 @@ export default function TaskProjectMenu({
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
       onClose={handleClose}
-      MenuListProps={{
-        "aria-labelledby": "task-project-button",
-        role: "listbox",
+      slotProps={{
+        list: {
+          "aria-labelledby": "task-project-button",
+          role: "listbox",
+        },
       }}
     >
       <MenuItem
-        component={ListItem}
         selected={inboxDefaultSection?.id === sectionId}
         onClick={() => {
           field.onChange(inboxDefaultSection?.id);
@@ -68,7 +69,7 @@ export default function TaskProjectMenu({
         .map((section) => (
           <MenuItem
             sx={{ pl: 4 }}
-            key={section.id}
+            key={`project-${inbox.id}--section-${section.id}`}
             selected={section.id === sectionId}
             onClick={() => {
               field.onChange(section.id);
@@ -99,7 +100,7 @@ export default function TaskProjectMenu({
         return (
           <>
             <MenuItem
-              key={project.id}
+              // key={project.id}
               selected={defaultSectionId === sectionId}
               onClick={() => {
                 field.onChange(defaultSectionId);
@@ -126,7 +127,7 @@ export default function TaskProjectMenu({
                 <MenuItem
                   component={ListItem}
                   sx={{ pl: 4 }}
-                  key={section.id}
+                  key={`project-${project.id}--section-${section.id}`}
                   selected={section.id === sectionId}
                   onClick={() => {
                     field.onChange(section.id);

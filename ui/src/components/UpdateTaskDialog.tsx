@@ -19,151 +19,54 @@ import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import { type Theme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { Extension } from "@tiptap/core";
-import { Link } from "@tiptap/extension-link";
-import { Placeholder } from "@tiptap/extension-placeholder";
-import { BubbleMenu, useEditor } from "@tiptap/react";
-import { StarterKit } from "@tiptap/starter-kit";
-import dayjs from "dayjs";
-import {
-  LinkBubbleMenu,
-  LinkBubbleMenuHandler,
-  MenuButton,
-  MenuButtonBlockquote,
-  MenuButtonBold,
-  MenuButtonBulletedList,
-  MenuButtonCode,
-  type MenuButtonEditLinkProps,
-  MenuButtonItalic,
-  MenuButtonOrderedList,
-  MenuButtonStrikethrough,
-  MenuControlsContainer,
-  MenuDivider,
-  RichTextContent,
-  RichTextEditorProvider,
-  useRichTextEditorContext,
-} from "mui-tiptap";
-import { Plugin, PluginKey } from "prosemirror-state";
 import { MouseEvent, useEffect, useRef, useState } from "react";
-import { SubmitHandler, useController, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import { useUpdateTask } from "../api";
-import useSectionContext from "../hooks/useSectionContext";
-import type { ProjectDetail, Task, TaskFormFields } from "../types/common";
-import CommentList from "./CommentList";
-import DatePicker from "./DatePicker";
+import type { Task, TaskFormFields } from "../types/common";
+import DescriptionField from "./DescriptionField";
+import DescriptionIcon from "./DescriptionIcon";
 import TaskCheckIcon from "./TaskCheckIcon";
-import TaskPriorityMenu from "./TaskPriorityMenu";
-import TaskProjectMenuButton from "./TaskProjectButton";
+import TitleField from "./TitleField";
+import UpdateTaskDialogDudeDate from "./UpdateTaskDialogDueDate";
+import UpdateTaskDialogTags from "./UpdateTaskDialogTags";
+import UpdateTaskPriorityMenu from "./UpdateTaskPriorityMenu";
 import UpdateTaskProjectButton from "./UpdateTaskProjectButton";
-import UpdateTaskTags from "./UpdateTaskTags";
 
-function MenuButtonEditLink(props: MenuButtonEditLinkProps) {
-  // This is taken from https://github.com/sjdemartini/mui-tiptap/blob/main/src/controls/MenuButtonEditLink.tsx
-  // Instead of using a ref to the menu button we use the editor view dom as the
-  // anchor instead. This prevents the LinkBubbleMenu from being positioned incorrectly
-  // when the bubble menu closes as the user interacts with the LinkBubbleMenu.
-  const editor = useRichTextEditorContext();
-  return (
-    <MenuButton
-      tooltipLabel="Link"
-      tooltipShortcutKeys={["mod", "Shift", "U"]}
-      IconComponent={LinkIcon}
-      selected={editor?.isActive("link")}
-      disabled={!editor?.isEditable}
-      onClick={() =>
-        editor?.commands.openLinkBubbleMenu({
-          anchorEl: editor?.view.dom,
-          placement: "bottom",
-        })
-      }
-      {...props}
-    />
-  );
+interface UpdateTaskDialogProps {
+  onClose: () => void;
+  task: Task;
 }
 
-// @link https://github.com/ueberdosis/tiptap/issues/313#issuecomment-1277897635
-const NoNewLine = Extension.create({
-  name: "no_new_line",
-
-  addOptions() {
-    return {
-      onEnter: () => undefined,
-    };
-  },
-
-  addProseMirrorPlugins() {
-    return [
-      new Plugin({
-        key: new PluginKey("eventHandler"),
-        props: {
-          handleKeyDown: (_, event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              this.options.onEnter();
-              return true;
-            }
-          },
-        },
-      }),
-    ];
-  },
-});
-
 export default function UpdateTaskDialog({
-  open,
-  handleClose,
+  onClose,
   task,
-  project,
-}: {
-  open: boolean;
-  handleClose: () => void;
-  task: Task;
-  project: ProjectDetail;
-}) {
+}: UpdateTaskDialogProps) {
   const ref = useRef<HTMLButtonElement>(null);
-  const titleFieldStyles = {
-    "& .tiptap.ProseMirror p ": {
-      fontWeight: (theme) => {
-        return theme.typography.fontWeightMedium;
-      },
-    },
-  };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [formActive, setFormActive] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(task.due_date != null);
   const updateTask = useUpdateTask(task);
+  const [showDatePicker, setShowDatePicker] = useState(task.due_date != null);
   const defaultValues = {
     title: task.title,
     description: task.description,
   };
-  const { control, handleSubmit, watch, formState } = useForm<TaskFormFields>({
+  const { control, handleSubmit, formState } = useForm<TaskFormFields>({
     defaultValues,
   });
 
-  const { field: titleField } = useController({
-    control,
-    name: "title",
-    rules: {
-      required: true,
-      validate: (value) => value.replace(/^(<p>)+|(<\/p>)+$/gi, "").length > 0,
-    },
-  });
-  const { field: descriptionField } = useController({
-    control,
-    name: "description",
-  });
-  const section = useSectionContext();
   const taskMenuOpen = Boolean(anchorEl);
 
   const onSubmit: SubmitHandler<TaskFormFields> = async (data) => {
-    console.log("onSubmit", data);
     try {
+      if (data.description === "<p></p>") {
+        data.description = "";
+      }
       await toast.promise(updateTask.mutateAsync(data), {
         loading: "Updating task...",
         success: "Task updated successfully!",
@@ -176,48 +79,9 @@ export default function UpdateTaskDialog({
     }
   };
 
-  const titleEditor = useEditor({
-    extensions: [
-      StarterKit,
-      LinkBubbleMenuHandler,
-      Link,
-      NoNewLine.configure({ onEnter: handleSubmit(onSubmit) }),
-      Placeholder.configure({ placeholder: "Task name" }),
-    ],
-    content: titleField.value,
-    onUpdate: ({ editor }) => {
-      titleField.onChange(editor.getHTML());
-    },
-  });
-
-  const descriptionEditor = useEditor({
-    extensions: [
-      StarterKit,
-      LinkBubbleMenuHandler,
-      Link,
-      Placeholder.configure({ placeholder: "Description" }),
-    ],
-    content: descriptionField.value,
-    onUpdate: ({ editor }) => {
-      descriptionField.onChange(editor.getHTML());
-    },
-  });
-
-  const sectionId = watch("section");
-  const dueDate = watch("due_date");
-  const priority = watch("priority");
-  const tags = watch("tags");
-
-  // FIXME: Too clunky. Revisit this when you get the chance.
   useEffect(() => {
-    setShowDatePicker(dueDate != null);
-  }, [dueDate]);
-  const handleCloseDatePicker = () => {
-    if (!dueDate) {
-      setShowDatePicker(false);
-    }
-    setShowDatePicker(true);
-  };
+    setShowDatePicker(!!task.due_date);
+  }, [task.due_date]);
 
   const handleOpenTaskMenu = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -253,7 +117,7 @@ export default function UpdateTaskDialog({
   return (
     <>
       <Dialog
-        open={open}
+        open
         slotProps={{
           paper: {
             sx: {
@@ -271,9 +135,9 @@ export default function UpdateTaskDialog({
           >
             <Stack direction="row">
               <Button size="small" startIcon={<TagIcon fontSize="small" />}>
-                {project.title}
+                {task.project_title}
               </Button>
-              {!section.is_default && (
+              {task.section_title && (
                 <>
                   {" "}
                   /{" "}
@@ -281,7 +145,7 @@ export default function UpdateTaskDialog({
                     size="small"
                     startIcon={<SplitscreenIcon fontSize="small" />}
                   >
-                    {section.title}
+                    {task.section_title}
                   </Button>
                 </>
               )}
@@ -296,7 +160,7 @@ export default function UpdateTaskDialog({
               <IconButton size="small" onClick={handleOpenTaskMenu}>
                 <MoreHorizIcon />
               </IconButton>
-              <IconButton size="small" onClick={handleClose}>
+              <IconButton size="small" onClick={onClose}>
                 <CloseIcon />
               </IconButton>
             </Stack>
@@ -325,13 +189,26 @@ export default function UpdateTaskDialog({
                           textDecoration: task.completion_date
                             ? "line-through"
                             : "default",
-                          paddingTop: "8px",
+                          "& p": {
+                            margin: 0,
+                          },
+                          fontSize: (theme: Theme) => {
+                            return theme.typography.h6.fontSize;
+                          },
                         }}
-                      >
-                        {task.title}
-                      </Typography>
+                        dangerouslySetInnerHTML={{
+                          __html: task.title,
+                        }}
+                      />
                       {!task.completion_date && task.description && (
-                        <Typography>{task.description}</Typography>
+                        <Typography
+                          dangerouslySetInnerHTML={{ __html: task.description }}
+                          sx={{
+                            "& p": {
+                              margin: 0,
+                            },
+                          }}
+                        />
                       )}
                       {!task.completion_date && !task.description && (
                         <Box display="flex" alignItems={"center"}>
@@ -351,65 +228,12 @@ export default function UpdateTaskDialog({
                           borderRadius: (theme) => theme.spacing(0.5),
                         }}
                       >
-                        <Box p={1}>
-                          <RichTextEditorProvider editor={titleEditor}>
-                            {titleEditor && (
-                              <BubbleMenu editor={titleEditor}>
-                                <Paper
-                                  onMouseDown={(event) =>
-                                    event.stopPropagation()
-                                  }
-                                >
-                                  <MenuControlsContainer>
-                                    <MenuButtonBold />
-                                    <MenuButtonItalic />
-                                    <MenuButtonStrikethrough />
-                                    <MenuButtonCode />
-                                    <MenuDivider />
-                                    <MenuButtonEditLink />
-                                  </MenuControlsContainer>
-                                </Paper>
-                              </BubbleMenu>
-                            )}
-                            <Box sx={titleFieldStyles}>
-                              <RichTextContent />
-                            </Box>
-                            <LinkBubbleMenu />
-                          </RichTextEditorProvider>
-                        </Box>
-                        <Stack p={1} direction="row" width={"100%"}>
-                          <DescriptionIcon
-                            isVisible={descriptionEditor?.isEmpty}
-                          />
-                          <Box flexGrow={1}>
-                            <RichTextEditorProvider editor={descriptionEditor}>
-                              {descriptionEditor && (
-                                <BubbleMenu editor={descriptionEditor}>
-                                  <Paper
-                                    onMouseDown={(event) =>
-                                      event.stopPropagation()
-                                    }
-                                  >
-                                    <MenuControlsContainer>
-                                      <MenuButtonBold />
-                                      <MenuButtonItalic />
-                                      <MenuButtonStrikethrough />
-                                      <HeadingMenuButtons />
-                                      <MenuButtonBlockquote />
-                                      <MenuButtonCode />
-                                      <MenuButtonBulletedList />
-                                      <MenuButtonOrderedList />
-                                      <MenuDivider />
-                                      <MenuButtonEditLink />
-                                    </MenuControlsContainer>
-                                  </Paper>
-                                </BubbleMenu>
-                              )}
-                              <RichTextContent />
-                              <LinkBubbleMenu />
-                            </RichTextEditorProvider>
-                          </Box>
-                        </Stack>
+                        <TitleField
+                          onEnter={handleSubmit(onSubmit)}
+                          control={control}
+                          p={1}
+                        />
+                        <DescriptionField p={1} control={control} />
                       </Stack>
                       <Stack
                         py={2}
@@ -479,22 +303,22 @@ export default function UpdateTaskDialog({
                       setShowDatePicker(true);
                       setTimeout(() => ref.current?.click(), 0);
                     }}
-                    endIcon={!dueDate && <AddIcon fontSize="small" />}
+                    endIcon={!task.due_date && <AddIcon fontSize="small" />}
                   >
                     <Typography variant="subtitle2">Due Date</Typography>
                   </Button>
                 </Tooltip>
               </Stack>
-              {/* {showDatePicker && (
-                <DatePicker
-                  onClose={handleCloseDatePicker}
+              {showDatePicker && (
+                <UpdateTaskDialogDudeDate
+                  task={task}
+                  setShowDatePicker={setShowDatePicker}
                   disabled={taskIsCompleted}
-                  control={control}
                   ref={ref}
                   variant="text"
                   fullWidth
                 />
-              )} */}
+              )}
               <Divider sx={{ my: 1 }} />
               <Typography
                 variant="subtitle2"
@@ -506,22 +330,17 @@ export default function UpdateTaskDialog({
               >
                 Priority
               </Typography>
-              {/* <TaskPriorityMenu
+              <UpdateTaskPriorityMenu
                 disabled={taskIsCompleted}
-                priority={priority}
+                task={task}
                 fullWidth
                 variant="text"
-                control={control}
                 sx={{
                   ".MuiButton-endIcon": { flexGrow: 1, justifyContent: "end" },
                 }}
-              /> */}
+              />
               <Divider sx={{ my: 1 }} />
-              {/* <UpdateTaskTags
-                tags={tags}
-                control={control}
-                disabled={taskIsCompleted}
-              /> */}
+              <UpdateTaskDialogTags task={task} />
             </Grid>
           </Grid>
         </DialogContent>
@@ -531,8 +350,8 @@ export default function UpdateTaskDialog({
         anchorEl={anchorEl}
         id="task-menu"
         open={taskMenuOpen}
-        onClose={handleClose}
-        onClick={handleClose}
+        onClose={onClose}
+        onClick={onClose}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
@@ -559,67 +378,6 @@ export default function UpdateTaskDialog({
           Delete
         </MenuItem>
       </Menu>
-    </>
-  );
-}
-
-function DescriptionIcon({ isVisible = true }: { isVisible?: boolean }) {
-  return (
-    <Box
-      color="GrayText"
-      mr={1}
-      display={"flex"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      sx={{
-        width: "16px",
-        height: "16px",
-        display: isVisible ? "block" : "none",
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="none"
-        viewBox="0 0 16 16"
-        aria-hidden="true"
-      >
-        <path
-          fill="currentColor"
-          d="M8.5 12a.5.5 0 1 1 0 1h-5a.5.5 0 0 1 0-1h5Zm3.864-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 9H3.636C3.285 9 3 8.777 3 8.5c0-.245.225-.45.522-.491L3.636 8h8.728Zm0-4c.351 0 .636.224.636.5 0 .246-.225.45-.522.492L12.364 5H3.636C3.285 5 3 4.777 3 4.5c0-.245.225-.45.522-.491L3.636 4h8.728Z"
-        ></path>
-      </svg>
-    </Box>
-  );
-}
-
-function HeadingMenuButtons() {
-  const editor = useRichTextEditorContext();
-  return (
-    <>
-      <MenuButton
-        onClick={() =>
-          editor?.chain().focus().toggleHeading({ level: 1 }).run()
-        }
-        tooltipLabel="Heading 1"
-        tooltipShortcutKeys={["mod", "alt", "1"]}
-        selected={editor?.isActive("heading", { level: 1 }) ?? false}
-        disabled={!editor?.isEditable || !editor.can().toggleBold()}
-      >
-        H1
-      </MenuButton>
-      <MenuButton
-        onClick={() =>
-          editor?.chain().focus().toggleHeading({ level: 2 }).run()
-        }
-        tooltipLabel="Heading 2"
-        tooltipShortcutKeys={["mod", "alt", "2"]}
-        selected={editor?.isActive("heading", { level: 2 }) ?? false}
-        disabled={!editor?.isEditable || !editor.can().toggleBold()}
-      >
-        H2
-      </MenuButton>
     </>
   );
 }

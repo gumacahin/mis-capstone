@@ -1,13 +1,16 @@
 import os
 
+import taggit.models
 from django.contrib import admin
 
-from upoutodo.models import Project, Task, UserProfile
+from upoutodo.models import Project, Tag, Task, UserProfile
 
 # Register your models here.
 admin.site.register(UserProfile)
 admin.site.register(Project)
 admin.site.register(Task)
+admin.site.register(Tag)
+admin.site.unregister(taggit.models.Tag)
 
 # Read the environment variable
 ENVIRONMENT = os.getenv("DJANGO_ENV", "development")

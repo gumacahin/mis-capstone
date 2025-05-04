@@ -11,7 +11,7 @@ export default function ToolBarContextProvider({
   const [toolbarAdditionalIcons, setToolbarAdditionalIcons] =
     useState<React.ReactNode>(null);
   const [toolbarTitle, setToolbarTitle] = useState<React.ReactNode>(null);
-  const [toolbarSubtitle, setToolbarSubtitle] = useState<React.ReactNode>(null);
+  const [toolbarBottom, setToolbarBottom] = useState<React.ReactNode>(null);
 
   return (
     <ToolbarContext.Provider
@@ -20,8 +20,8 @@ export default function ToolBarContextProvider({
         setToolbarIcons,
         toolbarTitle,
         setToolbarTitle,
-        toolbarSubtitle,
-        setToolbarSubtitle,
+        toolbarBottom,
+        setToolbarBottom,
         setToolbarAdditionalIcons,
         toolbarAdditionalIcons,
       }}

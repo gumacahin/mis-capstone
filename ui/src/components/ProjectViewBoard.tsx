@@ -19,7 +19,7 @@ import AddTaskButton from "./AddTaskButton";
 import BoardProjectSectionCard from "./BoardProjectSectionCard";
 import BoardTaskList from "./BoardTaskList";
 import BoardViewContainer from "./BoardViewContainer";
-import ProjectViewSectionHeader from "./ProjectSectionCardHeader";
+import ProjectViewSectionCardHeader from "./ProjectSectionCardHeader";
 import ProjectSectionDivider from "./ProjectSectionDivider";
 
 export default function ProjectViewBoard({
@@ -164,7 +164,7 @@ export default function ProjectViewBoard({
                 <SectionContext.Provider key={section.id} value={section}>
                   {section.is_default ? (
                     <BoardProjectSectionCard key={section.id}>
-                      <ProjectViewSectionHeader />
+                      <ProjectViewSectionCardHeader />
                       <BoardTaskList />
                       <CardActions>
                         <AddTaskButton />
@@ -186,7 +186,7 @@ export default function ProjectViewBoard({
                             snapshot.isDragging ? "outlined" : "elevation"
                           }
                         >
-                          <ProjectViewSectionHeader />
+                          <ProjectViewSectionCardHeader />
                           <BoardTaskList />
                           <CardActions>
                             <AddTaskButton />

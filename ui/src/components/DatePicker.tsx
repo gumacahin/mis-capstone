@@ -11,7 +11,6 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
 import Tooltip from "@mui/material/Tooltip";
@@ -30,7 +29,6 @@ import type { TaskFormFields } from "../types/common";
 type DatePickerProps = DateCalendarProps<Dayjs> & {
   control: Control<TaskFormFields>;
   onClose?: () => void;
-  compact?: boolean;
 } & ButtonGroupProps;
 
 const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
@@ -147,7 +145,10 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 }}
               >
                 <List>
-                  <ListItem disablePadding>
+                  <ListItem
+                    disablePadding
+                    secondaryAction={dayjs().format("ddd")}
+                  >
                     <ListItemButton
                       onClick={() => {
                         field.onChange(dayjs());
@@ -158,12 +159,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                         <TodayIcon />
                       </ListItemIcon>
                       <ListItemText primary={"Today"} />
-                      <ListItemSecondaryAction>
-                        {dayjs().format("ddd")}
-                      </ListItemSecondaryAction>
                     </ListItemButton>
                   </ListItem>
-                  <ListItem disablePadding>
+                  <ListItem
+                    disablePadding
+                    secondaryAction={dayjs().add(1, "day").format("ddd")}
+                  >
                     <ListItemButton
                       onClick={() => {
                         const tomorrow = dayjs().add(1, "day");
@@ -175,12 +176,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                         <WbSunnyIcon />
                       </ListItemIcon>
                       <ListItemText primary={"Tomorrow"} />
-                      <ListItemSecondaryAction>
-                        {dayjs().add(1, "day").format("ddd")}
-                      </ListItemSecondaryAction>
                     </ListItemButton>
                   </ListItem>
-                  <ListItem disablePadding>
+                  <ListItem
+                    disablePadding
+                    secondaryAction={comingWeekend.format("ddd")}
+                  >
                     <ListItemButton
                       onClick={() => {
                         handleClose();
@@ -191,12 +192,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                         <WeekendIcon />
                       </ListItemIcon>
                       <ListItemText primary={"This weekend"} />
-                      <ListItemSecondaryAction>
-                        {comingWeekend.format("ddd")}
-                      </ListItemSecondaryAction>
                     </ListItemButton>
                   </ListItem>
-                  <ListItem disablePadding>
+                  <ListItem
+                    disablePadding
+                    secondaryAction={nextWeek.format("ddd")}
+                  >
                     <ListItemButton
                       onClick={() => {
                         field.onChange(nextWeek);
@@ -207,9 +208,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                         <NextWeekIcon />
                       </ListItemIcon>
                       <ListItemText primary={"Next Week"} />
-                      <ListItemSecondaryAction>
-                        {nextWeek.format("ddd MMM D")}
-                      </ListItemSecondaryAction>
                     </ListItemButton>
                   </ListItem>
                   {field.value && (

@@ -26,7 +26,7 @@ export default function UpcomingPage() {
     "upcomingView",
     "list",
   );
-  const { setToolbarIcons } = useToolbarContext();
+  const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   const handleViewChange = useCallback(
     (view: ProjectViewType) => {
@@ -45,8 +45,11 @@ export default function UpcomingPage() {
         />
       </Stack>,
     );
-    return () => setToolbarIcons(null);
-  }, [handleViewChange, setToolbarIcons, view]);
+    return () => {
+      setToolbarIcons(null);
+      setToolbarTitle(null);
+    };
+  }, [handleViewChange, setToolbarIcons, setToolbarTitle, view]);
 
   return (
     <InboxDefaultSectionProvider>

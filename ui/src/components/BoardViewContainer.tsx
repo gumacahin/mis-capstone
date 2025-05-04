@@ -7,6 +7,7 @@ const BoardViewContainer = forwardRef<HTMLDivElement, StackProps>(
   (props: StackProps, ref) => {
     const { children, sx, ...rest } = props;
     const scrollbarWidth = useScrollbarWidth();
+    const titleHeight = 32; // px
     return (
       <Stack
         direction="row"

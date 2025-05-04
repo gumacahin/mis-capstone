@@ -1,28 +1,22 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from taggit.models import Tag
 
-from upoutodo.models import Task
-from upoutodo.serializers import TagSerializer
+from upoutodo.models import Tag
+from upoutodo.serializers import TagDetailSerializer, TagSerializer
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.all().order_by("name")
     permission_classes = [IsAuthenticated]
     serializer_class = TagSerializer
+    lookup_field = "slug"
 
     def get_queryset(self):
         user = self.request.user
-        tasks = Task.objects.filter(section__project__created_by=user)
-        tags = (
-            super()
-            .get_queryset()
-            .filter(
-                taggit_taggeditem_items__object_id__in=tasks.values_list(
-                    "id", flat=True
-                ),
-                taggit_taggeditem_items__content_type__model="task",
-            )
-            .distinct()
-        )
+        tags = super().get_queryset().filter(created_by=user).distinct()
         return tags
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return TagDetailSerializer
+        return super().get_serializer_class()
