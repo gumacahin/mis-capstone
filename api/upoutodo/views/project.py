@@ -1,7 +1,7 @@
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.db import models, transaction
-from rest_framework import permissions, serializers, viewsets, status
+from rest_framework import permissions, serializers, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from upoutodo.models import Project
 from upoutodo.serializers import ProjectDetailSerializer, ProjectSerializer
@@ -46,6 +46,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_create(self, serializer):
+        project_count = Project.objects.filter(
+            created_by=self.request.user, is_default=False
+        ).count()
+        if project_count >= Project.MAX_PROJECTS_PER_USER:
+            raise serializers.ValidationError(
+                f"You can only create {Project.MAX_PROJECTS_PER_USER} projects."
+            )
         above_project_id = self.request.data.get("above_project_id", None)
         below_project_id = self.request.data.get("below_project_id", None)
         if above_project_id and below_project_id:

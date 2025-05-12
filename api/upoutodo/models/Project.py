@@ -12,6 +12,7 @@ class ProjectViewMode(models.TextChoices):
 class Project(models.Model):
     DEFAULT_PROJECT_SECTION_TITLE = "(No Section)"
     DEFAULT_PROJECT_TITLE = "Inbox"
+    MAX_PROJECTS_PER_USER = 10
 
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_projects"
