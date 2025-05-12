@@ -72,9 +72,9 @@ def test_task_retrieve(auth_client, task):
 
 
 @pytest.mark.django_db
-def test_task_create_title_only_task(auth_client):
+def test_task_create_title_only_task(auth_client, section):
     url = reverse("task-list")
-    data = {"title": fake.sentence()}
+    data = {"title": fake.sentence(), "section": section.id}
     response = auth_client.post(url, data=data, format="json")
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["title"] == data["title"]
@@ -84,7 +84,7 @@ def test_task_create_title_only_task(auth_client):
 def test_task_update(auth_client, task):
     updated_title = fake.sentence()
     url = reverse("task-detail", args=[task.id])
-    data = {"title": updated_title}
+    data = {"title": updated_title, "section": task.section.id}
     response = auth_client.put(url, data=data, format="json")
     assert response.status_code == status.HTTP_200_OK
     assert response.data["title"] == updated_title

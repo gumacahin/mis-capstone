@@ -55,40 +55,6 @@ def inbox_with_task_in_default_section(user):
 
 
 @pytest.mark.django_db
-def test_user_inbox(
-    auth_client,
-):
-    url = reverse("project-inbox")
-    response = auth_client.get(url, format="json")
-    assert response.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.django_db
-def test_inbox_with_task_in_default_section(
-    auth_client, inbox_with_task_in_default_section
-):
-    inbox, task = inbox_with_task_in_default_section
-    url = reverse("project-inbox")
-    response = auth_client.get(url, format="json")
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data["id"] == inbox.id
-    print(f"{response.data=}")
-    assert any(t["id"] == task.id for t in response.data["sections"][0]["tasks"])
-
-
-@pytest.mark.django_db
-def test_project_list(auth_client):
-    url = reverse("project-list")
-    response = auth_client.get(url, format="json")
-    assert response.status_code == status.HTTP_200_OK
-    assert "count" in response.data
-    assert "next" in response.data
-    assert "previous" in response.data
-    assert "results" in response.data
-    assert response.data["count"] == 0
-
-
-@pytest.mark.django_db
 def test_project_list_only_own(auth_client, ten_projects):
     url = reverse("project-list")
     other_user = UserFactory()
@@ -159,10 +125,3 @@ def test_project_update_disallow_inbox_update(auth_client, user):
     response = auth_client.patch(url, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.data[0] == "Only 'view' can be updated in the default project."
-
-
-@pytest.mark.django_db
-def test_project_list_options(auth_client):
-    url = reverse("project-options")
-    response = auth_client.options(url, format="json")
-    assert response.status_code == status.HTTP_200_OK

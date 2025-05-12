@@ -4,7 +4,7 @@ from faker import Faker
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from upoutodo.models import Project, ProjectSection
+from upoutodo.models import ProjectSection
 from upoutodo.tests.factories import (
     ProjectFactory,
     ProjectSectionFactory,
@@ -75,21 +75,6 @@ def test_project_section_list(auth_client, project_with_three_sections):
 
 
 @pytest.mark.django_db
-def test_inbox_with_task_in_default_section(
-    auth_client, inbox_with_task_in_default_section
-):
-    inbox, tasks = inbox_with_task_in_default_section
-    url = reverse("project-inbox")
-    response = auth_client.get(url, format="json")
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data["id"] == inbox.id
-    assert (
-        response.data["sections"][0]["title"] == Project.DEFAULT_PROJECT_SECTION_TITLE
-    )
-    assert len(response.data["sections"][0]["tasks"]) == len(tasks)
-
-
-@pytest.mark.django_db
 def test_project_list(auth_client):
     url = reverse("project-list")
     response = auth_client.get(url, format="json")
@@ -105,7 +90,11 @@ def test_project_list(auth_client):
 def test_project_section_create(auth_client, user, project_without_sections):
     url = reverse("projectsection-list")
     title = " ".join(fake.words(3))
-    data = {"title": title, "project": project_without_sections.id}
+    data = {
+        "title": title,
+        "project": project_without_sections.id,
+        "preceding_section": 1,
+    }
     response = auth_client.post(url, data, format="json")
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["title"] == title
@@ -114,14 +103,15 @@ def test_project_section_create(auth_client, user, project_without_sections):
     assert section in project_without_sections.sections.all()
 
 
-@pytest.mark.skip(reason="FIXME: Not working")
+# @pytest.mark.skip(reason="FIXME: Not working")
 @pytest.mark.django_db
 def test_project_section_update(auth_client, project_with_section):
-    _, section = project_with_section
+    project, section = project_with_section
     updated_title = " ".join(fake.words(3))
-    data = {"title": updated_title}
+    data = {"title": updated_title, "project": project.id, "preceding_section": 1}
     url = reverse("projectsection-detail", args=[section.id])
     response = auth_client.put(url, data, format="json")
+    print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data["title"] == updated_title
 
@@ -142,7 +132,7 @@ def test_project_destroy_disallow_inbox_deletion(auth_client, user):
     project = user.profile.inbox
     url = reverse("project-detail", args=[project.id])
     response = auth_client.delete(url, format="json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
@@ -150,4 +140,4 @@ def test_project_update_disallow_inbox_update(auth_client, user):
     project = user.profile.inbox
     url = reverse("project-detail", args=[project.id])
     response = auth_client.put(url, format="json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

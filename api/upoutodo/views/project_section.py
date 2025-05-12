@@ -1,7 +1,7 @@
 from django.db import models, transaction
-from rest_framework import permissions, serializers, viewsets, status
-from rest_framework.response import Response
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from upoutodo.models import ProjectSection
 from upoutodo.serializers import ProjectSectionSerializer
@@ -66,22 +66,23 @@ class ProjectSectionViewSet(viewsets.ModelViewSet):
         source_project = serializer.validated_data.get("source_project")
         destination_project = serializer.validated_data.get("project")
 
-        source_project_sections = ProjectSection.objects.filter(
-            is_default=False, project=source_project
-        ).order_by("order")
-        for order, section in enumerate(source_project_sections, start=1):
-            section.order = order
-        ProjectSection.objects.bulk_update(source_project_sections, ["order"])
-        max_order = (
-            destination_project.sections.aggregate(max_order=models.Max("order"))[
-                "max_order"
-            ]
-            # The default section is always 0 but just in case
-            or 0
-        )
-        serializer.save(
-            order=max_order + 1,
-        )
+        if destination_project != source_project:
+            source_project_sections = ProjectSection.objects.filter(
+                is_default=False, project=source_project
+            ).order_by("order")
+            for order, section in enumerate(source_project_sections, start=1):
+                section.order = order
+            ProjectSection.objects.bulk_update(source_project_sections, ["order"])
+            max_order = (
+                destination_project.sections.aggregate(max_order=models.Max("order"))[
+                    "max_order"
+                ]
+                # The default section is always 0 but just in case
+                or 0
+            )
+            serializer.save(
+                order=max_order + 1,
+            )
 
     def perform_destroy(self, instance):
         if instance.is_default:

@@ -39,8 +39,5 @@ class Project(models.Model):
     def default_section(self):
         return self.sections.get(is_default=True)
 
-    def __str__(self):
-        return f'"{self.title}" created by {self.created_by}'
-
     class Meta:
         ordering = ["order", "created_at"]

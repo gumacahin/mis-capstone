@@ -1,6 +1,6 @@
 import pytest
 
-from api.upoutodo.serializers import ProjectSectionSerializer
+from upoutodo.serializers import ProjectSectionSerializer
 from upoutodo.tests.factories import ProjectFactory, UserFactory
 
 
@@ -24,6 +24,7 @@ def test_project_serializer_valid_data(project):
     valid_data = {
         "title": "Test Section",
         "project": project.id,
+        "preceding_section": 1,
     }
     serializer = ProjectSectionSerializer(data=valid_data)
     assert serializer.is_valid()

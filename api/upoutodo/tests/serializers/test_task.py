@@ -36,9 +36,9 @@ def task_data(section):
 
 
 @pytest.mark.django_db
-def test_only_title_is_required():
-    title_only = {"title": fake.sentence()}
-    serializer = TaskSerializer(data=title_only)
+def test_title_and_section_are_required(section):
+    data = {"title": fake.sentence(), "section": section.id}
+    serializer = TaskSerializer(data=data)
     assert serializer.is_valid()
 
 
