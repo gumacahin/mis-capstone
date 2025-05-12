@@ -47,7 +47,7 @@ const routes = [
         name: ROUTES.HOME,
       },
       {
-        path: "app",
+        path: "/",
         name: ROUTES.APP,
         element: <ProtectedRoute />,
         children: [

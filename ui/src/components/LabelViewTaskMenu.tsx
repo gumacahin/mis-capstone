@@ -52,7 +52,7 @@ export default function LabelViewTaskMenu({
 
   const handleGoToProject = (task: Task) => {
     handleCloseTaskMenu();
-    navigate(`/app/project/${task.project}#task-${task.id}`);
+    navigate(`/project/${task.project}#task-${task.id}`);
   };
 
   const handleOpenDatePicker = (e: MouseEvent<HTMLButtonElement>) => {

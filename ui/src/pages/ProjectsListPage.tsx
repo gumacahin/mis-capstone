@@ -174,7 +174,7 @@ export default function ProjectsListPage() {
                       >
                         <ListItemButton
                           onClick={() => {
-                            navigate(`/app/project/${project.id}`);
+                            navigate(`/project/${project.id}`);
                           }}
                         >
                           <ListItemText primary={project.title} />

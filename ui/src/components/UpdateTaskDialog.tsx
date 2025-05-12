@@ -141,7 +141,7 @@ export default function UpdateTaskDialog({
                 startIcon={<TagIcon fontSize="small" />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/app/project/${task.project}#task-${task.id}`);
+                  navigate(`/project/${task.project}#task-${task.id}`);
                   onClose();
                 }}
               >
@@ -157,7 +157,7 @@ export default function UpdateTaskDialog({
                     startIcon={<SplitscreenIcon fontSize="small" />}
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/app/project/${task.project}#task-${task.id}`);
+                      navigate(`/project/${task.project}#task-${task.id}`);
                       onClose();
                     }}
                   >

@@ -127,7 +127,7 @@ export default function LabelListPage() {
                       >
                         <ListItemButton
                           onClick={() => {
-                            navigate(`/app/label/${slugify(tag.name)}`);
+                            navigate(`/label/${slugify(tag.name)}`);
                           }}
                         >
                           <ListItemText primary={tag.name} />

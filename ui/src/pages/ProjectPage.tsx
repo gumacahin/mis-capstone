@@ -24,7 +24,7 @@ export default function ProjectPage() {
   useEffect(() => {
     setToolbarTitle(
       <Stack direction="row" spacing={1} alignItems="center">
-        <Button onClick={() => navigate("/app/projects")}>My Projects /</Button>
+        <Button onClick={() => navigate("/projects")}>My Projects /</Button>
         <ViewPageTitle title={projectTitle} />
       </Stack>,
     );

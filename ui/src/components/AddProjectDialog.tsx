@@ -54,7 +54,7 @@ export default function AddProjectDialog({
         success: "Project added successfully!",
         error: "Error adding project.",
       });
-      navigate(`/app/project/${project.id}/`);
+      navigate(`/project/${project.id}/`);
     } catch (error) {
       console.error("Error adding project", error);
     } finally {

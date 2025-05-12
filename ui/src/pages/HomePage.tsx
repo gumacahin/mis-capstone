@@ -13,7 +13,7 @@ function HomePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/app");
+      navigate("/today");
     }
   }, [isAuthenticated, navigate]);
 

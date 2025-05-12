@@ -45,7 +45,7 @@ export default function LabelTasksPage() {
     );
     setToolbarTitle(
       <Stack direction="row" spacing={1} alignItems="center">
-        <Button onClick={() => navigate("/app/labels")}>Labels /</Button>
+        <Button onClick={() => navigate("/labels")}>Labels /</Button>
         <ViewPageTitle title={label?.name} />
       </Stack>,
     );

@@ -44,7 +44,7 @@ export default function AddLabelDialog({
         success: "Label added successfully!",
         error: "Failed to add label.",
       });
-      navigate(`/app/label/${label}/`);
+      navigate(`/label/${label}/`);
     } catch (error) {
       console.error("Error adding label", error);
     } finally {
