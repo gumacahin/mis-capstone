@@ -13,8 +13,8 @@ class Task(models.Model):
 
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    completion_date = models.DateField(blank=True, null=True)
-    due_date = models.DateField(blank=True, null=True)
+    completion_date = models.DateTimeField(blank=True, null=True)
+    due_date = models.DateTimeField(blank=True, null=True)
     order = models.PositiveIntegerField(default=1)
 
     class Priority(models.TextChoices):
