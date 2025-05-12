@@ -59,7 +59,7 @@ const AddSectionButton = ({
 
   const title = watch("title");
   return (
-    <Box>
+    <Box width={"100%"}>
       {open ? (
         <Stack spacing={1} component={"form"} onSubmit={handleSubmit(onSubmit)}>
           <TextField
@@ -67,17 +67,11 @@ const AddSectionButton = ({
             size="small"
             id="section-title"
             aria-label="Section Name"
-            variant="outlined"
             placeholder="Name this section"
             {...register("title", { required: true })}
           />
           <Stack justifyContent="start" direction="row" spacing={1}>
-            <Button
-              size="small"
-              type="submit"
-              variant="outlined"
-              disabled={!title}
-            >
+            <Button size="small" type="submit" disabled={!title}>
               Add Section
             </Button>
             <Button size="small" onClick={() => setOpen(false)}>
@@ -245,13 +239,16 @@ export default function ProjectViewList({
               {project.sections.map((section: Section, index: number) => (
                 <SectionContext.Provider value={section} key={section.id}>
                   {section.is_default ? (
-                    <ListProjectSectionCard key={section.id}>
-                      <ProjectSectionCardHeader />
-                      <ListTaskList />
-                      <CardActions>
-                        <AddTaskButton />
-                      </CardActions>
-                    </ListProjectSectionCard>
+                    <>
+                      <ListProjectSectionCard key={section.id}>
+                        <ProjectSectionCardHeader />
+                        <ListTaskList />
+                        <CardActions>
+                          <AddTaskButton />
+                        </CardActions>
+                      </ListProjectSectionCard>
+                      <AddSectionButton precedingSection={section} />
+                    </>
                   ) : (
                     <Draggable
                       draggableId={`draggable-section-${section.id}`}

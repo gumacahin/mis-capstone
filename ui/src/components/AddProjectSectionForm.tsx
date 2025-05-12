@@ -46,7 +46,6 @@ export default function AddProjectSectionForm({
         size="small"
         id="section-title"
         aria-label="Section Name"
-        variant="outlined"
         placeholder="Name this section"
         {...register("title", { required: true })}
       />
@@ -55,7 +54,6 @@ export default function AddProjectSectionForm({
           sx={{ textWrap: "nowrap" }}
           size="small"
           type="submit"
-          variant="outlined"
           disabled={!title}
         >
           Add Section

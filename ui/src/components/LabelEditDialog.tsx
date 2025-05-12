@@ -92,7 +92,7 @@ export default function LabelEditDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button loading={loading} type="submit" variant="outlined">
+        <Button loading={loading} type="submit">
           Update Label
         </Button>
       </DialogActions>

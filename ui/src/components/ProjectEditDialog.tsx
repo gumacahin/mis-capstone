@@ -114,7 +114,7 @@ export default function ProjectEditDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button loading={isLoading} type="submit" variant="outlined">
+        <Button loading={isLoading} type="submit">
           Update Project
         </Button>
       </DialogActions>

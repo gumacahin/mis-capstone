@@ -40,9 +40,7 @@ export default function ProjectDeleteDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button variant={"outlined"} onClick={handleDelete}>
-          Delete
-        </Button>
+        <Button onClick={handleDelete}>Delete</Button>
       </DialogActions>
     </Dialog>
   );

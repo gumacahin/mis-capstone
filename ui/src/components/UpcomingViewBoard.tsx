@@ -113,7 +113,7 @@ export default function UpcomingViewBoard() {
     return () => {
       setToolbarTitle(null);
     };
-  }, []);
+  }, [setToolbarTitle]);
 
   return (
     <InboxDefaultSectionProvider>
@@ -182,19 +182,19 @@ function DatePager({
   selectedDate: Dayjs;
   handleDateSelect: (date: Dayjs) => void;
 }) {
-  const getStartOfNextWeek = (currentDate: Date) => {
+  const getStartOfNextWeek = (currentDate: Dayjs) => {
     const currentDay = dayjs(currentDate);
     const startOfNextWeek = currentDay.add(1, "week").startOf("week");
-    return startOfNextWeek.toDate();
+    return startOfNextWeek;
   };
 
-  const getStartOfPreviousWeek = (currentDate: Date) => {
+  const getStartOfPreviousWeek = (currentDate: Dayjs) => {
     const currentDay = dayjs(currentDate);
     const startOfPreviousWeek = currentDay.subtract(1, "week").startOf("week");
-    return startOfPreviousWeek.toDate();
+    return startOfPreviousWeek;
   };
 
-  const isDateInSelectedWeek = (selectedDate: Date) => {
+  const isDateInSelectedWeek = (selectedDate: Dayjs) => {
     const startOfWeek = dayjs(selectedDate).startOf("week").add(1, "day"); // Start from Monday
     const endOfWeek = dayjs(selectedDate).endOf("week").add(1, "day"); // End on Sunday
     const givenDate = dayjs();
@@ -216,7 +216,7 @@ function DatePager({
       <Button
         variant="outlined"
         onClick={() => {
-          handleDateSelect(dayjs().toDate());
+          handleDateSelect(dayjs());
         }}
       >
         Today

@@ -129,7 +129,10 @@ function ViewMenu({
             aria-label="view options"
             aria-labelledby="view-options-label"
             value={view}
-            onChange={(_, value) => handleViewChange(value)}
+            onChange={(_, value) => {
+              handleViewChange(value);
+              handleClose();
+            }}
           >
             <ToggleButton
               value="list"

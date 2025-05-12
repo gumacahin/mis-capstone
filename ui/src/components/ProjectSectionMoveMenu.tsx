@@ -67,7 +67,6 @@ export default function ProjectSectionMoveMenu({
           size="small"
           id="section-project-menu-search"
           aria-label="Search"
-          variant="outlined"
           placeholder="Type a project name"
           onKeyDown={(event) => {
             // Prevent menu items from getting focused when typing.

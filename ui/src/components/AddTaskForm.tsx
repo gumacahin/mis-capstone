@@ -136,9 +136,7 @@ export default function TaskForm({
         />
         <Stack spacing={1} direction="row">
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="outlined">
-            Save
-          </Button>
+          <Button type="submit">Save</Button>
         </Stack>
       </CardActions>
     </Card>

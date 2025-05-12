@@ -108,9 +108,11 @@ export default function TaskForm({
     }
   };
 
+  const title = watch("title");
   const priority = watch("priority");
   const tags = watch("tags");
   const sectionId = watch("section");
+  const titleIsEmpty = title === "" || title === "<p></p>";
 
   return (
     <Card
@@ -140,7 +142,7 @@ export default function TaskForm({
           <Button disabled={loading} onClick={handleClose}>
             Cancel
           </Button>
-          <Button loading={loading} type="submit" variant="outlined">
+          <Button disabled={titleIsEmpty} loading={loading} type="submit">
             Save
           </Button>
         </Stack>

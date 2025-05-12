@@ -121,7 +121,7 @@ export default function AddProjectDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button loading={isLoading} type="submit" variant="outlined">
+        <Button loading={isLoading} type="submit">
           Add Project
         </Button>
       </DialogActions>

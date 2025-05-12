@@ -69,7 +69,7 @@ export default function ProjectSectionEditDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button loading={isLoading} type="submit" variant="outlined">
+        <Button loading={isLoading} type="submit">
           Update Section
         </Button>
       </DialogActions>

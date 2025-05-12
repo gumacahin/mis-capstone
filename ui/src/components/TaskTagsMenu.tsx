@@ -96,7 +96,6 @@ export default function TaskTagsMenu({
           id="task-labels-search"
           aria-label="Search for labels"
           placeholder="Type a label"
-          variant="outlined"
           size="small"
           onKeyDown={(event) => {
             // Prevent menu items from getting focused when typing.
