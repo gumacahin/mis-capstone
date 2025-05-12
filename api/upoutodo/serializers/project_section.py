@@ -28,6 +28,22 @@ class ProjectSectionSerializer(serializers.HyperlinkedModelSerializer):
             "source_project",
         ]
 
+    def validate_project(self, value):
+        request = self.context["request"]
+        if value.created_by != request.user:
+            raise serializers.ValidationError(
+                "You do not have permission to modify this project."
+            )
+        return value
+
+    def validate_source_project(self, value):
+        request = self.context["request"]
+        if value.created_by != request.user:
+            raise serializers.ValidationError(
+                "You do not have permission to modify this project."
+            )
+        return value
+
     def validate(self, data):
         preceding_section = data.pop("preceding_section", None)
         data["order"] = (
