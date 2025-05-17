@@ -10,7 +10,7 @@ from upoutodo.serializers import CommentSerializer
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.filter(is_public=True, is_removed=False).order_by(
-        "-submit_date"
+        "submit_date"
     )
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
