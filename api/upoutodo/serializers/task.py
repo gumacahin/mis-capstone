@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
@@ -57,11 +56,6 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             return None
         return section_title
 
-    def validate_due_date(self, value):
-        if value and value < timezone.now().date():
-            raise serializers.ValidationError("Date cannot be in the past")
-        return value
-
     def validate(self, data):
         above_task = data.pop("above_task", None)
         below_task = data.pop("below_task", None)
@@ -99,3 +93,29 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             instance.tags.set(tag_objects)
 
         return instance
+
+
+class TaskAdminSerializer(TaskSerializer):
+    created_by = serializers.PrimaryKeyRelatedField(
+        source="section.project.created_by.id", read_only=True
+    )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True,
+        required=False,
+    )
+
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "title",
+            "description",
+            "due_date",
+            "priority",
+            "tags",
+            "completion_date",
+            "order",
+            "project",
+            "created_by",
+        ]

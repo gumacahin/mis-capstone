@@ -30,7 +30,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ["is_faculty", "is_student", "name"]
+        fields = ["is_faculty", "is_student", "is_admin", "name"]
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

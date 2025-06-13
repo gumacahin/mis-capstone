@@ -1,3 +1,6 @@
+from .admin import AdminProjectViewSet  # noqa: F401
+from .admin import AdminTaskViewSet  # noqa: F401
+from .admin import AdminUserViewSet  # noqa: F401
 from .comment import CommentViewSet  # noqa: F401
 from .project import ProjectViewSet  # noqa: F401
 from .project_section import ProjectSectionViewSet  # noqa: F401

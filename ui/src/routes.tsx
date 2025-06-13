@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
+import AdminPage from "./pages/AdminPage";
 import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
 import LabelsListPage from "./pages/LabelsListPage";
@@ -14,6 +15,7 @@ import UpcomingPage from "./pages/UpcomingPage";
 
 const HOME = "home";
 const APP = "app";
+const ADMIN = "admin";
 const TODAY = "today";
 const INBOX = "inbox";
 const UPCOMING = "upcoming";
@@ -26,6 +28,7 @@ const SETTINGS = "settings";
 export const ROUTES = {
   HOME,
   APP,
+  ADMIN,
   TODAY,
   INBOX,
   UPCOMING,
@@ -45,6 +48,11 @@ const routes = [
         index: true,
         element: <HomePage />,
         name: ROUTES.HOME,
+      },
+      {
+        path: "admin/*",
+        element: <AdminPage />,
+        name: ROUTES.ADMIN,
       },
       {
         path: "/",

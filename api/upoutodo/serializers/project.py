@@ -1,6 +1,14 @@
 from rest_framework import serializers
 
 from upoutodo.models import Project
+from upoutodo.serializers.project_section import ProjectSectionSerializer
+
+
+class ProjectAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = "__all__"
+        read_only_fields = ["created_at", "updated_at"]
 
 
 class BaseProjectSerializer(serializers.ModelSerializer):
@@ -36,14 +44,7 @@ class ProjectSerializer(BaseProjectSerializer):
 
 
 class ProjectDetailSerializer(BaseProjectSerializer):
-    sections = serializers.SerializerMethodField()
+    sections = ProjectSectionSerializer(many=True, read_only=True)
 
     class Meta(BaseProjectSerializer.Meta):
         fields = BaseProjectSerializer.Meta.fields + ["sections"]
-
-    def get_sections(self, obj):
-        # Avoid circular import by importing here
-        from upoutodo.serializers import ProjectSectionSerializer
-
-        sections = obj.sections.all()
-        return ProjectSectionSerializer(sections, many=True).data

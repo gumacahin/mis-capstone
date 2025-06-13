@@ -11,6 +11,7 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=100, blank=True)
     is_student = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     @property
     def inbox(self):

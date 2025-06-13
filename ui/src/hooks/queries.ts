@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs, { type Dayjs } from "dayjs";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 import type {
   Comment,
   PaginatedResponse,
@@ -16,11 +18,11 @@ import type {
 } from "../types/common";
 import { slugify } from "../utils";
 
-const useApiClient = () => {
+export const useApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
 
   const apiClient = axios.create({
-    baseURL: "http://localhost:3000/api/",
+    baseURL: API_BASE_URL,
   });
 
   apiClient.interceptors.request.use(async (config) => {

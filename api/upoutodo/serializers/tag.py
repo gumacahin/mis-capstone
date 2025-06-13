@@ -5,6 +5,12 @@ from upoutodo.models import Tag, Task
 from .task import TaskSerializer
 
 
+class TagAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ["id", "name", "created_by"]
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -29,4 +35,4 @@ class TagDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ["id", "name", "tasks"]
+        fields = ["id", "name", "tasks", "created_by"]
