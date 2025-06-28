@@ -28,9 +28,16 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
     class Meta:
         model = UserProfile
         fields = ["is_faculty", "is_student", "is_admin", "name"]
+
+    def get_name(self, obj):
+        if obj.name:
+            return obj.name
+        return f"User {obj.user.id}"
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -49,3 +56,18 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "projects",
         ]
         read_only_fields = ["id", "profile", "projects"]
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop("profile", None)
+        validated_data.pop("created_projects", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if profile_data:
+            profile = instance.profile
+            for attr, value in profile_data.items():
+                setattr(profile, attr, value)
+            profile.save()
+
+        return instance

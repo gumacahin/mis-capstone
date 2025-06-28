@@ -797,3 +797,14 @@ export function useDuplicateTask(task: Task) {
     },
   });
 }
+
+export const useDashboard = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["dashboard"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("dashboard");
+      return data;
+    },
+  });
+};

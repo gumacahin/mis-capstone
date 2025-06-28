@@ -16,6 +16,8 @@ class Task(models.Model):
     completion_date = models.DateTimeField(blank=True, null=True)
     due_date = models.DateTimeField(blank=True, null=True)
     order = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Priority(models.TextChoices):
         NONE = "NONE", "None"
