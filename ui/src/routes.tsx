@@ -104,6 +104,10 @@ const routes = [
             element: <SettingsPage />,
             name: ROUTES.SETTINGS,
           },
+          {
+            path: "*",
+            element: <Navigate to="today" replace />,
+          },
         ],
       },
     ],
