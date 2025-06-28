@@ -121,6 +121,9 @@ export default function UpcomingViewList() {
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
+  const tasksDueToday = tasksToday.filter((task) =>
+    dayjs(task.due_date).isSame(dayjs(), "day"),
+  );
 
   useEffect(() => {
     if (data?.results) {
@@ -376,9 +379,13 @@ export default function UpcomingViewList() {
                 ) : (
                   <ListTaskList
                     hideDueDates
-                    tasks={tasks.filter((task: Task) =>
-                      dayjs(task.due_date).isSame(dayjs(date)),
-                    )}
+                    tasks={
+                      dayjs(date).isSame(dayjs(), "day")
+                        ? tasksDueToday
+                        : tasks.filter((task: Task) =>
+                            dayjs(task.due_date).isSame(dayjs(date)),
+                          )
+                    }
                   />
                 )}
                 <CardActions>

@@ -53,6 +53,9 @@ export default function UpcomingViewBoard() {
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
+  const tasksDueToday = tasksToday.filter((task) =>
+    dayjs(task.due_date).isSame(dayjs(), "day"),
+  );
 
   const handleDateSelect = (date: Dayjs) => {
     setSelectedDate(date);
@@ -162,9 +165,13 @@ export default function UpcomingViewBoard() {
                 <BoardDateTasks
                   date={dayjs(date)}
                   hideDueDates
-                  tasks={tasks.filter((task: Task) =>
-                    dayjs(task.due_date).isSame(dayjs(date)),
-                  )}
+                  tasks={
+                    dayjs(date).isSame(dayjs(), "day")
+                      ? tasksDueToday
+                      : tasks.filter((task: Task) =>
+                          dayjs(task.due_date).isSame(dayjs(date)),
+                        )
+                  }
                 />
               )}
             </Fragment>
