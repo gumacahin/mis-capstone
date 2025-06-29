@@ -24,7 +24,10 @@ import type { ProjectViewType } from "../types/common";
 export default function LabelTasksPage() {
   const { slug } = useParams();
   const { isPending, isError, data: label } = useLabel(slug!);
-  const [view, setView] = useLocalStorage<ProjectViewType>("labelView", "list");
+  const [view, setView] = useLocalStorage<ProjectViewType>(
+    "upoutodo.labelView",
+    "list",
+  );
   const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
   const navigate = useNavigate();
 

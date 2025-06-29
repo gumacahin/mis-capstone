@@ -23,7 +23,7 @@ dayjs.extend(relativeTime);
 
 export default function UpcomingPage() {
   const [view, setView] = useLocalStorage<ProjectViewType>(
-    "upcomingView",
+    "upoutodo.upcomingView",
     "list",
   );
   const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
