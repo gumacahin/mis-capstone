@@ -71,9 +71,13 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
         return "Date";
       }
       const givenDate = dayjs(date).startOf("day");
+      const yesterday = dayjs().subtract(1, "day").startOf("day");
       const today = dayjs().startOf("day");
       const tomorrow = dayjs().add(1, "day").startOf("day");
       const sevenDaysFromNow = dayjs().add(7, "day").startOf("day"); // End on Sun
+      if (givenDate.isSame(yesterday)) {
+        return "Yesterday";
+      }
       if (givenDate.isSame(today)) {
         return "Today";
       }
