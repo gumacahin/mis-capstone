@@ -1,8 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import CircularProgress from "@mui/material/CircularProgress";
 import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -10,25 +8,29 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import LoginButton from "../components/LoginButton";
+import Spinner from "../components/Spinner";
+import useProfileContext from "../hooks/useProfileContext";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth0();
   const navigate = useNavigate();
+  const profile = useProfileContext();
 
   useEffect(() => {
     if (isAuthenticated) {
+      if (profile && !profile.is_onboarded) {
+        navigate("/onboarding");
+        return;
+      }
       navigate("/today");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, profile]);
 
   if (isLoading) {
     return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={true}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+      <Box className="flex items-center justify-center h-screen w-full">
+        <Spinner />
+      </Box>
     );
   }
 

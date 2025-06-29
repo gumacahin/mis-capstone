@@ -6,8 +6,8 @@ import Alert from "@mui/material/Alert";
 import { Toaster } from "react-hot-toast";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import { ProfileContextProvider } from "./components/ProfileContextProvider";
 import Spinner from "./components/Spinner";
-import ProfileContext from "./contexts/profileContext";
 import { useProfile } from "./hooks/queries";
 import routes from "./routes";
 
@@ -39,10 +39,10 @@ function App() {
   }
 
   return (
-    <ProfileContext.Provider value={profile}>
+    <ProfileContextProvider profile={profile}>
       <Toaster />
       <RouterProvider router={createBrowserRouter(routes)} />
-    </ProfileContext.Provider>
+    </ProfileContextProvider>
   );
 }
 

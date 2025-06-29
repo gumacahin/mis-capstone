@@ -17,6 +17,10 @@ export interface Profile {
   name: string;
   email: string;
   picture: string;
+  is_student: boolean;
+  is_faculty: boolean;
+  is_onboarded: boolean;
+  theme: "light" | "dark" | "system";
   projects: ProfileProject[];
 }
 
