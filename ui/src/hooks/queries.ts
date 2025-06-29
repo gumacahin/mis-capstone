@@ -322,6 +322,12 @@ export const useAddComment = (task: Task) => {
       queryClient.invalidateQueries({
         queryKey: ["comments", { taskId: task.id }],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["project"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tag"],
+      });
     },
   });
 };
@@ -732,7 +738,7 @@ export const useLabel = (slug: string) => {
   return useQuery({
     queryKey: ["tag", { slug }],
     queryFn: async () => {
-      const { data } = await apiClient.get(`tags/${slug}`);
+      const { data } = await apiClient.get(`tags/${slug}/`);
       return data;
     },
   });

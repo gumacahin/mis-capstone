@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+from django_comments.models import Comment
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
@@ -27,6 +29,8 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     tags = TagListSerializerField(required=False)
 
+    comments_count = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Task
         fields = [
@@ -45,7 +49,14 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "source_section",
             "section_title",
             "project_title",
+            "comments_count",
         ]
+
+    def get_comments_count(self, obj):
+        content_type = ContentType.objects.get_for_model(obj)
+        return Comment.objects.filter(
+            content_type=content_type, object_pk=obj.pk
+        ).count()
 
     def get_project_title(self, obj):
         return obj.section.project.title
