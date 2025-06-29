@@ -49,6 +49,7 @@ export interface Task {
   section_title?: string | null;
   tags: string[];
   order: number;
+  comments_count: number;
 }
 
 export interface Comment {

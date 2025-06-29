@@ -1,3 +1,4 @@
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import EventIcon from "@mui/icons-material/Event";
 import InboxIcon from "@mui/icons-material/Inbox";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -192,6 +193,18 @@ export default function LabelViewTaskCard({
                         }}
                       >
                         {formatDayOfWeek(dayjs(task.due_date))}
+                      </Typography>
+                    </Stack>
+                  )}
+                  {task.comments_count > 0 && (
+                    <Stack
+                      direction={"row"}
+                      spacing={0.5}
+                      alignItems={"center"}
+                    >
+                      <ChatBubbleIcon fontSize="small" />
+                      <Typography variant="caption">
+                        {task.comments_count}
                       </Typography>
                     </Stack>
                   )}
