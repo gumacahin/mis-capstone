@@ -1,14 +1,15 @@
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import FormLabel from "@mui/material/FormLabel";
 import Input from "@mui/material/Input";
 import Switch from "@mui/material/Switch";
+import Typography from "@mui/material/Typography";
 import {
   ArrowRight,
   CheckSquare,
   GraduationCap,
-  Info,
   SkipForward,
   Users,
 } from "lucide-react";
@@ -46,8 +47,8 @@ export default function OnboardingPage() {
     defaultValues,
   });
 
-  const handleSkip = async () => {
-    await updateProfile({
+  const handleSkip = () => {
+    updateProfile({
       is_onboarded: true,
     });
     navigate("/today");
@@ -75,13 +76,13 @@ export default function OnboardingPage() {
                   <CheckSquare className="h-10 w-10" />
                 </div>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <Typography variant="h3" component="h1">
                 Welcome to UPOU Todo
-              </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              </Typography>
+              <Typography variant="subtitle1">
                 Let’s personalize your experience to help you succeed at the
                 University of the Philippines Open University
-              </p>
+              </Typography>
             </div>
 
             {/* Form Fields */}
@@ -89,9 +90,9 @@ export default function OnboardingPage() {
               {/* Name Field */}
               <div className="space-y-1 flex flex-col">
                 <FormLabel htmlFor="name">
-                  <span className="text-lg font-semibold text-gray-800">
+                  <Typography variant="body1" fontWeight="semibold">
                     What should we call you?
-                  </span>
+                  </Typography>
                 </FormLabel>
                 <Input
                   id="name"
@@ -106,12 +107,12 @@ export default function OnboardingPage() {
               {/* UPOU Affiliation Section */}
               <div className="space-y-6">
                 <div className="text-center">
-                  <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                  <Typography variant="h4" component="h2" className="mb-2">
                     Your UPOU Connection
-                  </h3>
-                  <p className="text-gray-600">
+                  </Typography>
+                  <Typography variant="subtitle1">
                     Help us understand your role at UPOU
-                  </p>
+                  </Typography>
                 </div>
 
                 {/* Student Switch */}
@@ -123,15 +124,14 @@ export default function OnboardingPage() {
                           <GraduationCap className="h-6 w-6" />
                         </div>
                         <div>
-                          <FormLabel
-                            htmlFor="student-switch"
-                            className="text-lg font-semibold text-gray-800 cursor-pointer"
-                          >
-                            I’m a UPOU Student
+                          <FormLabel htmlFor="student-switch">
+                            <Typography variant="subtitle1">
+                              I’m a UPOU Student
+                            </Typography>
                           </FormLabel>
-                          <p className="text-gray-600 mt-1">
+                          <Typography variant="body2">
                             Currently enrolled in UPOU programs
-                          </p>
+                          </Typography>
                         </div>
                       </div>
                       <Switch
@@ -159,11 +159,13 @@ export default function OnboardingPage() {
                             htmlFor="faculty-switch"
                             className="text-lg font-semibold text-gray-800 cursor-pointer"
                           >
-                            I’m a UPOU Faculty
+                            <Typography variant="subtitle1">
+                              I’m a UPOU Faculty
+                            </Typography>
                           </FormLabel>
-                          <p className="text-gray-600 mt-1">
+                          <Typography variant="body2">
                             Teaching or working at UPOU
-                          </p>
+                          </Typography>
                         </div>
                       </div>
                       <Switch
@@ -180,27 +182,13 @@ export default function OnboardingPage() {
               </div>
 
               {/* Info Section */}
-              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-                <CardContent className="p-8">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600 flex-shrink-0 mt-1">
-                      <Info className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
-                        Why we ask this
-                      </h4>
-                      <p className="text-gray-700 leading-relaxed">
-                        By knowing your role at UPOU, we can provide you a
-                        better experience. Students will get study-focused
-                        recommendations, faculty members will receive teaching
-                        and research-oriented suggestions, and those with both
-                        roles will get the best of both worlds.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <Alert title="Why we ask this" severity="info">
+                By knowing your role at UPOU, we can provide you a better
+                experience. Students will get study-focused recommendations,
+                faculty members will receive teaching and research-oriented
+                suggestions, and those with both roles will get the best of both
+                worlds.
+              </Alert>
             </div>
 
             {/* Action Buttons */}
@@ -224,10 +212,10 @@ export default function OnboardingPage() {
 
             {/* Footer */}
             <div className="text-center mt-8">
-              <p className="text-sm text-gray-500">
+              <Typography variant="caption">
                 You can always update these preferences later in your profile
                 settings.
-              </p>
+              </Typography>
             </div>
           </CardContent>
         </Card>
