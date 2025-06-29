@@ -14,6 +14,7 @@ import { MouseEvent, useState } from "react";
 import { useProfile } from "../hooks/queries";
 import useUpdateTaskDialogContext from "../hooks/useUpdateTaskDialogContext";
 import { Project, Task } from "../types/common";
+import { formatDayOfWeek } from "../utils";
 import LabelViewTaskMenu from "./LabelViewTaskMenu";
 import TaskCheckIcon from "./TaskCheckIcon";
 import TaskDeleteDialog from "./TaskDeleteDialog";
@@ -190,7 +191,7 @@ export default function LabelViewTaskCard({
                           maxWidth: "100%",
                         }}
                       >
-                        {dayjs(task.due_date).format("MMM D YYYY")}
+                        {formatDayOfWeek(dayjs(task.due_date))}
                       </Typography>
                     </Stack>
                   )}

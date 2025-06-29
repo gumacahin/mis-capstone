@@ -34,17 +34,24 @@ export function getUserDisplayName(user: Profile) {
   return userDisplayName;
 }
 
-export function formatDayOfWeek(date: Date | Dayjs) {
+export function formatDayOfWeek(
+  date: Date | Dayjs,
+  defaultFormat = "MMM D YYYY",
+) {
   const givenDate = dayjs(date).startOf("day");
+  const yesterday = dayjs().subtract(1, "day").startOf("day");
   const today = dayjs().startOf("day");
   const tomorrow = dayjs().add(1, "day").startOf("day");
+  if (givenDate.isSame(yesterday)) {
+    return "Yesterday";
+  }
   if (givenDate.isSame(today)) {
     return "Today";
   }
   if (givenDate.isSame(tomorrow)) {
     return "Tomorrow";
   }
-  return dayjs(date).format("dddd");
+  return dayjs(date).format(defaultFormat);
 }
 
 export function getWeekDatesFromDate(date: Date | Dayjs, weekExtension = 0) {
