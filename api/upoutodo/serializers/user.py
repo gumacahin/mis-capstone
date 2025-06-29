@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from upoutodo.models import Project, ProjectSection, UserProfile
+from upoutodo.models import Project, ProjectSection
 
 User = get_user_model()
 
@@ -27,47 +27,42 @@ class ProjectSerializer(serializers.ModelSerializer):
     sections = ProjectSectionSerializer(many=True)
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-
-    class Meta:
-        model = UserProfile
-        fields = ["is_faculty", "is_student", "is_admin", "name"]
-
-    def get_name(self, obj):
-        if obj.name:
-            return obj.name
-        return f"User {obj.user.id}"
-
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    profile = UserProfileSerializer()
+    name = serializers.SerializerMethodField()
+    is_student = serializers.BooleanField(source="profile.is_student")
+    is_faculty = serializers.BooleanField(source="profile.is_faculty")
+    is_onboarded = serializers.BooleanField(source="profile.is_onboarded")
+    theme = serializers.CharField(source="profile.theme")
     projects = ProjectSerializer(source="created_projects", many=True)
 
     def get_projects(self, obj):
         projects = obj.projects.all()
         return ProjectSerializer(projects, many=True).data
 
+    def get_name(self, obj):
+        if obj.profile.name:
+            return obj.profile.name
+        return f"User {obj.user.id}"
+
     class Meta:
         model = User
         fields = [
             "id",
-            "profile",
+            "name",
+            "email",
+            "is_faculty",
+            "is_student",
+            "is_onboarded",
             "projects",
+            "theme",
         ]
-        read_only_fields = ["id", "profile", "projects"]
-
-    def update(self, instance, validated_data):
-        profile_data = validated_data.pop("profile", None)
-        validated_data.pop("created_projects", None)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        if profile_data:
-            profile = instance.profile
-            for attr, value in profile_data.items():
-                setattr(profile, attr, value)
-            profile.save()
-
-        return instance
+        read_only_fields = [
+            "id",
+            "projects",
+            "email",
+            "is_faculty",
+            "is_student",
+            "is_onboarded",
+            "projects",
+            "theme",
+        ]

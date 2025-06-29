@@ -7,36 +7,39 @@ import HomePage from "./pages/HomePage";
 import InboxPage from "./pages/InboxPage";
 import LabelsListPage from "./pages/LabelsListPage";
 import LabelTasksPage from "./pages/LabelTasksPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import ProjectPage from "./pages/ProjectPage";
 import ProjectsListPage from "./pages/ProjectsListPage";
 import SettingsPage from "./pages/SettingsPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
 
-const HOME = "home";
-const APP = "app";
 const ADMIN = "admin";
-const TODAY = "today";
+const APP = "app";
+const HOME = "home";
 const INBOX = "inbox";
-const UPCOMING = "upcoming";
-const PROJECTS = "projects";
 const LABELS = "labels";
-const PROJECT_DETAILS = "projectDetails";
 const LABEL_TASKS = "labelTasks";
+const ONBOARDING = "onboarding";
+const PROJECTS = "projects";
+const PROJECT_DETAILS = "projectDetails";
 const SETTINGS = "settings";
+const TODAY = "today";
+const UPCOMING = "upcoming";
 
 export const ROUTES = {
-  HOME,
-  APP,
   ADMIN,
-  TODAY,
+  APP,
+  HOME,
   INBOX,
-  UPCOMING,
-  PROJECTS,
   LABELS,
   LABEL_TASKS,
+  ONBOARDING,
+  PROJECTS,
   PROJECT_DETAILS,
   SETTINGS,
+  TODAY,
+  UPCOMING,
 };
 
 const routes = [
@@ -48,6 +51,11 @@ const routes = [
         index: true,
         element: <HomePage />,
         name: ROUTES.HOME,
+      },
+      {
+        path: "onboarding",
+        element: <OnboardingPage />,
+        name: ROUTES.ONBOARDING,
       },
       {
         path: "admin/*",

@@ -26,6 +26,7 @@
     "@tiptap/starter-kit": "^2.11.7",
     "axios": "^1.7.7",
     "dayjs": "^1.11.12",
+    "lucide-react": "^0.525.0",
     "mui-tiptap": "^1.18.1",
     "npm": "^10.8.2",
     "query-string": "^9.1.2",

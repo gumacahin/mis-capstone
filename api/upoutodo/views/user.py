@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -17,6 +17,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @action(methods=["PATCH"], detail=False)
+    def options(self, request):
+        request.user.profile.update_from_request(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=["GET"], detail=False)
     def me(self, request):

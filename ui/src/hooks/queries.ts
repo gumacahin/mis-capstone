@@ -8,6 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import type {
   Comment,
   PaginatedResponse,
+  Profile,
   Project,
   ProjectDetail,
   ProjectViewType,
@@ -51,6 +52,24 @@ export const useProfile = (enabled: boolean = true) => {
       return data;
     },
     enabled,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["updateOptions"],
+    mutationFn: async (data: Partial<Profile>) => {
+      void apiClient.patch("users/options/", data);
+    },
+    onMutate: (data) => {
+      queryClient.cancelQueries({ queryKey: ["me"] });
+      queryClient.setQueryData(["me"], (profile: Profile) => ({
+        ...profile,
+        ...data,
+      }));
+    },
   });
 };
 
