@@ -42,7 +42,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     def get_name(self, obj):
         if obj.profile.name:
             return obj.profile.name
-        return f"User {obj.user.id}"
+        return f"User {obj.id}"
 
     class Meta:
         model = User
