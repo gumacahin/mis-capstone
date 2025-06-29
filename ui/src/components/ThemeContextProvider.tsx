@@ -11,7 +11,7 @@ export default function ThemeContextProvider({
   children: ReactNode;
 }) {
   const [mode, setMode] = useLocalStorage<"light" | "dark" | "system">(
-    "theme",
+    "upoutodo.theme",
     "system",
   );
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");

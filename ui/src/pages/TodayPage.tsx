@@ -22,7 +22,10 @@ import type { ProjectViewType, Task } from "../types/common";
 
 export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();
-  const [view, setView] = useLocalStorage<ProjectViewType>("todayView", "list");
+  const [view, setView] = useLocalStorage<ProjectViewType>(
+    "upoutodo.todayView",
+    "list",
+  );
   const { setToolbarIcons, setToolbarTitle } = useToolbarContext();
 
   const tasks: Task[] = data?.results ?? [];
