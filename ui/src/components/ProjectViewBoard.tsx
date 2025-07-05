@@ -6,7 +6,7 @@ import {
   type DroppableProvided,
 } from "@hello-pangea/dnd";
 import CardActions from "@mui/material/CardActions";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { DROPPABLE_TYPE_SECTION, DROPPABLE_TYPE_TASK } from "../constants/ui";
@@ -21,6 +21,64 @@ import BoardTaskList from "./BoardTaskList";
 import BoardViewContainer from "./BoardViewContainer";
 import ProjectViewSectionCardHeader from "./ProjectSectionCardHeader";
 import ProjectSectionDivider from "./ProjectSectionDivider";
+
+interface InnerListProps {
+  sections: Section[];
+  isDragging: boolean;
+  lastSection: Section;
+}
+
+const InnerList = memo(function InnerList({
+  sections,
+  isDragging,
+  lastSection,
+}: InnerListProps) {
+  return (
+    <>
+      {sections.map((section: Section, index) => (
+        <SectionContext.Provider key={section.id} value={section}>
+          {section.is_default ? (
+            <BoardProjectSectionCard key={section.id}>
+              <ProjectViewSectionCardHeader />
+              <BoardTaskList hideProject />
+              <CardActions>
+                <AddTaskButton />
+              </CardActions>
+            </BoardProjectSectionCard>
+          ) : (
+            <Draggable
+              draggableId={`draggable-section-${section.id}`}
+              // Adjust index to because of non-draggable default section
+              index={index - 1}
+            >
+              {(provided, snapshot) => (
+                <BoardProjectSectionCard
+                  key={section.id}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  ref={provided.innerRef}
+                  variant={snapshot.isDragging ? "outlined" : "elevation"}
+                >
+                  <ProjectViewSectionCardHeader />
+                  <BoardTaskList hideProject />
+                  <CardActions>
+                    <AddTaskButton />
+                  </CardActions>
+                </BoardProjectSectionCard>
+              )}
+            </Draggable>
+          )}
+          {lastSection.id !== section.id && (
+            <ProjectSectionDivider
+              disabled={isDragging}
+              precedingSection={section}
+            />
+          )}
+        </SectionContext.Provider>
+      ))}
+    </>
+  );
+});
 
 export default function ProjectViewBoard({
   project,
@@ -160,49 +218,11 @@ export default function ProjectViewBoard({
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {project.sections.map((section: Section, index) => (
-                <SectionContext.Provider key={section.id} value={section}>
-                  {section.is_default ? (
-                    <BoardProjectSectionCard key={section.id}>
-                      <ProjectViewSectionCardHeader />
-                      <BoardTaskList hideProject />
-                      <CardActions>
-                        <AddTaskButton />
-                      </CardActions>
-                    </BoardProjectSectionCard>
-                  ) : (
-                    <Draggable
-                      draggableId={`draggable-section-${section.id}`}
-                      // Adjust index to because of non-draggable default section
-                      index={index - 1}
-                    >
-                      {(provided, snapshot) => (
-                        <BoardProjectSectionCard
-                          key={section.id}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                          variant={
-                            snapshot.isDragging ? "outlined" : "elevation"
-                          }
-                        >
-                          <ProjectViewSectionCardHeader />
-                          <BoardTaskList hideProject />
-                          <CardActions>
-                            <AddTaskButton />
-                          </CardActions>
-                        </BoardProjectSectionCard>
-                      )}
-                    </Draggable>
-                  )}
-                  {lastSection.id !== section.id && (
-                    <ProjectSectionDivider
-                      disabled={isDragging}
-                      precedingSection={section}
-                    />
-                  )}
-                </SectionContext.Provider>
-              ))}
+              <InnerList
+                sections={project.sections}
+                isDragging={isDragging}
+                lastSection={lastSection}
+              />
               {provided.placeholder}
               <AddProjectSectionButton precedingSection={lastSection} />
             </BoardViewContainer>

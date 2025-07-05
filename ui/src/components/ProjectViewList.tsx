@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Stack from "@mui/material/Stack";
-import { Fragment, useState } from "react";
+import { Fragment, memo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
@@ -32,6 +32,58 @@ import ProjectSectionCardHeader from "./ProjectSectionCardHeader";
 type FormValues = {
   title: string;
 };
+
+interface InnerListProps {
+  sections: Section[];
+}
+
+const InnerList = memo(function InnerList({ sections }: InnerListProps) {
+  return (
+    <>
+      {sections.map((section: Section, index: number) => (
+        <SectionContext.Provider value={section} key={section.id}>
+          {section.is_default ? (
+            <>
+              <ListProjectSectionCard key={section.id}>
+                <ProjectSectionCardHeader />
+                <ListTaskList />
+                <CardActions>
+                  <AddTaskButton />
+                </CardActions>
+              </ListProjectSectionCard>
+              <AddSectionButton precedingSection={section} />
+            </>
+          ) : (
+            <Draggable
+              draggableId={`draggable-section-${section.id}`}
+              // Adjust index to because of non-draggable default section
+              index={index - 1}
+            >
+              {(provided, snapshot) => (
+                <Fragment key={section.id}>
+                  <ListProjectSectionCard
+                    key={section.id}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    ref={provided.innerRef}
+                    variant={snapshot.isDragging ? "outlined" : "elevation"}
+                  >
+                    <ProjectSectionCardHeader />
+                    <ListTaskList hideProject />
+                    <CardActions>
+                      <AddTaskButton />
+                    </CardActions>
+                  </ListProjectSectionCard>
+                  <AddSectionButton precedingSection={section} />
+                </Fragment>
+              )}
+            </Draggable>
+          )}
+        </SectionContext.Provider>
+      ))}
+    </>
+  );
+});
 
 const AddSectionButton = ({
   precedingSection,
@@ -236,49 +288,7 @@ export default function ProjectViewList({
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {project.sections.map((section: Section, index: number) => (
-                <SectionContext.Provider value={section} key={section.id}>
-                  {section.is_default ? (
-                    <>
-                      <ListProjectSectionCard key={section.id}>
-                        <ProjectSectionCardHeader />
-                        <ListTaskList />
-                        <CardActions>
-                          <AddTaskButton />
-                        </CardActions>
-                      </ListProjectSectionCard>
-                      <AddSectionButton precedingSection={section} />
-                    </>
-                  ) : (
-                    <Draggable
-                      draggableId={`draggable-section-${section.id}`}
-                      // Adjust index to because of non-draggable default section
-                      index={index - 1}
-                    >
-                      {(provided, snapshot) => (
-                        <Fragment key={section.id}>
-                          <ListProjectSectionCard
-                            key={section.id}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                            variant={
-                              snapshot.isDragging ? "outlined" : "elevation"
-                            }
-                          >
-                            <ProjectSectionCardHeader />
-                            <ListTaskList hideProject />
-                            <CardActions>
-                              <AddTaskButton />
-                            </CardActions>
-                          </ListProjectSectionCard>
-                          <AddSectionButton precedingSection={section} />
-                        </Fragment>
-                      )}
-                    </Draggable>
-                  )}
-                </SectionContext.Provider>
-              ))}
+              <InnerList sections={project.sections} />
             </ListViewContainer>
           )}
         </Droppable>
