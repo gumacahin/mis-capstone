@@ -7,13 +7,83 @@ import {
 } from "@hello-pangea/dnd";
 import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, memo, useContext, useState } from "react";
 
 import { DROPPABLE_MIN_HEIGHT, DROPPABLE_TYPE_TASK } from "../constants/ui";
 import SectionContext from "../contexts/sectionContext";
 import type { Section, Task } from "../types/common";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
+
+interface InnerListProps {
+  tasks: Task[];
+  hideDueDates?: boolean;
+  hideProject?: boolean;
+  isDragDisabled?: boolean;
+  showAddTaskMenuItems?: boolean;
+  addTaskAbove?: number;
+  addTaskBelow?: number;
+  setAddTaskAbove: (id: number | undefined) => void;
+  setAddTaskBelow: (id: number | undefined) => void;
+  handleCloseAddAboveTaskForm: () => void;
+  handleCloseAddBelowTaskForm: () => void;
+}
+
+const InnerList = memo(function InnerList({
+  tasks,
+  hideDueDates,
+  hideProject,
+  isDragDisabled,
+  showAddTaskMenuItems,
+  addTaskAbove,
+  addTaskBelow,
+  setAddTaskAbove,
+  setAddTaskBelow,
+  handleCloseAddAboveTaskForm,
+  handleCloseAddBelowTaskForm,
+}: InnerListProps) {
+  return (
+    <>
+      {tasks.map((task: Task, index: number) => (
+        <Fragment key={task.id}>
+          {addTaskAbove === task.id && (
+            <TaskForm
+              taskAbove={addTaskAbove}
+              handleClose={handleCloseAddAboveTaskForm}
+            />
+          )}
+          <Draggable
+            isDragDisabled={isDragDisabled}
+            draggableId={`task-${task.id}`}
+            index={index}
+          >
+            {(
+              provided: DraggableProvided,
+              snapshot: DraggableStateSnapshot,
+            ) => (
+              <TaskCard
+                task={task}
+                hideDueDates={hideDueDates}
+                hideProject={hideProject}
+                handleAddTaskAbove={() => setAddTaskAbove(task.id)}
+                handleAddTaskBelow={() => setAddTaskBelow(task.id)}
+                showAddTaskMenuItems={showAddTaskMenuItems}
+                provided={provided}
+                snapshot={snapshot}
+              />
+            )}
+          </Draggable>
+          {addTaskBelow === task.id && (
+            <TaskForm
+              taskBelow={addTaskBelow}
+              handleClose={handleCloseAddBelowTaskForm}
+            />
+          )}
+        </Fragment>
+      ))}
+    </>
+  );
+});
 
 export interface ListTaskListProps extends CardContentProps {
   tasks?: Task[];
@@ -62,43 +132,19 @@ export default function ListTaskList({
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {tasks.map((task: Task, index: number) => (
-                <Fragment key={task.id}>
-                  {addTaskAbove === task.id && (
-                    <TaskForm
-                      taskAbove={addTaskAbove}
-                      handleClose={handleCloseAddAboveTaskForm}
-                    />
-                  )}
-                  <Draggable
-                    isDragDisabled={isDragDisabled}
-                    draggableId={`task-${task.id}`}
-                    index={index}
-                  >
-                    {(
-                      provided: DraggableProvided,
-                      snapshot: DraggableStateSnapshot,
-                    ) => (
-                      <TaskCard
-                        task={task}
-                        hideDueDates={hideDueDates}
-                        hideProject={hideProject}
-                        handleAddTaskAbove={() => setAddTaskAbove(task.id)}
-                        handleAddTaskBelow={() => setAddTaskBelow(task.id)}
-                        showAddTaskMenuItems={showAddTaskMenuItems}
-                        provided={provided}
-                        snapshot={snapshot}
-                      />
-                    )}
-                  </Draggable>
-                  {addTaskBelow === task.id && (
-                    <TaskForm
-                      taskBelow={addTaskBelow}
-                      handleClose={handleCloseAddBelowTaskForm}
-                    />
-                  )}
-                </Fragment>
-              ))}
+              <InnerList
+                tasks={tasks}
+                hideDueDates={hideDueDates}
+                hideProject={hideProject}
+                isDragDisabled={isDragDisabled}
+                showAddTaskMenuItems={showAddTaskMenuItems}
+                addTaskAbove={addTaskAbove}
+                addTaskBelow={addTaskBelow}
+                setAddTaskAbove={setAddTaskAbove}
+                setAddTaskBelow={setAddTaskBelow}
+                handleCloseAddAboveTaskForm={handleCloseAddAboveTaskForm}
+                handleCloseAddBelowTaskForm={handleCloseAddBelowTaskForm}
+              />
               {provided.placeholder}
             </Stack>
           )}
