@@ -176,3 +176,8 @@ JWT_AUTH = {
 }
 
 TAGGIT_CASE_INSENSITIVE = True
+
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+APP_URL = os.getenv("APP_URL")
+BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "upoutodo@gmail.com")
+BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "UPOU TODO")

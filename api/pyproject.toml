@@ -19,6 +19,7 @@ auth0-python = "^4.7.1"
 django-filter = "^24.3"
 django-taggit = "^6.1.0"
 django-contrib-comments = "^2.2.0"
+jinja2 = "^3.1.6"
 
 
 [tool.poetry.group.dev.dependencies]

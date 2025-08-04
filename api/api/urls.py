@@ -4,6 +4,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from upoutodo import views
+from upoutodo.views.email import daily_digest
 
 router = routers.DefaultRouter()
 router.register(r"project_sections", views.ProjectSectionViewSet)
@@ -32,5 +33,10 @@ urlpatterns = [
         "api/dashboard",
         views.admin.AdminDashboardView.as_view(),
         name="admin-dashboard",
+    ),
+    path(
+        "api/email/daily-digest",
+        daily_digest,
+        name="daily-digest",
     ),
 ]
