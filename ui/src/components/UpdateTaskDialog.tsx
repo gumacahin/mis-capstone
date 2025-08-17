@@ -23,10 +23,11 @@ import Typography from "@mui/material/Typography";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useDuplicateTask, useUpdateTask } from "../hooks/queries";
 import type { Task, TaskFormFields } from "../types/common";
+import { generateTaskLink } from "../utils";
 import AddCommentForm from "./AddCommentForm";
 import CommentList from "./CommentList";
 import DescriptionField from "./DescriptionField";
@@ -61,8 +62,24 @@ export default function UpdateTaskDialog({
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const taskMenuOpen = Boolean(anchorEl);
+
+  // Store the original URL when dialog opens
+  const originalUrl = useRef(location.pathname + location.search);
+
+  // Update URL when dialog opens
+  useEffect(() => {
+    const taskUrl = generateTaskLink(task.id);
+    // Change address bar without navigation
+    window.history.replaceState(null, "", taskUrl);
+
+    // Restore original URL when dialog closes
+    return () => {
+      window.history.replaceState(null, "", originalUrl.current);
+    };
+  }, [task.id]);
 
   const onSubmit: SubmitHandler<TaskFormFields> = async (data) => {
     try {
@@ -96,6 +113,19 @@ export default function UpdateTaskDialog({
 
   const handleDeleteMenuItemClick = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    handleCloseTaskMenu();
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const taskLink = generateTaskLink(task.id);
+      const fullUrl = `${window.location.origin}${taskLink}`;
+      await navigator.clipboard.writeText(fullUrl);
+      toast.success("Task link copied to clipboard!");
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+      toast.error("Failed to copy link to clipboard");
+    }
     handleCloseTaskMenu();
   };
 
@@ -360,8 +390,8 @@ export default function UpdateTaskDialog({
         anchorEl={anchorEl}
         id="task-menu"
         open={taskMenuOpen}
-        onClose={onClose}
-        onClick={onClose}
+        onClose={handleCloseTaskMenu}
+        onClick={handleCloseTaskMenu}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
@@ -370,6 +400,12 @@ export default function UpdateTaskDialog({
             <ContentCopyIcon fontSize="small" />
           </ListItemIcon>
           Duplicate
+        </MenuItem>
+        <MenuItem onClick={handleCopyLink}>
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          Copy Link
         </MenuItem>
         <Divider />
         <MenuItem

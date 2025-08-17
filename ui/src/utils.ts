@@ -77,3 +77,7 @@ export function slugify(str: string) {
     .trim()
     .replace(/[-\s]+/g, "-");
 }
+
+export function generateTaskLink(taskId: number): string {
+  return `/task/${taskId}`;
+}

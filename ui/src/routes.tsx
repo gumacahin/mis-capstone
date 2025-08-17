@@ -11,6 +11,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ProjectPage from "./pages/ProjectPage";
 import ProjectsListPage from "./pages/ProjectsListPage";
 import SettingsPage from "./pages/SettingsPage";
+import TaskPage from "./pages/TaskPage";
 import TodayPage from "./pages/TodayPage";
 import UpcomingPage from "./pages/UpcomingPage";
 
@@ -24,6 +25,7 @@ const ONBOARDING = "onboarding";
 const PROJECTS = "projects";
 const PROJECT_DETAILS = "projectDetails";
 const SETTINGS = "settings";
+const TASK = "task";
 const TODAY = "today";
 const UPCOMING = "upcoming";
 
@@ -38,6 +40,7 @@ export const ROUTES = {
   PROJECTS,
   PROJECT_DETAILS,
   SETTINGS,
+  TASK,
   TODAY,
   UPCOMING,
 };
@@ -96,6 +99,11 @@ const routes = [
             path: "project/:projectId",
             element: <ProjectPage />,
             name: ROUTES.PROJECT_DETAILS,
+          },
+          {
+            path: "task/:taskId",
+            element: <TaskPage />,
+            name: ROUTES.TASK,
           },
           {
             path: "labels",

@@ -11,7 +11,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { type MouseEvent, useContext, useState } from "react";
+import { Fragment, type MouseEvent, useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -193,7 +193,7 @@ export default function UpdateTaskProjectButton({ task }: { task: Task }) {
                 (s) => s.is_default,
               )!.id;
               return (
-                <>
+                <Fragment key={project.id}>
                   <MenuItem
                     key={project.id}
                     selected={defaultSectionId === task.section}
@@ -249,7 +249,7 @@ export default function UpdateTaskProjectButton({ task }: { task: Task }) {
                         </ListItemIcon>
                       </MenuItem>
                     ))}
-                </>
+                </Fragment>
               );
             })}
           </Menu>

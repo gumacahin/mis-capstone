@@ -1,3 +1,4 @@
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import FlagIcon from "@mui/icons-material/Flag";
@@ -23,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useUpdateTask } from "../hooks/queries";
 import type { Task } from "../types/common";
+import { generateTaskLink } from "../utils";
 import TaskDuplicateMenuItem from "./TaskDuplicateMenuItem";
 import TaskMenuDatePicker from "./TaskMenuDatePicker";
 import TaskMoveMenuItem from "./TaskMoveMenuItem";
@@ -191,6 +193,26 @@ export default function LabelViewTaskMenu({
             <ListIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Go to project" />
+        </MenuItem>
+        <MenuItem
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const taskLink = generateTaskLink(task.id);
+              const fullUrl = `${window.location.origin}${taskLink}`;
+              await navigator.clipboard.writeText(fullUrl);
+              toast.success("Task link copied to clipboard!");
+            } catch (error) {
+              console.error("Failed to copy link:", error);
+              toast.error("Failed to copy link to clipboard");
+            }
+            handleCloseTaskMenu();
+          }}
+        >
+          <ListItemIcon>
+            <ContentCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Copy Link" />
         </MenuItem>
         <Divider component="li" />
         <MenuSection label="Date">

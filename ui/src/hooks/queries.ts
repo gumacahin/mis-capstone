@@ -118,16 +118,21 @@ export const useUpcomingTasks = () => {
   });
 };
 
-export const useTask = (task: Task | null, enabled: boolean = true) => {
+export const useTask = (
+  taskOrId: Task | number | null,
+  enabled: boolean = true,
+) => {
   const apiClient = useApiClient();
+  const taskId = typeof taskOrId === "number" ? taskOrId : taskOrId?.id;
+
   return useQuery({
-    initialData: task,
-    queryKey: ["task", { taskId: task?.id }],
+    initialData: typeof taskOrId === "object" ? taskOrId : undefined,
+    queryKey: ["task", { taskId }],
     queryFn: async () => {
-      const { data } = await apiClient.get(`tasks/${task?.id}/`);
+      const { data } = await apiClient.get(`tasks/${taskId}/`);
       return data;
     },
-    enabled,
+    enabled: !!taskId && enabled,
   });
 };
 
