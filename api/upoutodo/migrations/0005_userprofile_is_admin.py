@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("upoutodo", "0004_alter_task_completion_date_alter_task_due_date"),
     ]

@@ -12,7 +12,6 @@ class ProjectAdminSerializer(serializers.ModelSerializer):
 
 
 class BaseProjectSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Project
         fields = [

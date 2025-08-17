@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("upoutodo", "0003_tag_taggeditem_alter_task_tags"),
     ]

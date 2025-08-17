@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("upoutodo", "0006_task_created_at_task_updated_at"),
     ]
