@@ -3,8 +3,8 @@
 .PHONY: api
 api:
 	cd api; \
-	poetry install; \
-	poetry run python manage.py runserver; \
+	uv sync --all-groups; \
+	uv run python manage.py runserver; \
 
 .PHONY: ui
 ui:
@@ -15,19 +15,19 @@ ui:
 .PHONY: shell
 shell:
 	cd api; \
-	poetry run python manage.py shell; \
+	uv run python manage.py shell; \
 
 .PHONY: test
 test:
 	cd api; \
-	poetry run pytest; \
+	uv run pytest; \
 
 .PHONY: resetdb
 resetdb:
 	cd api; \
 	rm -rf db.sqlite3; \
 	rm -rf api/upoutodo/migrations/; \
-	poetry run python manage.py makemigrations upoutodo; \
-	poetry run python manage.py migrate; \
+	uv run python manage.py makemigrations upoutodo; \
+	uv run python manage.py migrate; \
 
 
