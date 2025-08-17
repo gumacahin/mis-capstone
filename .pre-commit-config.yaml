@@ -1,18 +1,12 @@
 fail_fast: true
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9 # use the latest stable tag
     hooks:
-      - id: black
-        language_version: python3
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
-    hooks:
-      - id: flake8
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
+      - id: ruff
+        args: [--fix] # auto-fix lint + imports
+      - id: ruff-format # formatting (Black replacement)
+
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: "v9.22.0"
     hooks:
@@ -38,6 +32,7 @@ repos:
           - eslint-plugin-react-hooks@5.2.0
           - eslint-plugin-react-refresh@0.4.19
           - eslint-plugin-simple-import-sort@12.1.1
+
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
@@ -46,6 +41,7 @@ repos:
         args:
           - "--config"
           - "ui/.prettierrc.json"
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.24.0
     hooks:
