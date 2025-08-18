@@ -9,7 +9,12 @@ import { useAddTask } from "@shared/hooks/queries";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import useProjectContext from "@shared/hooks/useProjectContext";
 import useSectionContext from "@shared/hooks/useSectionContext";
-import type { TaskFormFields, TaskPriority } from "@shared/types/common";
+import type {
+  Project,
+  Section,
+  TaskFormFields,
+  TaskPriority,
+} from "@shared/types/common";
 import { Dayjs } from "dayjs";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -37,9 +42,11 @@ export default function AddTaskDialog({
 }) {
   const project = useProjectContext();
   const section = useSectionContext();
-  const { projects } = useProfileContext();
-  const inbox = projects.find((p) => p.is_default)!;
-  const inboxDefaultSection = inbox.sections.find((s) => s.is_default);
+  const profile = useProfileContext()!;
+  const inbox = profile.projects.find((p: Partial<Project>) => p.is_default)!;
+  const inboxDefaultSection = inbox.sections.find(
+    (s: Partial<Section>) => s.is_default,
+  )!;
   const [loading, setLoading] = useState(false);
 
   const { mutateAsync: addTask } = useAddTask({

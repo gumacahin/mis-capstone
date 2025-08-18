@@ -464,7 +464,7 @@ export const useAddProject = (
   return useMutation({
     mutationKey: ["addProject"],
     mutationFn: async (
-      project: Project & {
+      project: Partial<Project> & {
         above_project_id?: number;
         below_project_id?: number;
       },
@@ -528,7 +528,7 @@ export const useReorderProjects = () => {
   });
 };
 
-export const useDeleteProject = (project: Project) => {
+export const useDeleteProject = (project: ProjectDetail) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({

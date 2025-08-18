@@ -30,7 +30,7 @@ export default function ProjectSectionMoveMenu({
     sectionId,
     currentProjectId,
   );
-  const profile = useProfileContext();
+  const profile = useProfileContext()!;
   const [search, setSearch] = useState("");
   const inbox = profile.projects.filter((p) => p.is_default)[0];
   const projects = profile.projects.filter(

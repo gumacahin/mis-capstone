@@ -15,10 +15,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import ProfileContext from "@shared/contexts/profileContext";
 import { useComments, useDeleteComment } from "@shared/hooks/queries";
-import type { Comment, Profile, Task } from "@shared/types/common";
-import { useContext, useState } from "react";
+import useProfileContext from "@shared/hooks/useProfileContext";
+import type { Comment, Task } from "@shared/types/common";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import TaskComment from "./TaskComment";
@@ -75,7 +75,7 @@ function DeleteCommentDialog({
 }
 
 export default function CommentList({ task }: { task: Task }) {
-  const profile = useContext<Profile>(ProfileContext)!;
+  const profile = useProfileContext()!;
   const userId = profile.id;
 
   const { isPending, isError, data } = useComments(task);

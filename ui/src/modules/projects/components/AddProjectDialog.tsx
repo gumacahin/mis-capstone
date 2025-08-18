@@ -13,7 +13,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 import { useAddProject } from "@shared/hooks/queries";
-import type { Project, ProjectViewType } from "@shared/types/common";
+import type { ProjectViewType } from "@shared/types/common";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -45,7 +45,7 @@ export default function AddProjectDialog({
   const { register, setValue, handleSubmit, watch, reset } =
     useForm<FormValues>({ defaultValues });
   const view = watch("view");
-  const onSubmit: SubmitHandler<Project> = async (data) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
     try {
       const project = await toast.promise(addProject.mutateAsync(data), {

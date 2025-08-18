@@ -5,8 +5,7 @@ import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useUpdateTask } from "@shared/hooks/queries";
-import type { TaskFormFields } from "@shared/types/common";
-import { Task } from "@shared/types/common";
+import type { Task, TaskFormFields } from "@shared/types/common";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import {
   Controller,
@@ -21,7 +20,7 @@ export interface UpdateTaskTagsProps {
 }
 
 export default function UpdateTaskDialogTags({ task }: UpdateTaskTagsProps) {
-  const { mutateAsync: updateTask } = useUpdateTask(task, []);
+  const { mutateAsync: updateTask } = useUpdateTask(task);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleOpenTagsMenu = (event: MouseEvent<HTMLElement>) => {

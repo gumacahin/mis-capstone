@@ -52,6 +52,7 @@ const ListOverdueTasks = forwardRef<
     <ListProjectSectionCard
       component={Accordion}
       // FIXME: Why is this not valid when defaultExpanded is (both from Accordion)?
+      // @ts-expect-error - disableGutters is not a valid prop for CardProps
       disableGutters
       defaultExpanded
       elevation={0}

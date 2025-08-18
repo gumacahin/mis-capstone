@@ -6,7 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import type { Project } from "@shared/types/common";
+import type { ProjectDetail } from "@shared/types/common";
 import { useState } from "react";
 
 import ProjectDeleteDialog from "../components/ProjectDeleteDialog";
@@ -19,23 +19,23 @@ export default function ProjectMenu({
   handleClose,
 }: {
   anchorEl: null | HTMLElement;
-  project: Project;
+  project: ProjectDetail;
   handleClose: () => void;
 }) {
-  const [projectForEdit, setProjectForEdit] = useState<Project | null>(null);
-  const [projectForDelete, setProjectForDelete] = useState<Project | null>(
+  const [projectForEdit, setProjectForEdit] = useState<ProjectDetail | null>(
     null,
   );
+  const [projectForDelete, setProjectForDelete] =
+    useState<ProjectDetail | null>(null);
 
-  const [referenceProject, setReferenceProject] = useState<Project | null>(
-    null,
-  );
+  const [referenceProject, setReferenceProject] =
+    useState<ProjectDetail | null>(null);
 
   const [position, setPosition] = useState<"above" | "below" | null>(null);
 
   const handleAddProject = (
     e: React.MouseEvent<HTMLElement>,
-    project: Project,
+    project: ProjectDetail,
     position: "above" | "below",
   ) => {
     e.stopPropagation();

@@ -59,6 +59,7 @@ export interface Comment {
   author_name?: string;
   user?: number;
   object_pk: number;
+  content_type: string;
 }
 
 export type ProjectViewType = "list" | "board";
