@@ -1,3 +1,16 @@
+import Dashboard from "@admin/components/AdminDashboard";
+import AdminProjectEdit from "@admin/components/AdminProjectEdit";
+import AdminProjectList from "@admin/components/AdminProjectList";
+import AdminProjectShow from "@admin/components/AdminProjectShow";
+import AdminTagEdit from "@admin/components/AdminTagEdit";
+import AdminTagList from "@admin/components/AdminTagList";
+import AdminTagShow from "@admin/components/AdminTagShow";
+import AdminTaskEdit from "@admin/components/AdminTaskEdit";
+import AdminTaskList from "@admin/components/AdminTaskList";
+import AdminTaskShow from "@admin/components/AdminTaskShow";
+import AdminUserEdit from "@admin/components/AdminUserEdit";
+import AdminUserList from "@admin/components/AdminUserList";
+import AdminUserShow from "@admin/components/AdminUserShow";
 import { useAuth0 } from "@auth0/auth0-react";
 import CategoryIcon from "@mui/icons-material/Category";
 import LabelIcon from "@mui/icons-material/Label";
@@ -6,26 +19,12 @@ import TaskIcon from "@mui/icons-material/Task";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
+import useDrfDataProvider from "@shared/hooks/useDrfDataProvider";
+import { Task } from "@shared/types/common";
 import { useEffect } from "react";
 import { Admin, Resource, useRecordContext } from "react-admin";
 import { useNavigate } from "react-router-dom";
 import striptags from "striptags";
-
-import AdminDashboard from "../components/AdminDashboard";
-import AdminProjectEdit from "../components/AdminProjectEdit";
-import AdminProjectList from "../components/AdminProjectList";
-import AdminProjectShow from "../components/AdminProjectShow";
-import AdminTagEdit from "../components/AdminTagEdit";
-import AdminTagList from "../components/AdminTagList";
-import AdminTagShow from "../components/AdminTagShow";
-import AdminTaskEdit from "../components/AdminTaskEdit";
-import AdminTaskList from "../components/AdminTaskList";
-import AdminTaskShow from "../components/AdminTaskShow";
-import AdminUserEdit from "../components/AdminUserEdit";
-import AdminUserList from "../components/AdminUserList";
-import AdminUserShow from "../components/AdminUserShow";
-import useDrfDataProvider from "../hooks/useDrfDataProvider";
-import { Task } from "../types/common";
 
 const API_BASE_URL = import.meta.env.VITE_API_ADMIN_BASE_URL;
 
@@ -55,11 +54,7 @@ export default function AdminPage() {
   }
 
   return (
-    <Admin
-      basename="/admin"
-      dataProvider={dataProvider}
-      dashboard={AdminDashboard}
-    >
+    <Admin basename="/admin" dataProvider={dataProvider} dashboard={Dashboard}>
       <Resource
         name="tasks"
         list={AdminTaskList}

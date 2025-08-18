@@ -1,9 +1,8 @@
 import { createTheme, Theme, ThemeProvider } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import ThemeContext from "@shared/contexts/themeContext";
 import { ReactNode } from "react";
 import useLocalStorage from "use-local-storage";
-
-import ThemeContext from "../contexts/themeContext";
 
 export default function ThemeContextProvider({
   children,

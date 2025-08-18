@@ -1,15 +1,14 @@
 import Alert from "@mui/material/Alert";
 import Container from "@mui/material/Container";
+import ProjectView from "@projects/components/ProjectView";
+import ProjectViewMenu from "@projects/components/ProjectViewMenu";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useInboxTasks, useProfile } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import { Project } from "@shared/types/common";
+import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
+import ViewPageTitle from "@views/components/ViewPageTitle";
 import { useEffect } from "react";
-
-import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import ProjectView from "../components/ProjectView";
-import ProjectViewMenu from "../components/ProjectViewMenu";
-import SkeletonList from "../components/SkeletonList";
-import ViewPageTitle from "../components/ViewPageTitle";
-import { useInboxTasks, useProfile } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import { Project } from "../types/common";
 
 export default function InboxPage() {
   const { data } = useProfile();

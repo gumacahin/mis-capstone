@@ -1,19 +1,17 @@
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import ProjectView from "@projects/components/ProjectView";
+import ProjectViewMenu from "@projects/components/ProjectViewMenu";
+import SkeletonList from "@shared/components/SkeletonList";
+import ProjectContext from "@shared/contexts/projectContext";
+import { useProject, useTask } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import useUpdateTaskDialogContext from "@shared/hooks/useUpdateTaskDialogContext";
+import PageLayout from "@views/components/PageLayout";
+import ViewPageTitle from "@views/components/ViewPageTitle";
 import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
-import PageLayout from "../components/PageLayout";
-import ProjectView from "../components/ProjectView";
-import ProjectViewMenu from "../components/ProjectViewMenu";
-import SkeletonList from "../components/SkeletonList";
-import ViewPageTitle from "../components/ViewPageTitle";
-import ProjectContext from "../contexts/projectContext";
-import { useProject } from "../hooks/queries";
-import { useTask } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import useUpdateTaskDialogContext from "../hooks/useUpdateTaskDialogContext";
 
 export default function ProjectPage() {
   const navigate = useNavigate();

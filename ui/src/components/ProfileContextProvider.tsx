@@ -1,5 +1,5 @@
-import ProfileContext from "../contexts/profileContext";
-import type { Profile } from "../types/common";
+import ProfileContext from "@shared/contexts/profileContext";
+import type { Profile } from "@shared/types/common";
 
 export function ProfileContextProvider({
   children,

@@ -6,6 +6,8 @@ import FormLabel from "@mui/material/FormLabel";
 import Input from "@mui/material/Input";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
+import { useUpdateProfile } from "@shared/hooks/queries";
+import useProfileContext from "@shared/hooks/useProfileContext";
 import {
   ArrowRight,
   CheckSquare,
@@ -16,9 +18,6 @@ import {
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
-import { useUpdateProfile } from "../hooks/queries";
-import useProfileContext from "../hooks/useProfileContext";
 
 interface FormValues {
   name: string;

@@ -1,4 +1,4 @@
-import { useProfile } from "../hooks/queries";
+import { useProfile } from "@shared/hooks/queries";
 
 export const ProfilePage = () => {
   const { data, isPending, isError } = useProfile();

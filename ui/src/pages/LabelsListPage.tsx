@@ -1,3 +1,5 @@
+import AddLabelButton from "@labels/components/AddLabelButton";
+import LabelMenu from "@labels/components/LabelMenu";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -9,17 +11,14 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useTags } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import type { Tag } from "@shared/types/common";
+import { slugify } from "@shared/utils";
+import PageLayout from "@views/components/PageLayout";
 import { MouseEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import AddLabelButton from "../components/AddLabelButton";
-import LabelMenu from "../components/LabelMenu";
-import PageLayout from "../components/PageLayout";
-import SkeletonList from "../components/SkeletonList";
-import { useTags } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import type { Tag } from "../types/common";
-import { slugify } from "../utils";
 
 export default function LabelListPage() {
   const { isPending, isError, data } = useTags();

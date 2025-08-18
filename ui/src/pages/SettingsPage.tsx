@@ -18,14 +18,13 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { useUpdateProfile } from "@shared/hooks/queries";
+import useProfileContext from "@shared/hooks/useProfileContext";
+import useThemeContext from "@shared/hooks/useThemeContext";
 import { GraduationCap, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
-import { useUpdateProfile } from "../hooks/queries";
-import useProfileContext from "../hooks/useProfileContext";
-import useThemeContext from "../hooks/useThemeContext";
 
 function ConfirmDeleteDialog({
   open,

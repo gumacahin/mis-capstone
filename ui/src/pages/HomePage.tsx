@@ -9,11 +9,10 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Spinner from "@shared/components/Spinner";
+import useProfileContext from "@shared/hooks/useProfileContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-import Spinner from "../components/Spinner";
-import useProfileContext from "../hooks/useProfileContext";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth0();

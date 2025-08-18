@@ -14,6 +14,26 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Path mapping */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@auth": ["src/modules/auth"],
+      "@auth/*": ["src/modules/auth/*"],
+      "@shared": ["src/modules/shared"],
+      "@shared/*": ["src/modules/shared/*"],
+      "@tasks": ["src/modules/tasks"],
+      "@tasks/*": ["src/modules/tasks/*"],
+      "@admin": ["src/modules/admin"],
+      "@admin/*": ["src/modules/admin/*"],
+      "@projects": ["src/modules/projects"],
+      "@projects/*": ["src/modules/projects/*"],
+      "@views": ["src/modules/views"],
+      "@views/*": ["src/modules/views/*"],
+      "@labels": ["src/modules/labels"],
+      "@labels/*": ["src/modules/labels/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

@@ -7,16 +7,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import type { ProjectViewType } from "@shared/types/common";
+import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
+import UpcomingView from "@views/components/UpcomingView";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
-
-import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import UpcomingView from "../components/UpcomingView";
-import useToolbarContext from "../hooks/useToolbarContext";
-import type { ProjectViewType } from "../types/common";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);

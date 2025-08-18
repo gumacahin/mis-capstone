@@ -9,16 +9,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useTasksToday } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import type { ProjectViewType, Task } from "@shared/types/common";
+import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
+import TodayView from "@views/components/TodayView";
+import ViewPageTitle from "@views/components/ViewPageTitle";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
-
-import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import SkeletonList from "../components/SkeletonList";
-import TodayView from "../components/TodayView";
-import ViewPageTitle from "../components/ViewPageTitle";
-import { useTasksToday } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import type { ProjectViewType, Task } from "../types/common";
 
 export default function TodayPage() {
   const { isPending, isError, data } = useTasksToday();

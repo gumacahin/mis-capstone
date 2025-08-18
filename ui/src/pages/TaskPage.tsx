@@ -1,10 +1,9 @@
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
+import Spinner from "@shared/components/Spinner";
+import { useTask } from "@shared/hooks/queries";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-import Spinner from "../components/Spinner";
-import { useTask } from "../hooks/queries";
 
 export default function TaskPage() {
   const { taskId } = useParams();

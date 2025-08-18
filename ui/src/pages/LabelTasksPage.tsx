@@ -9,17 +9,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useLabel } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import type { ProjectViewType } from "@shared/types/common";
+import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
+import LabelView from "@views/components/LabelView";
+import ViewPageTitle from "@views/components/ViewPageTitle";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useLocalStorage from "use-local-storage";
-
-import InboxDefaultSectionProvider from "../components/InboxDefaultSectionProvider";
-import LabelView from "../components/LabelView";
-import SkeletonList from "../components/SkeletonList";
-import ViewPageTitle from "../components/ViewPageTitle";
-import { useLabel } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import type { ProjectViewType } from "../types/common";
 
 export default function LabelTasksPage() {
   const { slug } = useParams();

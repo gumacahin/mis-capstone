@@ -13,16 +13,15 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import Textfield from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import AddProjectButton from "@projects/components/AddProjectButton";
+import ProjectMenu from "@projects/components/ProjectMenu";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useProjects } from "@shared/hooks/queries";
+import useToolbarContext from "@shared/hooks/useToolbarContext";
+import type { Project } from "@shared/types/common";
+import PageLayout from "@views/components/PageLayout";
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import AddProjectButton from "../components/AddProjectButton";
-import PageLayout from "../components/PageLayout";
-import ProjectMenu from "../components/ProjectMenu";
-import SkeletonList from "../components/SkeletonList";
-import { useProjects } from "../hooks/queries";
-import useToolbarContext from "../hooks/useToolbarContext";
-import type { Project } from "../types/common";
 
 export default function ProjectsListPage() {
   const { isPending, isError, data } = useProjects();

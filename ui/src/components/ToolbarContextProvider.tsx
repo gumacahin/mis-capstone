@@ -1,6 +1,5 @@
+import ToolbarContext from "@shared/contexts/toolbarContext";
 import { useState } from "react";
-
-import ToolbarContext from "../contexts/toolbarContext";
 
 export default function ToolBarContextProvider({
   children,
