@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.http import JsonResponse
@@ -42,3 +45,13 @@ urlpatterns = [
         name="daily-digest",
     ),
 ]
+
+# Include test endpoints only when all guards are satisfied
+if (
+    getattr(settings, "DEBUG", False)
+    and getattr(settings, "E2E_TEST_MODE", False)
+    and os.getenv("DJANGO_ALLOW_TEST_ENDPOINTS") == "1"
+):
+    urlpatterns += [
+        path("test/", include("testkit.urls")),
+    ]

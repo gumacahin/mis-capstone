@@ -110,6 +110,13 @@ celerybeat-schedule
 ##########
 .env
 
+# E2E Testing Environment #
+###########################
+.e2e
+tmp/
+api/db_test.sqlite3
+api/db_test.sqlite3-journal
+
 # virtualenv #
 ##############
 venv/

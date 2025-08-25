@@ -207,7 +207,11 @@ function DrawerContents({
           </ListItemButton>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.INBOX} onClick={handleNavItemClick}>
+          <ListItemNavLink
+            to={ROUTES.INBOX}
+            onClick={handleNavItemClick}
+            data-testid="inbox-link"
+          >
             <ListItemIcon sx={listItemIconStyle}>
               <InboxIcon />
             </ListItemIcon>
@@ -215,7 +219,11 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.TODAY} onClick={handleNavItemClick}>
+          <ListItemNavLink
+            to={ROUTES.TODAY}
+            onClick={handleNavItemClick}
+            data-testid="today-link"
+          >
             <ListItemIcon sx={listItemIconStyle}>
               <TodayIcon />
             </ListItemIcon>
@@ -223,7 +231,11 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.UPCOMING} onClick={handleNavItemClick}>
+          <ListItemNavLink
+            to={ROUTES.UPCOMING}
+            onClick={handleNavItemClick}
+            data-testid="upcoming-link"
+          >
             <ListItemIcon sx={listItemIconStyle}>
               <UpcomingIcon />
             </ListItemIcon>
@@ -231,7 +243,11 @@ function DrawerContents({
           </ListItemNavLink>
         </ListItem>
         <ListItem component={"div"} disableGutters disablePadding>
-          <ListItemNavLink to={ROUTES.LABELS} onClick={handleNavItemClick}>
+          <ListItemNavLink
+            to={ROUTES.LABELS}
+            onClick={handleNavItemClick}
+            data-testid="labels-link"
+          >
             <ListItemIcon sx={listItemIconStyle}>
               <LabelIcon />
             </ListItemIcon>
@@ -263,7 +279,11 @@ function DrawerContents({
             </>
           }
         >
-          <ListItemNavLink to={ROUTES.PROJECTS} onClick={handleNavItemClick}>
+          <ListItemNavLink
+            to={ROUTES.PROJECTS}
+            onClick={handleNavItemClick}
+            data-testid="projects-link"
+          >
             <ListItemText primary={"My Projects"} />
           </ListItemNavLink>
         </ListItem>

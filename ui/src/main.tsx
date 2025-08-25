@@ -17,6 +17,19 @@ import ToolbarContextProvider from "./components/ToolbarContextProvider.tsx";
 
 const queryClient = new QueryClient();
 
+// Load E2E bootstrap module only in test mode
+if (import.meta.env.VITE_APP_ENV === "e2e") {
+  import("./scripts/e2e.ts")
+    .then(() => {
+      console.log("E2E bootstrap module loaded");
+      return true;
+    })
+    .catch((error) => {
+      console.error("Failed to load E2E bootstrap module:", error);
+      return false;
+    });
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeContextProvider>
