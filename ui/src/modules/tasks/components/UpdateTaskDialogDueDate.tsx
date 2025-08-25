@@ -26,6 +26,8 @@ import dayjs, { Dayjs } from "dayjs";
 import { forwardRef, MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 
+import TimeSelectionItem from "../../shared/components/TimeSelectionItem";
+
 type DatePickerProps = DateCalendarProps<Dayjs> & {
   task: Task;
   setShowDatePicker: (show: boolean) => void;
@@ -36,6 +38,7 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { mutateAsync: updateTask } = useUpdateTask(task);
+
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
     };
@@ -59,6 +62,7 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
       setAnchorEl(null);
       setShowDatePicker(!!task.due_date);
     };
+
     const open = Boolean(anchorEl);
 
     const id = open ? "calendar-popover" : undefined;
@@ -74,23 +78,31 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
       const today = dayjs().startOf("day");
       const tomorrow = dayjs().add(1, "day").startOf("day");
       const sevenDaysFromNow = dayjs().add(7, "day").startOf("day"); // End on Sun
+
+      let dateText = "";
       if (givenDate.isSame(yesterday)) {
-        return "Yesterday";
+        dateText = "Yesterday";
+      } else if (givenDate.isSame(today)) {
+        dateText = "Today";
+      } else if (givenDate.isSame(tomorrow)) {
+        dateText = "Tomorrow";
+      } else if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
+        dateText = dayjs(date).format("dddd");
+      } else {
+        dateText = dayjs(date).format("MMMM D");
       }
-      if (givenDate.isSame(today)) {
-        return "Today";
+
+      // Add time if it's not midnight
+      if (date.hour() !== 0 || date.minute() !== 0) {
+        dateText += ` ${date.format("h:mm A")}`;
       }
-      if (givenDate.isSame(tomorrow)) {
-        return "Tomorrow";
-      }
-      if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
-        return dayjs(date).format("dddd");
-      }
-      return dayjs(date).format("MMMM D");
+
+      return dateText;
     };
+
     const today = dayjs().startOf("day");
     const tomorrow = dayjs().add(1, "day").startOf("day");
-    const nextWeek = dayjs().add(7, "day");
+    const nextWeek = dayjs().add(7, "day").startOf("day");
     const comingWeekend =
       today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
 
@@ -160,6 +172,17 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
           }}
         >
           <List>
+            <ListItem divider>
+              <ListItemText
+                primary={
+                  dueDate
+                    ? dueDate.hour() === 0 && dueDate.minute() === 0
+                      ? dueDate.format("MMMM D, YYYY")
+                      : dueDate.format("MMMM D, YYYY h:mm A")
+                    : ""
+                }
+              />
+            </ListItem>
             <ListItem disablePadding secondaryAction={dayjs().format("ddd")}>
               <ListItemButton
                 onClick={() => {
@@ -195,7 +218,7 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
             >
               <ListItemButton
                 onClick={() => {
-                  handleChange(comingWeekend);
+                  handleChange(comingWeekend.startOf("day"));
                   handleClose();
                 }}
               >
@@ -208,7 +231,7 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
             <ListItem disablePadding secondaryAction={nextWeek.format("ddd")}>
               <ListItemButton
                 onClick={() => {
-                  handleChange(nextWeek);
+                  handleChange(nextWeek.startOf("day"));
                   handleClose();
                 }}
               >
@@ -218,6 +241,7 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
                 <ListItemText primary={"Next Week"} />
               </ListItemButton>
             </ListItem>
+
             {dueDate && (
               <ListItem disablePadding>
                 <ListItemButton
@@ -239,11 +263,18 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
               disablePast
               value={dueDate}
               onChange={(newDate: Dayjs | null) => {
-                handleChange(newDate);
+                if (newDate) {
+                  handleChange(newDate.startOf("day"));
+                } else {
+                  handleChange(null);
+                }
                 handleClose();
               }}
             />
           </LocalizationProvider>
+
+          {/* Time button below calendar */}
+          <TimeSelectionItem value={dueDate} onChange={handleChange} />
         </Popover>
       </>
     );

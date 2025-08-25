@@ -1,3 +1,4 @@
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CloseIcon from "@mui/icons-material/Close";
 import NextWeekIcon from "@mui/icons-material/NextWeek";
@@ -25,6 +26,7 @@ import { forwardRef, MouseEvent, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 import type { TaskFormFields } from "../types/common";
+import TimeSelectionItem from "./TimeSelectionItem";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
   control: Control<TaskFormFields>;
@@ -45,8 +47,8 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
         onClose();
       }
     };
-    const open = Boolean(anchorEl);
 
+    const open = Boolean(anchorEl);
     const id = open ? "calendar-popover" : undefined;
 
     const formatDayOfWeek = (date: Dayjs | null) => {
@@ -58,19 +60,27 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       const today = dayjs().startOf("day");
       const tomorrow = dayjs().add(1, "day").startOf("day");
       const sevenDaysFromNow = dayjs().add(7, "day").startOf("day"); // End on Sun
+
+      let dateText = "";
       if (givenDate.isSame(yesterday)) {
-        return "Yesterday";
+        dateText = "Yesterday";
+      } else if (givenDate.isSame(today)) {
+        dateText = "Today";
+      } else if (givenDate.isSame(tomorrow)) {
+        dateText = "Tomorrow";
+      } else if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
+        dateText = dayjs(date).format("dddd");
+      } else {
+        dateText = dayjs(date).format("MMMM D");
       }
-      if (givenDate.isSame(today)) {
-        return "Today";
+
+      // Add time if it's not midnight (00:00)
+      const hasTime = date.hour() !== 0 || date.minute() !== 0;
+      if (hasTime) {
+        dateText += ` ${date.format("h:mm A")}`;
       }
-      if (givenDate.isSame(tomorrow)) {
-        return "Tomorrow";
-      }
-      if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
-        return dayjs(date).format("dddd");
-      }
-      return dayjs(date).format("MMMM D");
+
+      return dateText;
     };
 
     return (
@@ -137,6 +147,27 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                     </Button>
                   </Tooltip>
                 )}
+                {field.value &&
+                  (field.value.hour() !== 0 || field.value.minute() !== 0) && (
+                    <Tooltip title="Clear time">
+                      <Button
+                        sx={{
+                          flexGrow: 0,
+                          flexShrink: 0,
+                          width: "auto",
+                        }}
+                        size="small"
+                        variant={props.variant ?? "outlined"}
+                        onClick={() => {
+                          // Clear time but keep date
+                          const dateOnly = field.value?.startOf("day");
+                          field.onChange(dateOnly);
+                        }}
+                      >
+                        <AccessTimeIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                  )}
               </ButtonGroup>
               <Popover
                 id={id}
@@ -149,13 +180,28 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 }}
               >
                 <List>
+                  <ListItem disablePadding>
+                    <ListItemButton disabled>
+                      <ListItemText
+                        primary={
+                          field.value
+                            ? field.value.hour() === 0 &&
+                              field.value.minute() === 0
+                              ? field.value.format("MMMM D, YYYY") // Date only (no time) for midnight
+                              : field.value.format("MMMM D, YYYY h:mm A") // Date + time for non-midnight
+                            : ""
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem divider />
                   <ListItem
                     disablePadding
                     secondaryAction={dayjs().format("ddd")}
                   >
                     <ListItemButton
                       onClick={() => {
-                        field.onChange(dayjs());
+                        field.onChange(dayjs().startOf("day"));
                         handleClose();
                       }}
                     >
@@ -171,7 +217,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                   >
                     <ListItemButton
                       onClick={() => {
-                        const tomorrow = dayjs().add(1, "day");
+                        const tomorrow = dayjs().add(1, "day").startOf("day");
                         field.onChange(tomorrow);
                         handleClose();
                       }}
@@ -189,7 +235,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                     <ListItemButton
                       onClick={() => {
                         handleClose();
-                        field.onChange(comingWeekend);
+                        field.onChange(comingWeekend.startOf("day"));
                       }}
                     >
                       <ListItemIcon>
@@ -204,8 +250,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                   >
                     <ListItemButton
                       onClick={() => {
-                        field.onChange(nextWeek);
-                        handleClose();
+                        field.onChange(nextWeek.startOf("day"));
                       }}
                     >
                       <ListItemIcon>
@@ -235,11 +280,18 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                     disablePast
                     value={field.value}
                     onChange={(newDate: Dayjs | null) => {
-                      field.onChange(newDate);
-                      handleClose();
+                      if (newDate) {
+                        field.onChange(newDate.startOf("day"));
+                      } else {
+                        field.onChange(null);
+                      }
                     }}
                   />
                 </LocalizationProvider>
+                <TimeSelectionItem
+                  value={field.value}
+                  onChange={field.onChange}
+                />
               </Popover>
             </>
           );

@@ -136,8 +136,8 @@ export const useTask = (
 
 export const useTasks = (start: Dayjs, end: Dayjs) => {
   const apiClient = useApiClient();
-  const startStr = start.format("YYYY-MM-DD");
-  const endStr = end.format("YYYY-MM-DD");
+  const startStr = start.format("YYYY-MM-DD HH:mm");
+  const endStr = end.format("YYYY-MM-DD HH:mm");
   return useQuery({
     queryKey: ["tasks", { start: startStr, end: endStr }],
     queryFn: async () => {
@@ -168,7 +168,7 @@ export const useAddTask = ({
         below_task: belowTaskId,
         above_task: aboveTaskId,
         ...(dayjs.isDayjs(task.due_date) && {
-          due_date: task.due_date.format("YYYY-MM-DD"),
+          due_date: task.due_date.format("YYYY-MM-DD HH:mm"),
         }),
       };
       const response = await apiClient.post("/tasks/", data);
@@ -193,10 +193,11 @@ export const useUpdateTask = (task?: Task) => {
       const data = {
         ...updatedTask,
         ...(dayjs.isDayjs(updatedTask.completion_date) && {
-          completion_date: updatedTask.completion_date.format("YYYY-MM-DD"),
+          completion_date:
+            updatedTask.completion_date.format("YYYY-MM-DD HH:mm"),
         }),
         ...(dayjs.isDayjs(updatedTask.due_date) && {
-          due_date: updatedTask.due_date.format("YYYY-MM-DD"),
+          due_date: updatedTask.due_date.format("YYYY-MM-DD HH:mm"),
         }),
       };
 
@@ -236,7 +237,7 @@ export const useRescheduleTask = () => {
     mutationKey: ["rescheduleTask"],
     mutationFn: async ({ task, dueDate }: { task: Task; dueDate: Dayjs }) => {
       const data = {
-        due_date: dueDate.format("YYYY-MM-DD"),
+        due_date: dueDate.format("YYYY-MM-DD HH:mm"),
       };
       const taskId = task.id;
       const result = await apiClient.patch(`/tasks/${taskId}/`, data);

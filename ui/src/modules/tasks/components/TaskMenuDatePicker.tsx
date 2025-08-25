@@ -13,6 +13,7 @@ import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import TimeSelectionItem from "@shared/components/TimeSelectionItem";
 import { Task } from "@shared/types/common";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -27,10 +28,14 @@ export default function TaskMenuDatePicker({
   anchorEl: null | HTMLElement;
   handleClose: () => void;
 }) {
-  const today = dayjs();
+  const today = dayjs().startOf("day");
   const nextWeek = today.add(7, "day");
   const comingWeekend =
     today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
+
+  // Get the current due date for display
+  const dueDate = task.due_date ? dayjs(task.due_date) : null;
+
   return (
     <Popover
       open={Boolean(anchorEl)}
@@ -42,6 +47,19 @@ export default function TaskMenuDatePicker({
       }}
     >
       <List>
+        {/* Date display at the top */}
+        <ListItem divider>
+          <ListItemText
+            primary={
+              dueDate
+                ? dueDate.hour() === 0 && dueDate.minute() === 0
+                  ? dueDate.format("MMMM D, YYYY")
+                  : dueDate.format("MMMM D, YYYY h:mm A")
+                : ""
+            }
+          />
+        </ListItem>
+
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
@@ -128,11 +146,18 @@ export default function TaskMenuDatePicker({
           disablePast
           defaultValue={task.due_date ? dayjs(task.due_date) : null}
           onChange={(newDate: Dayjs | null) => {
-            handleOnChange(newDate);
+            if (newDate) {
+              handleOnChange(newDate.startOf("day"));
+            } else {
+              handleOnChange(null);
+            }
             handleClose();
           }}
         />
       </LocalizationProvider>
+
+      {/* Time button below calendar */}
+      <TimeSelectionItem value={dueDate} onChange={handleOnChange} />
     </Popover>
   );
 }

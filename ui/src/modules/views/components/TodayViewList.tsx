@@ -54,7 +54,7 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
     const newOverdueTaskList = Array.from(overdueTaskList);
     const newTodayTaskList = Array.from(todayTaskList);
     const [removed] = newOverdueTaskList.splice(source.index, 1);
-    removed.due_date = dayjs().format("YYYY-MM-DD");
+    removed.due_date = dayjs().startOf("day").format("YYYY-MM-DD");
     newTodayTaskList.splice(destination.index, 0, removed);
 
     setOverdueTaskList(newOverdueTaskList);
@@ -63,7 +63,7 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
     await toast.promise(
       reschedTask({
         task: removed,
-        dueDate: dayjs(),
+        dueDate: dayjs().startOf("day"),
       }),
       {
         loading: "Rescheduling task...",

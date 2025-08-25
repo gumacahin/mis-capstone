@@ -98,7 +98,7 @@ export default function LabelViewTaskMenu({
     handleCloseTaskMenu();
     await toast.promise(
       updateTask({
-        due_date: dayjs(),
+        due_date: dayjs().startOf("day"),
       }),
       {
         loading: "Setting due date to today...",
@@ -112,7 +112,7 @@ export default function LabelViewTaskMenu({
     handleCloseTaskMenu();
     await toast.promise(
       updateTask({
-        due_date: dayjs().add(1, "day"),
+        due_date: dayjs().add(1, "day").startOf("day"),
       }),
       {
         loading: "Setting due date to tomorrow...",

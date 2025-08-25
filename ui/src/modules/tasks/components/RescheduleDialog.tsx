@@ -69,7 +69,7 @@ export default function RescheduleDialog({ tasks }: { tasks: Task[] }) {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                handleReschedule(dayjs().toDate());
+                handleReschedule(dayjs().startOf("day").toDate());
                 handleClose();
               }}
             >
@@ -85,7 +85,7 @@ export default function RescheduleDialog({ tasks }: { tasks: Task[] }) {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                handleReschedule(dayjs().add(1, "day").toDate());
+                handleReschedule(dayjs().add(1, "day").startOf("day").toDate());
                 handleClose();
               }}
             >
@@ -98,7 +98,13 @@ export default function RescheduleDialog({ tasks }: { tasks: Task[] }) {
               </ListItemSecondaryAction>
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
+          <ListItem
+            disablePadding
+            secondaryAction={dayjs()
+              .startOf("week")
+              .add(6, "day")
+              .format("ddd")}
+          >
             <ListItemButton
               onClick={() => {
                 handleReschedule(
@@ -119,7 +125,7 @@ export default function RescheduleDialog({ tasks }: { tasks: Task[] }) {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                handleReschedule(dayjs().add(7, "day").toDate());
+                handleReschedule(dayjs().add(7, "day").startOf("day").toDate());
                 handleClose();
               }}
             >
