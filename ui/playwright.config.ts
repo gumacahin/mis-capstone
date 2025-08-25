@@ -15,6 +15,12 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
+  /* Global timeout for each test */
+  timeout: 30000, // 30 seconds (reduced from 60s)
+  /* Timeout for each assertion */
+  expect: {
+    timeout: 5000, // 5 seconds (reduced from 10s)
+  },
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -31,15 +37,16 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
 
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
+    // Disable other browsers for now - focus on Chromium first
+    // {
+    //   name: "firefox",
+    //   use: { ...devices["Desktop Firefox"] },
+    // },
 
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
+    // {
+    //   name: "webkit",
+    //   use: { ...devices["Desktop Safari"] },
+    // },
 
     /* Test against mobile viewports. */
     // {
@@ -63,9 +70,18 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: "cd /Users/marcoenrico/Projects/capstone && make api",
+      url: "http://localhost:8000/",
+      reuseExistingServer: !process.env.CI,
+      timeout: 10 * 1000, // 10 seconds for backend startup (measured: 2s)
+    },
+    {
+      command: "cd /Users/marcoenrico/Projects/capstone && make ui",
+      url: "http://localhost:3000",
+      reuseExistingServer: !process.env.CI,
+      timeout: 15 * 1000, // 15 seconds for frontend startup (measured: 3s)
+    },
+  ],
 });

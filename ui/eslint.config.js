@@ -6,7 +6,6 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import cypress from "eslint-plugin-cypress";
 import _import from "eslint-plugin-import";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import promise from "eslint-plugin-promise";
@@ -32,8 +31,6 @@ export default [
       "**/dist",
       "**/node_modules",
       "**/.prettierrc",
-      "**/cypress",
-      "**/cypress.config.ts",
       "**/eslint.config.js",
       "**/package.json",
       "**/tsconfig.json",
@@ -45,7 +42,6 @@ export default [
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:react-hooks/recommended",
-      "plugin:cypress/recommended",
       "plugin:import/recommended",
       "plugin:import/typescript",
       "plugin:jsx-a11y/recommended",
@@ -59,7 +55,6 @@ export default [
   {
     plugins: {
       "react-refresh": reactRefresh,
-      cypress: fixupPluginRules(cypress),
       "@typescript-eslint": fixupPluginRules(typescriptEslint),
       import: fixupPluginRules(_import),
       "jsx-a11y": fixupPluginRules(jsxA11Y),
@@ -71,7 +66,6 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...cypress.environments.globals.globals,
       },
 
       parser: tsParser,
