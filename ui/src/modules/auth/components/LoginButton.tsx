@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import Button, { type ButtonProps } from "@mui/material/Button";
+import { Button } from "@mui/material";
+import type { ButtonProps } from "@mui/material/Button";
 import type { ReactNode } from "react";
 
 interface LoginButtonProps extends ButtonProps {
@@ -7,24 +8,29 @@ interface LoginButtonProps extends ButtonProps {
 }
 
 const LoginButton = ({ children, ...props }: LoginButtonProps) => {
-  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, loginWithRedirect } = useAuth0();
 
-  if (isLoading) {
+  const handleLogin = async () => {
+    try {
+      await loginWithRedirect();
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  if (user || isAuthenticated) {
     return null;
   }
 
   return (
-    !isAuthenticated && (
-      <Button
-        color="inherit"
-        onClick={async () => {
-          await loginWithRedirect();
-        }}
-        {...props}
-      >
-        {children ?? "Log In"}
-      </Button>
-    )
+    <Button
+      color="inherit"
+      onClick={handleLogin}
+      data-testid="login-button"
+      {...props}
+    >
+      {children ?? "Log In"}
+    </Button>
   );
 };
 

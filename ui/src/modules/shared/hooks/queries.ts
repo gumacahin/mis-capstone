@@ -20,7 +20,7 @@ import type {
 import { slugify } from "../utils";
 
 export const useApiClient = () => {
-  const { getAccessTokenSilently, loginWithRedirect } = useAuth0();
+  const { getAccessTokenSilently } = useAuth0();
 
   const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -29,13 +29,11 @@ export const useApiClient = () => {
   apiClient.interceptors.request.use(async (config) => {
     try {
       const token = await getAccessTokenSilently();
-      config.headers.Authorization = `Bearer ${token}`;
-    } catch (error) {
-      if (error instanceof Error && error.message === "Login required") {
-        await loginWithRedirect();
-      } else {
-        console.error("Unexpected error getting access token", error);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
+    } catch (error) {
+      console.error("Error getting Auth0 token", error);
     }
     return config;
   });

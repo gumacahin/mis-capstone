@@ -16,6 +16,8 @@ export interface Profile {
   id: number;
   name: string;
   email: string;
+  notification_email?: string;
+  email_for_notifications: string;
   picture: string;
   is_student: boolean;
   is_faculty: boolean;

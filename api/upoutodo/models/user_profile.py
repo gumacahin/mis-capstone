@@ -9,6 +9,11 @@ User = get_user_model()
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     name = models.CharField(max_length=100, blank=True)
+    notification_email = models.EmailField(
+        blank=True,
+        null=True,
+        help_text="Email address for notifications. If not set, uses the user's login email.",
+    )
     is_student = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
     is_onboarded = models.BooleanField(default=False)
@@ -24,6 +29,11 @@ class UserProfile(models.Model):
     @property
     def inbox(self):
         return Project.get_user_inbox(self.user)
+
+    @property
+    def email_for_notifications(self):
+        """Get the email to use for notifications"""
+        return self.notification_email or self.user.email
 
     def update_from_request(self, request):
         updated = False

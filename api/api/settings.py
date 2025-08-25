@@ -97,8 +97,7 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
         ),
     },
     {
@@ -157,11 +156,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 AUTH0 = {
-    "AUTH0_DOMAIN": os.getenv("VITE_AUTH0_DOMAIN"),
-    "AUTH0_CLIENT_ID": os.getenv("VITE_AUTH0_CLIENT_ID"),
-    "AUTH0_AUDIENCE": os.getenv("VITE_AUTH0_AUDIENCE"),
-    "AUTH0_SCOPE": os.getenv("VITE_AUTH0_SCOPE"),
-    "AUTH0_REDIRECT_URL": os.getenv("VITE_AUTH0_REDIRECT_URL"),
+    "AUTH0_DOMAIN": os.getenv("AUTH0_DOMAIN"),
+    "AUTH0_CLIENT_ID": os.getenv("AUTH0_CLIENT_ID"),
+    "AUTH0_AUDIENCE": os.getenv("AUTH0_AUDIENCE"),
+    "AUTH0_SCOPE": os.getenv("AUTH0_SCOPE"),
+    "AUTH0_REDIRECT_URL": os.getenv("AUTH0_REDIRECT_URL"),
 }
 
 JWT_AUTH = {

@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-// import "vite/client";
 
 interface ImportMetaEnv {
   readonly VITE_AUTH0_DOMAIN: string;
@@ -7,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_AUTH0_AUDIENCE: string;
   readonly VITE_AUTH0_SCOPE: string;
   readonly VITE_AUTH0_REDIRECT_URL: string;
+  readonly APP_ENV: string;
 }
 
 export interface ImportMeta {

@@ -29,6 +29,13 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.SerializerMethodField()
+    notification_email = serializers.EmailField(
+        source="profile.notification_email",
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+    email_for_notifications = serializers.SerializerMethodField()
     is_student = serializers.BooleanField(source="profile.is_student")
     is_faculty = serializers.BooleanField(source="profile.is_faculty")
     is_onboarded = serializers.BooleanField(source="profile.is_onboarded")
@@ -44,12 +51,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             return obj.profile.name
         return f"User {obj.id}"
 
+    def get_email_for_notifications(self, obj):
+        return obj.profile.email_for_notifications
+
     class Meta:
         model = User
         fields = [
             "id",
             "name",
             "email",
+            "notification_email",
+            "email_for_notifications",
             "is_faculty",
             "is_student",
             "is_onboarded",
@@ -60,9 +72,5 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "projects",
             "email",
-            "is_faculty",
-            "is_student",
-            "is_onboarded",
-            "projects",
-            "theme",
+            "email_for_notifications",
         ]

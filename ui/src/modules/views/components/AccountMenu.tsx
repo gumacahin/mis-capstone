@@ -16,17 +16,17 @@ import { useNavigate } from "react-router-dom";
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { logout } = useAuth0();
+  const { user, logout } = useAuth0();
   const navigate = useNavigate();
-  // const handleClick = (event: MouseEvent<HTMLElement>) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-  const handleLogoutClick = async () => {
-    await logout({ logoutParams: { returnTo: window.location.origin } });
+
+  const handleLogoutClick = () => {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+    handleClose();
   };
 
   const handleSettingsClick = () => {
     navigate("settings");
+    handleClose();
   };
 
   const handleMenuClick = (event: MouseEvent<HTMLElement>) => {
@@ -41,7 +41,7 @@ export default function AccountMenu() {
     handleClose();
   };
 
-  const name = "Todo User";
+  const name = user?.nickname || user?.name || "Todo User";
   const initial = name[0].toLocaleUpperCase();
 
   return (
@@ -57,6 +57,7 @@ export default function AccountMenu() {
           variant="text"
           startIcon={<Avatar sx={{ width: 24, height: 24 }}>{initial}</Avatar>}
           endIcon={<ExpandMoreIcon />}
+          data-testid="user-menu"
         >
           {name}
         </Button>
@@ -67,7 +68,6 @@ export default function AccountMenu() {
         id="account-menu"
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
@@ -84,7 +84,7 @@ export default function AccountMenu() {
           Settings
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleLogoutClick}>
+        <MenuItem onClick={handleLogoutClick} data-testid="logout-option">
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
