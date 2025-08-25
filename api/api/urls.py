@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.http import JsonResponse
 from django.urls import include, path
 from rest_framework import routers
 
@@ -23,6 +24,7 @@ admin_router.register(r"tags", views.admin.AdminTagViewSet)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    path("", lambda _: JsonResponse({"ok": True}), name="health-check"),
     path("api/", include(router.urls)),
     path("api-admin/", include(admin_router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
