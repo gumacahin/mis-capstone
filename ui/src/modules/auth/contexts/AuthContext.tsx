@@ -1,10 +1,10 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0, type User } from "@auth0/auth0-react";
 import { createContext, type ReactNode, useContext } from "react";
 
 interface AuthContextType {
-  user: any;
+  user: User | undefined;
   loading: boolean;
-  error: any;
+  error: Error | undefined;
   loginWithRedirect: () => void;
   logout: () => void;
   isAuthenticated: boolean;

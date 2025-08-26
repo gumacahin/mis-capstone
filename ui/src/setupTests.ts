@@ -33,3 +33,6 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),
   useLocation: () => ({ pathname: "/" }),
 }));
+
+jest.useFakeTimers();
+jest.setSystemTime(new Date("2025-08-27T10:00:00Z"));

@@ -119,3 +119,12 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"], url_path="complete")
+    def complete(self, request, pk=None):
+        """Mark a task as complete, handling recurrence if applicable."""
+        task = self.get_object()
+        task.mark_complete()
+
+        serializer = self.get_serializer(task)
+        return Response(serializer.data)

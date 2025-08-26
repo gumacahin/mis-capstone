@@ -27,11 +27,7 @@ export default {
   transform: {
     "^.+\\.(ts|tsx)$": [
       "ts-jest",
-      {
-        tsconfig: {
-          jsx: "react-jsx",
-        },
-      },
+      { tsconfig: "<rootDir>/tsconfig.jest.json" },
     ],
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],

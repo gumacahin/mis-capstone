@@ -31,6 +31,8 @@ export type FormValues = {
   description: string | null;
   due_date: Dayjs | null;
   section: number | null;
+  recurrence?: string | null;
+  repeat_when_complete?: boolean;
 };
 
 export default function AddTaskDialog({
@@ -60,6 +62,8 @@ export default function AddTaskDialog({
     section: section?.id ?? inboxDefaultSection?.id,
     priority: "NONE" as TaskPriority,
     tags: [],
+    recurrence: null,
+    repeat_when_complete: true,
   };
 
   const { control, handleSubmit, watch, reset } = useForm<TaskFormFields>({
@@ -74,6 +78,8 @@ export default function AddTaskDialog({
     project,
     tags,
     priority,
+    recurrence,
+    repeat_when_complete,
   }) => {
     setLoading(true);
     const data: Partial<TaskFormFields> = {
@@ -84,6 +90,8 @@ export default function AddTaskDialog({
       tags,
       priority,
       project,
+      recurrence,
+      repeat_when_complete,
     };
 
     try {

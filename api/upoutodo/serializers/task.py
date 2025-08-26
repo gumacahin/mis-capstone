@@ -4,6 +4,7 @@ from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
 from upoutodo.models import Project, ProjectSection, Task
+from upoutodo.recurrence import RecurrenceParseError, parse_recurrence
 
 from .tag import Tag
 
@@ -50,6 +51,16 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "section_title",
             "project_title",
             "comments_count",
+            "is_recurring",
+            "recurrence",
+            "rrule",
+            "recurrence_anchor",
+            "recurrence_timezone",
+            "repeat_when_complete",
+            "recurrence_anchor_mode",
+            "parent_task",
+            "humanized_recurrence",
+            "next_occurrence",
         ]
 
     def get_comments_count(self, obj):
@@ -82,7 +93,30 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
         if above_task:
             data["order"] = above_task.order
         elif below_task:
-            data["order"] = below_task.order + 1
+            data["order"] = above_task.order + 1
+
+        # Validate recurrence if provided
+        recurrence = data.get("recurrence")
+        if recurrence:
+            try:
+                rrule, anchor = parse_recurrence(recurrence)
+                data["rrule"] = rrule
+                data["recurrence_anchor"] = anchor
+                data["is_recurring"] = True
+
+                # Set due_date if not provided
+                if not data.get("due_date"):
+                    from upoutodo.recurrence import get_next_occurrence
+
+                    data["due_date"] = get_next_occurrence(anchor, rrule, "Asia/Manila")
+
+            except RecurrenceParseError as e:
+                raise serializers.ValidationError(
+                    {
+                        "recurrence": f"Invalid recurrence pattern: {str(e)}. "
+                        "Examples: 'every weekday at 9am', 'every 2 weeks', 'every 3rd friday'"
+                    }
+                )
 
         return data
 

@@ -249,8 +249,8 @@ export default function OnboardingPage() {
                 variant="h6"
                 className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed"
               >
-                Let's personalize your experience to help you succeed at the
-                University of the Philippines Open University
+                Let&apos;s personalize your experience to help you succeed at
+                the University of the Philippines Open University
               </Typography>
             </div>
           </div>
@@ -587,7 +587,7 @@ export default function OnboardingPage() {
                               variant="h6"
                               className="font-semibold text-gray-800 dark:text-gray-100"
                             >
-                              I'm a UPOU Student
+                              I&apos;m a UPOU Student
                             </Typography>
                           </FormLabel>
                           <Typography
@@ -661,7 +661,7 @@ export default function OnboardingPage() {
                               variant="h6"
                               className="font-semibold text-gray-800 dark:text-gray-100"
                             >
-                              I'm a UPOU Faculty
+                              I&apos;m a UPOU Faculty
                             </Typography>
                           </FormLabel>
                           <Typography

@@ -9,6 +9,7 @@ from rest_framework import routers
 
 from upoutodo import views
 from upoutodo.views.email import daily_digest
+from upoutodo.views.recurrence import preview_recurrence
 
 router = routers.DefaultRouter()
 router.register(r"project_sections", views.ProjectSectionViewSet)
@@ -43,6 +44,11 @@ urlpatterns = [
         "api/email/daily-digest",
         daily_digest,
         name="daily-digest",
+    ),
+    path(
+        "api/recurrence/preview",
+        preview_recurrence,
+        name="recurrence-preview",
     ),
 ]
 

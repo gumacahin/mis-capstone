@@ -36,6 +36,9 @@ export interface TaskFormFields {
   section: number;
   project: number;
   tags: string[];
+  recurrence?: string | null;
+  repeat_when_complete?: boolean;
+  recurrence_anchor_mode?: "SCHEDULED" | "COMPLETED";
 }
 
 export interface Task {
@@ -52,6 +55,16 @@ export interface Task {
   tags: string[];
   order: number;
   comments_count: number;
+  is_recurring?: boolean;
+  recurrence?: string | null;
+  rrule?: string | null;
+  recurrence_anchor?: string | null;
+  recurrence_timezone?: string;
+  repeat_when_complete?: boolean;
+  recurrence_anchor_mode?: "SCHEDULED" | "COMPLETED";
+  parent_task?: number | null;
+  humanized_recurrence?: string;
+  next_occurrence?: string | null;
 }
 
 export interface Comment {

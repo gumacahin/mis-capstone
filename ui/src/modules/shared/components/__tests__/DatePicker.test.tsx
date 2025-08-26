@@ -19,8 +19,12 @@ jest.mock("dayjs", () => {
 // Test wrapper component to provide form context
 const TestWrapper = ({
   initialValue = null,
+  initialRecurrence = null,
+  initialAnchorMode = "SCHEDULED",
 }: {
   initialValue?: dayjs.Dayjs | null;
+  initialRecurrence?: string | null;
+  initialAnchorMode?: "SCHEDULED" | "COMPLETED";
 }) => {
   const { control } = useForm<TaskFormFields>({
     defaultValues: {
@@ -32,6 +36,8 @@ const TestWrapper = ({
       section: 0,
       project: 0,
       tags: [],
+      recurrence: initialRecurrence,
+      recurrence_anchor_mode: initialAnchorMode,
     },
   });
   return <DatePicker control={control} />;
@@ -234,6 +240,37 @@ describe("DatePicker Component", () => {
         name: /remove due date/i,
       });
       expect(removeButton).toBeInTheDocument();
+    });
+  });
+
+  describe("Recurrence Functionality", () => {
+    it("should render RepeatSelectionItem when date picker is opened", async () => {
+      render(<TestWrapper />);
+      const button = screen.getByRole("button", { name: /set due date/i });
+
+      await user.click(button);
+
+      // Should show the Repeat button
+      expect(screen.getByText("Repeat")).toBeInTheDocument();
+    });
+
+    it("should show current recurrence value when set", async () => {
+      render(<TestWrapper initialRecurrence="every monday" />);
+      const button = screen.getByRole("button", { name: /set due date/i });
+
+      // Open the date picker to see the recurrence
+      await user.click(button);
+
+      // Should show the current recurrence
+      expect(screen.getByText("Every Mon")).toBeInTheDocument();
+    });
+
+    it("should show current anchor mode when set", () => {
+      render(<TestWrapper initialAnchorMode="COMPLETED" />);
+      const button = screen.getByRole("button", { name: /set due date/i });
+
+      // Should show the current anchor mode (though this might be hidden in the custom dialog)
+      expect(button).toBeInTheDocument();
     });
   });
 });

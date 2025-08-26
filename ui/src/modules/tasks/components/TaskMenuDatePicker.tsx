@@ -13,9 +13,12 @@ import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import RepeatSelectionItem from "@shared/components/RepeatSelectionItem";
+import { SmartDateTimeField } from "@shared/components/SmartDateTimeField";
 import TimeSelectionItem from "@shared/components/TimeSelectionItem";
 import { Task } from "@shared/types/common";
 import dayjs, { Dayjs } from "dayjs";
+import { useState } from "react";
 
 export default function TaskMenuDatePicker({
   task,
@@ -24,7 +27,11 @@ export default function TaskMenuDatePicker({
   handleClose,
 }: {
   task: Task;
-  handleOnChange: (date: Dayjs | null) => void;
+  handleOnChange: (
+    date: Dayjs | null,
+    recurrence?: string | null,
+    anchorMode?: "SCHEDULED" | "COMPLETED",
+  ) => void;
   anchorEl: null | HTMLElement;
   handleClose: () => void;
 }) {
@@ -35,6 +42,14 @@ export default function TaskMenuDatePicker({
 
   // Get the current due date for display
   const dueDate = task.due_date ? dayjs(task.due_date) : null;
+
+  // Local state for recurrence
+  const [recurrence, setRecurrence] = useState<string | null>(
+    task.recurrence || null,
+  );
+  const [anchorMode, setAnchorMode] = useState<"SCHEDULED" | "COMPLETED">(
+    task.recurrence_anchor_mode || "SCHEDULED",
+  );
 
   return (
     <Popover
@@ -47,19 +62,28 @@ export default function TaskMenuDatePicker({
       }}
     >
       <List>
-        {/* Date display at the top */}
         <ListItem divider>
-          <ListItemText
-            primary={
-              dueDate
-                ? dueDate.hour() === 0 && dueDate.minute() === 0
-                  ? dueDate.format("MMMM D, YYYY")
-                  : dueDate.format("MMMM D, YYYY h:mm A")
-                : ""
-            }
+          <SmartDateTimeField
+            value={dueDate}
+            onChange={(newDate, newRecurrence) => {
+              handleOnChange(newDate, newRecurrence || recurrence, anchorMode);
+            }}
+            recurrence={recurrence}
+            recurrenceAnchorMode={anchorMode}
+            onRecurrenceChange={(newRecurrence) => {
+              setRecurrence(newRecurrence);
+              if (dueDate) {
+                handleOnChange(dueDate, newRecurrence, anchorMode);
+              }
+            }}
+            onAnchorModeChange={(newAnchorMode) => {
+              setAnchorMode(newAnchorMode);
+              if (dueDate) {
+                handleOnChange(dueDate, recurrence, newAnchorMode);
+              }
+            }}
           />
         </ListItem>
-
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => {
@@ -158,6 +182,27 @@ export default function TaskMenuDatePicker({
 
       {/* Time button below calendar */}
       <TimeSelectionItem value={dueDate} onChange={handleOnChange} />
+
+      {/* Repeat button below time */}
+      <RepeatSelectionItem
+        value={recurrence}
+        onChange={(repeat) => {
+          setRecurrence(repeat);
+          // Update the task with the new recurrence
+          if (dueDate) {
+            handleOnChange(dueDate, repeat, anchorMode);
+          }
+        }}
+        selectedDate={dueDate}
+        anchorMode={anchorMode}
+        onAnchorModeChange={(mode) => {
+          setAnchorMode(mode);
+          // Update the task with the new anchor mode
+          if (dueDate) {
+            handleOnChange(dueDate, recurrence, mode);
+          }
+        }}
+      />
     </Popover>
   );
 }

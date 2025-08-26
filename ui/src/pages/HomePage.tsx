@@ -145,18 +145,18 @@ function HomePage() {
               {/* Footer */}
               <div className="text-center pt-6 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex justify-center space-x-6 text-sm">
-                  <a
-                    href="javascript:void(0)"
-                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                  <button
+                    type="button"
+                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors bg-transparent border-none cursor-pointer"
                   >
                     Privacy Policy
-                  </a>
-                  <a
-                    href="javascript:void(0)"
-                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                  </button>
+                  <button
+                    type="button"
+                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors bg-transparent border-none cursor-pointer"
                   >
                     Terms of Service
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

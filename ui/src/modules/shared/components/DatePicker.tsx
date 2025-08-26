@@ -26,6 +26,8 @@ import { forwardRef, MouseEvent, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
 import type { TaskFormFields } from "../types/common";
+import RepeatSelectionItem from "./RepeatSelectionItem";
+import { SmartDateTimeField } from "./SmartDateTimeField";
 import TimeSelectionItem from "./TimeSelectionItem";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
@@ -68,7 +70,10 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
         dateText = "Today";
       } else if (givenDate.isSame(tomorrow)) {
         dateText = "Tomorrow";
-      } else if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
+      } else if (
+        givenDate.isAfter(today) &&
+        givenDate.isBefore(sevenDaysFromNow)
+      ) {
         dateText = dayjs(date).format("dddd");
       } else {
         dateText = dayjs(date).format("MMMM D");
@@ -180,21 +185,36 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 }}
               >
                 <List>
-                  <ListItem disablePadding>
-                    <ListItemButton disabled>
-                      <ListItemText
-                        primary={
-                          field.value
-                            ? field.value.hour() === 0 &&
-                              field.value.minute() === 0
-                              ? field.value.format("MMMM D, YYYY") // Date only (no time) for midnight
-                              : field.value.format("MMMM D, YYYY h:mm A") // Date + time for non-midnight
-                            : ""
-                        }
-                      />
-                    </ListItemButton>
+                  <ListItem divider>
+                    <Controller
+                      name="recurrence"
+                      control={control}
+                      render={({ field: recurrenceField }) => (
+                        <Controller
+                          name="recurrence_anchor_mode"
+                          control={control}
+                          render={({ field: anchorModeField }) => (
+                            <SmartDateTimeField
+                              value={field.value}
+                              onChange={(newDate, newRecurrence) => {
+                                field.onChange(newDate);
+                                if (newRecurrence !== undefined) {
+                                  recurrenceField.onChange(newRecurrence);
+                                }
+                              }}
+                              recurrence={recurrenceField.value || null}
+                              onRecurrenceChange={(recurrence) => {
+                                recurrenceField.onChange(recurrence);
+                              }}
+                              onAnchorModeChange={(mode) => {
+                                anchorModeField.onChange(mode);
+                              }}
+                            />
+                          )}
+                        />
+                      )}
+                    />
                   </ListItem>
-                  <ListItem divider />
                   <ListItem
                     disablePadding
                     secondaryAction={dayjs().format("ddd")}
@@ -291,6 +311,29 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 <TimeSelectionItem
                   value={field.value}
                   onChange={field.onChange}
+                />
+                <Controller
+                  name="recurrence"
+                  control={control}
+                  render={({ field: recurrenceField }) => (
+                    <Controller
+                      name="recurrence_anchor_mode"
+                      control={control}
+                      render={({ field: anchorModeField }) => (
+                        <RepeatSelectionItem
+                          value={recurrenceField.value || null}
+                          onChange={(repeat) => {
+                            recurrenceField.onChange(repeat);
+                          }}
+                          selectedDate={field.value}
+                          anchorMode={anchorModeField.value || "SCHEDULED"}
+                          onAnchorModeChange={(mode) => {
+                            anchorModeField.onChange(mode);
+                          }}
+                        />
+                      )}
+                    />
+                  )}
                 />
               </Popover>
             </>

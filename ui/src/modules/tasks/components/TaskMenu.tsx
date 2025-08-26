@@ -76,12 +76,18 @@ export default function TaskMenu({
     );
   };
 
-  const handleSetDueDate = async (date: dayjs.Dayjs | null) => {
+  const handleSetDueDate = async (
+    date: dayjs.Dayjs | null,
+    recurrence?: string | null,
+    anchorMode?: "SCHEDULED" | "COMPLETED",
+  ) => {
     handleCloseTaskMenu();
     handleCloseDatePicker();
     await toast.promise(
       updateTask({
         due_date: date,
+        recurrence,
+        recurrence_anchor_mode: anchorMode,
       }),
       {
         loading: "Setting due date...",

@@ -26,6 +26,8 @@ import dayjs, { Dayjs } from "dayjs";
 import { forwardRef, MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 
+import RepeatSelectionItem from "../../shared/components/RepeatSelectionItem";
+import { SmartDateTimeField } from "../../shared/components/SmartDateTimeField";
 import TimeSelectionItem from "../../shared/components/TimeSelectionItem";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
@@ -39,15 +41,30 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { mutateAsync: updateTask } = useUpdateTask(task);
 
+    // Local state for recurrence
+    const [recurrence, setRecurrence] = useState<string | null>(
+      task.recurrence || null,
+    );
+    const [anchorMode, setAnchorMode] = useState<"SCHEDULED" | "COMPLETED">(
+      task.recurrence_anchor_mode || "SCHEDULED",
+    );
+
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
     };
 
-    const handleChange = async (newDueDate: Dayjs | null) => {
+    const handleChange = async (
+      newDueDate: Dayjs | null,
+      newRecurrence?: string | null,
+      newAnchorMode?: "SCHEDULED" | "COMPLETED",
+    ) => {
       setIsSubmitting(true);
       await toast.promise(
         updateTask({
           due_date: newDueDate,
+          recurrence: newRecurrence !== undefined ? newRecurrence : recurrence,
+          recurrence_anchor_mode:
+            newAnchorMode !== undefined ? newAnchorMode : anchorMode,
         }),
         {
           loading: "Updating task due date...",
@@ -86,7 +103,10 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
         dateText = "Today";
       } else if (givenDate.isSame(tomorrow)) {
         dateText = "Tomorrow";
-      } else if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
+      } else if (
+        givenDate.isAfter(today) &&
+        givenDate.isBefore(sevenDaysFromNow)
+      ) {
         dateText = dayjs(date).format("dddd");
       } else {
         dateText = dayjs(date).format("MMMM D");
@@ -173,14 +193,29 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
         >
           <List>
             <ListItem divider>
-              <ListItemText
-                primary={
-                  dueDate
-                    ? dueDate.hour() === 0 && dueDate.minute() === 0
-                      ? dueDate.format("MMMM D, YYYY")
-                      : dueDate.format("MMMM D, YYYY h:mm A")
-                    : ""
-                }
+              <SmartDateTimeField
+                value={dueDate}
+                onChange={(newDate, newRecurrence) => {
+                  handleChange(
+                    newDate,
+                    newRecurrence || recurrence,
+                    anchorMode,
+                  );
+                }}
+                recurrence={recurrence}
+                recurrenceAnchorMode={anchorMode}
+                onRecurrenceChange={(newRecurrence) => {
+                  setRecurrence(newRecurrence);
+                  if (dueDate) {
+                    handleChange(dueDate, newRecurrence, anchorMode);
+                  }
+                }}
+                onAnchorModeChange={(newAnchorMode) => {
+                  setAnchorMode(newAnchorMode);
+                  if (dueDate) {
+                    handleChange(dueDate, recurrence, newAnchorMode);
+                  }
+                }}
               />
             </ListItem>
             <ListItem disablePadding secondaryAction={dayjs().format("ddd")}>
@@ -275,6 +310,27 @@ const UpdateTaskDialogDudeDate = forwardRef<HTMLButtonElement, DatePickerProps>(
 
           {/* Time button below calendar */}
           <TimeSelectionItem value={dueDate} onChange={handleChange} />
+
+          {/* Repeat button below time */}
+          <RepeatSelectionItem
+            value={recurrence}
+            onChange={(repeat) => {
+              setRecurrence(repeat);
+              // Update the task with the new recurrence
+              if (dueDate) {
+                handleChange(dueDate, repeat, anchorMode);
+              }
+            }}
+            selectedDate={dueDate}
+            anchorMode={anchorMode}
+            onAnchorModeChange={(mode) => {
+              setAnchorMode(mode);
+              // Update the task with the new anchor mode
+              if (dueDate) {
+                handleChange(dueDate, recurrence, mode);
+              }
+            }}
+          />
         </Popover>
       </>
     );

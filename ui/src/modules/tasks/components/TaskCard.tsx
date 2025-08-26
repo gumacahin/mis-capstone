@@ -4,6 +4,7 @@ import EventIcon from "@mui/icons-material/Event";
 import InboxIcon from "@mui/icons-material/Inbox";
 import LabelIcon from "@mui/icons-material/Label";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import RepeatIcon from "@mui/icons-material/Repeat";
 import TagIcon from "@mui/icons-material/Tag";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -209,6 +210,19 @@ export default function TaskCard({
                           }}
                         >
                           {formatDayOfWeek(dayjs(task.due_date))}
+                        </Typography>
+                      </Stack>
+                    )}
+                    {task.is_recurring && (
+                      <Stack
+                        direction={"row"}
+                        spacing={0.5}
+                        alignItems={"center"}
+                        sx={{ color: "primary.main" }}
+                      >
+                        <RepeatIcon fontSize="small" />
+                        <Typography variant="caption" noWrap>
+                          {task.humanized_recurrence || "Repeats"}
                         </Typography>
                       </Stack>
                     )}
