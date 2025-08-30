@@ -237,7 +237,11 @@ function parseDatePattern(input: string): Dayjs | null {
   const relativeMatch = input.match(/in (\d+) (day|week|month|year)s?/i);
   if (relativeMatch) {
     const [, amount, unit] = relativeMatch;
-    return now.add(parseInt(amount), unit as "day" | "week" | "month" | "year");
+    const unitSingular = unit.replace(/s$/, ""); // Remove 's' from plural
+    return now.add(
+      parseInt(amount),
+      unitSingular as "day" | "week" | "month" | "year",
+    );
   }
 
   return null;
@@ -499,8 +503,9 @@ export function formatForEditing(
   } else if (date) {
     if (date.hour() === 0 && date.minute() === 0) {
       // Date only - try to format naturally
-      const now = dayjs();
-      const diff = date.diff(now, "day");
+      const now = dayjs().startOf("day");
+      const dateStart = date.startOf("day");
+      const diff = dateStart.diff(now, "day");
 
       if (diff === 0) {
         result = "today";
@@ -509,8 +514,31 @@ export function formatForEditing(
       } else if (diff === -1) {
         result = "yesterday";
       } else if (diff > 0 && diff <= 7) {
-        result = `next ${date.format("dddd")}`;
+        // Check if it's the next occurrence of a day of week
+        // For dates within 7 days, check if it's actually the next occurrence
+        const dayOfWeek = date.format("dddd").toLowerCase();
+
+        // Check if this is the next occurrence of this day of the week
+        // by looking for the same day of week in the next 7 days
+        let isNextOccurrence = false;
+        for (let i = 1; i <= 7; i++) {
+          const checkDate = now.add(i, "day");
+          if (checkDate.format("dddd").toLowerCase() === dayOfWeek) {
+            if (checkDate.isSame(date, "day")) {
+              isNextOccurrence = true;
+            }
+            break;
+          }
+        }
+
+        if (isNextOccurrence) {
+          result = `next ${dayOfWeek}`;
+        } else {
+          // Otherwise, use the specific date format
+          result = date.format("MMM D");
+        }
       } else {
+        // For dates beyond 7 days, use the specific date format
         result = date.format("MMM D");
       }
     } else {

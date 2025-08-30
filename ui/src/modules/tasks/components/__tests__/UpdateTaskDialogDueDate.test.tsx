@@ -1,13 +1,15 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, screen } from "@testing-library/react";
 import dayjs from "dayjs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderWithProviders } from "../../../../test/test-utils";
 
 // Mock MUI X Date Pickers components
-jest.mock("@mui/x-date-pickers/AdapterDayjs", () => ({
+vi.mock("@mui/x-date-pickers/AdapterDayjs", () => ({
   AdapterDayjs: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-jest.mock("@mui/x-date-pickers/DateCalendar", () => ({
+vi.mock("@mui/x-date-pickers/DateCalendar", () => ({
   DateCalendar: ({
     children,
     onChange,
@@ -22,27 +24,17 @@ jest.mock("@mui/x-date-pickers/DateCalendar", () => ({
   ),
 }));
 
-jest.mock("@mui/x-date-pickers/LocalizationProvider", () => ({
+vi.mock("@mui/x-date-pickers/LocalizationProvider", () => ({
   LocalizationProvider: ({ children }: { children: React.ReactNode }) =>
     children,
 }));
 
 // Mock the useUpdateTask hook
-jest.mock("@shared/hooks/queries", () => ({
+vi.mock("@shared/hooks/queries", () => ({
   useUpdateTask: () => ({
-    mutateAsync: jest.fn().mockResolvedValue({}),
+    mutateAsync: vi.fn().mockResolvedValue({}),
   }),
 }));
-
-// Mock dayjs to avoid import issues in tests
-jest.mock("dayjs", () => {
-  const originalDayjs = jest.requireActual("dayjs");
-  return {
-    ...originalDayjs,
-    __esModule: true,
-    default: originalDayjs.default || originalDayjs,
-  };
-});
 
 import UpdateTaskDialogDueDate from "../UpdateTaskDialogDueDate";
 
@@ -52,10 +44,12 @@ const mockTask = {
   title: "Test Task",
   description: "Test Description",
   due_date: "2025-08-25T14:30:00Z", // With time
-  priority: "MEDIUM",
+  priority: "MEDIUM" as const,
   section: 1,
   project: 1,
-  tags: [],
+  project_title: "Test Project",
+  section_title: "Test Section",
+  tags: [] as string[],
   order: 0,
   comments_count: 0,
 };
@@ -63,7 +57,7 @@ const mockTask = {
 // Mock props
 const mockProps = {
   task: mockTask,
-  setShowDatePicker: jest.fn(),
+  setShowDatePicker: vi.fn(),
 };
 
 // Test wrapper component
@@ -72,7 +66,7 @@ const TestWrapper = ({
   setShowDatePicker,
 }: {
   task: typeof mockTask;
-  setShowDatePicker: jest.Mock;
+  setShowDatePicker: ReturnType<typeof vi.fn>;
 }) => {
   return (
     <UpdateTaskDialogDueDate
@@ -84,102 +78,99 @@ const TestWrapper = ({
 
 describe("UpdateTaskDialogDueDate Component", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Rendering", () => {
     it("should render without crashing", () => {
-      render(<TestWrapper {...mockProps} />);
-      expect(screen.getByText(/Today/)).toBeInTheDocument();
+      renderWithProviders(<TestWrapper {...mockProps} />);
+      expect(screen.getByText(/August 25/)).toBeInTheDocument();
     });
 
     it("should display calendar icon", () => {
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
       expect(screen.getByTestId("CalendarTodayIcon")).toBeInTheDocument();
     });
 
     it("should show remove date button when date is selected", () => {
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
       expect(screen.getByTestId("CloseIcon")).toBeInTheDocument();
     });
 
     it("should not show remove date button when no date is selected", () => {
       const taskWithoutDate = { ...mockTask, due_date: null };
-      render(<TestWrapper {...mockProps} task={taskWithoutDate} />);
+      renderWithProviders(
+        <TestWrapper {...mockProps} task={taskWithoutDate} />,
+      );
       expect(screen.queryByTestId("CloseIcon")).not.toBeInTheDocument();
     });
   });
 
   describe("Date Selection", () => {
     it("should select today when clicking today option", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Click today option in the popover
       const todayButton = screen.getByRole("button", { name: /today/i });
-      await user.click(todayButton);
+      await fireEvent.click(todayButton);
 
       expect(mockProps.setShowDatePicker).toHaveBeenCalledWith(true);
     });
 
     it("should select tomorrow when clicking tomorrow option", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Click tomorrow option in the popover
       const tomorrowButton = screen.getByRole("button", { name: /tomorrow/i });
-      await user.click(tomorrowButton);
+      await fireEvent.click(tomorrowButton);
 
       expect(mockProps.setShowDatePicker).toHaveBeenCalledWith(true);
     });
 
     it("should select weekend when clicking weekend option", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Click weekend option in the popover
       const weekendButton = screen.getByRole("button", {
         name: /this weekend/i,
       });
-      await user.click(weekendButton);
+      await fireEvent.click(weekendButton);
 
       expect(mockProps.setShowDatePicker).toHaveBeenCalledWith(true);
     });
 
     it("should select next week when clicking next week option", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Click next week option in the popover
       const nextWeekButton = screen.getByRole("button", { name: /next week/i });
-      await user.click(nextWeekButton);
+      await fireEvent.click(nextWeekButton);
 
       expect(mockProps.setShowDatePicker).toHaveBeenCalledWith(true);
     });
 
     it("should close popover after selecting a quick date", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Verify popover is open by checking for a specific option
       expect(
@@ -188,7 +179,7 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
       // Click today option in the popover
       const todayButton = screen.getByRole("button", { name: /today/i });
-      await user.click(todayButton);
+      await fireEvent.click(todayButton);
 
       // Verify popover is closed
       expect(
@@ -198,14 +189,13 @@ describe("UpdateTaskDialogDueDate Component", () => {
     });
 
     it("should remove date when clicking remove button", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Click remove date button
       const removeButton = screen.getByRole("button", {
         name: /remove due date/i,
       });
-      await user.click(removeButton);
+      await fireEvent.click(removeButton);
 
       // The remove button only calls handleChange, not setShowDatePicker
       // This is the correct behavior based on the component implementation
@@ -215,42 +205,39 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
   describe("Calendar Integration", () => {
     it("should render calendar picker", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Calendar should be rendered
       expect(screen.getByRole("grid")).toBeInTheDocument();
     });
 
     it("should select date from calendar", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Find and click a date in the calendar
       const calendarDate = screen
         .getByRole("grid")
         .querySelector('[role="gridcell"]');
       if (calendarDate) {
-        await user.click(calendarDate);
+        await fireEvent.click(calendarDate);
         expect(mockProps.setShowDatePicker).toHaveBeenCalledWith(true);
       }
     });
 
     it("should close popover after calendar selection", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Open the popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
 
       // Verify popover is open by checking for a specific option
       expect(
@@ -262,7 +249,7 @@ describe("UpdateTaskDialogDueDate Component", () => {
         .getByRole("grid")
         .querySelector('[role="gridcell"]');
       if (calendarDate) {
-        await user.click(calendarDate);
+        await fireEvent.click(calendarDate);
 
         // Verify popover is closed
         expect(
@@ -275,15 +262,17 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
   describe("State Management", () => {
     it("should initialize with correct default values", () => {
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Should show the current due date
-      expect(screen.getByText(/Today/)).toBeInTheDocument();
+      expect(screen.getByText(/August 25/)).toBeInTheDocument();
     });
 
     it("should handle null values correctly", () => {
       const taskWithoutDate = { ...mockTask, due_date: null };
-      render(<TestWrapper {...mockProps} task={taskWithoutDate} />);
+      renderWithProviders(
+        <TestWrapper {...mockProps} task={taskWithoutDate} />,
+      );
 
       // Should show "Date" when no date is selected
       expect(screen.getByText("Date")).toBeInTheDocument();
@@ -292,8 +281,7 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
   describe("Event Handling", () => {
     it("should handle popover open/close correctly", async () => {
-      const user = userEvent.setup();
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Initially closed - check that popover options are not visible
       expect(
@@ -302,14 +290,14 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
       // Open popover by clicking the main button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
-      await user.click(dateButton);
+      await fireEvent.click(dateButton);
       expect(
         screen.getByRole("button", { name: /tomorrow/i }),
       ).toBeInTheDocument();
 
       // Close popover by clicking an option
       const todayButton = screen.getByRole("button", { name: /today/i });
-      await user.click(todayButton);
+      await fireEvent.click(todayButton);
       expect(
         screen.queryByRole("button", { name: /tomorrow/i }),
       ).not.toBeInTheDocument();
@@ -318,7 +306,7 @@ describe("UpdateTaskDialogDueDate Component", () => {
 
   describe("Accessibility", () => {
     it("should have proper tooltips", () => {
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Check for tooltip on date button
       const dateButton = screen.getByRole("button", { name: /set due date/i });
@@ -326,7 +314,7 @@ describe("UpdateTaskDialogDueDate Component", () => {
     });
 
     it("should have proper button labels", () => {
-      render(<TestWrapper {...mockProps} />);
+      renderWithProviders(<TestWrapper {...mockProps} />);
 
       // Check for remove date button
       const removeButton = screen.getByRole("button", {

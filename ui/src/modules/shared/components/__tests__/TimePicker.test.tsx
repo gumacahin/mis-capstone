@@ -1,29 +1,20 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, screen } from "@testing-library/react";
 import dayjs from "dayjs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { renderWithProviders } from "../../../../test/test-utils";
 import TimePicker from "../TimePicker";
 
-// Mock dayjs to avoid any import issues
-jest.mock("dayjs", () => {
-  const originalDayjs = jest.requireActual("dayjs");
-  return {
-    ...originalDayjs,
-    __esModule: true,
-    default: originalDayjs.default || originalDayjs,
-  };
-});
-
 describe("TimePicker", () => {
-  const mockOnChange = jest.fn();
-  const mockOnCancel = jest.fn();
+  const mockOnChange = vi.fn();
+  const mockOnCancel = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("renders without crashing", () => {
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -41,7 +32,7 @@ describe("TimePicker", () => {
 
   it("renders with initial value without crashing", () => {
     const initialTime = dayjs("2024-01-01 14:30:00");
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockOnChange}
@@ -53,7 +44,7 @@ describe("TimePicker", () => {
   });
 
   it("renders in 24-hour format without crashing", () => {
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -66,7 +57,7 @@ describe("TimePicker", () => {
   });
 
   it("handles null value without crashing", () => {
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -78,8 +69,7 @@ describe("TimePicker", () => {
   });
 
   it("handles empty string input without crashing", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -90,14 +80,13 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.clear(input);
+    fireEvent.change(input, { target: { value: "" } });
 
     expect(input).toHaveValue("");
   });
 
   it("handles invalid time input without crashing", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -108,15 +97,14 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "invalid time");
+    fireEvent.change(input, { target: { value: "invalid time" } });
 
     expect(input).toHaveValue("invalid time");
     expect(screen.getByText("Please enter a valid time")).toBeInTheDocument();
   });
 
   it("disables save button for invalid input", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -133,7 +121,7 @@ describe("TimePicker", () => {
     expect(saveButton).not.toBeDisabled();
 
     // Type invalid input
-    await user.type(input, "garbage");
+    fireEvent.change(input, { target: { value: "garbage" } });
 
     // Save button should be disabled
     expect(saveButton).toBeDisabled();
@@ -141,8 +129,7 @@ describe("TimePicker", () => {
   });
 
   it("enables save button for valid input", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -156,7 +143,7 @@ describe("TimePicker", () => {
     const saveButton = screen.getByText("Save");
 
     // Type valid input
-    await user.type(input, "2:30 PM");
+    fireEvent.change(input, { target: { value: "2:30 PM" } });
 
     // Save button should be enabled
     expect(saveButton).not.toBeDisabled();
@@ -166,9 +153,8 @@ describe("TimePicker", () => {
   });
 
   it("enables save button for empty input (clearing time)", async () => {
-    const user = userEvent.setup();
     const initialTime = dayjs("2024-01-01 14:30:00");
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockOnChange}
@@ -182,7 +168,7 @@ describe("TimePicker", () => {
     const saveButton = screen.getByText("Save");
 
     // Clear the input
-    await user.clear(input);
+    fireEvent.change(input, { target: { value: "" } });
 
     // Save button should be enabled (allowing user to clear the time)
     expect(saveButton).not.toBeDisabled();
@@ -192,8 +178,7 @@ describe("TimePicker", () => {
   });
 
   it("shows validation error for invalid input", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -206,7 +191,7 @@ describe("TimePicker", () => {
     );
 
     // Type invalid input
-    await user.type(input, "not a time");
+    fireEvent.change(input, { target: { value: "not a time" } });
 
     // Should show validation error
     expect(screen.getByText("Please enter a valid time")).toBeInTheDocument();
@@ -214,8 +199,7 @@ describe("TimePicker", () => {
   });
 
   it("clears validation error when input becomes valid", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -228,12 +212,12 @@ describe("TimePicker", () => {
     );
 
     // Type invalid input first
-    await user.type(input, "garbage");
+    fireEvent.change(input, { target: { value: "garbage" } });
     expect(screen.getByText("Please enter a valid time")).toBeInTheDocument();
 
     // Clear and type valid input
-    await user.clear(input);
-    await user.type(input, "3:45 PM");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "3:45 PM" } });
 
     // Validation error should be gone
     expect(
@@ -243,8 +227,7 @@ describe("TimePicker", () => {
   });
 
   it("parses 12-hour format correctly", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -255,14 +238,13 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "2:30 PM");
+    fireEvent.change(input, { target: { value: "2:30 PM" } });
 
     expect(input).toHaveValue("2:30 PM");
   });
 
   it("parses 24-hour format correctly", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -273,14 +255,13 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "14:30");
+    fireEvent.change(input, { target: { value: "14:30" } });
 
     expect(input).toHaveValue("14:30");
   });
 
   it("parses time without AM/PM correctly", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -291,14 +272,13 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "2:30");
+    fireEvent.change(input, { target: { value: "2:30" } });
 
     expect(input).toHaveValue("2:30");
   });
 
   it("parses lowercase AM/PM format correctly", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -309,7 +289,7 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "01:33pm");
+    fireEvent.change(input, { target: { value: "01:33pm" } });
 
     expect(input).toHaveValue("01:33pm");
     // The save button should be enabled since this is a valid time
@@ -318,9 +298,8 @@ describe("TimePicker", () => {
   });
 
   it("handles save button click without crashing", async () => {
-    const user = userEvent.setup();
     const initialTime = dayjs("2024-01-01 14:30:00");
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockOnChange}
@@ -330,16 +309,15 @@ describe("TimePicker", () => {
     );
 
     const saveButton = screen.getByText("Save");
-    await user.click(saveButton);
+    fireEvent.click(saveButton);
 
     expect(mockOnChange).toHaveBeenCalledWith(initialTime);
   });
 
   it("implements smart date assignment when no currentDate provided", async () => {
-    const user = userEvent.setup();
-    const mockDate = jest.fn();
+    const mockDate = vi.fn();
 
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockDate}
@@ -353,9 +331,9 @@ describe("TimePicker", () => {
     );
 
     // Test case: time after current time (should use today)
-    await user.type(input, "3:00 PM");
+    fireEvent.change(input, { target: { value: "3:00 PM" } });
     const saveButton = screen.getByText("Save");
-    await user.click(saveButton);
+    fireEvent.click(saveButton);
 
     // Should call onChange with today's date + 3:00 PM
     expect(mockDate).toHaveBeenCalled();
@@ -365,11 +343,10 @@ describe("TimePicker", () => {
   });
 
   it("removes time when empty input is saved", async () => {
-    const user = userEvent.setup();
-    const mockDate = jest.fn();
+    const mockDate = vi.fn();
     const initialTime = dayjs("2024-01-01 14:30:00");
 
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockDate}
@@ -383,9 +360,9 @@ describe("TimePicker", () => {
     );
 
     // Clear the input
-    await user.clear(input);
+    fireEvent.change(input, { target: { value: "" } });
     const saveButton = screen.getByText("Save");
-    await user.click(saveButton);
+    fireEvent.click(saveButton);
 
     // Should call onChange with date only (time set to midnight)
     expect(mockDate).toHaveBeenCalled();
@@ -394,9 +371,8 @@ describe("TimePicker", () => {
   });
 
   it("handles cancel button click without crashing", async () => {
-    const user = userEvent.setup();
     const initialTime = dayjs("2024-01-01 14:30:00");
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockOnChange}
@@ -405,13 +381,13 @@ describe("TimePicker", () => {
     );
 
     const cancelButton = screen.getByText("Cancel");
-    await user.click(cancelButton);
+    fireEvent.click(cancelButton);
 
     expect(mockOnCancel).toHaveBeenCalled();
   });
 
-  it("generates 15-minute interval options for 12-hour format", () => {
-    render(
+  it("generates 15-minute interval options for 12-hour format", async () => {
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -431,7 +407,7 @@ describe("TimePicker", () => {
   });
 
   it("generates 15-minute interval options for 24-hour format", () => {
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -450,8 +426,7 @@ describe("TimePicker", () => {
   });
 
   it("handles time change from dropdown without crashing", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -462,14 +437,13 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.type(input, "3:45 PM");
+    fireEvent.change(input, { target: { value: "3:45 PM" } });
 
     expect(input).toHaveValue("3:45 PM");
   });
 
   it("handles rapid input changes without crashing", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -482,21 +456,20 @@ describe("TimePicker", () => {
     );
 
     // Rapidly type and change input
-    await user.type(input, "1");
-    await user.type(input, "2");
-    await user.type(input, ":");
-    await user.type(input, "3");
-    await user.type(input, "0");
-    await user.type(input, " ");
-    await user.type(input, "P");
-    await user.type(input, "M");
+    fireEvent.change(input, { target: { value: "1" } });
+    fireEvent.change(input, { target: { value: "12" } });
+    fireEvent.change(input, { target: { value: "12:" } });
+    fireEvent.change(input, { target: { value: "12:3" } });
+    fireEvent.change(input, { target: { value: "12:30" } });
+    fireEvent.change(input, { target: { value: "12:30 " } });
+    fireEvent.change(input, { target: { value: "12:30 P" } });
+    fireEvent.change(input, { target: { value: "12:30 PM" } });
 
     expect(input).toHaveValue("12:30 PM");
   });
 
   it("handles edge case times without crashing", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -509,24 +482,24 @@ describe("TimePicker", () => {
     );
 
     // Test edge cases
-    await user.type(input, "12:00 AM");
+    fireEvent.change(input, { target: { value: "12:00 AM" } });
     expect(input).toHaveValue("12:00 AM");
 
-    await user.clear(input);
-    await user.type(input, "11:59 PM");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "11:59 PM" } });
     expect(input).toHaveValue("11:59 PM");
 
-    await user.clear(input);
-    await user.type(input, "00:00");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "00:00" } });
     expect(input).toHaveValue("00:00");
 
-    await user.clear(input);
-    await user.type(input, "23:59");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "23:59" } });
     expect(input).toHaveValue("23:59");
   });
 
   it("handles component unmounting without crashing", () => {
-    const { unmount } = render(
+    const { unmount } = renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -538,8 +511,7 @@ describe("TimePicker", () => {
   });
 
   it("handles onChange callback with null value", async () => {
-    const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <TimePicker
         value={null}
         onChange={mockOnChange}
@@ -548,15 +520,14 @@ describe("TimePicker", () => {
     );
 
     const saveButton = screen.getByText("Save");
-    await user.click(saveButton);
+    fireEvent.click(saveButton);
 
     expect(mockOnChange).toHaveBeenCalledWith(null);
   });
 
   it("handles onCancel callback correctly", async () => {
-    const user = userEvent.setup();
     const initialTime = dayjs("2024-01-01 14:30:00");
-    render(
+    renderWithProviders(
       <TimePicker
         value={initialTime}
         onChange={mockOnChange}
@@ -568,12 +539,12 @@ describe("TimePicker", () => {
     const input = screen.getByPlaceholderText(
       "Enter time or select from dropdown",
     );
-    await user.clear(input);
-    await user.type(input, "3:00 PM");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.change(input, { target: { value: "3:00 PM" } });
 
     // Cancel should reset to original value
     const cancelButton = screen.getByText("Cancel");
-    await user.click(cancelButton);
+    fireEvent.click(cancelButton);
 
     expect(mockOnCancel).toHaveBeenCalled();
     // The input should still show the changed value until the component re-renders

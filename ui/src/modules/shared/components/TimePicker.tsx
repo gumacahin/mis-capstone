@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid2";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import dayjs, { Dayjs } from "dayjs";
-import { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 interface TimePickerProps {
   value: Dayjs | null;
@@ -42,14 +42,14 @@ export default function TimePicker({
       // 12-hour format: 12:00 AM, 12:15 AM, 12:30 AM, 12:45 AM, 1:00 AM, etc.
       for (let hour = 1; hour <= 12; hour++) {
         for (let minute = 0; minute < 60; minute += 15) {
-          const timeStr = `${hour}:${minute.toString().padStart(2, "0")} ${hour === 12 ? "AM" : "AM"}`;
+          const timeStr = `${hour}:${minute.toString().padStart(2, "0")} AM`;
           options.push(timeStr);
         }
       }
       // Add PM times
       for (let hour = 1; hour <= 12; hour++) {
         for (let minute = 0; minute < 60; minute += 15) {
-          const timeStr = `${hour}:${minute.toString().padStart(2, "0")} ${hour === 12 ? "PM" : "PM"}`;
+          const timeStr = `${hour}:${minute.toString().padStart(2, "0")} PM`;
           options.push(timeStr);
         }
       }
@@ -100,9 +100,12 @@ export default function TimePicker({
   };
 
   // Format time for display
-  const formatTime = (time: Dayjs): string => {
-    return use24Hour ? time.format("HH:mm") : time.format("h:mm A");
-  };
+  const formatTime = useCallback(
+    (time: Dayjs): string => {
+      return use24Hour ? time.format("HH:mm") : time.format("h:mm A");
+    },
+    [use24Hour],
+  );
 
   const handleTimeChange = (
     event: React.SyntheticEvent,
@@ -119,8 +122,10 @@ export default function TimePicker({
   };
 
   const handleInputChange = (
-    event: React.SyntheticEvent,
+    event: React.SyntheticEvent | null,
     newInputValue: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    reason: string,
   ) => {
     setInputValue(newInputValue);
 
@@ -196,12 +201,12 @@ export default function TimePicker({
   };
 
   // Initialize input value when component mounts or value changes
-  useState(() => {
+  React.useEffect(() => {
     if (value) {
       setInputValue(formatTime(value));
       setIsValid(true);
     }
-  });
+  }, [value, formatTime]);
 
   // Determine if save button should be enabled
   // Enable if input is valid AND either we have a valid time OR we're clearing the time (empty input)
@@ -220,7 +225,6 @@ export default function TimePicker({
             value={inputValue}
             onChange={handleTimeChange}
             onInputChange={handleInputChange}
-            inputValue={inputValue}
             renderInput={(params) => (
               <TextField
                 {...params}

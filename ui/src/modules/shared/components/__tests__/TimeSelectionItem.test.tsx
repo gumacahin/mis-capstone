@@ -1,22 +1,12 @@
-import { jest } from "@jest/globals";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, screen } from "@testing-library/react";
 import dayjs from "dayjs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { renderWithProviders } from "../../../../test/test-utils";
 import TimeSelectionItem from "../TimeSelectionItem";
 
-// Mock dayjs to avoid any import issues
-jest.mock("dayjs", () => {
-  const originalDayjs = jest.requireActual("dayjs");
-  return {
-    ...originalDayjs,
-    __esModule: true,
-    default: originalDayjs.default || originalDayjs,
-  };
-});
-
 // Mock TimePicker component
-jest.mock("../TimePicker", () => ({
+vi.mock("../TimePicker", () => ({
   default: ({
     onChange,
     onCancel,
@@ -24,9 +14,10 @@ jest.mock("../TimePicker", () => ({
     onChange: (date: dayjs.Dayjs | null) => void;
     onCancel: () => void;
   }) => (
-    <div data-testid="time-picker">
+    <div>
+      <div>Time</div>
       <button onClick={() => onChange(dayjs().hour(14).minute(30))}>
-        Set 2:30 PM
+        Save
       </button>
       <button onClick={() => onChange(null)}>Clear Time</button>
       <button onClick={onCancel}>Cancel</button>
@@ -35,7 +26,7 @@ jest.mock("../TimePicker", () => ({
 }));
 
 describe("TimeSelectionItem Component", () => {
-  const mockOnChange = jest.fn();
+  const mockOnChange = vi.fn();
 
   beforeEach(() => {
     mockOnChange.mockClear();
@@ -43,33 +34,40 @@ describe("TimeSelectionItem Component", () => {
 
   describe("Rendering States", () => {
     it("should render with 'Time' text when no value is provided", () => {
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       expect(screen.getByText("Time")).toBeInTheDocument();
-      expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+      // Time picker should not be open initially
+      expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
     });
 
     it("should render with 'Time' text when date has no time (midnight)", () => {
       const dateOnly = dayjs().startOf("day");
-      render(<TimeSelectionItem value={dateOnly} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={dateOnly} onChange={mockOnChange} />,
+      );
 
       expect(screen.getByText("Time")).toBeInTheDocument();
-      expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+      // Time picker should not be open initially
+      expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
     });
 
     it("should render with formatted time when both date and time are set", () => {
       const dateWithTime = dayjs().hour(14).minute(30);
-      render(
+      renderWithProviders(
         <TimeSelectionItem value={dateWithTime} onChange={mockOnChange} />,
       );
 
       expect(screen.getByText("2:30 PM")).toBeInTheDocument();
-      expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+      // Time picker should not be open initially
+      expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
     });
 
     it("should show clear time button when time is set", () => {
       const dateWithTime = dayjs().hour(14).minute(30);
-      render(
+      renderWithProviders(
         <TimeSelectionItem value={dateWithTime} onChange={mockOnChange} />,
       );
 
@@ -79,7 +77,9 @@ describe("TimeSelectionItem Component", () => {
     });
 
     it("should not show clear time button when no time is set", () => {
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       expect(
         screen.queryByRole("button", { name: /clear time/i }),
@@ -89,65 +89,73 @@ describe("TimeSelectionItem Component", () => {
 
   describe("Interaction Behavior", () => {
     it("should open time picker when clicked", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       const timeButton = screen.getByRole("button", { name: /time/i });
-      await user.click(timeButton);
+      fireEvent.click(timeButton);
 
-      expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
     });
 
     it("should close time picker when time is selected", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       // Open time picker
       const timeButton = screen.getByRole("button", { name: /time/i });
-      await user.click(timeButton);
-      expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+      fireEvent.click(timeButton);
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
 
       // Select a time
       const setTimeButton = screen.getByRole("button", {
-        name: /set 2:30 pm/i,
+        name: /save/i,
       });
-      await user.click(setTimeButton);
+      fireEvent.click(setTimeButton);
 
       // Time picker should close
-      expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /save/i }),
+      ).not.toBeInTheDocument();
     });
 
     it("should close time picker when cancelled", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       // Open time picker
       const timeButton = screen.getByRole("button", { name: /time/i });
-      await user.click(timeButton);
-      expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+      fireEvent.click(timeButton);
+      expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
 
       // Cancel
       const cancelButton = screen.getByRole("button", { name: /cancel/i });
-      await user.click(cancelButton);
+      fireEvent.click(cancelButton);
 
       // Time picker should close
-      expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /save/i }),
+      ).not.toBeInTheDocument();
     });
   });
 
   describe("Time Selection Scenarios", () => {
     it("should call onChange with time when time is selected from picker", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       // Open time picker and select time
       const timeButton = screen.getByRole("button", { name: /time/i });
-      await user.click(timeButton);
+      fireEvent.click(timeButton);
 
       const setTimeButton = screen.getByRole("button", {
-        name: /set 2:30 pm/i,
+        name: /save/i,
       });
-      await user.click(setTimeButton);
+      fireEvent.click(setTimeButton);
 
       expect(mockOnChange).toHaveBeenCalledWith(expect.any(Object));
 
@@ -161,17 +169,18 @@ describe("TimeSelectionItem Component", () => {
     });
 
     it("should call onChange with null when time is cleared from picker", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       // Open time picker and clear time
       const timeButton = screen.getByRole("button", { name: /time/i });
-      await user.click(timeButton);
+      fireEvent.click(timeButton);
 
       const clearTimeButton = screen.getByRole("button", {
         name: /clear time/i,
       });
-      await user.click(clearTimeButton);
+      fireEvent.click(clearTimeButton);
 
       expect(mockOnChange).toHaveBeenCalledWith(null);
     });
@@ -179,14 +188,13 @@ describe("TimeSelectionItem Component", () => {
 
   describe("Clear Time Button", () => {
     it("should clear time and keep date when clear button is clicked", async () => {
-      const user = userEvent.setup();
       const dateWithTime = dayjs().hour(14).minute(30);
-      render(
+      renderWithProviders(
         <TimeSelectionItem value={dateWithTime} onChange={mockOnChange} />,
       );
 
       const clearButton = screen.getByRole("button", { name: /clear time/i });
-      await user.click(clearButton);
+      fireEvent.click(clearButton);
 
       // Should call onChange with date only (start of day)
       expect(mockOnChange).toHaveBeenCalledWith(expect.any(Object));
@@ -201,13 +209,14 @@ describe("TimeSelectionItem Component", () => {
     });
 
     it("should handle clear time when no date is set", async () => {
-      const user = userEvent.setup();
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       // Clear button shouldn't be visible, but if it somehow is, clicking should handle gracefully
       const clearButton = screen.queryByRole("button", { name: /clear time/i });
       if (clearButton) {
-        await user.click(clearButton);
+        fireEvent.click(clearButton);
         expect(mockOnChange).toHaveBeenCalledWith(null);
       }
     });
@@ -215,7 +224,7 @@ describe("TimeSelectionItem Component", () => {
 
   describe("Edge Cases", () => {
     it("should handle disabled state correctly", () => {
-      render(
+      renderWithProviders(
         <TimeSelectionItem
           value={null}
           onChange={mockOnChange}
@@ -229,7 +238,7 @@ describe("TimeSelectionItem Component", () => {
 
     it("should handle very early morning times (12 AM - 5 AM)", () => {
       const earlyMorning = dayjs().hour(3).minute(0);
-      render(
+      renderWithProviders(
         <TimeSelectionItem value={earlyMorning} onChange={mockOnChange} />,
       );
 
@@ -238,14 +247,18 @@ describe("TimeSelectionItem Component", () => {
 
     it("should handle late night times (10 PM - 11 PM)", () => {
       const lateNight = dayjs().hour(23).minute(30);
-      render(<TimeSelectionItem value={lateNight} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={lateNight} onChange={mockOnChange} />,
+      );
 
       expect(screen.getByText("11:30 PM")).toBeInTheDocument();
     });
 
     it("should handle noon and midnight correctly", () => {
       const noon = dayjs().hour(12).minute(0);
-      render(<TimeSelectionItem value={noon} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={noon} onChange={mockOnChange} />,
+      );
 
       expect(screen.getByText("12:00 PM")).toBeInTheDocument();
     });
@@ -253,7 +266,9 @@ describe("TimeSelectionItem Component", () => {
 
   describe("Accessibility", () => {
     it("should have proper button labels", () => {
-      render(<TimeSelectionItem value={null} onChange={mockOnChange} />);
+      renderWithProviders(
+        <TimeSelectionItem value={null} onChange={mockOnChange} />,
+      );
 
       const timeButton = screen.getByRole("button", { name: /time/i });
       expect(timeButton).toBeInTheDocument();
@@ -261,7 +276,7 @@ describe("TimeSelectionItem Component", () => {
 
     it("should have proper tooltip for clear button", () => {
       const dateWithTime = dayjs().hour(14).minute(30);
-      render(
+      renderWithProviders(
         <TimeSelectionItem value={dateWithTime} onChange={mockOnChange} />,
       );
 
