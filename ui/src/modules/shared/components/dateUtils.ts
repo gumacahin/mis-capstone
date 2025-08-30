@@ -1,3 +1,4 @@
+import * as chrono from "chrono-node";
 import dayjs, { Dayjs } from "dayjs";
 
 export interface ParsedDate {
@@ -7,7 +8,7 @@ export interface ParsedDate {
 }
 
 /**
- * Parse natural language input into structured date and recurrence data
+ * Parse natural language input into structured date and recurrence data using chrono-node
  */
 export function parseNaturalLanguage(input: string): ParsedDate {
   const normalized = input.toLowerCase().trim();
@@ -33,40 +34,50 @@ export function parseNaturalLanguage(input: string): ParsedDate {
     anchorMode = "SCHEDULED";
   }
 
-  // Handle recurrence patterns
-  if (normalized.includes("every")) {
-    recurrence = parseRecurrencePattern(normalized);
+  // Use chrono-node to parse the input
+  const results = chrono.parse(normalized);
 
-    // Extract date/time from recurrence if present
-    const dateTimeMatch = extractDateTimeFromRecurrence(normalized);
-    if (dateTimeMatch) {
-      date = dateTimeMatch;
-    }
-  } else {
-    // Parse standalone date/time
-    date = parseDatePattern(normalized);
-  }
+  if (results.length > 0) {
+    const result = results[0];
 
-  // Special case: if we have a date pattern but no recurrence, check if there's a recurrence pattern
-  if (!date && !recurrence) {
-    // Try to extract date from patterns like "sept 1 every week"
-    const dateMatch = extractMonthDay(normalized);
-    if (dateMatch) {
-      date = parseMonthDay(dateMatch);
+    // Extract date from chrono result
+    if (result.start) {
+      const startDate = result.start.date();
+      date = dayjs(startDate);
+
+      // If it's a date-only result (no time), set to start of day
+      if (!result.start.get("hour") && !result.start.get("minute")) {
+        date = date.startOf("day");
+      }
     }
 
-    // Check for recurrence patterns
-    if (normalized.includes("every")) {
-      recurrence = parseRecurrencePattern(normalized);
+    // Extract recurrence pattern if present
+    if (result.text.includes("every")) {
+      recurrence = extractRecurrencePattern(result.text);
     }
   }
 
-  // Special case: if we have recurrence but no date, and the input contains date patterns
+  // Special handling for recurrence patterns that chrono might not catch
+  if (!recurrence && normalized.includes("every")) {
+    recurrence = extractRecurrencePattern(normalized);
+  }
+
+  // If we have a recurrence but no date, try to extract a date from the input
   if (recurrence && !date) {
-    // Look for date patterns in the input
-    const dateMatch = extractMonthDay(normalized);
-    if (dateMatch) {
-      date = parseMonthDay(dateMatch);
+    // Remove the recurrence part and try to parse the remaining text
+    const dateText = normalized.replace(/every\s+\w+/, "").trim();
+    if (dateText) {
+      const dateResults = chrono.parse(dateText);
+      if (dateResults.length > 0 && dateResults[0].start) {
+        const startDate = dateResults[0].start.date();
+        date = dayjs(startDate);
+        if (
+          !dateResults[0].start.get("hour") &&
+          !dateResults[0].start.get("minute")
+        ) {
+          date = date.startOf("day");
+        }
+      }
     }
   }
 
@@ -74,34 +85,27 @@ export function parseNaturalLanguage(input: string): ParsedDate {
 }
 
 /**
- * Parse recurrence patterns like "every monday", "every 2 weeks", etc.
+ * Extract recurrence patterns from text using chrono-node and custom logic
  */
-function parseRecurrencePattern(input: string): string {
+function extractRecurrencePattern(input: string): string {
   const normalized = input.toLowerCase();
 
-  // Extract just the recurrence part (before any time/date modifiers)
-  const recurrenceMatch = normalized.match(
-    /^(every (?:day|week|month|year|weekday|weekend|\d+ (?:day|week|month|year)s?|[a-z]+))/,
-  );
-  if (recurrenceMatch) {
-    return recurrenceMatch[1].trim();
+  // Look for recurrence indicators in the text
+  if (normalized.includes("every")) {
+    // Extract the "every" pattern
+    const everyMatch = normalized.match(/every\s+([^,\s]+(?:\s+[^,\s]+)*)/);
+    if (everyMatch) {
+      return `every ${everyMatch[1].trim()}`;
+    }
   }
 
-  // Daily patterns
-  if (normalized.includes("every day") || normalized.includes("daily")) {
+  // Handle specific recurrence patterns
+  if (normalized.includes("daily") || normalized.includes("every day")) {
     return "every day";
   }
 
-  if (normalized.includes("every weekday") || normalized.includes("weekdays")) {
-    return "every weekday";
-  }
-
-  if (normalized.includes("every weekend") || normalized.includes("weekends")) {
-    return "every weekend";
-  }
-
-  // Weekly patterns
-  if (normalized.includes("every week")) {
+  if (normalized.includes("weekly") || normalized.includes("every week")) {
+    // Check for specific day of week
     const dayMatch = extractDayOfWeek(normalized);
     if (dayMatch) {
       return `every ${dayMatch}`;
@@ -109,8 +113,7 @@ function parseRecurrencePattern(input: string): string {
     return "every week";
   }
 
-  // Monthly patterns
-  if (normalized.includes("every month")) {
+  if (normalized.includes("monthly") || normalized.includes("every month")) {
     const dayMatch = extractDayOfMonth(normalized);
     if (dayMatch) {
       return `every month on the ${dayMatch}`;
@@ -118,8 +121,7 @@ function parseRecurrencePattern(input: string): string {
     return "every month";
   }
 
-  // Yearly patterns
-  if (normalized.includes("every year") || normalized.includes("yearly")) {
+  if (normalized.includes("yearly") || normalized.includes("every year")) {
     const monthDayMatch = extractMonthDay(normalized);
     if (monthDayMatch) {
       return `every year on ${monthDayMatch}`;
@@ -136,137 +138,6 @@ function parseRecurrencePattern(input: string): string {
 
   // Fallback: return the original input
   return input;
-}
-
-/**
- * Parse date patterns like "tomorrow", "sept 1", "next friday", "at 9am", "the 25th"
- */
-function parseDatePattern(input: string): Dayjs | null {
-  const normalized = input.toLowerCase();
-  const now = dayjs();
-
-  // Standalone time patterns
-  const timeMatch = normalized.match(/^at (\d{1,2}):?(\d{2})?\s*(am|pm)?$/i);
-  if (timeMatch) {
-    const [, hour, minute = "00", period] = timeMatch;
-    let hourNum = parseInt(hour);
-
-    if (period === "pm" && hourNum < 12) {
-      hourNum += 12;
-    } else if (period === "am" && hourNum === 12) {
-      hourNum = 0;
-    }
-
-    return now.hour(hourNum).minute(parseInt(minute)).second(0).millisecond(0);
-  }
-
-  // Relative dates
-  if (normalized === "today") {
-    return now.startOf("day");
-  }
-
-  if (normalized === "tomorrow") {
-    return now.add(1, "day").startOf("day");
-  }
-
-  if (normalized === "yesterday") {
-    return now.subtract(1, "day").startOf("day");
-  }
-
-  if (normalized.includes("next week")) {
-    return now.add(1, "week").startOf("week");
-  }
-
-  if (normalized.includes("last week")) {
-    return now.subtract(1, "week").startOf("week");
-  }
-
-  // Day of week
-  const dayMatch = extractDayOfWeek(normalized);
-  if (dayMatch) {
-    if (normalized.includes("next")) {
-      return getNextDayOfWeek(dayMatch);
-    } else if (normalized.includes("last") || normalized.includes("previous")) {
-      return getPreviousDayOfWeek(dayMatch);
-    } else {
-      return getNextDayOfWeek(dayMatch);
-    }
-  }
-
-  // Month and day
-  const monthDayMatch = extractMonthDay(normalized);
-  if (monthDayMatch) {
-    return parseMonthDay(monthDayMatch);
-  }
-
-  // Standalone ordinal day (e.g., "the 25th")
-  const ordinalMatch = normalized.match(/^the (\d{1,2})(st|nd|rd|th)$/i);
-  if (ordinalMatch) {
-    const dayNum = parseInt(ordinalMatch[1]);
-    const currentMonth = now.month();
-    const currentYear = now.year();
-
-    // Try current month first
-    let targetDate = dayjs().year(currentYear).month(currentMonth).date(dayNum);
-
-    // If the date has passed this month, try next month
-    if (targetDate.isBefore(now, "day")) {
-      targetDate = dayjs()
-        .year(currentYear)
-        .month(currentMonth + 1)
-        .date(dayNum);
-
-      // If we went past December, go to next year
-      if (targetDate.month() === 0) {
-        targetDate = dayjs()
-          .year(currentYear + 1)
-          .month(0)
-          .date(dayNum);
-      }
-    }
-
-    return targetDate.startOf("day");
-  }
-
-  // ISO date format
-  if (/^\d{4}-\d{2}-\d{2}/.test(normalized)) {
-    return dayjs(normalized);
-  }
-
-  // Relative time
-  const relativeMatch = input.match(/in (\d+) (day|week|month|year)s?/i);
-  if (relativeMatch) {
-    const [, amount, unit] = relativeMatch;
-    const unitSingular = unit.replace(/s$/, ""); // Remove 's' from plural
-    return now.add(
-      parseInt(amount),
-      unitSingular as "day" | "week" | "month" | "year",
-    );
-  }
-
-  return null;
-}
-
-/**
- * Extract time from input and apply to date
- */
-function extractDateTimeFromRecurrence(input: string): Dayjs | null {
-  const timeMatch = input.match(/at (\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
-  if (timeMatch) {
-    const [, hour, minute = "00", period] = timeMatch;
-    let hourNum = parseInt(hour);
-
-    if (period === "pm" && hourNum < 12) {
-      hourNum += 12;
-    } else if (period === "am" && hourNum === 12) {
-      hourNum = 0;
-    }
-
-    const now = dayjs();
-    return now.hour(hourNum).minute(parseInt(minute)).second(0).millisecond(0);
-  }
-
-  return null;
 }
 
 /**
@@ -356,91 +227,6 @@ function extractMonthDay(input: string): string | null {
   }
 
   return null;
-}
-
-/**
- * Get next occurrence of a specific day of week
- */
-function getNextDayOfWeek(dayName: string): Dayjs {
-  const days = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  const targetDay = days.indexOf(dayName);
-  const now = dayjs();
-  const currentDay = now.day();
-
-  let daysToAdd = targetDay - currentDay;
-  if (daysToAdd <= 0) {
-    daysToAdd += 7;
-  }
-
-  return now.add(daysToAdd, "day").startOf("day");
-}
-
-/**
- * Get previous occurrence of a specific day of week
- */
-function getPreviousDayOfWeek(dayName: string): Dayjs {
-  const days = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  const targetDay = days.indexOf(dayName);
-  const now = dayjs();
-  const currentDay = now.day();
-
-  let daysToSubtract = currentDay - targetDay;
-  if (daysToSubtract <= 0) {
-    daysToSubtract += 7;
-  }
-
-  return now.subtract(daysToSubtract, "day").startOf("day");
-}
-
-/**
- * Parse month and day string into Dayjs object
- */
-function parseMonthDay(monthDay: string): Dayjs {
-  const months = [
-    "january",
-    "february",
-    "march",
-    "april",
-    "may",
-    "june",
-    "july",
-    "august",
-    "september",
-    "october",
-    "november",
-    "december",
-  ];
-
-  const [month, day] = monthDay.split(" ");
-  const monthIndex = months.indexOf(month.toLowerCase());
-  const dayNum = parseInt(day);
-
-  const now = dayjs();
-  let year = now.year();
-
-  // If the date has passed this year, use next year
-  const targetDate = dayjs().month(monthIndex).date(dayNum);
-  if (targetDate.isBefore(now, "day")) {
-    year++;
-  }
-
-  return dayjs().year(year).month(monthIndex).date(dayNum).startOf("day");
 }
 
 /**

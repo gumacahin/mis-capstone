@@ -262,7 +262,8 @@ describe("SmartDateTimeField", () => {
       fireEvent.change(input, { target: { value: "every monday" } });
 
       expect(input).toHaveValue("every monday");
-      expect(screen.getByText("✓ every monday")).toBeInTheDocument();
+      // With chrono-node, "every monday" is parsed as both a date (next Monday) and recurrence
+      expect(screen.getByText(/✓ .+ \(every monday\)/)).toBeInTheDocument();
     });
 
     it("should parse 'sept 1 at 9am' correctly", async () => {
