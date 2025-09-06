@@ -13,6 +13,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
+import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -21,10 +22,20 @@ import {
 } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
-import { forwardRef, MouseEvent, useState } from "react";
+import debounce from "lodash.debounce";
+import { forwardRef, MouseEvent, useMemo, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 
+import { useTimezone } from "../hooks/useTimezone";
 import type { TaskFormFields } from "../types/common";
+import {
+  parseNaturalLanguage,
+  parseRRuleToDate,
+  updateRRuleWithDate,
+} from "../utils/rrule";
+import ParsedRRuleListItem from "./ParsedRRuleListItem";
+import RepeatOptionListItem from "./RepeatOptionListItem";
+import TimeOptionListItem from "./TimeOptionListItem";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
   control: Control<TaskFormFields>;
@@ -33,7 +44,11 @@ type DatePickerProps = DateCalendarProps<Dayjs> & {
 
 const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
   ({ control, sx, onClose, ...props }, ref) => {
+    const { timezone } = useTimezone();
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+    const [naturalLanguageInput, setNaturalLanguageInput] =
+      useState<string>("");
+    const [parsedRRule, setParsedRRule] = useState<string | null>(null);
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
@@ -41,6 +56,8 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
 
     const handleClose = () => {
       setAnchorEl(null);
+      setNaturalLanguageInput("");
+      setParsedRRule(null);
       if (onClose) {
         onClose();
       }
@@ -48,6 +65,15 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
     const open = Boolean(anchorEl);
 
     const id = open ? "calendar-popover" : undefined;
+
+    // Memoize date calculations
+    const { nextWeek, comingWeekend } = useMemo(() => {
+      const today = dayjs().startOf("day");
+      const nextWeek = dayjs().add(7, "day");
+      const comingWeekend =
+        today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
+      return { nextWeek, comingWeekend };
+    }, []);
 
     const formatDayOfWeek = (date: Dayjs | null) => {
       if (date === null) {
@@ -73,15 +99,33 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       return dayjs(date).format("MMMM D");
     };
 
+    const debouncedSetParsedRRule = useMemo(
+      () =>
+        debounce((value: string) => {
+          const parsedRRule = parseNaturalLanguage(value);
+          setParsedRRule(parsedRRule);
+        }, 300),
+      [],
+    );
+
+    const handleNaturalLanguageInputChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+      const value = e.target.value;
+      setNaturalLanguageInput(value);
+      debouncedSetParsedRRule(value);
+    };
+
     return (
       <Controller
-        name="due_date"
+        name="rrule"
         control={control}
-        render={({ field }) => {
-          const today = dayjs().startOf("day");
-          const nextWeek = dayjs().add(7, "day");
-          const comingWeekend =
-            today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
+        render={({ field: rruleField }) => {
+          // Parse the due date directly (no memoization needed here since it's simple)
+          const dueDate = rruleField.value
+            ? parseRRuleToDate(rruleField.value, timezone)
+            : null;
+
           return (
             <>
               <ButtonGroup
@@ -116,10 +160,10 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                     ref={ref}
                     size="small"
                   >
-                    {formatDayOfWeek(field.value)}
+                    {formatDayOfWeek(dueDate)}
                   </Button>
                 </Tooltip>
-                {field.value && (
+                {dueDate && (
                   <Tooltip title="Remove due date">
                     <Button
                       sx={{
@@ -130,7 +174,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                       size="small"
                       variant={props.variant ?? "outlined"}
                       onClick={() => {
-                        field.onChange(null);
+                        rruleField.onChange(null);
                       }}
                     >
                       <CloseIcon fontSize="small" />
@@ -149,13 +193,37 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 }}
               >
                 <List>
+                  <ListItem>
+                    <TextField
+                      placeholder="Type a date…"
+                      value={naturalLanguageInput}
+                      onChange={handleNaturalLanguageInputChange}
+                      fullWidth
+                    />
+                  </ListItem>
+                  {parsedRRule && (
+                    <ParsedRRuleListItem
+                      rrule={parsedRRule}
+                      onRRuleChange={(newRRule) => {
+                        rruleField.onChange(newRRule);
+                        // Note: DatePicker stays open to allow further adjustments
+                      }}
+                    />
+                  )}
+                  <ListItem divider disablePadding />
                   <ListItem
                     disablePadding
                     secondaryAction={dayjs().format("ddd")}
                   >
                     <ListItemButton
                       onClick={() => {
-                        field.onChange(dayjs());
+                        const today = dayjs();
+                        const rrule = updateRRuleWithDate(
+                          rruleField.value || null,
+                          today,
+                          timezone,
+                        );
+                        rruleField.onChange(rrule);
                         handleClose();
                       }}
                     >
@@ -172,7 +240,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                     <ListItemButton
                       onClick={() => {
                         const tomorrow = dayjs().add(1, "day");
-                        field.onChange(tomorrow);
+                        const rrule = updateRRuleWithDate(
+                          rruleField.value || null,
+                          tomorrow,
+                          timezone,
+                        );
+                        rruleField.onChange(rrule);
                         handleClose();
                       }}
                     >
@@ -188,8 +261,13 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                   >
                     <ListItemButton
                       onClick={() => {
+                        const rrule = updateRRuleWithDate(
+                          rruleField.value || null,
+                          comingWeekend,
+                          timezone,
+                        );
+                        rruleField.onChange(rrule);
                         handleClose();
-                        field.onChange(comingWeekend);
                       }}
                     >
                       <ListItemIcon>
@@ -204,7 +282,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                   >
                     <ListItemButton
                       onClick={() => {
-                        field.onChange(nextWeek);
+                        const rrule = updateRRuleWithDate(
+                          rruleField.value || null,
+                          nextWeek,
+                          timezone,
+                        );
+                        rruleField.onChange(rrule);
                         handleClose();
                       }}
                     >
@@ -214,11 +297,11 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                       <ListItemText primary={"Next Week"} />
                     </ListItemButton>
                   </ListItem>
-                  {field.value && (
+                  {dueDate && (
                     <ListItem disablePadding>
                       <ListItemButton
                         onClick={() => {
-                          field.onChange(null);
+                          rruleField.onChange(null);
                           handleClose();
                         }}
                       >
@@ -229,17 +312,36 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                       </ListItemButton>
                     </ListItem>
                   )}
-                </List>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateCalendar
-                    disablePast
-                    value={field.value}
-                    onChange={(newDate: Dayjs | null) => {
-                      field.onChange(newDate);
-                      handleClose();
-                    }}
+                  <ListItem disablePadding>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DateCalendar
+                        disablePast
+                        value={dueDate}
+                        onChange={(newDate: Dayjs | null) => {
+                          if (newDate) {
+                            const rrule = updateRRuleWithDate(
+                              rruleField.value || null,
+                              newDate,
+                              timezone,
+                            );
+                            rruleField.onChange(rrule);
+                          } else {
+                            rruleField.onChange(null);
+                          }
+                          // Note: Dialog stays open to allow further adjustments
+                        }}
+                      />
+                    </LocalizationProvider>
+                  </ListItem>
+                  <TimeOptionListItem
+                    currentRRule={rruleField.value}
+                    onRRuleChange={rruleField.onChange}
                   />
-                </LocalizationProvider>
+                  <RepeatOptionListItem
+                    currentRRule={rruleField.value}
+                    onRRuleChange={rruleField.onChange}
+                  />
+                </List>
               </Popover>
             </>
           );

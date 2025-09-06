@@ -29,7 +29,12 @@ export interface TaskFormFields {
   title: string;
   description: string | null;
   completion_date: Dayjs | null;
+  // UI continues to use due_date for date pickers
   due_date: Dayjs | null;
+  // NEW: rrule field for API (optional in form)
+  rrule?: string;
+  // Time field for time selection
+  time?: string | null;
   priority: TaskPriority;
   section: number;
   project: number;
@@ -41,6 +46,9 @@ export interface Task {
   title: string;
   completion_date?: string | null;
   description?: string | null;
+  // NEW: RRULE field (single source of truth)
+  rrule: string;
+  // MODIFIED: due_date becomes read-only (cached from backend)
   due_date?: string | null;
   priority?: TaskPriority;
   section: number;

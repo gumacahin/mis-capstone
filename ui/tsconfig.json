@@ -18,6 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@/test": ["src/test"],
+      "@/test/*": ["src/test/*"],
       "@auth": ["src/modules/auth"],
       "@auth/*": ["src/modules/auth/*"],
       "@shared": ["src/modules/shared"],

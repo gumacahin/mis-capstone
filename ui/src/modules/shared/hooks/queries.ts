@@ -3,6 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import dayjs, { type Dayjs } from "dayjs";
 
+import { generateSingleOccurrenceRRule } from "../utils/rrule";
+import { useTimezone } from "./useTimezone";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 import type {
@@ -151,6 +154,21 @@ export const useTasks = (start: Dayjs, end: Dayjs) => {
   });
 };
 
+export const useTasksForDate = (date: Dayjs) => {
+  const apiClient = useApiClient();
+  const dateStr = date.format("YYYY-MM-DD");
+  return useQuery({
+    queryKey: ["tasks", "date", dateStr],
+    queryFn: async () => {
+      const { data } = await apiClient.get(
+        `tasks/?start_date=${dateStr}&end_date=${dateStr}`,
+      );
+      return data;
+    },
+    enabled: !!date && date.isValid(),
+  });
+};
+
 export const useAddTask = ({
   projectId,
   belowTaskId,
@@ -162,16 +180,24 @@ export const useAddTask = ({
 }) => {
   const queryClient = useQueryClient();
   const apiClient = useApiClient();
+  const { timezone } = useTimezone();
+
   return useMutation({
     mutationKey: ["addTask"],
     mutationFn: async (task: Partial<TaskFormFields>) => {
+      // Convert due_date to rrule if provided
+      const rrule = task.due_date
+        ? generateSingleOccurrenceRRule(task.due_date, timezone)
+        : null;
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { due_date, ...taskWithoutDueDate } = task;
       const data = {
-        ...task,
+        ...taskWithoutDueDate,
         below_task: belowTaskId,
         above_task: aboveTaskId,
-        ...(dayjs.isDayjs(task.due_date) && {
-          due_date: task.due_date.format("YYYY-MM-DD"),
-        }),
+        // Always include rrule field - null means no due date
+        rrule,
       };
       const response = await apiClient.post("/tasks/", data);
       return response.data;
@@ -187,19 +213,27 @@ export const useAddTask = ({
 export const useUpdateTask = (task?: Task) => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
+  const { timezone } = useTimezone();
   const taskId = task?.id;
   const projectId = task?.project;
+
   return useMutation({
     mutationKey: ["updateTask", { taskId }],
     mutationFn: async (updatedTask: Partial<TaskFormFields>) => {
+      // Convert due_date to rrule if provided
+      const rrule = updatedTask.due_date
+        ? generateSingleOccurrenceRRule(updatedTask.due_date, timezone)
+        : null;
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { due_date, ...updatedTaskWithoutDueDate } = updatedTask;
       const data = {
-        ...updatedTask,
+        ...updatedTaskWithoutDueDate,
         ...(dayjs.isDayjs(updatedTask.completion_date) && {
           completion_date: updatedTask.completion_date.format("YYYY-MM-DD"),
         }),
-        ...(dayjs.isDayjs(updatedTask.due_date) && {
-          due_date: updatedTask.due_date.format("YYYY-MM-DD"),
-        }),
+        // Always include rrule field - null means clear due date
+        rrule,
       };
 
       const result = await apiClient.patch(`/tasks/${taskId}/`, data);

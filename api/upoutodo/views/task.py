@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models, transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
@@ -119,3 +121,30 @@ class TaskViewSet(viewsets.ModelViewSet):
             serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["post"])
+    def generate_occurrences(self, request, pk=None):
+        """Generate occurrences for a recurring task within date range"""
+        task = self.get_object()
+
+        start_date = request.data.get("start_date")
+        end_date = request.data.get("end_date")
+
+        if not start_date or not end_date:
+            return Response({"error": "start_date and end_date required"}, status=400)
+
+        try:
+            start = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
+            end = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
+            occurrences = task.get_occurrences_in_range(start, end, request.user)
+
+            return Response({"occurrences": [occ.isoformat() for occ in occurrences]})
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+    @action(detail=True, methods=["post"])
+    def refresh_due_date(self, request, pk=None):
+        """Manually refresh the cached due_date"""
+        task = self.get_object()
+        task.update_due_date_cache(request.user)
+        return Response({"due_date": task.due_date})

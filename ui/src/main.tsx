@@ -4,6 +4,20 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
+// Configure dayjs with timezone support
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(relativeTime);
+
+// Set default timezone
+const DEFAULT_TIMEZONE = "Asia/Manila";
+dayjs.tz.setDefault(DEFAULT_TIMEZONE);
+
 import {
   AUTH0_AUDIENCE,
   AUTH0_CLIENT_ID,
@@ -21,6 +35,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import ThemeContextProvider from "./components/ThemeContextProvider.tsx";
 import ToolbarContextProvider from "./components/ToolbarContextProvider.tsx";
+import { TimezoneProvider } from "./modules/shared/contexts/TimezoneContext.tsx";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -38,9 +53,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         cacheLocation="localstorage"
       >
         <QueryClientProvider client={queryClient}>
-          <ToolbarContextProvider>
-            <App />
-          </ToolbarContextProvider>
+          <TimezoneProvider>
+            <ToolbarContextProvider>
+              <App />
+            </ToolbarContextProvider>
+          </TimezoneProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </Auth0Provider>

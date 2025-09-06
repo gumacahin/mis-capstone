@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import Spinner from "../modules/shared/components/Spinner";
-import { render, screen } from "../test/test-utils";
+import { render, screen } from "@/test/test-utils";
+
+import Spinner from "../Spinner";
 
 describe("Spinner Component", () => {
   it("renders the spinner SVG", () => {

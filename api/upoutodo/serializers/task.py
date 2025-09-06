@@ -1,3 +1,4 @@
+from dateutil import rrule
 from django.contrib.contenttypes.models import ContentType
 from django_comments.models import Comment
 from rest_framework import serializers
@@ -27,6 +28,12 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
     project_title = serializers.SerializerMethodField(read_only=True)
     section_title = serializers.SerializerMethodField(read_only=True)
 
+    # NEW: RRULE field (input/output) - optional for tasks without due dates
+    rrule = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+    # MODIFIED: due_date becomes read-only (cached value)
+    due_date = serializers.DateTimeField(read_only=True)
+
     tags = TagListSerializerField(required=False)
 
     comments_count = serializers.SerializerMethodField(read_only=True)
@@ -37,7 +44,8 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "id",
             "title",
             "description",
-            "due_date",
+            "rrule",  # NEW
+            "due_date",  # Now read-only
             "priority",
             "tags",
             "completion_date",
@@ -67,6 +75,18 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             return None
         return section_title
 
+    def validate_rrule(self, value):
+        """Validate RRULE format"""
+        if not value:
+            # Allow empty/null RRULE for tasks without due dates
+            return value
+
+        try:
+            rrule.rrulestr(value)
+        except Exception as e:
+            raise serializers.ValidationError(f"Invalid RRULE format: {str(e)}")
+        return value
+
     def validate(self, data):
         above_task = data.pop("above_task", None)
         below_task = data.pop("below_task", None)
@@ -86,22 +106,48 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
         return data
 
-    def update(self, instance, validated_data):
-        request = self.context.get("request")
-        tags_data = validated_data.pop("tags", None)
+    def create(self, validated_data):
+        """Create task and update due_date cache in user's timezone"""
+        instance = super().create(validated_data)
+        if instance.rrule:
+            user = (
+                self.context.get("request").user
+                if self.context.get("request")
+                else None
+            )
+            instance.update_due_date_cache(user)
+        else:
+            # No RRULE means no due date
+            instance.due_date = None
+            instance.save(update_fields=["due_date"])
+        return instance
 
-        # Update other fields
+    def update(self, instance, validated_data):
+        """Update task and handle completion logic in user's timezone"""
+        rrule_changed = "rrule" in validated_data
+        completion_changed = "completion_date" in validated_data
+
         instance = super().update(instance, validated_data)
 
-        # Handle tags if provided
-        if tags_data is not None:
-            tag_objects = []
-            for tag_name in tags_data:
-                tag, _ = Tag.objects.get_or_create(
-                    name=tag_name, created_by=request.user
-                )
-                tag_objects.append(tag)
-            instance.tags.set(tag_objects)
+        user = self.context.get("request").user if self.context.get("request") else None
+
+        if rrule_changed:
+            if instance.rrule:
+                instance.update_due_date_cache(user)
+            else:
+                # No RRULE means no due date
+                instance.due_date = None
+                instance.save(update_fields=["due_date"])
+        elif completion_changed and instance.completion_date and instance.is_recurring:
+            # Task was just completed and is recurring - update to next occurrence
+            instance.update_due_date_cache(user)
+        elif (
+            completion_changed
+            and not instance.completion_date
+            and instance.is_recurring
+        ):
+            # Task was marked incomplete and is recurring - restore next occurrence
+            instance.update_due_date_cache(user)
 
         return instance
 
@@ -122,7 +168,8 @@ class TaskAdminSerializer(TaskSerializer):
             "id",
             "title",
             "description",
-            "due_date",
+            "rrule",  # NEW
+            "due_date",  # Now read-only
             "priority",
             "tags",
             "completion_date",

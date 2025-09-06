@@ -89,7 +89,16 @@ export default function ProjectsListPage() {
       {project && (
         <ProjectMenu
           anchorEl={anchorEl}
-          project={project}
+          project={{
+            ...project,
+            view: "list" as const,
+            sections: project.sections.map((section) => ({
+              ...section,
+              project: project.id,
+              tasks: [],
+              order: 0,
+            })),
+          }}
           handleClose={handleCloseProjectMenu}
         />
       )}

@@ -5,10 +5,24 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, RenderOptions } from "@testing-library/react";
 import React, { ReactElement } from "react";
 
+import { TimezoneProvider } from "../modules/shared/contexts/TimezoneContext.tsx";
+
 // Create a custom theme for testing
 const theme = createTheme({
   palette: {
     mode: "light",
+  },
+  transitions: {
+    duration: {
+      shortest: 0,
+      shorter: 0,
+      short: 0,
+      standard: 0,
+      complex: 0,
+      enteringScreen: 0,
+      leavingScreen: 0,
+    },
+    create: () => "none",
   },
 });
 
@@ -25,8 +39,10 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
+        <TimezoneProvider>
+          <CssBaseline />
+          {children}
+        </TimezoneProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

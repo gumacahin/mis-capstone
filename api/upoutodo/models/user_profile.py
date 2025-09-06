@@ -20,6 +20,11 @@ class UserProfile(models.Model):
         DARK = "dark", "Dark"
 
     theme = models.CharField(choices=Theme.choices, default=Theme.SYSTEM, max_length=6)
+    timezone = models.CharField(
+        max_length=50,
+        default="Asia/Manila",
+        help_text="User's timezone (e.g., Asia/Manila, America/New_York)",
+    )
 
     @property
     def inbox(self):

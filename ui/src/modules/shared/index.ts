@@ -2,6 +2,7 @@
 
 // Components
 export { default as DatePicker } from "./components/DatePicker";
+export { default as ParsedRRuleListItem } from "./components/ParsedRRuleListItem";
 export { default as SkeletonList } from "./components/SkeletonList";
 export { default as Spinner } from "./components/Spinner";
 
@@ -30,6 +31,7 @@ export { default as useProfileContext } from "./hooks/useProfileContext";
 export { default as useProjectContext } from "./hooks/useProjectContext";
 export { default as useScrollbarWidth } from "./hooks/useScrollbarWidth";
 export { default as useSectionContext } from "./hooks/useSectionContext";
+export { useTasksForDate } from "./hooks/useTasksForDate";
 export { default as useThemeContext } from "./hooks/useThemeContext";
 export { default as useToolbarContext } from "./hooks/useToolbarContext";
 export { default as useUpdateTaskDialogContext } from "./hooks/useUpdateTaskDialogContext";

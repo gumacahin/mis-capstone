@@ -1,32 +1,33 @@
 import { useForm } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 
-import DatePicker from "../modules/shared/components/DatePicker";
-import type { TaskFormFields } from "../modules/shared/types/common";
-import { render, screen } from "../test/test-utils";
+import { render, screen } from "@/test/test-utils";
+
+import type { TaskFormFields } from "../../types/common";
+import DatePicker from "../DatePicker";
 
 // Mock component that uses the DatePicker
 const TestWrapper = () => {
   const { control } = useForm<TaskFormFields>({
     defaultValues: {
-      dueDate: null,
+      rrule: undefined,
     },
   });
 
-  return (
-    <DatePicker control={control} name="dueDate" data-testid="date-picker" />
-  );
+  return <DatePicker control={control} />;
 };
 
 describe("DatePicker Component", () => {
   it("renders date picker button", () => {
     render(<TestWrapper />);
-    expect(screen.getByTestId("date-picker")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /set due date/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders with correct button text", () => {
     render(<TestWrapper />);
-    expect(screen.getByText("Today")).toBeInTheDocument();
+    expect(screen.getByText("Date")).toBeInTheDocument();
   });
 
   it("has proper accessibility attributes", () => {
