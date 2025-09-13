@@ -20,11 +20,14 @@ export interface Profile {
   is_student: boolean;
   is_faculty: boolean;
   is_onboarded: boolean;
+  timezone?: string;
   theme: "light" | "dark" | "system";
   projects: ProfileProject[];
 }
 
 export type TaskPriority = "NONE" | "LOW" | "MEDIUM" | "HIGH";
+export type AnchorMode = "SCHEDULED" | "COMPLETED";
+export type EndType = "NEVER" | "ON_DATE";
 export interface TaskFormFields {
   title: string;
   description: string | null;
@@ -34,6 +37,9 @@ export interface TaskFormFields {
   section: number;
   project: number;
   tags: string[];
+  rrule: string | null;
+  dtstart_local: Dayjs | null;
+  anchor_mode: AnchorMode | null;
 }
 
 export interface Task {
@@ -49,6 +55,9 @@ export interface Task {
   section_title?: string | null;
   tags: string[];
   order: number;
+  rrule: string | null;
+  dtstart_local: Dayjs | null;
+  anchor_mode: AnchorMode | null;
   comments_count: number;
 }
 
@@ -105,3 +114,10 @@ export interface TagDetail {
   id: number;
   tasks: Task[];
 }
+
+export type RepeatOption =
+  | "daily"
+  | "weekly"
+  | "weekdays"
+  | "monthly"
+  | "yearly";

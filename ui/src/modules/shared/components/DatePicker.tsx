@@ -21,20 +21,35 @@ import {
 } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { forwardRef, MouseEvent, useState } from "react";
-import { type Control, Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
+import { Frequency, RRule } from "rrule";
 
+import useTimezoneContext from "../hooks/useTimezoneContext";
 import type { TaskFormFields } from "../types/common";
+import RepeatOptions from "./RepeatOptions";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
-  control: Control<TaskFormFields>;
   onClose?: () => void;
 } & ButtonGroupProps;
 
-const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
-  ({ control, sx, onClose, ...props }, ref) => {
-    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
+const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
+  ({ sx, onClose, ...props }, ref) => {
+    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+    const timezone = useTimezoneContext();
+
+    const { watch, setValue } = useFormContext<TaskFormFields>();
+
+    const handleRemoveDueDate = () => {
+      setValue("rrule", null);
+      setValue("dtstart_local", null);
+      setValue("anchor_mode", null);
+    };
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
     };
@@ -45,7 +60,66 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
         onClose();
       }
     };
+    const handleDateChange = (newDate: Dayjs | null) => {
+      if (!newDate || !rrule) return;
+      newDate = newDate.startOf("day");
+
+      // Parse existing RRule
+      const rruleObject = RRule.fromString(rrule);
+      console.log("=== RRule!!!!!!! ===", rrule);
+      console.log("=== RRule Object ===", rruleObject.options);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { dtstart, byhour, byminute, bysecond, ...options } =
+        rruleObject.options;
+      console.log("=== Options ===", options);
+
+      // Update options based on frequency and selected date
+      switch (options.freq) {
+        case Frequency.WEEKLY: {
+          // Update byweekday to include the selected day
+          const dayOfWeek = (newDate.day() + 6) % 7; // Convert dayjs to RRule day
+          if (!options.byweekday) {
+            options.byweekday = [dayOfWeek];
+          } else if (!options.byweekday.includes(dayOfWeek)) {
+            options.byweekday = [...options.byweekday, dayOfWeek];
+          }
+          break;
+        }
+
+        case Frequency.MONTHLY: {
+          // Update bymonthday to the selected date
+          options.bymonthday = [newDate.date()];
+          // Clear weekday options if they exist
+          options.byweekday = [];
+          options.bysetpos = [];
+          break;
+        }
+
+        case Frequency.YEARLY: {
+          // Update bymonth and bymonthday to the selected date
+          options.bymonth = [newDate.month() + 1];
+          options.bymonthday = [newDate.date()];
+          // Clear weekday options if they exist
+          options.byweekday = [];
+          options.bysetpos = [];
+          break;
+        }
+
+        case Frequency.DAILY:
+          // No changes needed for daily
+          break;
+      }
+
+      // Create new RRule and update
+      const newRrule = new RRule(options);
+      setValue("rrule", newRrule.toString());
+    };
+
+    const dtstartLocal = watch("dtstart_local");
+    const rrule = watch("rrule");
     const open = Boolean(anchorEl);
+
+    console.log("=== RRule STRING ===", rrule);
 
     const id = open ? "calendar-popover" : undefined;
 
@@ -53,11 +127,11 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       if (date === null) {
         return "Date";
       }
-      const givenDate = dayjs(date).startOf("day");
-      const yesterday = dayjs().subtract(1, "day").startOf("day");
-      const today = dayjs().startOf("day");
-      const tomorrow = dayjs().add(1, "day").startOf("day");
-      const sevenDaysFromNow = dayjs().add(7, "day").startOf("day"); // End on Sun
+      const givenDate = dayjs.utc(date).tz(timezone).startOf("day");
+      const today = dayjs.utc(dayjs()).tz(timezone).startOf("day");
+      const yesterday = today.subtract(1, "day").startOf("day");
+      const tomorrow = today.add(1, "day").startOf("day");
+      const sevenDaysFromNow = today.add(7, "day").startOf("day");
       if (givenDate.isSame(yesterday)) {
         return "Yesterday";
       }
@@ -68,183 +142,176 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
         return "Tomorrow";
       }
       if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
-        return dayjs(date).format("dddd");
+        return givenDate.format("dddd");
       }
-      return dayjs(date).format("MMMM D");
+      return givenDate.format("MMMM D");
     };
 
+    const dueDate = dtstartLocal ? dayjs.utc(dtstartLocal).tz(timezone) : null;
+    const today = dayjs.utc(dayjs()).tz(timezone).startOf("day");
+    const tomorrow = today.add(1, "day").startOf("day");
+    const nextWeek = today.add(7, "day").startOf("day");
+    const comingWeekend =
+      today.day() >= 6
+        ? today.add(1, "week").day(6).startOf("day")
+        : today.day(6).startOf("day");
+
     return (
-      <Controller
-        name="due_date"
-        control={control}
-        render={({ field }) => {
-          const today = dayjs().startOf("day");
-          const nextWeek = dayjs().add(7, "day");
-          const comingWeekend =
-            today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
-          return (
-            <>
-              <ButtonGroup
+      <>
+        <ButtonGroup
+          size="small"
+          {...props}
+          sx={[
+            {
+              "& .MuiButtonGroup-grouped:not(:last-of-type)": {
+                borderRight: props.variant === "text" ? "none" : undefined, // Remove dividers for text variant
+              },
+              "& .MuiButtonGroup-grouped:not(:first-of-type)": {
+                marginLeft: props.variant === "text" ? 0 : undefined, // Remove spacing for text variant
+              },
+            },
+            ...(Array.isArray(sx) ? sx : [sx]), // Ensure sx is an array
+          ]}
+        >
+          <Tooltip title="Set due date">
+            <Button
+              sx={{
+                flexGrow: 1, // Allow this button to grow and occupy remaining space
+                flexShrink: 1, // Allow it to shrink if needed
+                textOverflow: "ellipsis", // Handle overflow gracefully
+                overflow: "hidden", // Hide overflowing text
+                whiteSpace: "nowrap", // Prevent text wrapping
+                ...(props.fullWidth && { justifyContent: "start" }),
+              }}
+              startIcon={<CalendarTodayIcon />}
+              variant={props.variant ?? "outlined"}
+              onClick={handleClick}
+              ref={ref}
+              size="small"
+            >
+              {formatDayOfWeek(dueDate)}
+            </Button>
+          </Tooltip>
+          {dueDate && (
+            <Tooltip title="Remove due date">
+              <Button
+                sx={{
+                  flexGrow: 0, // Prevent this button from growing
+                  flexShrink: 0, // Prevent this button from shrinking
+                  width: "auto", // Ensure it only takes up the space it needs
+                }}
                 size="small"
-                {...props}
-                sx={[
-                  {
-                    "& .MuiButtonGroup-grouped:not(:last-of-type)": {
-                      borderRight:
-                        props.variant === "text" ? "none" : undefined, // Remove dividers for text variant
-                    },
-                    "& .MuiButtonGroup-grouped:not(:first-of-type)": {
-                      marginLeft: props.variant === "text" ? 0 : undefined, // Remove spacing for text variant
-                    },
-                  },
-                  ...(Array.isArray(sx) ? sx : [sx]), // Ensure sx is an array
-                ]}
+                variant={props.variant ?? "outlined"}
+                onClick={handleRemoveDueDate}
               >
-                <Tooltip title="Set due date">
-                  <Button
-                    sx={{
-                      flexGrow: 1, // Allow this button to grow and occupy remaining space
-                      flexShrink: 1, // Allow it to shrink if needed
-                      textOverflow: "ellipsis", // Handle overflow gracefully
-                      overflow: "hidden", // Hide overflowing text
-                      whiteSpace: "nowrap", // Prevent text wrapping
-                      ...(props.fullWidth && { justifyContent: "start" }),
-                    }}
-                    startIcon={<CalendarTodayIcon />}
-                    variant={props.variant ?? "outlined"}
-                    onClick={handleClick}
-                    ref={ref}
-                    size="small"
-                  >
-                    {formatDayOfWeek(field.value)}
-                  </Button>
-                </Tooltip>
-                {field.value && (
-                  <Tooltip title="Remove due date">
-                    <Button
-                      sx={{
-                        flexGrow: 0, // Prevent this button from growing
-                        flexShrink: 0, // Prevent this button from shrinking
-                        width: "auto", // Ensure it only takes up the space it needs
-                      }}
-                      size="small"
-                      variant={props.variant ?? "outlined"}
-                      onClick={() => {
-                        field.onChange(null);
-                      }}
-                    >
-                      <CloseIcon fontSize="small" />
-                    </Button>
-                  </Tooltip>
-                )}
-              </ButtonGroup>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
+                <CloseIcon fontSize="small" />
+              </Button>
+            </Tooltip>
+          )}
+        </ButtonGroup>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+        >
+          <List>
+            <ListItem disablePadding secondaryAction={today.format("ddd")}>
+              <ListItemButton
+                onClick={() => {
+                  handleDateChange(today);
+                  setValue("dtstart_local", today);
+                  handleClose();
                 }}
               >
-                <List>
-                  <ListItem
-                    disablePadding
-                    secondaryAction={dayjs().format("ddd")}
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        field.onChange(dayjs());
-                        handleClose();
-                      }}
-                    >
-                      <ListItemIcon>
-                        <TodayIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={"Today"} />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem
-                    disablePadding
-                    secondaryAction={dayjs().add(1, "day").format("ddd")}
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        const tomorrow = dayjs().add(1, "day");
-                        field.onChange(tomorrow);
-                        handleClose();
-                      }}
-                    >
-                      <ListItemIcon>
-                        <WbSunnyIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={"Tomorrow"} />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem
-                    disablePadding
-                    secondaryAction={comingWeekend.format("ddd")}
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        handleClose();
-                        field.onChange(comingWeekend);
-                      }}
-                    >
-                      <ListItemIcon>
-                        <WeekendIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={"This weekend"} />
-                    </ListItemButton>
-                  </ListItem>
-                  <ListItem
-                    disablePadding
-                    secondaryAction={nextWeek.format("ddd")}
-                  >
-                    <ListItemButton
-                      onClick={() => {
-                        field.onChange(nextWeek);
-                        handleClose();
-                      }}
-                    >
-                      <ListItemIcon>
-                        <NextWeekIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={"Next Week"} />
-                    </ListItemButton>
-                  </ListItem>
-                  {field.value && (
-                    <ListItem disablePadding>
-                      <ListItemButton
-                        onClick={() => {
-                          field.onChange(null);
-                          handleClose();
-                        }}
-                      >
-                        <ListItemIcon>
-                          <NotInterestedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"No date"} />
-                      </ListItemButton>
-                    </ListItem>
-                  )}
-                </List>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateCalendar
-                    disablePast
-                    value={field.value}
-                    onChange={(newDate: Dayjs | null) => {
-                      field.onChange(newDate);
-                      handleClose();
-                    }}
-                  />
-                </LocalizationProvider>
-              </Popover>
-            </>
-          );
-        }}
-      />
+                <ListItemIcon>
+                  <TodayIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Today"} />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding secondaryAction={tomorrow.format("ddd")}>
+              <ListItemButton
+                onClick={() => {
+                  handleDateChange(tomorrow);
+                  setValue("dtstart_local", tomorrow);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <WbSunnyIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Tomorrow"} />
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              disablePadding
+              secondaryAction={comingWeekend.format("ddd")}
+            >
+              <ListItemButton
+                onClick={() => {
+                  handleDateChange(comingWeekend);
+                  setValue("dtstart_local", comingWeekend);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <WeekendIcon />
+                </ListItemIcon>
+                <ListItemText primary={"This weekend"} />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding secondaryAction={nextWeek.format("ddd")}>
+              <ListItemButton
+                onClick={() => {
+                  handleDateChange(nextWeek);
+                  setValue("dtstart_local", nextWeek);
+                  handleClose();
+                }}
+              >
+                <ListItemIcon>
+                  <NextWeekIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Next Week"} />
+              </ListItemButton>
+            </ListItem>
+            {dueDate && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setValue("dtstart_local", null);
+                    setValue("rrule", null);
+                    handleClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <NotInterestedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"No date"} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            <ListItem disablePadding>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  disablePast
+                  value={dueDate}
+                  onChange={(value: Dayjs) => {
+                    const newDate = value.startOf("day");
+                    handleDateChange(newDate);
+                    setValue("dtstart_local", newDate);
+                  }}
+                />
+              </LocalizationProvider>
+            </ListItem>
+            <RepeatOptions />
+          </List>
+        </Popover>
+      </>
     );
   },
 );

@@ -15,9 +15,10 @@ import type {
   TaskFormFields,
   TaskPriority,
 } from "@shared/types/common";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import DescriptionField from "./DescriptionField";
@@ -25,6 +26,8 @@ import TaskPriorityMenu from "./TaskPriorityMenu";
 import TaskProjectButton from "./TaskProjectButton";
 import TaskTagsButton from "./TaskTagsButton";
 import TitleField from "./TitleField";
+
+dayjs.extend(utc);
 
 export interface TaskFormProps {
   presetDueDate?: Dayjs;
@@ -61,6 +64,12 @@ export default function TaskForm({
   const defaultValues = {
     title: task?.title ?? "",
     description: task?.description ?? "",
+    rrule: task?.rrule ?? null,
+    // dtstart_local: task?.dtstart_local
+    //   ? dayjs.utc(task.dtstart_local)
+    //   : (presetDueDate ?? null),
+    dtstart_local: null,
+    anchor_mode: task?.anchor_mode ?? "SCHEDULED",
     due_date: task?.due_date ?? presetDueDate ?? null,
     project: task ? task.project : (project?.id ?? inbox?.id),
     section: task ? task.section : (section?.id ?? inboxDefaultSection?.id),
@@ -68,9 +77,11 @@ export default function TaskForm({
     tags: task?.tags ?? (presetLabel ? [presetLabel] : []),
   };
 
-  const { control, handleSubmit, watch } = useForm<TaskFormFields>({
+  const form = useForm<TaskFormFields>({
     defaultValues,
   });
+
+  const { control, handleSubmit, watch } = form;
 
   const isAdding = !task;
 
@@ -129,17 +140,19 @@ export default function TaskForm({
       variant="outlined"
       sx={{ width: "100%", maxWidth: "100%" }}
     >
-      <CardContent>
-        <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
-          <TitleField control={control} onEnter={handleSubmit(onSubmit)} />
-          <DescriptionField control={control} hideDescriptionIcon />
-          <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
-            <DatePicker control={control} />
-            <TaskPriorityMenu control={control} priority={priority} />
-            <TaskTagsButton control={control} tags={tags} />
+      <FormProvider {...form}>
+        <CardContent>
+          <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
+            <TitleField control={control} onEnter={handleSubmit(onSubmit)} />
+            <DescriptionField control={control} hideDescriptionIcon />
+            <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
+              <DatePicker />
+              <TaskPriorityMenu control={control} priority={priority} />
+              <TaskTagsButton control={control} tags={tags} />
+            </Stack>
           </Stack>
-        </Stack>
-      </CardContent>
+        </CardContent>
+      </FormProvider>
       <CardActions sx={{ justifyContent: "space-between" }}>
         <TaskProjectButton
           control={control}

@@ -9,3 +9,4 @@ export const DROPPABLE_MIN_HEIGHT = 50;
 export const DROPPABLE_TYPE_TASK = "TASK";
 export const DROPPABLE_TYPE_SECTION = "SECTION";
 export const MAX_LABEL_LENGTH = 60;
+export const DEFAULT_TIMEZONE = "Asia/Manila";

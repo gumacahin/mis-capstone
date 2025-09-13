@@ -81,3 +81,15 @@ export function slugify(str: string) {
 export function generateTaskLink(taskId: number): string {
   return `/task/${taskId}`;
 }
+
+export function rruleToDayjsDay(rruleWeekday: number): number {
+  // RRule: 0=Monday, 1=Tuesday, ..., 6=Sunday
+  // dayjs: 0=Sunday, 1=Monday, ..., 6=Saturday
+  return (rruleWeekday + 1) % 7;
+}
+
+export function dayjsToRRuleDay(dayjsDay: Dayjs): number {
+  // dayjs: 0=Sunday, 1=Monday, ..., 6=Saturday
+  // RRule: 0=Monday, 1=Tuesday, ..., 6=Sunday
+  return (dayjsDay.day() + 6) % 7;
+}
