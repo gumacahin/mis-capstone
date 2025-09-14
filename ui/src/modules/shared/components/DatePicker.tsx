@@ -30,6 +30,7 @@ import { Frequency, RRule } from "rrule";
 import useTimezoneContext from "../hooks/useTimezoneContext";
 import type { TaskFormFields } from "../types/common";
 import RepeatOptions from "./RepeatOptions";
+import TimeOptions from "./TimeOptions";
 
 type DatePickerProps = DateCalendarProps<Dayjs> & {
   onClose?: () => void;
@@ -44,6 +45,14 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
     const timezone = useTimezoneContext();
 
     const { watch, setValue } = useFormContext<TaskFormFields>();
+
+    const dtstartLocal = watch("dtstart_local");
+    const rrule = watch("rrule");
+    const open = Boolean(anchorEl);
+
+    console.log("=== RRule STRING ===", rrule);
+
+    const id = open ? "calendar-popover" : undefined;
 
     const handleRemoveDueDate = () => {
       setValue("rrule", null);
@@ -61,8 +70,13 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       }
     };
     const handleDateChange = (newDate: Dayjs | null) => {
-      if (!newDate || !rrule) return;
-      newDate = newDate.startOf("day");
+      if (!newDate) return;
+      const hour = dtstartLocal?.hour() || 0;
+      const minute = dtstartLocal?.minute() || 0;
+      newDate = newDate.hour(hour).minute(minute);
+      setValue("dtstart_local", newDate);
+
+      if (!rrule) return;
 
       // Parse existing RRule
       const rruleObject = RRule.fromString(rrule);
@@ -114,14 +128,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       const newRrule = new RRule(options);
       setValue("rrule", newRrule.toString());
     };
-
-    const dtstartLocal = watch("dtstart_local");
-    const rrule = watch("rrule");
-    const open = Boolean(anchorEl);
-
-    console.log("=== RRule STRING ===", rrule);
-
-    const id = open ? "calendar-popover" : undefined;
 
     const formatDayOfWeek = (date: Dayjs | null) => {
       if (date === null) {
@@ -224,7 +230,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
               <ListItemButton
                 onClick={() => {
                   handleDateChange(today);
-                  setValue("dtstart_local", today);
                   handleClose();
                 }}
               >
@@ -238,7 +243,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
               <ListItemButton
                 onClick={() => {
                   handleDateChange(tomorrow);
-                  setValue("dtstart_local", tomorrow);
                   handleClose();
                 }}
               >
@@ -255,7 +259,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
               <ListItemButton
                 onClick={() => {
                   handleDateChange(comingWeekend);
-                  setValue("dtstart_local", comingWeekend);
                   handleClose();
                 }}
               >
@@ -269,7 +272,6 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
               <ListItemButton
                 onClick={() => {
                   handleDateChange(nextWeek);
-                  setValue("dtstart_local", nextWeek);
                   handleClose();
                 }}
               >
@@ -301,13 +303,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                   disablePast
                   value={dueDate}
                   onChange={(value: Dayjs) => {
-                    const newDate = value.startOf("day");
-                    handleDateChange(newDate);
-                    setValue("dtstart_local", newDate);
+                    handleDateChange(value);
                   }}
                 />
               </LocalizationProvider>
             </ListItem>
+            <TimeOptions />
             <RepeatOptions />
           </List>
         </Popover>
