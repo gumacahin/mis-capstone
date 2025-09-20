@@ -9,6 +9,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import type { ProfileProject, TaskFormFields } from "@shared/types/common";
+import { Fragment } from "react/jsx-runtime";
 import { ControllerRenderProps } from "react-hook-form";
 
 export interface TaskProjectMenuProps {
@@ -97,7 +98,7 @@ export default function TaskProjectMenu({
       {projects?.map((project) => {
         const defaultSectionId = project.sections.find((s) => s.is_default)!.id;
         return (
-          <>
+          <Fragment key={project.id}>
             <MenuItem
               // key={project.id}
               selected={defaultSectionId === sectionId}
@@ -148,7 +149,7 @@ export default function TaskProjectMenu({
                   </ListItemIcon>
                 </MenuItem>
               ))}
-          </>
+          </Fragment>
         );
       })}
     </Menu>

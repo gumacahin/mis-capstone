@@ -7,26 +7,28 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { MouseEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { RRule } from "rrule";
 
 import useTimezoneContext from "../hooks/useTimezoneContext";
-import { generateRrule } from "../rrule";
 import { AnchorMode, RepeatOption, TaskFormFields } from "../types/common";
+import { findNextValidOccurrence, generateRrule } from "../utils";
 import RepeatOptionsCustom from "./RepeatOptionsCustom";
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function RepeatOptions() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
   const { watch, setValue } = useFormContext<TaskFormFields>();
   const timezone = useTimezoneContext();
-  const dtstartLocal = watch("dtstart_local");
-  const startDate = dtstartLocal
-    ? dayjs.tz(dtstartLocal, timezone).startOf("day")
+  const dtstart = watch("dtstart");
+  const startDate = dtstart
+    ? dayjs.tz(dtstart, timezone).startOf("day")
     : dayjs.tz(dayjs(), timezone).startOf("day");
   const rrule = watch("rrule");
   const anchor_mode = watch("anchor_mode");
@@ -62,44 +64,30 @@ export default function RepeatOptions() {
       return;
     }
 
-    const newRrule = generateRrule(rrule, option, startDate);
+    const newRrule = generateRrule(option, startDate);
     setValue("rrule", newRrule);
 
-    if (!dtstartLocal) {
-      if (option !== "weekdays") {
-        setValue("dtstart_local", startDate);
-      } else {
-        const day = startDate.day();
-        if (day === 6) {
-          setValue("dtstart_local", startDate.add(2, "day"));
-        } else if (day === 0) {
-          setValue("dtstart_local", startDate.add(1, "day"));
-        } else {
-          setValue("dtstart_local", startDate);
-        }
-      }
-    }
-
-    if (dtstartLocal) {
-      if (option !== "weekdays") {
-        setValue("dtstart_local", dtstartLocal);
-      } else {
-        const day = dtstartLocal.day();
-        if (day === 6) {
-          setValue("dtstart_local", dtstartLocal.add(2, "day"));
-        } else if (day === 0) {
-          setValue("dtstart_local", dtstartLocal.add(1, "day"));
-        } else {
-          setValue("dtstart_local", dtstartLocal);
-        }
-      }
-    }
+    const rruleObj = RRule.fromString(newRrule);
+    const nextValidDate = findNextValidOccurrence(
+      rruleObj,
+      startDate,
+      timezone,
+    );
+    setValue("dtstart", nextValidDate);
     handleClose();
   };
 
   const handleCustomSave = (rrule: string, anchor_mode: AnchorMode | null) => {
     setValue("rrule", rrule);
     setValue("anchor_mode", anchor_mode);
+
+    const rruleObj = RRule.fromString(rrule);
+    const nextValidDate = findNextValidOccurrence(
+      rruleObj,
+      startDate,
+      timezone,
+    );
+    setValue("dtstart", nextValidDate);
     setShowCustomDialog(false);
   };
 
@@ -116,7 +104,7 @@ export default function RepeatOptions() {
     <>
       <ListItem disablePadding>
         <ListItemButton onClick={handleClick}>
-          <ListItemIcon sx={{ minWidth: "auto", marginRight: 1 }}>
+          <ListItemIcon>
             <RepeatIcon />
           </ListItemIcon>
           <ListItemText primary={displayText} />
@@ -160,7 +148,7 @@ export default function RepeatOptions() {
         open={showCustomDialog}
         onClose={() => setShowCustomDialog(false)}
         onSave={handleCustomSave}
-        dtstartLocal={dtstartLocal ? dayjs.tz(dtstartLocal, timezone) : null}
+        dtstart={dtstart ? dayjs.tz(dtstart, timezone) : null}
         rrule={rrule}
         anchor_mode={anchor_mode}
       />

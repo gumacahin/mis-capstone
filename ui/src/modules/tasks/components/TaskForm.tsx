@@ -65,12 +65,11 @@ export default function TaskForm({
     title: task?.title ?? "",
     description: task?.description ?? "",
     rrule: task?.rrule ?? null,
-    // dtstart_local: task?.dtstart_local
-    //   ? dayjs.utc(task.dtstart_local)
-    //   : (presetDueDate ?? null),
-    dtstart_local: null,
+    dtstart: task?.dtstart
+      ? dayjs(task.dtstart).utc()
+      : (presetDueDate?.startOf("day").utc() ?? null),
     anchor_mode: task?.anchor_mode ?? "SCHEDULED",
-    due_date: task?.due_date ?? presetDueDate ?? null,
+    // due_date: task?.due_date ?? presetDueDate ?? null,
     project: task ? task.project : (project?.id ?? inbox?.id),
     section: task ? task.section : (section?.id ?? inboxDefaultSection?.id),
     priority: task?.priority ?? ("NONE" as TaskPriority),
@@ -88,7 +87,6 @@ export default function TaskForm({
   const onSubmit: SubmitHandler<TaskFormFields> = async ({
     title,
     description,
-    due_date,
     section,
     project,
     tags,
@@ -98,7 +96,6 @@ export default function TaskForm({
       title,
       description,
       section,
-      due_date,
       tags,
       priority,
       project,

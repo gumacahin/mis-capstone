@@ -3,6 +3,8 @@ import "./App.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Spinner from "@shared/components/Spinner";
 import { useProfile } from "@shared/hooks/queries";
 import { Toaster } from "react-hot-toast";
@@ -41,7 +43,9 @@ function App() {
   return (
     <ProfileContextProvider profile={profile}>
       <Toaster />
-      <RouterProvider router={createBrowserRouter(routes)} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={createBrowserRouter(routes)} />
+      </LocalizationProvider>
     </ProfileContextProvider>
   );
 }

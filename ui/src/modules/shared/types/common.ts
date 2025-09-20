@@ -32,13 +32,12 @@ export interface TaskFormFields {
   title: string;
   description: string | null;
   completion_date: Dayjs | null;
-  due_date: Dayjs | null;
   priority: TaskPriority;
   section: number;
   project: number;
   tags: string[];
   rrule: string | null;
-  dtstart_local: Dayjs | null;
+  dtstart: Dayjs | null;
   anchor_mode: AnchorMode | null;
 }
 
@@ -47,7 +46,6 @@ export interface Task {
   title: string;
   completion_date?: string | null;
   description?: string | null;
-  due_date?: string | null;
   priority?: TaskPriority;
   section: number;
   project: number;
@@ -56,7 +54,7 @@ export interface Task {
   tags: string[];
   order: number;
   rrule: string | null;
-  dtstart_local: Dayjs | null;
+  dtstart: Dayjs | null;
   anchor_mode: AnchorMode | null;
   comments_count: number;
 }

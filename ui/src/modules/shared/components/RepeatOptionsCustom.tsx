@@ -32,7 +32,7 @@ interface RepeatOptionsCustomProps {
   open: boolean;
   onClose: () => void;
   onSave: (rrule: string, anchor_mode: AnchorMode | null) => void;
-  dtstartLocal: Dayjs | null;
+  dtstart: Dayjs | null;
   rrule: string | null;
   anchor_mode: AnchorMode | null;
 }
@@ -60,7 +60,7 @@ export default function RepeatOptionsCustom({
   onClose,
   onSave,
   rrule,
-  dtstartLocal,
+  dtstart,
   anchor_mode,
 }: RepeatOptionsCustomProps) {
   const timezone = useTimezoneContext();
@@ -76,16 +76,16 @@ export default function RepeatOptionsCustom({
 
   const watchedFrequency = watch("frequency");
   const watchedEndType = watch("endType");
-  const defaultSelectedWeekday = dtstartLocal
-    ? dayjsToRRuleDay(dayjs.tz(dtstartLocal, timezone))
+  const defaultSelectedWeekday = dtstart
+    ? dayjsToRRuleDay(dayjs.tz(dtstart, timezone))
     : dayjsToRRuleDay(dayjs.tz(dayjs(), timezone));
 
-  const defaultDayOfMonth = dtstartLocal
-    ? dayjs.tz(dtstartLocal, timezone).date()
+  const defaultDayOfMonth = dtstart
+    ? dayjs.tz(dtstart, timezone).date()
     : dayjs.tz(dayjs(), timezone).date();
 
-  const defaultMonth = dtstartLocal
-    ? dayjs.tz(dtstartLocal, timezone).month() + 1
+  const defaultMonth = dtstart
+    ? dayjs.tz(dtstart, timezone).month() + 1
     : dayjs.tz(dayjs(), timezone).month() + 1;
 
   useEffect(() => {
@@ -127,8 +127,8 @@ export default function RepeatOptionsCustom({
       weekOfMonth: rruleObject.options.bysetpos?.[0] || undefined,
       dayOfWeek: rruleObject.options.byweekday
         ? rruleObject.options.byweekday[0]
-        : dtstartLocal
-          ? dayjsToRRuleDay(dayjs.tz(dtstartLocal, timezone))
+        : dtstart
+          ? dayjsToRRuleDay(dayjs.tz(dtstart, timezone))
           : dayjsToRRuleDay(dayjs.tz(dayjs(), timezone)),
       yearlyOption: getYearlyOption(rruleObject.options),
       month: rruleObject.options.bymonth?.[0] || defaultMonth,
@@ -137,14 +137,14 @@ export default function RepeatOptionsCustom({
       yearlyWeekOfMonth: rruleObject.options.bysetpos?.[0] || undefined,
       yearlyDayOfWeek: rruleObject.options.byweekday
         ? rruleObject.options.byweekday[0]
-        : dtstartLocal
-          ? dayjsToRRuleDay(dayjs.tz(dtstartLocal, timezone))
+        : dtstart
+          ? dayjsToRRuleDay(dayjs.tz(dtstart, timezone))
           : dayjsToRRuleDay(dayjs.tz(dayjs(), timezone)),
     });
   }, [
     rrule,
     timezone,
-    dtstartLocal,
+    dtstart,
     reset,
     anchor_mode,
     defaultSelectedWeekday,
@@ -170,11 +170,11 @@ export default function RepeatOptionsCustom({
       case Frequency.MONTHLY:
         if (data.monthlyOption === "day") {
           // Use current date values for monthly date option
-          const currentDate = dtstartLocal || dayjs();
+          const currentDate = dtstart || dayjs();
           rruleOptions.bymonthday = currentDate.date();
         } else {
           // Use current date values for monthly weekday option
-          const currentDate = dtstartLocal || dayjs();
+          const currentDate = dtstart || dayjs();
           rruleOptions.byweekday = currentDate.day();
           rruleOptions.bysetpos = Math.ceil(currentDate.date() / 7);
         }
@@ -183,12 +183,12 @@ export default function RepeatOptionsCustom({
       case Frequency.YEARLY:
         if (data.yearlyOption === "date") {
           // Use current date values for yearly date option
-          const currentDate = dtstartLocal || dayjs();
+          const currentDate = dtstart || dayjs();
           rruleOptions.bymonth = currentDate.month() + 1;
           rruleOptions.bymonthday = currentDate.date();
         } else {
           // Use current date values for yearly weekday option
-          const currentDate = dtstartLocal || dayjs();
+          const currentDate = dtstart || dayjs();
           rruleOptions.bymonth = currentDate.month() + 1;
           rruleOptions.byweekday = currentDate.day();
           rruleOptions.bysetpos = Math.ceil(currentDate.date() / 7);
@@ -230,7 +230,7 @@ export default function RepeatOptionsCustom({
   };
 
   const getMonthlyDayLabel = () => {
-    const currentDate = dtstartLocal || dayjs.tz(dayjs(), timezone);
+    const currentDate = dtstart || dayjs.tz(dayjs(), timezone);
     const day = currentDate.date();
     const suffix =
       day === 1 ? "st" : day === 2 ? "nd" : day === 3 ? "rd" : "th";
@@ -238,7 +238,7 @@ export default function RepeatOptionsCustom({
   };
 
   const getMonthlyWeekdayLabel = () => {
-    const currentDate = dtstartLocal || dayjs.tz(dayjs(), timezone);
+    const currentDate = dtstart || dayjs.tz(dayjs(), timezone);
     const weekNumber = Math.ceil(currentDate.date() / 7);
     const suffix =
       weekNumber === 1
@@ -347,12 +347,12 @@ export default function RepeatOptionsCustom({
                   <FormControlLabel
                     value="date"
                     control={<Radio />}
-                    label={`${dtstartLocal ? dayjs(dtstartLocal).date() : dayjs().date()}${dtstartLocal ? (dayjs(dtstartLocal).date() === 1 ? "st" : dayjs(dtstartLocal).date() === 2 ? "nd" : dayjs(dtstartLocal).date() === 3 ? "rd" : "th") : dayjs().date() === 1 ? "st" : dayjs().date() === 2 ? "nd" : dayjs().date() === 3 ? "rd" : "th"} ${dtstartLocal ? dayjs(dtstartLocal).format("MMMM") : dayjs().format("MMMM")}`}
+                    label={`${dtstart ? dayjs(dtstart).date() : dayjs().date()}${dtstart ? (dayjs(dtstart).date() === 1 ? "st" : dayjs(dtstart).date() === 2 ? "nd" : dayjs(dtstart).date() === 3 ? "rd" : "th") : dayjs().date() === 1 ? "st" : dayjs().date() === 2 ? "nd" : dayjs().date() === 3 ? "rd" : "th"} ${dtstart ? dayjs(dtstart).format("MMMM") : dayjs().format("MMMM")}`}
                   />
                   <FormControlLabel
                     value="weekday"
                     control={<Radio />}
-                    label={`The ${dtstartLocal ? Math.ceil(dayjs(dtstartLocal).date() / 7) : Math.ceil(dayjs().date() / 7)}${dtstartLocal ? (Math.ceil(dayjs(dtstartLocal).date() / 7) === 1 ? "st" : Math.ceil(dayjs(dtstartLocal).date() / 7) === 2 ? "nd" : Math.ceil(dayjs(dtstartLocal).date() / 7) === 3 ? "rd" : "th") : Math.ceil(dayjs().date() / 7) === 1 ? "st" : Math.ceil(dayjs().date() / 7) === 2 ? "nd" : Math.ceil(dayjs().date() / 7) === 3 ? "rd" : "th"} ${dtstartLocal ? getFullDayName(dayjs(dtstartLocal).day()) : getFullDayName(dayjs().day())} of ${dtstartLocal ? dayjs(dtstartLocal).format("MMMM") : dayjs().format("MMMM")}`}
+                    label={`The ${dtstart ? Math.ceil(dayjs(dtstart).date() / 7) : Math.ceil(dayjs().date() / 7)}${dtstart ? (Math.ceil(dayjs(dtstart).date() / 7) === 1 ? "st" : Math.ceil(dayjs(dtstart).date() / 7) === 2 ? "nd" : Math.ceil(dayjs(dtstart).date() / 7) === 3 ? "rd" : "th") : Math.ceil(dayjs().date() / 7) === 1 ? "st" : Math.ceil(dayjs().date() / 7) === 2 ? "nd" : Math.ceil(dayjs().date() / 7) === 3 ? "rd" : "th"} ${dtstart ? getFullDayName(dayjs(dtstart).day()) : getFullDayName(dayjs().day())} of ${dtstart ? dayjs(dtstart).format("MMMM") : dayjs().format("MMMM")}`}
                   />
                 </RadioGroup>
               )}

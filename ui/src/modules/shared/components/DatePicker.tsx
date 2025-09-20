@@ -2,6 +2,8 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CloseIcon from "@mui/icons-material/Close";
 import NextWeekIcon from "@mui/icons-material/NextWeek";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import PostponeIcon from "@mui/icons-material/Shortcut";
 import TodayIcon from "@mui/icons-material/Today";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import WeekendIcon from "@mui/icons-material/Weekend";
@@ -14,21 +16,22 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Popover from "@mui/material/Popover";
 import Tooltip from "@mui/material/Tooltip";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   DateCalendar,
   type DateCalendarProps,
 } from "@mui/x-date-pickers/DateCalendar";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs, { Dayjs } from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { forwardRef, MouseEvent, useState } from "react";
+import { forwardRef, MouseEvent, useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Frequency, RRule } from "rrule";
 
 import useTimezoneContext from "../hooks/useTimezoneContext";
 import type { TaskFormFields } from "../types/common";
+import { getPostponeDate, getRepeatDates } from "../utils";
+import CustomPickersDay from "./CustomPickersDay";
+import NaturalLanguageInput from "./NaturalLanguageInput";
 import RepeatOptions from "./RepeatOptions";
 import TimeOptions from "./TimeOptions";
 
@@ -42,21 +45,22 @@ dayjs.extend(timezone);
 const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
   ({ sx, onClose, ...props }, ref) => {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+    const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
     const timezone = useTimezoneContext();
 
     const { watch, setValue } = useFormContext<TaskFormFields>();
 
-    const dtstartLocal = watch("dtstart_local");
+    const dtstart = watch("dtstart");
     const rrule = watch("rrule");
     const open = Boolean(anchorEl);
-
-    console.log("=== RRule STRING ===", rrule);
+    const isRepeating = rrule !== null;
+    const dueDate = dtstart ? dayjs(dtstart).tz(timezone) : null;
 
     const id = open ? "calendar-popover" : undefined;
 
     const handleRemoveDueDate = () => {
       setValue("rrule", null);
-      setValue("dtstart_local", null);
+      setValue("dtstart", null);
       setValue("anchor_mode", null);
     };
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -69,98 +73,144 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
         onClose();
       }
     };
-    const handleDateChange = (newDate: Dayjs | null) => {
-      if (!newDate) return;
-      const hour = dtstartLocal?.hour() || 0;
-      const minute = dtstartLocal?.minute() || 0;
-      newDate = newDate.hour(hour).minute(minute);
-      setValue("dtstart_local", newDate);
+
+    const handleMonthChange = useCallback((newMonth: Dayjs) => {
+      setCurrentMonth(newMonth.startOf("month"));
+    }, []);
+
+    // Calculate the displayed date range
+    const getDisplayedDateRange = (month: Dayjs) => {
+      const startOfMonth = month.startOf("month");
+      const endOfMonth = month.endOf("month");
+      return { start: startOfMonth, end: endOfMonth };
+    };
+
+    const { start, end } = getDisplayedDateRange(currentMonth);
+
+    const handlePostpone = () => {
+      setValue("dtstart", postponeDate);
+      handleClose();
+    };
+
+    const handleDateChange = (picked: Dayjs | null) => {
+      if (!picked) return;
+
+      // 1) Work in user's timezone on the picked CALENDAR day
+      let local = dayjs(picked).tz(timezone).startOf("day");
+
+      // 2) Apply the time (from current selection, interpreted in user's tz)
+      const base = dtstart ? dayjs(dtstart).tz(timezone) : null;
+      const hour = base?.hour() ?? 0;
+      const minute = base?.minute() ?? 0;
+
+      local = local.hour(hour).minute(minute).second(0).millisecond(0);
+
+      // 3) Store as UTC
+      const utcValue = local.utc();
+      setValue("dtstart", utcValue);
 
       if (!rrule) return;
 
-      // Parse existing RRule
+      // === RRule update (same logic, but use `local` for day fields) ===
       const rruleObject = RRule.fromString(rrule);
-      console.log("=== RRule!!!!!!! ===", rrule);
-      console.log("=== RRule Object ===", rruleObject.options);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { dtstart, byhour, byminute, bysecond, ...options } =
-        rruleObject.options;
-      console.log("=== Options ===", options);
 
-      // Update options based on frequency and selected date
+      const {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        dtstart: _,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        byhour,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        byminute,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        bysecond,
+        ...options
+      } = rruleObject.options;
+
       switch (options.freq) {
         case Frequency.WEEKLY: {
-          // Update byweekday to include the selected day
-          const dayOfWeek = (newDate.day() + 6) % 7; // Convert dayjs to RRule day
-          if (!options.byweekday) {
-            options.byweekday = [dayOfWeek];
-          } else if (!options.byweekday.includes(dayOfWeek)) {
+          const dayOfWeek = (local.day() + 6) % 7; // dayjs->RRule
+          if (!options.byweekday) options.byweekday = [dayOfWeek];
+          else if (!options.byweekday.includes(dayOfWeek))
             options.byweekday = [...options.byweekday, dayOfWeek];
-          }
           break;
         }
-
         case Frequency.MONTHLY: {
-          // Update bymonthday to the selected date
-          options.bymonthday = [newDate.date()];
-          // Clear weekday options if they exist
+          options.bymonthday = [local.date()];
           options.byweekday = [];
           options.bysetpos = [];
           break;
         }
-
         case Frequency.YEARLY: {
-          // Update bymonth and bymonthday to the selected date
-          options.bymonth = [newDate.month() + 1];
-          options.bymonthday = [newDate.date()];
-          // Clear weekday options if they exist
+          options.bymonth = [local.month() + 1];
+          options.bymonthday = [local.date()];
           options.byweekday = [];
           options.bysetpos = [];
           break;
         }
-
         case Frequency.DAILY:
-          // No changes needed for daily
           break;
       }
 
-      // Create new RRule and update
       const newRrule = new RRule(options);
       setValue("rrule", newRrule.toString());
     };
 
     const formatDayOfWeek = (date: Dayjs | null) => {
-      if (date === null) {
-        return "Date";
+      if (date === null) return "Date";
+      const givenDate = dayjs(date).tz(timezone);
+      const today = dayjs().tz(timezone).startOf("day");
+      const yesterday = today.subtract(1, "day");
+      const tomorrow = today.add(1, "day");
+      const sevenDaysFromNow = today.add(7, "day");
+
+      // Check if time is not midnight (12:00 AM)
+      const isMidnight = givenDate.hour() === 0 && givenDate.minute() === 0;
+
+      // Format time if not midnight
+      let timeStr = "";
+      if (!isMidnight) {
+        const hour = givenDate.hour();
+        const minute = givenDate.minute();
+
+        if (minute === 0) {
+          // Only hour if minute is 00
+          const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+          const ampm = hour < 12 ? "AM" : "PM";
+          timeStr = ` ${displayHour}${ampm}`;
+        } else {
+          // Include minute if not 00
+          const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+          const ampm = hour < 12 ? "AM" : "PM";
+          timeStr = ` ${displayHour}:${minute.toString().padStart(2, "0")}${ampm}`;
+        }
       }
-      const givenDate = dayjs.utc(date).tz(timezone).startOf("day");
-      const today = dayjs.utc(dayjs()).tz(timezone).startOf("day");
-      const yesterday = today.subtract(1, "day").startOf("day");
-      const tomorrow = today.add(1, "day").startOf("day");
-      const sevenDaysFromNow = today.add(7, "day").startOf("day");
-      if (givenDate.isSame(yesterday)) {
-        return "Yesterday";
-      }
-      if (givenDate.isSame(today)) {
-        return "Today";
-      }
-      if (givenDate.isSame(tomorrow)) {
-        return "Tomorrow";
-      }
-      if (givenDate.isBetween(today, sevenDaysFromNow, null, "[]")) {
-        return givenDate.format("dddd");
-      }
-      return givenDate.format("MMMM D");
+
+      const dateOnly = givenDate.startOf("day");
+      if (dateOnly.isSame(yesterday)) return "Yesterday" + timeStr;
+      if (dateOnly.isSame(today)) return "Today" + timeStr;
+      if (dateOnly.isSame(tomorrow)) return "Tomorrow" + timeStr;
+      if (dateOnly.isBetween(today, sevenDaysFromNow, null, "[]"))
+        return givenDate.format("dddd") + timeStr;
+      return givenDate.format("MMMM D") + timeStr;
     };
 
-    const dueDate = dtstartLocal ? dayjs.utc(dtstartLocal).tz(timezone) : null;
-    const today = dayjs.utc(dayjs()).tz(timezone).startOf("day");
-    const tomorrow = today.add(1, "day").startOf("day");
-    const nextWeek = today.add(7, "day").startOf("day");
+    const todayLocal = dayjs().tz(timezone).startOf("day");
+
+    const today = todayLocal; // local
+    const tomorrow = todayLocal.add(1, "day");
+    const nextWeek = todayLocal.add(7, "day");
     const comingWeekend =
-      today.day() >= 6
-        ? today.add(1, "week").day(6).startOf("day")
-        : today.day(6).startOf("day");
+      todayLocal.day() >= 6
+        ? todayLocal.add(1, "week").day(6).startOf("day") // next Saturday
+        : todayLocal.day(6).startOf("day"); // this Saturday
+
+    const postponeDate = rrule
+      ? getPostponeDate(RRule.fromString(rrule), dtstart, timezone)
+      : null;
+
+    const repeatDates = rrule
+      ? getRepeatDates(RRule.fromString(rrule), start, end, timezone)
+      : [];
 
     return (
       <>
@@ -190,6 +240,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 ...(props.fullWidth && { justifyContent: "start" }),
               }}
               startIcon={<CalendarTodayIcon />}
+              endIcon={isRepeating ? <RepeatIcon /> : undefined}
               variant={props.variant ?? "outlined"}
               onClick={handleClick}
               ref={ref}
@@ -221,11 +272,12 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
           anchorEl={anchorEl}
           onClose={handleClose}
           anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
+            vertical: "center",
+            horizontal: "center",
           }}
         >
           <List>
+            <NaturalLanguageInput />
             <ListItem disablePadding secondaryAction={today.format("ddd")}>
               <ListItemButton
                 onClick={() => {
@@ -254,7 +306,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
             </ListItem>
             <ListItem
               disablePadding
-              secondaryAction={comingWeekend.format("ddd")}
+              secondaryAction={comingWeekend.format("ddd MMM D")}
             >
               <ListItemButton
                 onClick={() => {
@@ -268,7 +320,10 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 <ListItemText primary={"This weekend"} />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding secondaryAction={nextWeek.format("ddd")}>
+            <ListItem
+              disablePadding
+              secondaryAction={nextWeek.format("ddd MMM D")}
+            >
               <ListItemButton
                 onClick={() => {
                   handleDateChange(nextWeek);
@@ -281,11 +336,24 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 <ListItemText primary={"Next Week"} />
               </ListItemButton>
             </ListItem>
+            {isRepeating && (
+              <ListItem
+                disablePadding
+                secondaryAction={postponeDate.tz(timezone).format("ddd MMM D")}
+              >
+                <ListItemButton onClick={handlePostpone}>
+                  <ListItemIcon>
+                    <PostponeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Postpone"} />
+                </ListItemButton>
+              </ListItem>
+            )}
             {dueDate && (
               <ListItem disablePadding>
                 <ListItemButton
                   onClick={() => {
-                    setValue("dtstart_local", null);
+                    setValue("dtstart", null);
                     setValue("rrule", null);
                     handleClose();
                   }}
@@ -298,15 +366,22 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
               </ListItem>
             )}
             <ListItem disablePadding>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DateCalendar
-                  disablePast
-                  value={dueDate}
-                  onChange={(value: Dayjs) => {
-                    handleDateChange(value);
-                  }}
-                />
-              </LocalizationProvider>
+              <DateCalendar
+                disablePast
+                value={dueDate}
+                onMonthChange={handleMonthChange}
+                onChange={(value: Dayjs) => {
+                  handleDateChange(value);
+                }}
+                slots={{
+                  day: (props) => (
+                    <CustomPickersDay
+                      {...props}
+                      highlightedDates={repeatDates}
+                    />
+                  ),
+                }}
+              />
             </ListItem>
             <TimeOptions />
             <RepeatOptions />

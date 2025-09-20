@@ -67,12 +67,12 @@ function TimeOptionsDialog({ open, onClose }: TimeOptionsDialogProps) {
     return opts;
   }, []);
 
-  const dtstartLocal = watch("dtstart_local");
+  const dtstart = watch("dtstart");
 
   const onSave = (data: TimeOptionsDialogForm) => {
     const time = data.time || "12:00 AM";
-    const effectiveDatetime = dtstartLocal
-      ? dayjs.tz(dtstartLocal, timezone)
+    const effectiveDatetime = dtstart
+      ? dayjs.tz(dtstart, timezone)
       : dayjs.tz(dayjs(), timezone).startOf("day");
 
     const parsedTime = dayjs(time, "h:mm A");
@@ -81,18 +81,18 @@ function TimeOptionsDialog({ open, onClose }: TimeOptionsDialogProps) {
       .minute(parsedTime.minute())
       .second(0)
       .millisecond(0);
-    setValue("dtstart_local", updatedDateTime);
+    setValue("dtstart", updatedDateTime);
     onClose();
   };
 
   useEffect(() => {
-    const effectiveDatetime = dtstartLocal
-      ? dayjs.tz(dtstartLocal, timezone)
+    const effectiveDatetime = dtstart
+      ? dayjs.tz(dtstart, timezone)
       : dayjs.tz(dayjs(), timezone).startOf("day");
     form.reset({
       time: effectiveDatetime.format("h:mm A"),
     });
-  }, [dtstartLocal, form, timezone]);
+  }, [dtstart, form, timezone]);
 
   return (
     <Dialog open={open} fullWidth maxWidth="xs">
@@ -100,6 +100,7 @@ function TimeOptionsDialog({ open, onClose }: TimeOptionsDialogProps) {
         <DialogTitle>Set Time</DialogTitle>
         <DialogContent>
           <Autocomplete
+            sx={{ mt: 1 }}
             freeSolo
             value={form.watch("time")}
             onChange={(_, newInputValue) => {
@@ -143,19 +144,21 @@ export default function TimeOptions() {
   const timezone = useTimezoneContext();
   const [open, setOpen] = useState(false);
   const { watch, setValue } = useFormContext<TaskFormFields>();
-  const dtstartLocal = watch("dtstart_local");
-  const hasTime = dtstartLocal && dtstartLocal.format("h:mm A") !== "12:00 AM";
+  const dtstart = watch("dtstart");
+  const hasTime =
+    dtstart && dtstart.tz(timezone).format("h:mm A") !== "12:00 AM";
 
   const getPrimaryText = () => {
     if (hasTime) {
-      return dayjs.tz(dtstartLocal, timezone).format("h:mm A");
+      return dtstart.tz(timezone).format("h:mm A");
     }
     return "Time";
   };
   const handleClear = (e: MouseEvent<HTMLElement>) => {
+    if (!dtstart) return;
     e.stopPropagation();
-    const newTime = dayjs.tz(dtstartLocal, timezone).startOf("day");
-    setValue("dtstart_local", newTime);
+    const newTime = dtstart.tz(timezone).startOf("day");
+    setValue("dtstart", newTime);
   };
 
   return (
@@ -163,7 +166,7 @@ export default function TimeOptions() {
       <TimeOptionsDialog open={open} onClose={() => setOpen(false)} />
       <ListItem disablePadding>
         <ListItemButton onClick={() => setOpen(true)}>
-          <ListItemIcon sx={{ minWidth: "auto", marginRight: 1 }}>
+          <ListItemIcon>
             <AccessTimeIcon />
           </ListItemIcon>
           <ListItemText primary={getPrimaryText()} />
