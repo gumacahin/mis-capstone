@@ -37,6 +37,8 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "id",
             "title",
             "description",
+            "dtstart",
+            "rrule",
             "due_date",
             "priority",
             "tags",
@@ -51,6 +53,8 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             "project_title",
             "comments_count",
         ]
+
+        read_only_fields = ["due_date"]
 
     def get_comments_count(self, obj):
         content_type = ContentType.objects.get_for_model(obj)
@@ -83,6 +87,14 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             data["order"] = above_task.order
         elif below_task:
             data["order"] = below_task.order + 1
+
+        # Calculate due_date from rrule and dtstart
+        if data.get("rrule") and data.get("dtstart"):
+            from upoutodo.utils import calculate_next_due_date
+
+            due_date = calculate_next_due_date(data["rrule"], data["dtstart"])
+            if due_date:
+                data["due_date"] = due_date
 
         return data
 
@@ -122,6 +134,8 @@ class TaskAdminSerializer(TaskSerializer):
             "id",
             "title",
             "description",
+            "dtstart",
+            "rrule",
             "due_date",
             "priority",
             "tags",

@@ -69,7 +69,6 @@ export default function TaskForm({
       ? dayjs(task.dtstart).utc()
       : (presetDueDate?.startOf("day").utc() ?? null),
     anchor_mode: task?.anchor_mode ?? "SCHEDULED",
-    // due_date: task?.due_date ?? presetDueDate ?? null,
     project: task ? task.project : (project?.id ?? inbox?.id),
     section: task ? task.section : (section?.id ?? inboxDefaultSection?.id),
     priority: task?.priority ?? ("NONE" as TaskPriority),
@@ -91,6 +90,9 @@ export default function TaskForm({
     project,
     tags,
     priority,
+    rrule,
+    dtstart,
+    anchor_mode,
   }) => {
     const data: Partial<TaskFormFields> = {
       title,
@@ -99,6 +101,9 @@ export default function TaskForm({
       tags,
       priority,
       project,
+      rrule,
+      dtstart,
+      anchor_mode,
     };
 
     setLoading(true);

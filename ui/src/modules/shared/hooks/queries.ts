@@ -169,8 +169,11 @@ export const useAddTask = ({
         ...task,
         below_task: belowTaskId,
         above_task: aboveTaskId,
-        ...(dayjs.isDayjs(task.due_date) && {
-          due_date: task.due_date.format("YYYY-MM-DD"),
+        ...(task.dtstart && {
+          dtstart: task.dtstart.toISOString(),
+        }),
+        ...(task.rrule && {
+          rrule: task.rrule,
         }),
       };
       const response = await apiClient.post("/tasks/", data);
@@ -199,6 +202,12 @@ export const useUpdateTask = (task?: Task) => {
         }),
         ...(dayjs.isDayjs(updatedTask.due_date) && {
           due_date: updatedTask.due_date.format("YYYY-MM-DD"),
+        }),
+        ...(dayjs.isDayjs(updatedTask.dtstart) && {
+          dtstart: updatedTask.dtstart.toISOString(),
+        }),
+        ...(updatedTask.rrule !== undefined && {
+          rrule: updatedTask.rrule,
         }),
       };
 

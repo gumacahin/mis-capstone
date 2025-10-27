@@ -18,6 +18,8 @@ class Task(models.Model):
     order = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    rrule = models.TextField(blank=True, null=True)
+    dtstart = models.DateTimeField(blank=True, null=True)
 
     class Priority(models.TextChoices):
         NONE = "NONE", "None"
