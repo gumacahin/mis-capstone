@@ -96,7 +96,8 @@ export default function RepeatOptions() {
     setValue("rrule", null);
   };
 
-  const displayText = isRepeating ? RRule.fromString(rrule).toText() : "Repeat";
+  const displayText =
+    isRepeating && rrule ? RRule.fromString(rrule).toText() : "Repeat";
 
   const open = Boolean(anchorEl);
 
