@@ -24,7 +24,9 @@ admin_router.register(r"tags", views.admin.AdminTagViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path("api/", include(router.urls)),
-    path("api-admin/", include((admin_router.urls, "admin"), namespace="admin")),
+    path(
+        "api-admin/", include((admin_router.urls, "api_admin"), namespace="api_admin")
+    ),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("login", auth_views.LoginView.as_view(), name="login"),
     path("logout", auth_views.LogoutView.as_view(), name="logout"),
