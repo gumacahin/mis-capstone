@@ -12,7 +12,7 @@ import { useAddTask } from "@shared/hooks/queries";
 import type { Task, TaskFormFields, TaskPriority } from "@shared/types/common";
 import { Dayjs } from "dayjs";
 import { useContext } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import TaskPriorityMenu from "./TaskPriorityMenu";
@@ -57,9 +57,11 @@ export default function TaskForm({
     tags: task?.tags ?? (presetLabel ? [presetLabel] : []),
   };
 
-  const { control, register, handleSubmit, watch } = useForm<TaskFormFields>({
+  const form = useForm<TaskFormFields>({
     defaultValues,
   });
+
+  const { control, register, handleSubmit, watch } = form;
 
   const onSubmit: SubmitHandler<TaskFormFields> = async ({
     title,
@@ -98,36 +100,38 @@ export default function TaskForm({
       variant="outlined"
       sx={{ width: "100%", maxWidth: "100%" }}
     >
-      <CardContent>
-        <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
-          <TextField
-            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-            required
-            margin="dense"
-            id="title"
-            label="Task name"
-            type="text"
-            fullWidth
-            variant="standard"
-            {...register("title")}
-          />
-          <TextField
-            multiline
-            margin="dense"
-            id="desciption"
-            label="Description"
-            type="text"
-            fullWidth
-            variant="standard"
-            {...register("description")}
-          />
-          <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
-            <DatePicker control={control} />
-            <TaskPriorityMenu control={control} priority={priority} />
-            <TaskTagsButton control={control} tags={tags} />
+      <FormProvider {...form}>
+        <CardContent>
+          <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
+            <TextField
+              autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+              required
+              margin="dense"
+              id="title"
+              label="Task name"
+              type="text"
+              fullWidth
+              variant="standard"
+              {...register("title")}
+            />
+            <TextField
+              multiline
+              margin="dense"
+              id="desciption"
+              label="Description"
+              type="text"
+              fullWidth
+              variant="standard"
+              {...register("description")}
+            />
+            <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
+              <DatePicker />
+              <TaskPriorityMenu control={control} priority={priority} />
+              <TaskTagsButton control={control} tags={tags} />
+            </Stack>
           </Stack>
-        </Stack>
-      </CardContent>
+        </CardContent>
+      </FormProvider>
       <CardActions sx={{ justifyContent: "space-between" }}>
         <TaskProjectButton
           control={control}

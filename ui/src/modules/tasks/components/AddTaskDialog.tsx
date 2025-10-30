@@ -17,7 +17,7 @@ import type {
 } from "@shared/types/common";
 import { Dayjs } from "dayjs";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 import DescriptionField from "./DescriptionField";
@@ -62,9 +62,11 @@ export default function AddTaskDialog({
     tags: [],
   };
 
-  const { control, handleSubmit, watch, reset } = useForm<TaskFormFields>({
+  const form = useForm<TaskFormFields>({
     defaultValues,
   });
+
+  const { control, handleSubmit, watch, reset } = form;
 
   const onSubmit: SubmitHandler<TaskFormFields> = async ({
     title,
@@ -106,19 +108,21 @@ export default function AddTaskDialog({
   const sectionId = watch("section");
   return (
     <Dialog component="form" open={open} onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle>
-        <TitleField control={control} onEnter={handleSubmit(onSubmit)} />
-      </DialogTitle>
-      <DialogContent>
-        <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
-          <DescriptionField control={control} hideDescriptionIcon />
-          <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
-            <DatePicker control={control} />
-            <TaskPriorityMenu control={control} priority={priority} />
-            <TaskTagsButton control={control} tags={tags} />
+      <FormProvider {...form}>
+        <DialogTitle>
+          <TitleField control={control} onEnter={handleSubmit(onSubmit)} />
+        </DialogTitle>
+        <DialogContent>
+          <Stack overflow="hidden" maxWidth={"100%"} spacing={2}>
+            <DescriptionField control={control} hideDescriptionIcon />
+            <Stack spacing={1} direction="row" flexWrap={"wrap"} useFlexGap>
+              <DatePicker />
+              <TaskPriorityMenu control={control} priority={priority} />
+              <TaskTagsButton control={control} tags={tags} />
+            </Stack>
           </Stack>
-        </Stack>
-      </DialogContent>
+        </DialogContent>
+      </FormProvider>
       <DialogActions sx={{ justifyContent: "space-between" }}>
         <TaskProjectButton
           control={control}
