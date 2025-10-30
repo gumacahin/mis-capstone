@@ -53,7 +53,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
     const dtstart = watch("dtstart");
     const rrule = watch("rrule");
     const open = Boolean(anchorEl);
-    const isRepeating = rrule !== null && !rrule.includes("COUNT=1");
+    const isRepeating = rrule && !rrule.includes("COUNT=1");
     const dueDate = dtstart ? dayjs(dtstart).tz(timezone) : null;
 
     const id = open ? "calendar-popover" : undefined;
@@ -340,7 +340,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
                 <ListItemText primary={"Next Week"} />
               </ListItemButton>
             </ListItem>
-            {isRepeating && (
+            {isRepeating && postponeDate && (
               <ListItem
                 disablePadding
                 secondaryAction={postponeDate.tz(timezone).format("ddd MMM D")}
