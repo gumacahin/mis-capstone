@@ -64,7 +64,7 @@ export default function TaskForm({
   const defaultValues = {
     title: task?.title ?? "",
     description: task?.description ?? "",
-    rrule: task?.rrule ?? null,
+    rrule: task?.rrule ?? (presetDueDate ? "FREQ=DAILY;COUNT=1" : null),
     dtstart: task?.dtstart
       ? dayjs(task.dtstart).utc()
       : (presetDueDate?.startOf("day").utc() ?? null),

@@ -7,6 +7,16 @@ from .tag import TaggedItem
 
 
 class Task(models.Model):
+    class AnchorMode(models.TextChoices):
+        SCHEDULED = "SCHEDULED", "Scheduled"
+        COMPLETED = "COMPLETED", "Completed"
+
+    class Priority(models.TextChoices):
+        NONE = "NONE", "None"
+        LOW = "LOW", "Low"
+        MEDIUM = "MEDIUM", "Medium"
+        HIGH = "HIGH", "High"
+
     section = models.ForeignKey(
         ProjectSection, on_delete=models.CASCADE, related_name="tasks"
     )
@@ -20,17 +30,9 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     rrule = models.TextField(blank=True, null=True)
     dtstart = models.DateTimeField(blank=True, null=True)
-    anchor_mode = models.CharField(blank=True, null=True, max_length=10)
-
-    class AnchorMode(models.TextChoices):
-        SCHEDULED = "SCHEDULED", "Scheduled"
-        COMPLETED = "COMPLETED", "Completed"
-
-    class Priority(models.TextChoices):
-        NONE = "NONE", "None"
-        LOW = "LOW", "Low"
-        MEDIUM = "MEDIUM", "Medium"
-        HIGH = "HIGH", "High"
+    anchor_mode = models.CharField(
+        choices=AnchorMode.choices, blank=True, null=True, max_length=10
+    )
 
     priority = models.CharField(
         choices=Priority.choices, default=Priority.NONE, max_length=6
@@ -49,16 +51,14 @@ class Task(models.Model):
     @property
     def is_overdue(self):
         return (
-            self.due_date
-            and not self.is_completed
-            and self.due_date < timezone.now().date()
+            self.due_date and not self.is_completed and self.due_date < timezone.now()
         )
 
     def __str__(self):
         return self.title
 
     def mark_complete(self):
-        self.completion_date = timezone.now().date()
+        self.completion_date = timezone.now()
         self.save()
 
     def mark_incomplete(self):

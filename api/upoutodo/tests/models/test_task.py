@@ -56,7 +56,7 @@ def test_task_mark_incomplete(task):
 
 @pytest.mark.django_db
 def test_task_overdue(task):
-    task.due_date = timezone.now().date() - timedelta(days=1)
+    task.due_date = timezone.now() - timedelta(days=1)
     assert task.is_overdue is True
 
 

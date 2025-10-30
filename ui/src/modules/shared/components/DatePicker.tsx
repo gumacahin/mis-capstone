@@ -53,7 +53,7 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
     const dtstart = watch("dtstart");
     const rrule = watch("rrule");
     const open = Boolean(anchorEl);
-    const isRepeating = rrule !== null;
+    const isRepeating = rrule !== null && !rrule.includes("COUNT=1");
     const dueDate = dtstart ? dayjs(dtstart).tz(timezone) : null;
 
     const id = open ? "calendar-popover" : undefined;
@@ -109,7 +109,11 @@ const DatePicker = forwardRef<HTMLButtonElement, DatePickerProps>(
       const utcValue = local.utc();
       setValue("dtstart", utcValue);
 
-      if (!rrule) return;
+      // For one-time tasks, set a simple daily rule with count=1
+      if (!rrule) {
+        setValue("rrule", "FREQ=DAILY;COUNT=1");
+        return;
+      }
 
       // === RRule update (same logic, but use `local` for day fields) ===
       const rruleObject = RRule.fromString(rrule);
