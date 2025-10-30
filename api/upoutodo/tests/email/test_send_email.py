@@ -14,8 +14,10 @@ class TestSendEmail:
         """Set up test fixtures before each test method"""
         # Create a temporary directory for test templates
         self.temp_dir = tempfile.mkdtemp()
-        # Create the email/templates directory structure that send_email expects
-        self.template_dir = os.path.join(self.temp_dir, "email", "templates")
+        # Create the upoutodo/email/templates directory structure that send_email expects
+        self.template_dir = os.path.join(
+            self.temp_dir, "upoutodo", "email", "templates"
+        )
         os.makedirs(self.template_dir, exist_ok=True)
 
     def teardown_method(self):

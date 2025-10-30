@@ -20,6 +20,11 @@ class Task(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     rrule = models.TextField(blank=True, null=True)
     dtstart = models.DateTimeField(blank=True, null=True)
+    anchor_mode = models.CharField(blank=True, null=True, max_length=10)
+
+    class AnchorMode(models.TextChoices):
+        SCHEDULED = "SCHEDULED", "Scheduled"
+        COMPLETED = "COMPLETED", "Completed"
 
     class Priority(models.TextChoices):
         NONE = "NONE", "None"
