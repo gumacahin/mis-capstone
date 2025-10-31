@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -9,6 +11,8 @@ from upoutodo.utils import calculate_next_due_date
 
 from .project_section import ProjectSection
 from .tag import TaggedItem
+
+logger = logging.getLogger(__name__)
 
 
 class Task(models.Model):
@@ -78,37 +82,77 @@ class Task(models.Model):
 
     def _create_next_occurrence(self):
         """Create the next occurrence of a recurring task."""
+        if not self.rrule or not self.rrule.strip():
+            logger.warning(
+                f"Cannot create next occurrence for task {self.id}: no RRULE defined"
+            )
+            return
+
+        if not self.dtstart:
+            logger.warning(
+                f"Cannot create next occurrence for task {self.id}: no dtstart defined"
+            )
+            return
+
         try:
             # Calculate next due date based on anchor mode
             if self.anchor_mode == self.AnchorMode.COMPLETED:
                 # Next occurrence from completion time
                 reference_date = timezone.now()
+                logger.debug(f"Using completion-based anchor for task {self.id}")
             else:  # SCHEDULED or empty (default to scheduled behavior)
                 # Next occurrence from original schedule
                 reference_date = self.due_date or self.dtstart
+                logger.debug(f"Using schedule-based anchor for task {self.id}")
 
             next_due = calculate_next_due_date(self.rrule, reference_date)
 
             if next_due:
                 # Create new task for next occurrence
-                next_task = Task.objects.create(
-                    title=self.title,
-                    description=self.description,
-                    section=self.section,
-                    due_date=next_due,
-                    priority=self.priority,
-                    rrule=self.rrule,
-                    dtstart=self.dtstart,
-                    anchor_mode=self.anchor_mode,
-                )
+                try:
+                    next_task = Task.objects.create(
+                        title=self.title,
+                        description=self.description,
+                        section=self.section,
+                        due_date=next_due,
+                        priority=self.priority,
+                        rrule=self.rrule,
+                        dtstart=self.dtstart,
+                        anchor_mode=self.anchor_mode,
+                    )
 
-                # Copy tags
-                for tag in self.tags.all():
-                    next_task.tags.add(tag)
-        except Exception:
-            # Silently handle errors in next occurrence creation
-            # In production, this should use proper logging
-            pass
+                    # Copy tags
+                    tag_count = 0
+                    for tag in self.tags.all():
+                        try:
+                            next_task.tags.add(tag)
+                            tag_count += 1
+                        except Exception as e:
+                            logger.error(
+                                f"Failed to copy tag {tag.name} to next occurrence: {e}"
+                            )
+
+                    logger.info(
+                        f"Created next occurrence (ID: {next_task.id}) for recurring task {self.id}. "
+                        f"Due: {next_due}, Tags copied: {tag_count}"
+                    )
+
+                except ValidationError as e:
+                    logger.error(
+                        f"Validation error creating next occurrence for task {self.id}: {e}"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Database error creating next occurrence for task {self.id}: {e}"
+                    )
+            else:
+                logger.info(f"No future occurrences found for recurring task {self.id}")
+
+        except Exception as e:
+            logger.error(
+                f"Unexpected error creating next occurrence for task {self.id}: {e}"
+            )
+            # Don't re-raise - we want the original task completion to succeed
 
     def mark_incomplete(self):
         self.completion_date = None

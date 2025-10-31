@@ -26,11 +26,14 @@ dev = [
   "pre-commit",
   "pytest",
   "pytest-django",
+  "pytest-cov",
+  "pytest-xdist",
   "faker",
   "factory-boy",
   "pytest-testmon",
   "pytest-watcher",
   "ruff",
+  "psutil",  # For performance tests
 ]
 
 [tool.ruff]
@@ -56,6 +59,42 @@ known-first-party = ["upoutodo"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "api.settings"
 testpaths = ["upoutodo/tests"]
+addopts = "--cov=upoutodo --cov-report=html --cov-report=term-missing --cov-fail-under=75"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["upoutodo"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/__pycache__/*",
+    "manage.py",
+    "*/settings/*",
+    "*/wsgi.py",
+    "*/asgi.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
 
 [build-system]
 requires = ["hatchling>=1.25.0"]

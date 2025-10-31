@@ -96,15 +96,16 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         """Convert serialized data to internal Python representation."""
-        # Convert None values to empty strings for model compatibility
-        if data.get("rrule") is None:
-            data = data.copy()
-            data["rrule"] = ""
-        if data.get("anchor_mode") is None:
-            data = data.copy()
-            data["anchor_mode"] = ""
+        # Only convert None values to empty strings for model compatibility
+        # Don't modify existing non-None values
+        data_copy = data.copy() if hasattr(data, "copy") else dict(data)
 
-        return super().to_internal_value(data)
+        if data_copy.get("rrule") is None:
+            data_copy["rrule"] = ""
+        if data_copy.get("anchor_mode") is None:
+            data_copy["anchor_mode"] = ""
+
+        return super().to_internal_value(data_copy)
 
     def validate(self, data):
         above_task = data.pop("above_task", None)
@@ -137,6 +138,10 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
         request = self.context.get("request")
         tags_data = validated_data.pop("tags", None)
 
+        # Check if completion_date is being set (task is being completed)
+        completion_date = validated_data.get("completion_date")
+        was_completed = instance.is_completed
+
         # Update other fields
         instance = super().update(instance, validated_data)
 
@@ -149,6 +154,16 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
                 )
                 tag_objects.append(tag)
             instance.tags.set(tag_objects)
+
+        # If task is being completed and it's a recurring task, create next occurrence
+        if (
+            completion_date
+            and not was_completed
+            and instance.rrule
+            and instance.rrule.strip()
+            and instance.dtstart
+        ):
+            instance._create_next_occurrence()
 
         return instance
 

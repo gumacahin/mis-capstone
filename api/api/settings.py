@@ -21,12 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-hudu@f3o^*(a%-t!0rrfn4bpd0y0iwde%*2v+#@!@d#d8=90&p"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-hudu@f3o^*(a%-t!0rrfn4bpd0y0iwde%*2v+#@!@d#d8=90&p",  # Default for development
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes", "on")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -145,9 +148,28 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ),
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": os.getenv("THROTTLE_ANON", "100/hour"),
+        "user": os.getenv("THROTTLE_USER", "1000/hour"),
+    },
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS Configuration - more secure for production
+CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ALLOW_ALL", "True").lower() in (
+    "true",
+    "1",
+    "yes",
+    "on",
+)
+CORS_ALLOWED_ORIGINS = (
+    os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    if os.getenv("CORS_ALLOWED_ORIGINS")
+    else []
+)
 
 SITE_ID = 1
 
@@ -181,3 +203,73 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 APP_URL = os.getenv("APP_URL")
 BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "upoutodo@gmail.com")
 BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "UPOU TODO")
+
+# Security Settings for Production
+if not DEBUG:
+    # HTTPS Settings
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    # HSTS Settings
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Cookie Security
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+
+    # Content Security
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = "DENY"
+
+# Logging Configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "django.log"),
+            "formatter": "verbose",
+        },
+        "console": {
+            "level": "DEBUG" if DEBUG else "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "upoutodo": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+os.makedirs(os.path.join(BASE_DIR, "logs"), exist_ok=True)
