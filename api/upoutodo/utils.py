@@ -55,8 +55,9 @@ def calculate_next_due_date(rrule_str: str, dtstart: datetime) -> Optional[datet
         # Parse the RRULE string
         rrule = rrulestr(rrule_str, dtstart=dtstart)
 
-        # Find the next occurrence after dtstart (inclusive)
-        next_occurrence = rrule.after(dtstart, inc=True)
+        # Find the next occurrence after dtstart (exclusive)
+        # Use inc=False to get the next occurrence, not the current one
+        next_occurrence = rrule.after(dtstart, inc=False)
 
         return next_occurrence
 
