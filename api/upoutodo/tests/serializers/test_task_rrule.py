@@ -73,9 +73,9 @@ class TestTaskSerializerRRuleFields:
         assert serializer.is_valid(), serializer.errors
 
         task = serializer.save()
-        assert task.rrule is None
-        assert task.dtstart is None
-        assert task.anchor_mode is None
+        assert task.rrule == ""  # Model stores empty string, not None
+        assert task.dtstart is None  # DateTimeField can be None
+        assert task.anchor_mode == ""  # Model stores empty string, not None
 
     def test_serializer_updates_rrule_fields(self):
         """Test that serializer can update RRule fields."""

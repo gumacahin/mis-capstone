@@ -27,6 +27,16 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
     project_title = serializers.SerializerMethodField(read_only=True)
     section_title = serializers.SerializerMethodField(read_only=True)
 
+    # RRULE fields with explicit null handling
+    rrule = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    dtstart = serializers.DateTimeField(required=False, allow_null=True)
+    anchor_mode = serializers.ChoiceField(
+        choices=Task.AnchorMode.choices,
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+
     tags = TagListSerializerField(required=False)
 
     comments_count = serializers.SerializerMethodField(read_only=True)
@@ -71,6 +81,30 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
         if section_title == Project.DEFAULT_PROJECT_SECTION_TITLE:
             return None
         return section_title
+
+    def to_representation(self, instance):
+        """Convert model instance to serialized representation."""
+        data = super().to_representation(instance)
+
+        # Convert empty strings to None for RRULE fields to match API expectations
+        if data.get("rrule") == "":
+            data["rrule"] = None
+        if data.get("anchor_mode") == "":
+            data["anchor_mode"] = None
+
+        return data
+
+    def to_internal_value(self, data):
+        """Convert serialized data to internal Python representation."""
+        # Convert None values to empty strings for model compatibility
+        if data.get("rrule") is None:
+            data = data.copy()
+            data["rrule"] = ""
+        if data.get("anchor_mode") is None:
+            data = data.copy()
+            data["anchor_mode"] = ""
+
+        return super().to_internal_value(data)
 
     def validate(self, data):
         above_task = data.pop("above_task", None)
