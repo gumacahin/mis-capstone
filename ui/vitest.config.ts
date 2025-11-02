@@ -1,10 +1,13 @@
 /// <reference types="vitest" />
 import react from "@vitejs/plugin-react";
-import { resolve } from "path";
 import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tsconfigPaths(), // 👈 Add this line!
+  ],
   test: {
     globals: true,
     environment: "jsdom",
@@ -33,11 +36,6 @@ export default defineConfig({
         "test-results/",
         "tests/e2e/",
       ],
-    },
-  },
-  resolve: {
-    alias: {
-      "@": resolve(__dirname, "./src"),
     },
   },
 });

@@ -61,6 +61,7 @@ export default function ProjectViewMenu({
   return (
     <div>
       <Button
+        data-testid="project-view-menu-button"
         id="view-menu-button"
         aria-controls={open ? "view-menu" : undefined}
         aria-haspopup="true"

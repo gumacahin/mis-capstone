@@ -67,13 +67,15 @@ export default function AddProjectDialog({
   return (
     <Dialog
       open={open}
+      data-testid="add-project-dialog"
+      aria-labelledby="add-project-dialog-title"
       PaperProps={{
         component: "form",
         onSubmit: handleSubmit(onSubmit),
         sx: { minWidth: { xs: "100vw", sm: 600 } },
       }}
     >
-      <DialogTitle>Add Project</DialogTitle>
+      <DialogTitle id="add-project-dialog-title">Add Project</DialogTitle>
       <DialogContent>
         <Stack spacing={3}>
           <TextField

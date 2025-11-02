@@ -19,7 +19,7 @@ function AddProjectButton() {
       <IconButton
         onClick={handleAddProjectClick}
         edge="end"
-        aria-label="add project"
+        aria-label="add project button"
       >
         <AddIcon />
       </IconButton>

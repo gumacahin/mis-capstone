@@ -171,7 +171,7 @@ export default function ProjectSectionCardHeader() {
                 textOverflow: "ellipsis",
               }}
             >
-              {section.tasks.length}
+              {section.tasks?.length ?? 0}
             </Typography>
           </Stack>
         }
