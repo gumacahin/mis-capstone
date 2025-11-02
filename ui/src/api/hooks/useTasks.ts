@@ -370,12 +370,8 @@ export const useAddTask = ({
       const response = await api.apiTasksCreate({ taskRequest });
       return transformTask(response.data);
     },
-    onSuccess: () => {
-      toast.success("Task created successfully!");
-    },
     onError: (error) => {
       console.error("Failed to create task:", error);
-      toast.error("Failed to create task");
     },
     onSettled: () => {
       invalidateTaskQueries(queryClient, () => {

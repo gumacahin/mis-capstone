@@ -101,12 +101,12 @@ export default function AddTaskDialog({
         error: "Error adding task.",
       });
     } catch (error) {
-      console.error("Error adding task:", error);
+      console.error("Error adding task", error);
     } finally {
       setLoading(false);
+      reset();
+      handleClose();
     }
-    reset(defaultValues);
-    handleClose();
   };
 
   const priority = watch("priority");

@@ -196,12 +196,9 @@ export const useUpdateProject = (projectId: number) => {
           };
         },
       );
-
-      toast.success("Project updated successfully!");
     },
     onError: (error) => {
       console.error("Failed to update project:", error);
-      toast.error("Failed to update project");
     },
   });
 };
@@ -235,12 +232,8 @@ export const useDeleteProject = (project: ProjectDetail) => {
         },
       );
     },
-    onSuccess: () => {
-      toast.success("Project deleted successfully!");
-    },
     onError: (error) => {
       console.error("Failed to delete project:", error);
-      toast.error("Failed to delete project");
     },
     onSettled: () => {
       // Always refetch to ensure consistency

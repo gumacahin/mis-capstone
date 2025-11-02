@@ -19,6 +19,7 @@ import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 import DescriptionField from "./DescriptionField";
 import TaskPriorityMenu from "./TaskPriorityMenu";
@@ -108,12 +109,19 @@ export default function TaskForm({
     setLoading(true);
     try {
       if (isAdding) {
-        await addTask(data);
+        await toast.promise(addTask(data), {
+          loading: "Adding task...",
+          success: "Task added successfully!",
+          error: "Error adding task.",
+        });
       } else {
-        await updateTask(data);
+        await toast.promise(updateTask(data), {
+          loading: "Updating task...",
+          success: "Task updated successfully!",
+          error: "Error updating task.",
+        });
       }
     } catch (error) {
-      // Hook already handles error notification
       console.error("Error adding/updating task:", error);
     } finally {
       setLoading(false);
