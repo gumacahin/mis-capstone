@@ -12,11 +12,10 @@ import TextField from "@mui/material/TextField";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
+import type { ProjectViewType } from "@shared";
 import { useAddProject } from "@shared/hooks/queries";
-import type { ProjectViewType } from "@shared/types/common";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 type FormValues = {
@@ -48,13 +47,10 @@ export default function AddProjectDialog({
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setLoading(true);
     try {
-      const project = await toast.promise(addProject.mutateAsync(data), {
-        loading: "Adding project...",
-        success: "Project added successfully!",
-        error: "Error adding project.",
-      });
+      const project = await addProject.mutateAsync(data);
       navigate(`/project/${project.id}/`);
     } catch (error) {
+      // Hook already handles error notification
       console.error("Error adding project", error);
     } finally {
       setLoading(false);

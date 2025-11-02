@@ -8,7 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
-import type { TaskFormFields, TaskPriority } from "@shared/types/common";
+import type { TaskFormFields, TaskPriority } from "@shared";
 import * as React from "react";
 import { type Control, Controller } from "react-hook-form";
 

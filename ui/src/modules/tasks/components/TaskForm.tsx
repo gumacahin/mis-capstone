@@ -3,23 +3,22 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import DatePicker from "@shared/components/DatePicker";
-import { useAddTask, useUpdateTask } from "@shared/hooks/queries";
-import useProfileContext from "@shared/hooks/useProfileContext";
-import useProjectContext from "@shared/hooks/useProjectContext";
-import useSectionContext from "@shared/hooks/useSectionContext";
 import type {
   Project,
   Section,
   Task,
   TaskFormFields,
   TaskPriority,
-} from "@shared/types/common";
+} from "@shared";
+import DatePicker from "@shared/components/DatePicker";
+import { useAddTask, useUpdateTask } from "@shared/hooks/queries";
+import useProfileContext from "@shared/hooks/useProfileContext";
+import useProjectContext from "@shared/hooks/useProjectContext";
+import useSectionContext from "@shared/hooks/useSectionContext";
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 
 import DescriptionField from "./DescriptionField";
 import TaskPriorityMenu from "./TaskPriorityMenu";
@@ -109,19 +108,12 @@ export default function TaskForm({
     setLoading(true);
     try {
       if (isAdding) {
-        await toast.promise(addTask(data), {
-          loading: "Adding task...",
-          success: "Task added successfully!",
-          error: "Failed to add task.",
-        });
+        await addTask(data);
       } else {
-        await toast.promise(updateTask(data), {
-          loading: "Updating task...",
-          success: "Task updated successfully!",
-          error: "Failed to update task.",
-        });
+        await updateTask(data);
       }
     } catch (error) {
+      // Hook already handles error notification
       console.error("Error adding/updating task:", error);
     } finally {
       setLoading(false);

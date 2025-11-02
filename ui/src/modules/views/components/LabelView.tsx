@@ -1,4 +1,4 @@
-import { ProjectViewType, TagDetail } from "@shared/types/common";
+import { ProjectViewType, TagDetail } from "@shared";
 
 import LabelViewBoard from "./LabelViewBoard";
 import LabelViewList from "./LabelViewList";

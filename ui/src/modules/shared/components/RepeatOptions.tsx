@@ -13,8 +13,12 @@ import { MouseEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { RRule } from "rrule";
 
+import {
+  AnchorMode,
+  RepeatOption,
+  TaskFormFields,
+} from "../../../api/migration-helpers";
 import useTimezoneContext from "../hooks/useTimezoneContext";
-import { AnchorMode, RepeatOption, TaskFormFields } from "../types/common";
 import { findNextValidOccurrence, generateRrule } from "../utils";
 import RepeatOptionsCustom from "./RepeatOptionsCustom";
 

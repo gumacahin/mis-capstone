@@ -13,7 +13,7 @@ import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Task } from "@shared/types/common";
+import { Task } from "@shared";
 import dayjs, { Dayjs } from "dayjs";
 
 export default function TaskMenuDatePicker({

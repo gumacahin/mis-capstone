@@ -13,9 +13,9 @@ import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { RRule } from "rrule";
 
+import { TaskFormFields } from "../../../api/migration-helpers";
 import { useTasksDueOn } from "../hooks/useTasksDueOn";
 import useTimezoneContext from "../hooks/useTimezoneContext";
-import { TaskFormFields } from "../types/common";
 import { type NLParserResult, parseNaturalLanguage } from "../utils";
 
 export default function NaturalLanguageInput() {

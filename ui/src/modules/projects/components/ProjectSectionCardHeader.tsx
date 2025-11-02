@@ -12,10 +12,10 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { ProjectDetail, Section } from "@shared";
 import ProjectContext from "@shared/contexts/projectContext";
 import SectionContext from "@shared/contexts/sectionContext";
 import { useDuplicateSection } from "@shared/hooks/queries";
-import { ProjectDetail, Section } from "@shared/types/common";
 import { MouseEvent, useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "rest_framework",
+    "drf_spectacular",
     "corsheaders",
     "taggit",
     "django_comments",
@@ -100,8 +101,7 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
         ),
     },
     {
@@ -156,6 +156,17 @@ REST_FRAMEWORK = {
         "anon": os.getenv("THROTTLE_ANON", "100/hour"),
         "user": os.getenv("THROTTLE_USER", "1000/hour"),
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# DRF Spectacular Settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "UPOU TODO API",
+    "DESCRIPTION": "Task management API for UPOU students and faculty",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SORT_OPERATIONS": False,
 }
 
 # CORS Configuration - more secure for production

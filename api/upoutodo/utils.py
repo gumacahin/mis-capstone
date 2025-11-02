@@ -23,7 +23,7 @@ def jwt_get_username_from_payload_handler(payload):
 
 def jwt_decode_token(token):
     """
-    Decode and validate a JWT token using Auth0 public keys.
+    Decode and validate a JWT token using Auth0 public keys or test signing key.
 
     Args:
         token: JWT token string to decode
@@ -106,7 +106,15 @@ def calculate_next_due_date(rrule_str: str, dtstart: datetime) -> Optional[datet
         # Parse the RRULE string
         rrule = rrulestr(rrule_str, dtstart=dtstart)
 
-        # Find the next occurrence after dtstart (exclusive)
+        # Check if this is a one-time task (COUNT=1)
+        if "COUNT=1" in rrule_str.upper():
+            # For one-time tasks, the due date is the dtstart date itself
+            logger.debug(
+                f"One-time task detected (COUNT=1), returning dtstart: {dtstart} for RRULE: {rrule_str}"
+            )
+            return dtstart
+
+        # For recurring tasks, find the next occurrence after dtstart (exclusive)
         # Use inc=False to get the next occurrence, not the current one
         next_occurrence = rrule.after(dtstart, inc=False)
 

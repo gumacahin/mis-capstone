@@ -25,6 +25,7 @@ export {
   useUpdateTask,
 } from "./hooks/queries";
 export { default as useDrfDataProvider } from "./hooks/useDrfDataProvider";
+export { default as useInbox } from "./hooks/useInbox";
 export { default as useLabelContext } from "./hooks/useLabelContext";
 export { default as useProfileContext } from "./hooks/useProfileContext";
 export { default as useProjectContext } from "./hooks/useProjectContext";
@@ -43,8 +44,8 @@ export { default as ThemeContextProvider } from "./contexts/themeContext";
 export { default as ToolbarContextProvider } from "./contexts/toolbarContext";
 export { default as UpdateTaskDialogProvider } from "./contexts/updateTaskDialogContext";
 
-// Types
-export * from "./types/common";
+// Types - Now using generated types from API client
+export * from "../../api/migration-helpers";
 
 // Utils
 export * from "./tiptap-extensions";

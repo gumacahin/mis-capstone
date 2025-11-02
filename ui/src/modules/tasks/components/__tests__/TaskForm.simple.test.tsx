@@ -1,4 +1,4 @@
-import type { TaskFormFields } from "@shared/types/common";
+import type { TaskFormFields } from "@shared";
 import dayjs from "dayjs";
 import { describe, expect, it } from "vitest";
 

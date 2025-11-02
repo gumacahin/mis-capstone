@@ -4,9 +4,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { Section } from "@shared";
 import ProjectContext from "@shared/contexts/projectContext";
 import { useDeleteSection } from "@shared/hooks/queries";
-import { Section } from "@shared/types/common";
 import { useContext } from "react";
 import { toast } from "react-hot-toast";
 

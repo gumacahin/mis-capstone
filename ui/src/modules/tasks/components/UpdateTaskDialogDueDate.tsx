@@ -20,8 +20,8 @@ import {
   type DateCalendarProps,
 } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { Task } from "@shared";
 import { useUpdateTask } from "@shared/hooks/queries";
-import { Task } from "@shared/types/common";
 import dayjs, { Dayjs } from "dayjs";
 import { forwardRef, MouseEvent, useState } from "react";
 import toast from "react-hot-toast";

@@ -27,8 +27,8 @@ import { forwardRef, MouseEvent, useCallback, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Frequency, RRule } from "rrule";
 
+import type { TaskFormFields } from "../../../api/migration-helpers";
 import useTimezoneContext from "../hooks/useTimezoneContext";
-import type { TaskFormFields } from "../types/common";
 import { getPostponeDate, getRepeatDates } from "../utils";
 import CustomPickersDay from "./CustomPickersDay";
 import NaturalLanguageInput from "./NaturalLanguageInput";

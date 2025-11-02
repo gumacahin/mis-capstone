@@ -11,13 +11,12 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import type { TaskFormFields } from "@shared";
+import { Task } from "@shared";
 import ProfileContext from "@shared/contexts/profileContext";
 import { useUpdateTask } from "@shared/hooks/queries";
-import type { TaskFormFields } from "@shared/types/common";
-import { Task } from "@shared/types/common";
 import { Fragment, type MouseEvent, useContext, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 
 import TaskProjectButtonLabel from "./TaskProjectButtonLabel";
 
@@ -64,17 +63,16 @@ export default function UpdateTaskProjectButton({ task }: { task: Task }) {
 
   const onSubmit = async (data: TaskFormFields) => {
     setIsSubmitting(true);
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         section: data.section,
-      }),
-      {
-        loading: "Reorganizing task...",
-        success: "Task reorganized successfully!",
-        error: "Failed to reorganize task.",
-      },
-    );
-    setIsSubmitting(false);
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to reorganize task:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const taskIsCompleted = task.completion_date != null;

@@ -9,8 +9,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import type { Task } from "@shared";
 import { useDeleteTask } from "@shared/hooks/queries";
-import type { Task } from "@shared/types/common";
 import { MouseEvent, useState } from "react";
 import toast from "react-hot-toast";
 

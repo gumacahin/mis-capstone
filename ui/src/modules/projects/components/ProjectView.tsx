@@ -1,4 +1,4 @@
-import { ProjectDetail } from "@shared/types/common";
+import { ProjectDetail } from "@shared";
 
 import ProjectViewBoard from "./ProjectViewBoard";
 import ProjectViewList from "./ProjectViewList";

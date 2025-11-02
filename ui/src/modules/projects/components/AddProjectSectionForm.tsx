@@ -1,8 +1,8 @@
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import { Section } from "@shared";
 import { useAddSection } from "@shared/hooks/queries";
-import { Section } from "@shared/types/common";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 

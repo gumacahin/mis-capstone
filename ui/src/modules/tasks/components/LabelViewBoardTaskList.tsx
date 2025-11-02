@@ -1,8 +1,8 @@
 import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
+import type { Section, Task } from "@shared";
 import SectionContext from "@shared/contexts/sectionContext";
 import useScrollbarWidth from "@shared/hooks/useScrollbarWidth";
-import type { Section, Task } from "@shared/types/common";
 import { useContext, useState } from "react";
 
 import LabelViewTaskCard from "./LabelViewTaskCard";

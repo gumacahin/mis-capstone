@@ -1,4 +1,4 @@
-import { ProjectViewType, Task } from "@shared/types/common";
+import { ProjectViewType, Task } from "@shared";
 
 import TodayViewBoard from "./TodayViewBoard";
 import TodayViewList from "./TodayViewList";

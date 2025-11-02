@@ -1,13 +1,16 @@
 import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
+import { Task } from "@shared";
 import { useRescheduleTask } from "@shared/hooks/queries";
-import { Task } from "@shared/types/common";
 import ListDateTasks from "@tasks/components/ListDateTasks";
 import ListOverdueTasks, {
   OVERDUE_TASK_LIST_ID,
 } from "@tasks/components/ListOverdueTasks";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
+
+dayjs.extend(utc);
 
 import ListViewContainer from "./ListViewContainer";
 
@@ -28,7 +31,10 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
   const todayTasks = useMemo(
     () =>
       tasks.filter(
-        (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
+        (task) =>
+          task.due_date &&
+          dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+            dayjs().format("YYYY-MM-DD"),
       ),
     [tasks],
   );

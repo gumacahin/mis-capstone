@@ -1,8 +1,8 @@
 import Box, { BoxProps } from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { type Theme } from "@mui/material/styles";
+import { TaskFormFields } from "@shared";
 import { NoNewLine, RemoveNewlinesOnPaste } from "@shared/tiptap-extensions";
-import { TaskFormFields } from "@shared/types/common";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { BubbleMenu, useEditor } from "@tiptap/react";

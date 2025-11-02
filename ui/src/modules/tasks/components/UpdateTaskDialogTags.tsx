@@ -4,8 +4,8 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import type { Task, TaskFormFields } from "@shared";
 import { useUpdateTask } from "@shared/hooks/queries";
-import type { Task, TaskFormFields } from "@shared/types/common";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import {
   Controller,

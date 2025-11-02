@@ -6,6 +6,7 @@ import {
   type DroppableProvided,
 } from "@hello-pangea/dnd";
 import CardActions from "@mui/material/CardActions";
+import { ProjectDetail, Section, Task } from "@shared";
 import {
   DROPPABLE_TYPE_SECTION,
   DROPPABLE_TYPE_TASK,
@@ -13,7 +14,6 @@ import {
 import ProjectContext from "@shared/contexts/projectContext";
 import SectionContext from "@shared/contexts/sectionContext";
 import { useReorderSections, useReorderTasks } from "@shared/hooks/queries";
-import { ProjectDetail, Section, Task } from "@shared/types/common";
 import AddTaskButton from "@tasks/components/AddTaskButton";
 import BoardTaskList from "@tasks/components/BoardTaskList";
 import BoardViewContainer from "@views/components/BoardViewContainer";
@@ -206,6 +206,17 @@ export default function ProjectViewBoard({
   };
 
   const lastSection = project.sections[project.sections.length - 1];
+
+  // Safety check: if no sections exist, don't render the board view
+  if (!project.sections || project.sections.length === 0) {
+    return (
+      <ProjectContext.Provider value={project}>
+        <BoardViewContainer id="project-sections-board-view-container">
+          <div>No sections found</div>
+        </BoardViewContainer>
+      </ProjectContext.Provider>
+    );
+  }
 
   return (
     <ProjectContext.Provider value={project}>

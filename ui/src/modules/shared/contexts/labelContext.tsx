@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Tag } from "../types/common";
+import type { Tag } from "../../../api/migration-helpers";
 
 const LabelContext = createContext<Tag | null>(null);
 

@@ -23,10 +23,18 @@ export default defineConfig({
       "@views/*": path.resolve(__dirname, "./src/modules/views/*"),
       "@labels": path.resolve(__dirname, "./src/modules/labels"),
       "@labels/*": path.resolve(__dirname, "./src/modules/labels/*"),
+      "@api": path.resolve(__dirname, "./src/api"),
+      "@api/*": path.resolve(__dirname, "./src/api/*"),
+      "@generated-api": path.resolve(__dirname, "./src/generated-api-client"),
+      "@generated-api/*": path.resolve(
+        __dirname,
+        "./src/generated-api-client/*",
+      ),
     },
   },
   server: {
     port: 3000,
+    strictPort: true, // Fail if port 3000 is occupied instead of trying next port
     proxy: {
       "/api": "http://127.0.0.1:8000/",
     },

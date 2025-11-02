@@ -4,16 +4,15 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import type { Task, TaskFormFields, TaskPriority } from "@shared";
 import DatePicker from "@shared/components/DatePicker";
 import ProfileContext from "@shared/contexts/profileContext";
 import ProjectContext from "@shared/contexts/projectContext";
 import SectionContext from "@shared/contexts/sectionContext";
 import { useAddTask } from "@shared/hooks/queries";
-import type { Task, TaskFormFields, TaskPriority } from "@shared/types/common";
 import { Dayjs } from "dayjs";
 import { useContext } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 
 import TaskPriorityMenu from "./TaskPriorityMenu";
 import TaskProjectButton from "./TaskProjectButton";
@@ -81,12 +80,13 @@ export default function TaskForm({
       priority,
       project,
     };
-    toast.promise(addTask(data), {
-      loading: "Adding task...",
-      success: "Task added successfully!",
-      error: "Error adding task.",
-    });
-    handleClose();
+    try {
+      await addTask(data);
+      handleClose();
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Error adding task:", error);
+    }
   };
 
   const priority = watch("priority");

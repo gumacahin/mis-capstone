@@ -2,7 +2,7 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import type { TagDetail, Task } from "@shared/types/common";
+import type { TagDetail, Task } from "@shared";
 import { Fragment } from "react";
 
 import AddTaskButton from "./AddTaskButton";

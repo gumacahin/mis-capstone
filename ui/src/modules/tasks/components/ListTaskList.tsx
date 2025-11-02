@@ -7,12 +7,12 @@ import {
 } from "@hello-pangea/dnd";
 import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
+import type { Section, Task } from "@shared";
 import {
   DROPPABLE_MIN_HEIGHT,
   DROPPABLE_TYPE_TASK,
 } from "@shared/constants/ui";
 import SectionContext from "@shared/contexts/sectionContext";
-import type { Section, Task } from "@shared/types/common";
 import { Fragment, memo, useContext, useState } from "react";
 
 import TaskCard from "./TaskCard";

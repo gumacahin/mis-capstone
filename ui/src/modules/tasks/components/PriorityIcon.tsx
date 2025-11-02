@@ -1,5 +1,5 @@
 import FlagIcon from "@mui/icons-material/Flag";
-import { TaskPriority } from "@shared/types/common";
+import { TaskPriority } from "@shared";
 
 export default function PriorityIcon({ priority }: { priority: TaskPriority }) {
   switch (priority) {

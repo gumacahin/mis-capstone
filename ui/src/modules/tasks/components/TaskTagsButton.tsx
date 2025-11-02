@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import ButtonGroup, { type ButtonGroupProps } from "@mui/material/ButtonGroup";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
-import type { TaskFormFields } from "@shared/types/common";
+import type { TaskFormFields } from "@shared";
 import { MouseEvent, useRef, useState } from "react";
 import {
   type Control,

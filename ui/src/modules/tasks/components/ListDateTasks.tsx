@@ -2,7 +2,7 @@ import CardActions from "@mui/material/CardActions";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import ListProjectSectionCard from "@projects/components/ListProjectSectionCard";
-import { Task } from "@shared/types/common";
+import { Task } from "@shared";
 import dayjs from "dayjs";
 
 import AddTaskButton from "./AddTaskButton";

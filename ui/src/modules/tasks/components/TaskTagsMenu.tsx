@@ -4,8 +4,8 @@ import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
+import { type TaskFormFields } from "@shared";
 import { useTags } from "@shared/hooks/queries";
-import { type TaskFormFields } from "@shared/types/common";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { type ControllerRenderProps } from "react-hook-form";
 

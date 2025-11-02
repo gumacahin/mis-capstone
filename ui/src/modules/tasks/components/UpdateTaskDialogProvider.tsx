@@ -1,6 +1,6 @@
+import { Task } from "@shared";
 import UpdateTaskDialogContext from "@shared/contexts/updateTaskDialogContext";
 import { useTask } from "@shared/hooks/queries";
-import { Task } from "@shared/types/common";
 import { PropsWithChildren, useState } from "react";
 
 import UpdateTaskDialog from "./UpdateTaskDialog";

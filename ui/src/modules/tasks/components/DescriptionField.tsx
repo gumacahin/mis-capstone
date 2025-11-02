@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import { StackProps } from "@mui/material/Stack/Stack";
-import { TaskFormFields } from "@shared/types/common";
+import { TaskFormFields } from "@shared";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { BubbleMenu, useEditor } from "@tiptap/react";

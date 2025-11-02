@@ -1,4 +1,4 @@
-import { TagDetail } from "@shared/types/common";
+import { TagDetail } from "@shared";
 import LabelViewListTaskList from "@tasks/components/LabelViewListTaskList";
 
 import ListViewContainer from "./ListViewContainer";

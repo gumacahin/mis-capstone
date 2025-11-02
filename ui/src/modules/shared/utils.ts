@@ -4,7 +4,7 @@ import timezonePlugin from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { RRule } from "rrule";
 
-import { Profile, RepeatOption } from "./types/common";
+import { Profile, RepeatOption } from "../../api/migration-helpers";
 
 dayjs.extend(utc);
 dayjs.extend(timezonePlugin);

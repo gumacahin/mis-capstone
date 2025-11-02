@@ -1,5 +1,5 @@
+import type { Tag } from "@shared";
 import LabelContext from "@shared/contexts/labelContext";
-import type { Tag } from "@shared/types/common";
 
 export default function LabelContextProvider({
   children,

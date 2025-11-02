@@ -2,8 +2,8 @@ import DuplicateIcon from "@mui/icons-material/ContentCopy";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
+import { Task } from "@shared";
 import { useDuplicateTask } from "@shared/hooks/queries";
-import { Task } from "@shared/types/common";
 import toast from "react-hot-toast";
 
 export interface TaskDuplicateMenuItemProps {

@@ -13,8 +13,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import type { Comment } from "@shared";
 import { useUpdateComment } from "@shared/hooks/queries";
-import type { Comment } from "@shared/types/common";
 import { FormEvent, MouseEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 

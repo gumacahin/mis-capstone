@@ -18,8 +18,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/system";
+import type { Task } from "@shared";
 import { useUpdateTask } from "@shared/hooks/queries";
-import type { Task } from "@shared/types/common";
 import { generateTaskLink } from "@shared/utils";
 import dayjs from "dayjs";
 import { MouseEvent, useState } from "react";
@@ -64,60 +64,52 @@ export default function TaskMenu({
 
   const handleSetPriority = async (priority: Task["priority"]) => {
     // handleCloseTaskMenu();
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         priority,
-      }),
-      {
-        loading: "Setting task priority...",
-        success: "Successfully set task priority.",
-        error: "Failed to set task priority.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to set task priority:", error);
+    }
   };
 
   const handleSetDueDate = async (date: dayjs.Dayjs | null) => {
     handleCloseTaskMenu();
     handleCloseDatePicker();
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         due_date: date,
-      }),
-      {
-        loading: "Setting due date...",
-        success: "Successfully set due date.",
-        error: "Failed to set due date.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to set due date:", error);
+    }
   };
 
   const handleSetDueToday = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     handleCloseTaskMenu();
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         due_date: dayjs(),
-      }),
-      {
-        loading: "Setting due date to today...",
-        success: "Successfully set due date to today.",
-        error: "Failed to set due date to today.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to set due date to today:", error);
+    }
   };
   const handleSetDueTomorrow = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     handleCloseTaskMenu();
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         due_date: dayjs().add(1, "day"),
-      }),
-      {
-        loading: "Setting due date to tomorrow...",
-        success: "Successfully set due date to tomorrow.",
-        error: "Failed to set due date to tomorrow.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to set due date to tomorrow:", error);
+    }
   };
 
   const handleSetDueNextWeekend = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -126,30 +118,26 @@ export default function TaskMenu({
     const today = dayjs();
     const comingWeekend =
       today.day() >= 6 ? today.add(1, "week").day(6) : today.day(6);
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         due_date: comingWeekend,
-      }),
-      {
-        loading: "Setting due date to coming weekend...",
-        success: "Successfully set due date to coming weekend.",
-        error: "Failed to set due date to coming weekend.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to set due date to coming weekend:", error);
+    }
   };
   const handleRemoveDueDate = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     handleCloseTaskMenu();
-    await toast.promise(
-      updateTask({
+    try {
+      await updateTask({
         due_date: null,
-      }),
-      {
-        loading: "Removing due date...",
-        success: "Successfully removed due date.",
-        error: "Failed to remove due date.",
-      },
-    );
+      });
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to remove due date:", error);
+    }
   };
   return (
     <>

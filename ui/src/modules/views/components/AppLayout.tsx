@@ -36,9 +36,9 @@ import Toolbar from "@mui/material/Toolbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import AddProjectDialog from "@projects/components/AddProjectDialog";
 import ProjectMenu from "@projects/components/ProjectMenu";
+import { Project, ProjectDetail } from "@shared";
 import { useProjects, useReorderProjects } from "@shared/hooks/queries";
 import useToolbarContext from "@shared/hooks/useToolbarContext";
-import { Project } from "@shared/types/common";
 import AddTaskDialog from "@tasks/components/AddTaskDialog";
 import UpdateTaskDialogProvider from "@tasks/components/UpdateTaskDialogProvider";
 import { MouseEvent, ReactNode, useState } from "react";
@@ -168,7 +168,7 @@ function DrawerContents({
       {project && (
         <ProjectMenu
           anchorEl={anchorEl}
-          project={project}
+          project={project as unknown as ProjectDetail} // Cast Project to ProjectDetail for compatibility
           handleClose={handleCloseProjectMenu}
         />
       )}

@@ -19,7 +19,7 @@ export const mockUser = {
   },
   type: (element: HTMLElement, text: string) => {
     element.focus();
-    element.value = text;
+    (element as HTMLInputElement).value = text;
     element.dispatchEvent(new Event("input", { bubbles: true }));
   },
 };

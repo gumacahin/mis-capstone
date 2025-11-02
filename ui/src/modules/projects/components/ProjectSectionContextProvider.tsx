@@ -1,5 +1,5 @@
+import type { Section } from "@shared";
 import SectionContext from "@shared/contexts/sectionContext";
-import type { Section } from "@shared/types/common";
 
 export function ProjectSectionContextProvider({
   children,

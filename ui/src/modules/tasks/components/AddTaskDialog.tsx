@@ -4,18 +4,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
+import type { Project, Section, TaskFormFields, TaskPriority } from "@shared";
 import DatePicker from "@shared/components/DatePicker";
 import { useAddTask } from "@shared/hooks/queries";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import useProjectContext from "@shared/hooks/useProjectContext";
 import useSectionContext from "@shared/hooks/useSectionContext";
-import type {
-  Project,
-  Section,
-  TaskFormFields,
-  TaskPriority,
-} from "@shared/types/common";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -60,6 +55,10 @@ export default function AddTaskDialog({
     section: section?.id ?? inboxDefaultSection?.id,
     priority: "NONE" as TaskPriority,
     tags: [],
+    // Add missing scheduling fields
+    dtstart: dayjs().startOf("day"), // Default to today
+    rrule: null,
+    anchor_mode: "SCHEDULED" as const,
   };
 
   const form = useForm<TaskFormFields>({
@@ -76,6 +75,9 @@ export default function AddTaskDialog({
     project,
     tags,
     priority,
+    dtstart,
+    rrule,
+    anchor_mode,
   }) => {
     setLoading(true);
     const data: Partial<TaskFormFields> = {
@@ -86,6 +88,10 @@ export default function AddTaskDialog({
       tags,
       priority,
       project,
+      // Include scheduling fields
+      dtstart,
+      rrule,
+      anchor_mode,
     };
 
     try {

@@ -1,5 +1,5 @@
 import { Divider, Typography } from "@mui/material";
-import { Section } from "@shared/types/common";
+import { Section } from "@shared";
 import { useEffect, useRef, useState } from "react";
 
 import AddProjectSectionForm from "./AddProjectSectionForm";

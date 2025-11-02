@@ -8,7 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import type { ProfileProject, TaskFormFields } from "@shared/types/common";
+import type { ProfileProject, TaskFormFields } from "@shared";
 import { Fragment } from "react/jsx-runtime";
 import { ControllerRenderProps } from "react-hook-form";
 

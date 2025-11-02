@@ -1,8 +1,8 @@
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import CircleOutlinedIcon from "@mui/icons-material/CircleOutlined";
 import IconButton from "@mui/material/IconButton";
+import type { Task } from "@shared";
 import { useUpdateTask } from "@shared/hooks/queries";
-import type { Task } from "@shared/types/common";
 import dayjs from "dayjs";
 import { MouseEvent } from "react";
 import toast from "react-hot-toast";

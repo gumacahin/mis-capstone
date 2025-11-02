@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { ProjectDetail } from "../types/common";
+import type { ProjectDetail } from "../../../api/migration-helpers";
 
 const ProjectContext = createContext<ProjectDetail | null>(null);
 

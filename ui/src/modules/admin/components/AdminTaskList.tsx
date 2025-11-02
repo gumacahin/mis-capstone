@@ -1,5 +1,5 @@
 import Typography from "@mui/material/Typography";
-import { Task } from "@shared/types/common";
+import { Task } from "@shared";
 import PriorityIcon from "@tasks/components/PriorityIcon";
 import {
   Datagrid,

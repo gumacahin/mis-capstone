@@ -10,6 +10,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Stack from "@mui/material/Stack";
+import { ProjectDetail, Section, Task } from "@shared";
 import {
   DROPPABLE_TYPE_SECTION,
   DROPPABLE_TYPE_TASK,
@@ -21,7 +22,6 @@ import {
   useReorderSections,
   useReorderTasks,
 } from "@shared/hooks/queries";
-import { ProjectDetail, Section, Task } from "@shared/types/common";
 import AddTaskButton from "@tasks/components/AddTaskButton";
 import ListTaskList from "@tasks/components/ListTaskList";
 import ListViewContainer from "@views/components/ListViewContainer";
@@ -276,6 +276,17 @@ export default function ProjectViewList({
       await handleTaskDragEnd(source, destination);
     }
   };
+
+  // Safety check: if no sections exist, show a message
+  if (!project.sections || project.sections.length === 0) {
+    return (
+      <ProjectContext.Provider value={project}>
+        <ListViewContainer id="project-sections-list-view-container">
+          <div>No sections found</div>
+        </ListViewContainer>
+      </ProjectContext.Provider>
+    );
+  }
 
   return (
     <ProjectContext.Provider value={project}>

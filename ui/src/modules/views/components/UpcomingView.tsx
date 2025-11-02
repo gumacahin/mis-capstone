@@ -1,4 +1,4 @@
-import { ProjectViewType } from "@shared/types/common";
+import { ProjectViewType } from "@shared";
 
 import UpcomingViewBoard from "./UpcomingViewBoard";
 import UpcomingViewList from "./UpcomingViewList";

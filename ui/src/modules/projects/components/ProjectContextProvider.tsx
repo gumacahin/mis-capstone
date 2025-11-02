@@ -1,5 +1,5 @@
+import type { ProjectDetail } from "@shared";
 import ProjectContext from "@shared/contexts/projectContext";
-import type { ProjectDetail } from "@shared/types/common";
 
 export function ProjectContextProvider({
   children,

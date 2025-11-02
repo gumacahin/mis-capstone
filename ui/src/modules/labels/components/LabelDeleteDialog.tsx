@@ -4,8 +4,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { Tag } from "@shared";
 import { useDeleteLabel } from "@shared/hooks/queries";
-import { Tag } from "@shared/types/common";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 

@@ -19,11 +19,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import ListProjectSectionCard from "@projects/components/ListProjectSectionCard";
+import type { Task } from "@shared";
 import SkeletonList from "@shared/components/SkeletonList";
 import { LIST_VIEW_MAX_WIDTH } from "@shared/constants/ui";
 import { useTasks, useTasksToday } from "@shared/hooks/queries";
 import useToolbarContext from "@shared/hooks/useToolbarContext";
-import type { Task } from "@shared/types/common";
 import { getWeekDatesFromDate } from "@shared/utils";
 import AddTaskButton from "@tasks/components/AddTaskButton";
 import ListOverdueTasks from "@tasks/components/ListOverdueTasks";
@@ -31,6 +31,7 @@ import ListTaskList from "@tasks/components/ListTaskList";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 import {
   MouseEvent,
   useCallback,
@@ -45,6 +46,7 @@ import ListViewContainer from "./ListViewContainer";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 export default function UpcomingViewList() {
   const [initialDataFetch, setInitialDataFetch] = useState(true);
@@ -121,8 +123,10 @@ export default function UpcomingViewList() {
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
-  const tasksDueToday = tasksToday.filter((task) =>
-    dayjs(task.due_date).isSame(dayjs(), "day"),
+  const tasksDueToday = tasksToday.filter(
+    (task) =>
+      dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+      dayjs().format("YYYY-MM-DD"),
   );
 
   useEffect(() => {
@@ -382,8 +386,12 @@ export default function UpcomingViewList() {
                     tasks={
                       dayjs(date).isSame(dayjs(), "day")
                         ? tasksDueToday
-                        : tasks.filter((task: Task) =>
-                            dayjs(task.due_date).isSame(dayjs(date)),
+                        : tasks.filter(
+                            (task: Task) =>
+                              dayjs(task.due_date)
+                                .utc()
+                                .format("YYYY-MM-DD") ===
+                              dayjs(date).format("YYYY-MM-DD"),
                           )
                     }
                   />

@@ -9,7 +9,7 @@ import Portal from "@mui/material/Portal";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import ListProjectSectionCard from "@projects/components/ListProjectSectionCard";
-import { Task } from "@shared/types/common";
+import { Task } from "@shared";
 import { forwardRef } from "react";
 
 import ListTaskList from "./ListTaskList";

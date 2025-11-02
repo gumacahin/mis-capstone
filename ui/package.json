@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --noUnusedLocals false && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
@@ -14,7 +14,10 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "generate-api": "openapi-generator-cli generate -i http://localhost:8000/api/schema/ -g typescript-axios -o src/generated-api-client --additional-properties=supportsES6=true,withInterfaces=true,typescriptThreePlus=true,useSingleRequestParameter=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api",
+    "generate-api:clean": "rm -rf src/generated-api-client && npm run generate-api",
+    "generate-api:watch": "npm run generate-api && echo 'API client generated. Restart if backend schema changes.'"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
@@ -47,6 +50,7 @@
     "react-hot-toast": "^2.4.1",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.24.1",
+    "rrule": "^2.8.1",
     "striptags": "^3.2.0",
     "tailwindcss": "^4.1.11",
     "use-local-storage": "^3.0.0"
@@ -55,6 +59,7 @@
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.0",
     "@eslint/js": "^9.22.0",
+    "@openapitools/openapi-generator-cli": "^2.25.0",
     "@playwright/test": "^1.55.0",
     "@tanstack/eslint-plugin-query": "^5.67.2",
     "@tanstack/react-query-devtools": "^5.67.2",

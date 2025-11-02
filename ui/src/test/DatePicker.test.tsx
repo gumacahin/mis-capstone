@@ -1,8 +1,8 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 
+import type { TaskFormFields } from "../api/migration-helpers";
 import DatePicker from "../modules/shared/components/DatePicker";
-import type { TaskFormFields } from "../modules/shared/types/common";
 import { render, screen } from "../test/test-utils";
 
 // Mock component that uses the DatePicker

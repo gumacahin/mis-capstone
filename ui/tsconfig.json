@@ -31,7 +31,11 @@
       "@views": ["src/modules/views"],
       "@views/*": ["src/modules/views/*"],
       "@labels": ["src/modules/labels"],
-      "@labels/*": ["src/modules/labels/*"]
+      "@labels/*": ["src/modules/labels/*"],
+      "@api": ["src/api"],
+      "@api/*": ["src/api/*"],
+      "@generated-api": ["src/generated-api-client"],
+      "@generated-api/*": ["src/generated-api-client/*"]
     },
 
     /* Linting */

@@ -15,9 +15,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import List from "@mui/material/List";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import type { Comment, Task } from "@shared";
 import { useComments, useDeleteComment } from "@shared/hooks/queries";
 import useProfileContext from "@shared/hooks/useProfileContext";
-import type { Comment, Task } from "@shared/types/common";
 import { useState } from "react";
 import toast from "react-hot-toast";
 

@@ -35,6 +35,7 @@ export default [
       "**/package.json",
       "**/tsconfig.json",
       "**/package-lock.json",
+      "**/src/generated-api-client/**",
     ],
   },
   ...fixupConfigRules(

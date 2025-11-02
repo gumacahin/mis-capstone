@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { Task } from "../types/common";
+import { Task } from "../../../api/migration-helpers";
 
 export interface UpdateTaskDialogContextType {
   setTask: (task: Task) => void;

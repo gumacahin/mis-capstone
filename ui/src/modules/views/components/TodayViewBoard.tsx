@@ -1,13 +1,16 @@
 import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
+import { Task } from "@shared";
 import { useRescheduleTask } from "@shared/hooks/queries";
-import { Task } from "@shared/types/common";
 import BoardDateTasks from "@tasks/components/BoardDateTasks";
 import BoardOverdueTasks, {
   OVERDUE_TASK_LIST_ID,
 } from "@tasks/components/BoardOverdueTasks";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+
+dayjs.extend(utc);
 
 import BoardViewContainer from "./BoardViewContainer";
 
@@ -21,7 +24,10 @@ export default function TodayViewList({ tasks }: TodayViewListProps) {
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
   const todayTasks = tasks.filter(
-    (task) => task.due_date && dayjs(task.due_date).isSame(dayjs(), "day"),
+    (task) =>
+      task.due_date &&
+      dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+        dayjs().format("YYYY-MM-DD"),
   );
   const [overdueTaskList, setOverdueTaskList] = useState<Task[]>(overdueTasks);
   const [todayTaskList, setTodayTaskList] = useState<Task[]>(todayTasks);

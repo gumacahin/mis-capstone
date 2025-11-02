@@ -6,7 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import type { ProjectDetail } from "@shared/types/common";
+import type { ProjectDetail } from "@shared";
 import { useState } from "react";
 
 import ProjectDeleteDialog from "../components/ProjectDeleteDialog";

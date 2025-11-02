@@ -24,8 +24,8 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Frequency, Options, RRule } from "rrule";
 
+import { AnchorMode, EndType } from "../../../api/migration-helpers";
 import useTimezoneContext from "../hooks/useTimezoneContext";
-import { AnchorMode, EndType } from "../types/common";
 import { dayjsToRRuleDay } from "../utils";
 
 interface RepeatOptionsCustomProps {

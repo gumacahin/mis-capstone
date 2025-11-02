@@ -15,10 +15,10 @@ import Textfield from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import AddProjectButton from "@projects/components/AddProjectButton";
 import ProjectMenu from "@projects/components/ProjectMenu";
+import type { Project, ProjectDetail } from "@shared";
 import SkeletonList from "@shared/components/SkeletonList";
 import { useProjects } from "@shared/hooks/queries";
 import useToolbarContext from "@shared/hooks/useToolbarContext";
-import type { Project } from "@shared/types/common";
 import PageLayout from "@views/components/PageLayout";
 import { ChangeEvent, MouseEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -89,7 +89,7 @@ export default function ProjectsListPage() {
       {project && (
         <ProjectMenu
           anchorEl={anchorEl}
-          project={project}
+          project={project as unknown as ProjectDetail} // Cast Project to ProjectDetail for compatibility
           handleClose={handleCloseProjectMenu}
         />
       )}

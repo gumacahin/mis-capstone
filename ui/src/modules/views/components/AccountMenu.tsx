@@ -51,6 +51,7 @@ export default function AccountMenu() {
           onClick={handleMenuClick}
           size="small"
           sx={{ ml: 2 }}
+          aria-label="Account menu"
           aria-controls={open ? "account-menu" : undefined}
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}

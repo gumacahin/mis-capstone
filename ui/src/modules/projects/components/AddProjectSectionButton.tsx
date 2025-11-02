@@ -1,7 +1,7 @@
 import SplitscreenIcon from "@mui/icons-material/Splitscreen";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Section } from "@shared/types/common";
+import { Section } from "@shared";
 import { useState } from "react";
 
 import AddProjectSectionForm from "./AddProjectSectionForm";

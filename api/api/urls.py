@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework import routers
 
 from upoutodo import views
@@ -40,5 +41,10 @@ urlpatterns = [
         "api/email/daily-digest",
         daily_digest,
         name="daily-digest",
+    ),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
 ]

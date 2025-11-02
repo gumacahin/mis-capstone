@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import type { Profile } from "../types/common";
+import type { Profile } from "../../../api/migration-helpers";
 
 const ProfileContext = createContext<Profile | null>(null);
 

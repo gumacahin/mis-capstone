@@ -3,7 +3,7 @@ import CardHeader from "@mui/material/CardHeader";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import BoardProjectSectionCard from "@projects/components/BoardProjectSectionCard";
-import { TagDetail } from "@shared/types/common";
+import { TagDetail } from "@shared";
 import AddTaskButton from "@tasks/components/AddTaskButton";
 import LabelViewBoardTaskList from "@tasks/components/LabelViewBoardTaskList";
 import LabelViewNoTasks from "@tasks/components/LabelViewNoTasks";

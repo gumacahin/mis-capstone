@@ -20,8 +20,8 @@ import Stack from "@mui/material/Stack";
 import { type Theme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import type { Task, TaskFormFields } from "@shared";
 import { useDuplicateTask, useUpdateTask } from "@shared/hooks/queries";
-import type { Task, TaskFormFields } from "@shared/types/common";
 import { generateTaskLink } from "@shared/utils";
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -89,12 +89,9 @@ export default function UpdateTaskDialog({
       if (data.description === "<p></p>") {
         data.description = "";
       }
-      await toast.promise(updateTask.mutateAsync(data), {
-        loading: "Updating task...",
-        success: "Task updated successfully!",
-        error: "Error updating task.",
-      });
+      await updateTask.mutateAsync(data);
     } catch (error) {
+      // Hook already handles error notification
       console.error("Error updating task", error);
     } finally {
       setFormActive(false);
@@ -135,15 +132,12 @@ export default function UpdateTaskDialog({
   const { mutateAsync: duplicateTask } = useDuplicateTask(task);
   const handleDuplicateTask = async () => {
     onClose();
-    await toast.promise(
-      duplicateTask(),
-
-      {
-        loading: "Duplicating task...",
-        success: "Task duplicated successfully!",
-        error: "Failed to duplicate task.",
-      },
-    );
+    try {
+      await duplicateTask();
+    } catch (error) {
+      // Hook already handles error notification
+      console.error("Failed to duplicate task:", error);
+    }
   };
 
   const taskIsCompleted = task.completion_date != null;

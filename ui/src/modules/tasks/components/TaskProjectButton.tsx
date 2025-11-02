@@ -3,8 +3,8 @@ import InboxIcon from "@mui/icons-material/Inbox";
 import TagIcon from "@mui/icons-material/Tag";
 import Button, { type ButtonProps } from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
+import type { TaskFormFields } from "@shared";
 import ProfileContext from "@shared/contexts/profileContext";
-import type { TaskFormFields } from "@shared/types/common";
 import { type MouseEvent, useContext, useState } from "react";
 import { type Control, Controller } from "react-hook-form";
 

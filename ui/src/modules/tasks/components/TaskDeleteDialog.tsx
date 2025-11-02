@@ -7,8 +7,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import type { Task } from "@shared";
 import { useDeleteTask } from "@shared/hooks/queries";
-import type { Task } from "@shared/types/common";
 import { toast } from "react-hot-toast";
 
 export default function TaskDeleteDialog({

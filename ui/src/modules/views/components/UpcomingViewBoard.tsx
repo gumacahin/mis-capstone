@@ -12,6 +12,7 @@ import Popover from "@mui/material/Popover";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import type { Task } from "@shared";
 import SkeletonList from "@shared/components/SkeletonList";
 import { DATE_PAGER_HEIGHT, TASK_CARD_WIDTH } from "@shared/constants/ui";
 import {
@@ -21,13 +22,13 @@ import {
 } from "@shared/hooks/queries";
 import useScrollbarWidth from "@shared/hooks/useScrollbarWidth";
 import useToolbarContext from "@shared/hooks/useToolbarContext";
-import type { Task } from "@shared/types/common";
 import { getWeekDatesFromDate } from "@shared/utils";
 import BoardDateTasks from "@tasks/components/BoardDateTasks";
 import BoardOverdueTasks from "@tasks/components/BoardOverdueTasks";
 import dayjs, { type Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 import { Fragment, MouseEvent, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -37,6 +38,7 @@ import ViewPageTitle from "./ViewPageTitle";
 
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 export default function UpcomingViewBoard() {
   const { setToolbarTitle } = useToolbarContext();
@@ -57,8 +59,10 @@ export default function UpcomingViewBoard() {
   const overdueTasks = tasksToday.filter(
     (task) => task.due_date && dayjs(task.due_date).isBefore(dayjs(), "day"),
   );
-  const tasksDueToday = tasksToday.filter((task) =>
-    dayjs(task.due_date).isSame(dayjs(), "day"),
+  const tasksDueToday = tasksToday.filter(
+    (task) =>
+      dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+      dayjs().format("YYYY-MM-DD"),
   );
 
   const handleDateSelect = (date: Dayjs) => {
@@ -89,13 +93,17 @@ export default function UpcomingViewBoard() {
     const newSourceTaskList = Array.from(
       sourceIsOverdue
         ? overdueTasks
-        : tasks.filter((task: Task) =>
-            dayjs(task.due_date).isSame(sourceDate, "day"),
+        : tasks.filter(
+            (task: Task) =>
+              dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+              dayjs(sourceDate).format("YYYY-MM-DD"),
           ),
     );
     const newDestinationTaskList = Array.from(
-      tasks.filter((task: Task) =>
-        dayjs(task.due_date).isSame(destinationDate, "day"),
+      tasks.filter(
+        (task: Task) =>
+          dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+          dayjs(destinationDate).format("YYYY-MM-DD"),
       ),
     );
     // TODO: Handle optimistic updates.
@@ -172,8 +180,10 @@ export default function UpcomingViewBoard() {
                   tasks={
                     dayjs(date).isSame(dayjs(), "day")
                       ? tasksDueToday
-                      : tasks.filter((task: Task) =>
-                          dayjs(task.due_date).isSame(dayjs(date)),
+                      : tasks.filter(
+                          (task: Task) =>
+                            dayjs(task.due_date).utc().format("YYYY-MM-DD") ===
+                            dayjs(date).format("YYYY-MM-DD"),
                         )
                   }
                 />

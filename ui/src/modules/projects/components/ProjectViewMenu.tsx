@@ -8,8 +8,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import type { ProjectDetail, ProjectViewType } from "@shared";
 import { useUpdateProjectView } from "@shared/hooks/queries";
-import type { ProjectDetail, ProjectViewType } from "@shared/types/common";
 import { useQueryClient } from "@tanstack/react-query";
 import { MouseEvent, useMemo, useState } from "react";
 
