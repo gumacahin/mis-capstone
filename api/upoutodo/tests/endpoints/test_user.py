@@ -50,6 +50,7 @@ def test_user_me_endpoint(auth_client, user):
         "is_onboarded",
         "projects",
         "theme",
+        "email_digest_enabled",
     }
     assert set(data.keys()) == expected_fields
 

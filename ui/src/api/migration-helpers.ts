@@ -119,6 +119,7 @@ export interface Profile {
   is_student: boolean;
   is_faculty: boolean;
   is_onboarded: boolean;
+  email_digest_enabled: boolean;
   timezone?: string; // Missing from generated User
   theme: "light" | "dark" | "system"; // More specific than generated User
   projects: ProfileProject[];

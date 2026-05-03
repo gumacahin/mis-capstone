@@ -14,6 +14,7 @@ router.register(r"tags", views.TagViewSet)
 router.register(r"comments", views.CommentViewSet)
 router.register(r"tasks", views.TaskViewSet)
 router.register(r"users", views.UserViewSet)
+router.register(r"notifications", views.NotificationViewSet, basename="notification")
 
 admin_router = routers.DefaultRouter()
 admin_router.register(r"projects", views.admin.AdminProjectViewSet)

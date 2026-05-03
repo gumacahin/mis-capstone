@@ -26,7 +26,7 @@ def daily_digest(request):
     """
     try:
         # Get all users
-        users = User.objects.filter(is_active=True)
+        users = User.objects.filter(is_active=True, profile__email_digest_enabled=True)
 
         emails_sent = 0
         errors = []
@@ -98,7 +98,6 @@ def daily_digest(request):
 
         return Response(status=status.HTTP_201_CREATED)
 
-    except Exception as e:
-        error_msg = f"Error processing daily digest: {str(e)}"
-        logger.error(error_msg)
+    except Exception:
+        logger.exception("Error processing daily digest")
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

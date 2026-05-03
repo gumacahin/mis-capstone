@@ -49,6 +49,7 @@ import { ROUTES } from "../../../routes";
 import AccountMenu from "./AccountMenu";
 import InboxDefaultSectionProvider from "./InboxDefaultSectionProvider";
 import ListItemNavLink from "./ListItemNavLink";
+import NotificationBell from "./NotificationBell";
 import TodayIcon from "./TodayIcon";
 
 const DRAWER_WIDTH = 240;
@@ -444,7 +445,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </IconButton>
               </Box>
               <Box width="100%">{toolbarTitle}</Box>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <NotificationBell />
                 {toolbarAdditionalIcons && <Box>{toolbarAdditionalIcons}</Box>}
                 <Box>{toolbarIcons}</Box>
               </Stack>

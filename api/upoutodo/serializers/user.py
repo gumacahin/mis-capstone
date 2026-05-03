@@ -33,6 +33,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     is_faculty = serializers.BooleanField(source="profile.is_faculty")
     is_onboarded = serializers.BooleanField(source="profile.is_onboarded")
     theme = serializers.CharField(source="profile.theme")
+    email_digest_enabled = serializers.BooleanField(
+        source="profile.email_digest_enabled"
+    )
     projects = ProjectSerializer(source="created_projects", many=True)
 
     def get_projects(self, obj):
@@ -55,6 +58,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "is_onboarded",
             "projects",
             "theme",
+            "email_digest_enabled",
         ]
         read_only_fields = [
             "id",
@@ -65,4 +69,5 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "is_onboarded",
             "projects",
             "theme",
+            "email_digest_enabled",
         ]

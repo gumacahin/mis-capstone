@@ -13,6 +13,7 @@ class UserProfile(models.Model):
     is_faculty = models.BooleanField(default=False)
     is_onboarded = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    email_digest_enabled = models.BooleanField(default=True)
 
     class Theme(models.TextChoices):
         SYSTEM = "system", "System"

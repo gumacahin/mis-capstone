@@ -22,7 +22,7 @@ import Typography from "@mui/material/Typography";
 import { useDeleteAccount, useUpdateProfile } from "@shared/hooks/queries";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import useThemeContext from "@shared/hooks/useThemeContext";
-import { GraduationCap, Users } from "lucide-react";
+import { GraduationCap, Mail, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -75,6 +75,7 @@ interface FormValues {
   name: string;
   isFaculty: boolean;
   isStudent: boolean;
+  emailDigestEnabled: boolean;
 }
 
 export default function SettingsPage() {
@@ -90,6 +91,7 @@ export default function SettingsPage() {
     name: profile?.name ?? "",
     isFaculty: profile?.is_faculty ?? false,
     isStudent: profile?.is_student ?? false,
+    emailDigestEnabled: profile?.email_digest_enabled ?? true,
   };
   const { setMode } = useThemeContext();
   const { handleSubmit, register, watch, setValue, formState, reset } =
@@ -104,6 +106,7 @@ export default function SettingsPage() {
       is_faculty: data.isFaculty,
       is_onboarded: true,
       theme: data.theme,
+      email_digest_enabled: data.emailDigestEnabled,
     };
     setIsLoading(true);
     await toast.promise(updateProfile(newValues), {
@@ -227,6 +230,44 @@ export default function SettingsPage() {
                 <MenuItem value="dark">Dark</MenuItem>
               </Select>
             </FormControl>
+          </Stack>
+          <Stack spacing={3}>
+            <Typography variant="h6" component={"h3"}>
+              Notifications
+            </Typography>
+            <Card>
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                      <Mail className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <FormLabel
+                        htmlFor="email-digest-switch"
+                        className="text-lg font-semibold text-gray-800 cursor-pointer"
+                      >
+                        Daily Email Digest
+                      </FormLabel>
+                      <p className="text-gray-600 mt-1">
+                        Receive a daily summary of your tasks due today and
+                        overdue items
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="email-digest-switch"
+                    checked={watch("emailDigestEnabled")}
+                    onChange={(event) =>
+                      setValue("emailDigestEnabled", event.target.checked, {
+                        shouldDirty: true,
+                      })
+                    }
+                    className="scale-125"
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </Stack>
           <Button
             type="submit"

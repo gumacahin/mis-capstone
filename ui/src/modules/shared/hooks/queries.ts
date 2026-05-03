@@ -105,6 +105,68 @@ export const useDeleteAccount = () => {
   });
 };
 
+export interface AppNotification {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  task: number | null;
+  created_at: string;
+}
+
+export const useNotifications = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("notifications/");
+      return data as AppNotification[];
+    },
+    refetchInterval: 60_000,
+  });
+};
+
+export const useUnreadNotificationCount = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["notifications", "unread_count"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("notifications/unread_count/");
+      return data.count as number;
+    },
+    refetchInterval: 60_000,
+  });
+};
+
+export const useMarkNotificationRead = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["markNotificationRead"],
+    mutationFn: async (id: number) => {
+      await apiClient.post(`notifications/${id}/read/`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
+export const useMarkAllNotificationsRead = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["markAllNotificationsRead"],
+    mutationFn: async () => {
+      await apiClient.post("notifications/read_all/");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+};
+
 export const useTags = () => {
   const apiClient = useApiClient();
   return useQuery({
