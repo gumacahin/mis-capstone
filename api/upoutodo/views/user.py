@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from upoutodo.serializers import UserSerializer
@@ -17,6 +18,18 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(
+            "DELETE", detail="Use /api/users/delete_account/ instead."
+        )
+
+    @action(methods=["DELETE"], detail=False, url_path="delete_account")
+    def delete_account(self, request):
+        user = request.user
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=["PATCH"], detail=False)
     def options(self, request):

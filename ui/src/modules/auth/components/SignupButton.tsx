@@ -1,19 +1,35 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import Button from "@mui/material/Button";
+import Button, { type ButtonProps } from "@mui/material/Button";
+import type { ReactNode } from "react";
 
-const LoginButton = () => {
-  const { loginWithRedirect } = useAuth0();
+interface SignupButtonProps extends ButtonProps {
+  children?: ReactNode;
+}
+
+const SignupButton = ({ children, ...props }: SignupButtonProps) => {
+  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0();
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
-    <Button
-      color="inherit"
-      onClick={async () => {
-        await loginWithRedirect();
-      }}
-    >
-      Log In
-    </Button>
+    !isAuthenticated && (
+      <Button
+        color="inherit"
+        onClick={async () => {
+          await loginWithRedirect({
+            authorizationParams: {
+              screen_hint: "signup",
+            },
+          });
+        }}
+        {...props}
+      >
+        {children ?? "Sign Up"}
+      </Button>
+    )
   );
 };
 
-export default LoginButton;
+export default SignupButton;

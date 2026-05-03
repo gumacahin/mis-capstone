@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,7 +19,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useUpdateProfile } from "@shared/hooks/queries";
+import { useDeleteAccount, useUpdateProfile } from "@shared/hooks/queries";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import useThemeContext from "@shared/hooks/useThemeContext";
 import { GraduationCap, Users } from "lucide-react";
@@ -29,32 +30,43 @@ import toast from "react-hot-toast";
 function ConfirmDeleteDialog({
   open,
   handleClose,
+  handleConfirm,
+  isDeleting,
 }: {
   open: boolean;
   handleClose: () => void;
+  handleConfirm: () => void;
+  isDeleting: boolean;
 }) {
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="delete-confirm-dialog-title"
-        aria-describedby="delete-confirm-dialog-description"
-      >
-        <DialogTitle id="delete-confirm-dialog-title">
-          {"Are you sure you want to delete your account?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="delete-confirm-dialog-description">
-            This action cannot be undone. All your data will be lost forever.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Yes, I&apos;m sure</Button>
-          <Button onClick={handleClose}>No, go back</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="delete-confirm-dialog-title"
+      aria-describedby="delete-confirm-dialog-description"
+    >
+      <DialogTitle id="delete-confirm-dialog-title">
+        Are you sure you want to delete your account?
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="delete-confirm-dialog-description">
+          This action cannot be undone. All your data will be lost forever.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={isDeleting}>
+          No, go back
+        </Button>
+        <Button
+          onClick={handleConfirm}
+          color="error"
+          variant="contained"
+          disabled={isDeleting}
+        >
+          {isDeleting ? "Deleting..." : "Yes, delete my account"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 
@@ -69,6 +81,9 @@ export default function SettingsPage() {
   const profile = useProfileContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { mutateAsync: updateProfile } = useUpdateProfile();
+  const { mutateAsync: deleteAccount, isPending: isDeleting } =
+    useDeleteAccount();
+  const { logout } = useAuth0();
   const [open, setOpen] = useState<boolean>(false);
   const defaultValues: FormValues = {
     theme: profile?.theme ?? "system",
@@ -242,8 +257,17 @@ export default function SettingsPage() {
       </Box>
       <ConfirmDeleteDialog
         open={open}
+        isDeleting={isDeleting}
         handleClose={() => {
           setOpen(false);
+        }}
+        handleConfirm={async () => {
+          await toast.promise(deleteAccount(), {
+            loading: "Deleting account...",
+            success: "Account deleted. Signing out...",
+            error: "Failed to delete account.",
+          });
+          logout({ logoutParams: { returnTo: window.location.origin } });
         }}
       />
     </Container>

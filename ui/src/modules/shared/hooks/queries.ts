@@ -95,6 +95,16 @@ export const useUpdateProfile = () => {
   });
 };
 
+export const useDeleteAccount = () => {
+  const apiClient = useApiClient();
+  return useMutation({
+    mutationKey: ["deleteAccount"],
+    mutationFn: async () => {
+      await apiClient.delete("users/delete_account/");
+    },
+  });
+};
+
 export const useTags = () => {
   const apiClient = useApiClient();
   return useQuery({
