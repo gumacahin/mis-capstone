@@ -370,7 +370,12 @@ export default function RepeatOptionsCustom({
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           Custom repeat
-          <IconButton onClick={handleClose} size="small">
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            role="button"
+            aria-label="Close"
+          >
             <CloseIcon />
           </IconButton>
         </Box>
@@ -523,8 +528,15 @@ export default function RepeatOptionsCustom({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit(onSubmit)} variant="contained">
+        <Button onClick={handleClose} role="button" aria-label="Cancel">
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          role="button"
+          aria-label="Save"
+        >
           Save
         </Button>
       </DialogActions>

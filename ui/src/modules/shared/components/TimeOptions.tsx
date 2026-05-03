@@ -12,11 +12,16 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import TextField from "@mui/material/TextField";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 
 import { TaskFormFields } from "..";
 import useTimezoneContext from "../hooks/useTimezoneContext";
+
+dayjs.extend(timezone);
+dayjs.extend(utc);
 
 interface TimeOptionsDialogProps {
   open: boolean;

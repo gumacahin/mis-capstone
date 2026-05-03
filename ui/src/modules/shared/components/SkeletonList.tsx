@@ -22,15 +22,26 @@ export default function SkeletonList({
               alignItems: "center",
             }}
           >
-            <Skeleton variant="circular" width={15} height={15} />
+            <Skeleton
+              role="progressbar"
+              variant="circular"
+              width={15}
+              height={15}
+            />
           </ListItemIcon>
           <ListItemText
             primary={
-              <Skeleton variant="rectangular" width={width} height={15} />
+              <Skeleton
+                role="progressbar"
+                variant="rectangular"
+                width={width}
+                height={15}
+              />
             }
             secondary={
               <Box my={1}>
                 <Skeleton
+                  role="progressbar"
                   variant="rectangular"
                   width={width * 0.75}
                   height={15}

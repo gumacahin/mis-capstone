@@ -115,6 +115,8 @@ export default function RepeatOptions() {
           <ListItemText primary={displayText} />
           {isRepeating && (
             <ListItemIcon
+              role="button"
+              aria-label="Clear repeat"
               onClick={handleClear}
               sx={{
                 cursor: "pointer",
