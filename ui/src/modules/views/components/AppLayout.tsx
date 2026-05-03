@@ -10,6 +10,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import InsightsIcon from "@mui/icons-material/Insights";
 import LabelIcon from "@mui/icons-material/Label";
 import MenuIcon from "@mui/icons-material/Menu";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -237,6 +238,17 @@ function DrawerContents({
               <LabelIcon />
             </ListItemIcon>
             <ListItemText primary={"Labels"} />
+          </ListItemNavLink>
+        </ListItem>
+        <ListItem component={"div"} disableGutters disablePadding>
+          <ListItemNavLink
+            to={ROUTES.PRODUCTIVITY}
+            onClick={handleNavItemClick}
+          >
+            <ListItemIcon sx={listItemIconStyle}>
+              <InsightsIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Productivity"} />
           </ListItemNavLink>
         </ListItem>
         <Divider />

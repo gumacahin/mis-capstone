@@ -8,6 +8,7 @@ import InboxPage from "./pages/InboxPage";
 import LabelsListPage from "./pages/LabelsListPage";
 import LabelTasksPage from "./pages/LabelTasksPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import ProductivityPage from "./pages/ProductivityPage";
 import ProjectPage from "./pages/ProjectPage";
 import ProjectsListPage from "./pages/ProjectsListPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -22,6 +23,7 @@ const INBOX = "inbox";
 const LABELS = "labels";
 const LABEL_TASKS = "labelTasks";
 const ONBOARDING = "onboarding";
+const PRODUCTIVITY = "productivity";
 const PROJECTS = "projects";
 const PROJECT_DETAILS = "projectDetails";
 const SETTINGS = "settings";
@@ -37,6 +39,7 @@ export const ROUTES = {
   LABELS,
   LABEL_TASKS,
   ONBOARDING,
+  PRODUCTIVITY,
   PROJECTS,
   PROJECT_DETAILS,
   SETTINGS,
@@ -114,6 +117,11 @@ const routes = [
             path: "label/:slug",
             element: <LabelTasksPage />,
             name: ROUTES.LABEL_TASKS,
+          },
+          {
+            path: "productivity",
+            element: <ProductivityPage />,
+            name: ROUTES.PRODUCTIVITY,
           },
           {
             path: "settings",

@@ -167,6 +167,51 @@ export const useMarkAllNotificationsRead = () => {
   });
 };
 
+export interface ProductivitySummary {
+  total: number;
+  completed: number;
+  pending: number;
+  overdue: number;
+  due_today: number;
+  completed_this_week: number;
+  created_this_week: number;
+  completion_rate: number;
+  avg_completion_days: number | null;
+}
+
+export interface WeeklyTrend {
+  date: string;
+  day: string;
+  created: number;
+  completed: number;
+}
+
+export interface PriorityDistribution {
+  priority: string;
+  label: string;
+  count: number;
+  percent: number;
+  completion_rate: number;
+}
+
+export interface ProductivityData {
+  summary: ProductivitySummary;
+  weekly_trends: WeeklyTrend[];
+  priority_distribution: PriorityDistribution[];
+  streak: { current: number };
+}
+
+export const useProductivity = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["productivity"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("productivity");
+      return data as ProductivityData;
+    },
+  });
+};
+
 export const useTags = () => {
   const apiClient = useApiClient();
   return useQuery({
