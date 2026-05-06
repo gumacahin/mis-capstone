@@ -9,50 +9,93 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from upoutodo.email.send_email import send_email
+from upoutodo.models import Notification
 from upoutodo.models.task import Task
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+def _create_due_notifications(user, today):
+    """Create in-app notifications for tasks due today and overdue tasks."""
+    tasks_due_today = Task.objects.filter(
+        section__project__created_by=user,
+        due_date__date=today,
+        completion_date__isnull=True,
+    )
+    for task in tasks_due_today:
+        already_notified = Notification.objects.filter(
+            user=user,
+            type=Notification.Type.TASK_DUE,
+            task=task,
+            created_at__date=today,
+        ).exists()
+        if not already_notified:
+            Notification.objects.create(
+                user=user,
+                type=Notification.Type.TASK_DUE,
+                title=f'"{task.title}" is due today',
+                task=task,
+            )
+
+    overdue_tasks = Task.objects.filter(
+        section__project__created_by=user,
+        due_date__date__lt=today,
+        completion_date__isnull=True,
+    )
+    for task in overdue_tasks:
+        already_notified = Notification.objects.filter(
+            user=user,
+            type=Notification.Type.TASK_OVERDUE,
+            task=task,
+            created_at__date=today,
+        ).exists()
+        if not already_notified:
+            Notification.objects.create(
+                user=user,
+                type=Notification.Type.TASK_OVERDUE,
+                title=f'"{task.title}" is overdue',
+                task=task,
+            )
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def daily_digest(request):
     """
-    Send daily digest emails to all users.
+    Send daily digest emails and in-app notifications to all users.
 
-    This endpoint will be triggered by Cloud Scheduler and will send daily digest
-    emails to all users containing their tasks and other relevant information.
+    Triggered by Cloud Scheduler. Creates task_due / task_overdue
+    notifications and sends digest emails.
     """
     try:
-        # Get all users
-        users = User.objects.filter(is_active=True, profile__email_digest_enabled=True)
+        today = timezone.now().date()
+        active_users = User.objects.filter(is_active=True)
 
+        for user in active_users:
+            _create_due_notifications(user, today)
+
+        digest_users = active_users.filter(profile__email_digest_enabled=True)
         emails_sent = 0
         errors = []
 
-        for user in users:
-            # Skip users without email addresses
+        for user in digest_users:
             if not user.email:
                 continue
 
             try:
-                # Get user's tasks for today
-                today = timezone.now().date()
                 tasks_today = Task.objects.filter(
                     section__project__created_by=user,
                     due_date__date=today,
                     completion_date__isnull=True,
                 ).select_related("section__project")
 
-                # Get overdue tasks
                 overdue_tasks = Task.objects.filter(
                     section__project__created_by=user,
                     due_date__lt=today,
                     completion_date__isnull=True,
                 ).select_related("section__project")
 
-                # Prepare template variables
                 template_vars = {
                     "tasks_today": [
                         {"name": task.title, "project": task.section.project.title}
@@ -64,7 +107,6 @@ def daily_digest(request):
                     ),
                 }
 
-                # Get user's name from profile if available
                 recipient_name = None
                 if hasattr(user, "profile") and user.profile.name:
                     recipient_name = user.profile.name
@@ -73,7 +115,6 @@ def daily_digest(request):
                 elif user.username:
                     recipient_name = user.username
 
-                # Send email
                 send_email(
                     subject="Your Daily Digest",
                     recipient_email=user.email,
@@ -89,7 +130,6 @@ def daily_digest(request):
                 errors.append(error_msg)
                 logger.error(error_msg)
 
-        # Log summary
         if errors:
             logger.warning(
                 f"Daily digest completed with {len(errors)} errors. "
