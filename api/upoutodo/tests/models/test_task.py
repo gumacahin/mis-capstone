@@ -323,11 +323,11 @@ def test_task_anchor_mode_choices(section):
         assert task.anchor_mode == mode[0]
         task.delete()
 
-    # Test null anchor mode (should be allowed)
+    # Empty anchor mode (default)
     task = Task.objects.create(
-        title="No Anchor Mode Task", section=section, anchor_mode=None
+        title="No Anchor Mode Task", section=section, anchor_mode=""
     )
-    assert task.anchor_mode is None
+    assert task.anchor_mode == ""
 
 
 # Test 12: RRule and dtstart field behavior
@@ -348,11 +348,11 @@ def test_task_rrule_fields(section):
     assert task.dtstart == dtstart
     assert task.anchor_mode == Task.AnchorMode.SCHEDULED
 
-    # Test null values (should be allowed)
+    # Empty rrule and null dtstart (non-recurring task)
     task_no_rrule = Task.objects.create(
-        title="Non-recurring Task", section=section, rrule=None, dtstart=None
+        title="Non-recurring Task", section=section, rrule="", dtstart=None
     )
-    assert task_no_rrule.rrule is None
+    assert task_no_rrule.rrule == ""
     assert task_no_rrule.dtstart is None
 
 

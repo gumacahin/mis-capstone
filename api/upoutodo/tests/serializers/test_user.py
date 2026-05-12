@@ -52,6 +52,7 @@ def test_user_serializer_serialization(user_with_profile, api_request):
         "is_onboarded",
         "projects",
         "theme",
+        "email_digest_enabled",
     }
     assert set(data.keys()) == expected_fields
 
