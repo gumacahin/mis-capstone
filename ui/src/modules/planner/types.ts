@@ -67,6 +67,15 @@ export interface PlannerSuggestion {
   updated_at: string;
 }
 
+export interface PlannerFeedback {
+  id: number;
+  helpfulness_rating: number;
+  confidence_rating: number;
+  note?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TodayPlan {
   id: number;
   date: string;
@@ -74,6 +83,7 @@ export interface TodayPlan {
   generated_at: string;
   check_in: PlannerCheckIn;
   suggestions: PlannerSuggestion[];
+  feedback: PlannerFeedback | null;
   created_at: string;
   updated_at: string;
 }
@@ -90,3 +100,8 @@ export interface PlannerSuggestionActionInput {
   action: PlannerSuggestionAction;
   minutes?: number;
 }
+
+export type PlannerFeedbackInput = Pick<
+  PlannerFeedback,
+  "helpfulness_rating" | "confidence_rating" | "note"
+>;

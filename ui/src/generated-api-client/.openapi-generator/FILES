@@ -68,6 +68,8 @@ docs/Task.md
 docs/TaskRequest.md
 docs/TasksApi.md
 docs/TodayPlan.md
+docs/TodayPlanFeedback.md
+docs/TodayPlanFeedbackRequest.md
 docs/TodayPlanStatusEnum.md
 docs/TypeEnum.md
 docs/User.md
@@ -119,6 +121,8 @@ models/tag-request.ts
 models/tag.ts
 models/task-request.ts
 models/task.ts
+models/today-plan-feedback-request.ts
+models/today-plan-feedback.ts
 models/today-plan-status-enum.ts
 models/today-plan.ts
 models/type-enum.ts

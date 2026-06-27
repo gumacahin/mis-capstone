@@ -408,6 +408,28 @@ Notes:
 - This can start as a small details area inside `SuggestionReasonCard`.
 - The goal is transparency, not exposing every internal scoring detail.
 
+### `PlannerFeedbackCard`
+
+Purpose:
+
+Capture the user's quick evaluation of the current daily plan.
+
+Inputs:
+
+- today plan
+- helpfulness rating
+- confidence rating
+- optional feedback note
+
+Allowed operations:
+
+- `submit_plan_feedback`
+
+Notes:
+
+- This supports HCI evaluation for the capstone.
+- Feedback belongs to the current daily plan, not to a generic task record.
+
 ### `SchedulePreviewCard`
 
 Purpose:
@@ -460,6 +482,7 @@ such as `TodayPlanCard` or a plain text message.
 | `accept_suggestion` | Button click | Yes | Implemented |
 | `snooze_suggestion` | Button click | Yes | Implemented |
 | `dismiss_suggestion` | Button click | Yes | Implemented |
+| `submit_plan_feedback` | Submit button | Yes | Implemented |
 | `schedule_plan_item` | Explicit confirmation | Yes | Future |
 | `sync_calendar_block` | Explicit confirmation | Yes | Future |
 
@@ -491,6 +514,8 @@ Possible measures:
 - time to choose a first task
 - number of accepted suggestions
 - number of plan rebuilds
+- helpfulness rating for the generated daily plan
+- confidence rating after reviewing the plan
 - user rating of suggestion clarity
 - user rating of confidence after planning
 - user rating of workload fit
@@ -523,9 +548,11 @@ The current implementation supports the first JIT planner UI slice:
 - Planner endpoints are documented in the OpenAPI schema and available through
   the generated TypeScript client.
 - `/today` renders planner UI through a component registry and UI schema.
+- `/today` captures daily-plan feedback through `PlannerFeedbackCard`, backed
+  by the typed `submit_plan_feedback` operation.
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
-  `SuggestionReasonCard`, and `TaskSignalBreakdown`.
+  `SuggestionReasonCard`, `TaskSignalBreakdown`, and `PlannerFeedbackCard`.
 - The suggestion card now shows a concise today line derived from task signals,
   while the expanded reason panel separates immediate relevance, planner
   rationale, and labeled evidence.
@@ -537,7 +564,8 @@ The current implementation supports the first JIT planner UI slice:
 - Unit tests cover deterministic explanation helpers for today-line,
   relevance, and history text.
 - Playwright verifies check-in, acceptance, snooze, dismiss, empty-state,
-  unavailable-state, low-energy mode, and reason-details behavior.
+  unavailable-state, low-energy mode, reason-details behavior, and plan
+  feedback submission.
 
 Next implementation steps:
 

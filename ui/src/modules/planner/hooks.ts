@@ -7,11 +7,14 @@ import {
   plannerQueryKeys,
   rebuildTodayPlan,
   submitPlannerCheckIn,
+  submitPlannerFeedback,
   updatePlannerSuggestion,
 } from "./client";
 import type {
   PlannerCheckInInput,
+  PlannerFeedbackInput,
   PlannerSuggestionActionInput,
+  TodayPlan,
 } from "./types";
 
 export const usePlannerToday = () => {
@@ -43,6 +46,22 @@ export const useRebuildTodayPlan = () => {
     mutationFn: async () => rebuildTodayPlan(planner),
     onSuccess: (data) => {
       queryClient.setQueryData(plannerQueryKeys.today, data);
+    },
+  });
+};
+
+export const useSubmitPlannerFeedback = () => {
+  const { planner } = useGeneratedApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["planner", "feedback"],
+    mutationFn: async (input: PlannerFeedbackInput) =>
+      submitPlannerFeedback(planner, input),
+    onSuccess: (data) => {
+      queryClient.setQueryData<TodayPlan | undefined>(
+        plannerQueryKeys.today,
+        (plan) => (plan ? { ...plan, feedback: data } : plan),
+      );
     },
   });
 };

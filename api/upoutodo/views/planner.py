@@ -7,11 +7,12 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from upoutodo.models import PlanItem
+from upoutodo.models import PlanItem, TodayPlanFeedback
 from upoutodo.serializers.planner import (
     EnergyCheckInSerializer,
     PlanItemSerializer,
     SnoozePlanItemSerializer,
+    TodayPlanFeedbackSerializer,
     TodayPlanSerializer,
 )
 from upoutodo.services.planner import (
@@ -55,6 +56,25 @@ class PlannerViewSet(viewsets.ViewSet):
         plan = rebuild_today_plan(request.user)
         serializer = TodayPlanSerializer(plan, context=self.get_serializer_context())
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=TodayPlanFeedbackSerializer,
+        responses=TodayPlanFeedbackSerializer,
+    )
+    @action(detail=False, methods=["post"], url_path="feedback")
+    def feedback(self, request):
+        serializer = TodayPlanFeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        plan = get_today_plan(request.user)
+        feedback, _ = TodayPlanFeedback.objects.update_or_create(
+            plan=plan,
+            defaults={
+                "user": request.user,
+                **serializer.validated_data,
+            },
+        )
+        output_serializer = TodayPlanFeedbackSerializer(feedback)
+        return Response(output_serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         parameters=[

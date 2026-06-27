@@ -1,4 +1,5 @@
 export { default as EnergyCheckInCard } from "./EnergyCheckInCard";
+export { default as PlannerFeedbackCard } from "./PlannerFeedbackCard";
 export { default as PlannerSurface } from "./PlannerSurface";
 export { default as PlannerUnavailableCard } from "./PlannerUnavailableCard";
 export { default as PlanSuggestionsCard } from "./PlanSuggestionsCard";

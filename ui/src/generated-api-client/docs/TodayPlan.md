@@ -10,6 +10,7 @@
 | **generated_at** | **string**                                        |             | [readonly] [default to undefined] |
 | **check_in**     | [**EnergyCheckIn**](EnergyCheckIn.md)             |             | [readonly] [default to undefined] |
 | **suggestions**  | [**Array&lt;PlanItem&gt;**](PlanItem.md)          |             | [readonly] [default to undefined] |
+| **feedback**     | [**TodayPlanFeedback**](TodayPlanFeedback.md)     |             | [readonly] [default to undefined] |
 | **created_at**   | **string**                                        |             | [readonly] [default to undefined] |
 | **updated_at**   | **string**                                        |             | [readonly] [default to undefined] |
 
@@ -25,6 +26,7 @@ const instance: TodayPlan = {
   generated_at,
   check_in,
   suggestions,
+  feedback,
   created_at,
   updated_at,
 };

@@ -59,6 +59,7 @@ const basePlan: TodayPlan = {
     updated_at: "2026-06-28T08:00:00Z",
   },
   suggestions: [baseSuggestion],
+  feedback: null,
   created_at: "2026-06-28T08:00:00Z",
   updated_at: "2026-06-28T08:00:00Z",
 };

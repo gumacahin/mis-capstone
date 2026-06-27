@@ -618,6 +618,67 @@ ui E2E: 8 passed
   users can inspect due status, priority, effort, recurrence, location, score,
   and prior snooze or dismiss history.
 
+## 2026-06-28: Planner Feedback Capture
+
+### Goal
+
+Add a small evaluation slice so `/today` can capture whether the generated
+daily plan was useful and whether it increased the user's confidence about what
+to do next.
+
+### Human Decisions And Constraints
+
+- This should support the capstone study and HCI evaluation, not expand generic
+  task-management scope.
+- Feedback should belong to the current daily plan and authenticated user.
+- The frontend should call a typed planner operation from the generated API
+  client rather than posting to an ad hoc endpoint string.
+
+### Codex-Assisted Actions
+
+- Added `TodayPlanFeedback` with helpfulness rating, confidence rating,
+  optional note, and one feedback record per `TodayPlan`.
+- Added `POST /api/planner/feedback/`, which upserts feedback for the current
+  authenticated user's current daily plan.
+- Included nullable `feedback` in `GET /api/planner/today/`.
+- Updated the OpenAPI planner contract test and regenerated the TypeScript
+  client so `plannerFeedbackCreate` is available to the UI.
+- Added `PlannerFeedbackCard` to `/today` with helpfulness, confidence, note,
+  and saved-state behavior.
+- Extended the Today Playwright spec to verify feedback submission through the
+  typed planner endpoint.
+- Updated `JIT_PLANNER_UI_SPEC.md` so `PlannerFeedbackCard` and
+  `submit_plan_feedback` are part of the implemented component and operation
+  catalog.
+
+### Verification
+
+```text
+api: uv run ruff check targeted planner files
+api: uv run ruff format --check targeted planner files
+api: uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py
+ui: targeted ESLint for planner and Today E2E files
+ui: vitest run src/modules/planner/__tests__/uiSchema.test.ts
+ui: npm run build
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed results:
+
+```text
+api planner tests: 11 passed
+ui schema tests: 7 passed
+ui E2E: 8 passed
+ui build: passed
+```
+
+### Study Notes
+
+- This creates a concrete user-evaluation artifact for the planner-first
+  direction: helpfulness, confidence, and qualitative note.
+- The feedback model can support later analysis of whether just-in-time planner
+  UI improves the user's ability to decide what to do today.
+
 ## 2026-06-28: Planner OpenAPI Contract And Generated Client
 
 ### Goal

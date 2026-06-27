@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from upoutodo.models import EnergyCheckIn, PlanItem, Task, TodayPlan
+from upoutodo.models import EnergyCheckIn, PlanItem, Task, TodayPlan, TodayPlanFeedback
 from upoutodo.tests.factories import ProjectFactory, TaskFactory, UserFactory
 
 
@@ -218,6 +218,72 @@ def test_check_in_rejects_invalid_available_minutes(auth_client):
 
 
 @pytest.mark.django_db
+def test_feedback_upserts_current_today_plan_feedback(auth_client, user, section):
+    TaskFactory(section=section, due_date=timezone.now(), title="Feedback task")
+    today_response = auth_client.get("/api/planner/today/", format="json")
+    plan_id = today_response.data["id"]
+    assert today_response.data["feedback"] is None
+
+    response = auth_client.post(
+        "/api/planner/feedback/",
+        {
+            "helpfulness_rating": 4,
+            "confidence_rating": 5,
+            "note": "The plan made the next step clear.",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["helpfulness_rating"] == 4
+    assert response.data["confidence_rating"] == 5
+    assert response.data["note"] == "The plan made the next step clear."
+    feedback = TodayPlanFeedback.objects.get()
+    assert feedback.user == user
+    assert feedback.plan_id == plan_id
+
+    update_response = auth_client.post(
+        "/api/planner/feedback/",
+        {
+            "helpfulness_rating": 5,
+            "confidence_rating": 4,
+            "note": "",
+        },
+        format="json",
+    )
+
+    assert update_response.status_code == status.HTTP_200_OK
+    assert TodayPlanFeedback.objects.count() == 1
+    feedback.refresh_from_db()
+    assert feedback.helpfulness_rating == 5
+    assert feedback.confidence_rating == 4
+    assert feedback.note == ""
+
+    updated_today_response = auth_client.get("/api/planner/today/", format="json")
+    assert updated_today_response.data["feedback"]["id"] == feedback.id
+    assert updated_today_response.data["feedback"]["helpfulness_rating"] == 5
+
+
+@pytest.mark.django_db
+def test_feedback_rejects_invalid_ratings(auth_client):
+    response = auth_client.post(
+        "/api/planner/feedback/",
+        {
+            "helpfulness_rating": 0,
+            "confidence_rating": 6,
+            "note": "Invalid",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "helpfulness_rating" in response.data
+    assert "confidence_rating" in response.data
+    assert TodayPlan.objects.count() == 0
+    assert TodayPlanFeedback.objects.count() == 0
+
+
+@pytest.mark.django_db
 def test_planner_requires_authentication(api_client):
     response = api_client.get("/api/planner/today/", format="json")
 
@@ -249,9 +315,26 @@ def test_openapi_schema_documents_planner_contract(auth_client):
         ]["content"]["application/json"]["schema"]["$ref"]
         == "#/components/schemas/SnoozePlanItemRequest"
     )
+    assert (
+        planner_paths["/api/planner/feedback/"]["post"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/TodayPlanFeedback"
+    )
+    assert (
+        planner_paths["/api/planner/feedback/"]["post"]["requestBody"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/TodayPlanFeedbackRequest"
+    )
     signal_properties = schema["components"]["schemas"]["PlanItemSignals"]["properties"]
     assert (
         signal_properties["due_status"]["$ref"] == "#/components/schemas/DueStatusEnum"
     )
     assert signal_properties["priority_label"]["type"] == "string"
     assert signal_properties["snoozed_count"]["type"] == "integer"
+    feedback_properties = schema["components"]["schemas"]["TodayPlanFeedback"][
+        "properties"
+    ]
+    assert feedback_properties["helpfulness_rating"]["type"] == "integer"
+    assert feedback_properties["confidence_rating"]["type"] == "integer"

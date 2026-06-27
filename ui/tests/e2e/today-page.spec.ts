@@ -57,6 +57,21 @@ const suggestedSignals = {
   dismissed_count: 0,
 };
 
+interface PlannerFeedbackMock {
+  id: number;
+  helpfulness_rating: number;
+  confidence_rating: number;
+  note?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PlannerFeedbackPayload {
+  helpfulness_rating: number;
+  confidence_rating: number;
+  note?: string;
+}
+
 const initialPlan = {
   id: 20,
   date: "2026-06-27",
@@ -89,6 +104,7 @@ const initialPlan = {
       updated_at: "2026-06-27T08:00:00Z",
     },
   ],
+  feedback: null as PlannerFeedbackMock | null,
   created_at: "2026-06-27T08:00:00Z",
   updated_at: "2026-06-27T08:00:00Z",
 };
@@ -117,6 +133,7 @@ async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
           context: string;
         }
       | undefined,
+    feedbackPayload: undefined as PlannerFeedbackPayload | undefined,
   };
 
   await page.route(/\/(?:api\/)?users\/me\/?$/, async (route) => {
@@ -163,6 +180,27 @@ async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
       updated_at: "2026-06-27T08:15:00Z",
     };
     await route.fulfill({ json: plan });
+  });
+  await page.route(/\/(?:api\/)?planner\/feedback\/?$/, async (route) => {
+    const feedbackPayload = route
+      .request()
+      .postDataJSON() as PlannerFeedbackPayload;
+    calls.feedbackPayload = feedbackPayload;
+    const now = "2026-06-27T08:30:00Z";
+    const feedback = {
+      id: plan.feedback?.id ?? 50,
+      helpfulness_rating: feedbackPayload.helpfulness_rating,
+      confidence_rating: feedbackPayload.confidence_rating,
+      note: feedbackPayload.note ?? "",
+      created_at: plan.feedback?.created_at ?? now,
+      updated_at: now,
+    };
+    plan = {
+      ...plan,
+      feedback,
+      updated_at: now,
+    };
+    await route.fulfill({ json: feedback });
   });
   await page.route(
     /\/(?:api\/)?planner\/suggestions\/40\/accept\/?$/,
@@ -269,6 +307,21 @@ test.describe("Today Page", () => {
 
     await expect.poll(() => calls.accept).toBe(1);
     await expect(page.getByText("accepted")).toBeVisible();
+
+    await expect(
+      page.getByRole("heading", { name: "Was this plan useful?" }),
+    ).toBeVisible();
+    await page.getByLabel("Helpful rating").fill("4");
+    await page.getByLabel("Confidence rating").fill("5");
+    await page.getByLabel("Feedback note").fill("Clear next step.");
+    await page.getByRole("button", { name: "Save feedback" }).click();
+
+    await expect.poll(() => calls.feedbackPayload?.helpfulness_rating).toBe(4);
+    await expect.poll(() => calls.feedbackPayload?.confidence_rating).toBe(5);
+    await expect
+      .poll(() => calls.feedbackPayload?.note)
+      .toBe("Clear next step.");
+    await expect(page.getByText("Feedback saved")).toBeVisible();
   });
 
   test("shows reason details and task signals just in time", async ({

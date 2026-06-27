@@ -41,6 +41,8 @@ export * from "./tag-request";
 export * from "./task";
 export * from "./task-request";
 export * from "./today-plan";
+export * from "./today-plan-feedback";
+export * from "./today-plan-feedback-request";
 export * from "./today-plan-status-enum";
 export * from "./type-enum";
 export * from "./user";

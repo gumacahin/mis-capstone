@@ -5,6 +5,7 @@ All URIs are relative to _http://localhost_
 | Method                                                                  | HTTP request                                         | Description |
 | ----------------------------------------------------------------------- | ---------------------------------------------------- | ----------- |
 | [**plannerCheckInCreate**](#plannercheckincreate)                       | **POST** /api/planner/check-in/                      |             |
+| [**plannerFeedbackCreate**](#plannerfeedbackcreate)                     | **POST** /api/planner/feedback/                      |             |
 | [**plannerRebuildCreate**](#plannerrebuildcreate)                       | **POST** /api/planner/rebuild/                       |             |
 | [**plannerSuggestionsAcceptCreate**](#plannersuggestionsacceptcreate)   | **POST** /api/planner/suggestions/{item_id}/accept/  |             |
 | [**plannerSuggestionsDismissCreate**](#plannersuggestionsdismisscreate) | **POST** /api/planner/suggestions/{item_id}/dismiss/ |             |
@@ -38,6 +39,52 @@ const { status, data } =
 ### Return type
 
 **TodayPlan**
+
+### Authorization
+
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+
+### HTTP request headers
+
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **plannerFeedbackCreate**
+
+> TodayPlanFeedback plannerFeedbackCreate(todayPlanFeedbackRequest)
+
+### Example
+
+```typescript
+import { PlannerApi, Configuration, TodayPlanFeedbackRequest } from "./api";
+
+const configuration = new Configuration();
+const apiInstance = new PlannerApi(configuration);
+
+let todayPlanFeedbackRequest: TodayPlanFeedbackRequest; //
+
+const { status, data } = await apiInstance.plannerFeedbackCreate(
+  todayPlanFeedbackRequest,
+);
+```
+
+### Parameters
+
+| Name                         | Type                         | Description | Notes |
+| ---------------------------- | ---------------------------- | ----------- | ----- |
+| **todayPlanFeedbackRequest** | **TodayPlanFeedbackRequest** |             |       |
+
+### Return type
+
+**TodayPlanFeedback**
 
 ### Authorization
 

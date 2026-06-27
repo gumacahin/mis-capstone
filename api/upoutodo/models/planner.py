@@ -72,6 +72,35 @@ class TodayPlan(models.Model):
         ]
 
 
+class TodayPlanFeedback(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="today_plan_feedback"
+    )
+    plan = models.OneToOneField(
+        TodayPlan, on_delete=models.CASCADE, related_name="feedback"
+    )
+    helpfulness_rating = models.PositiveSmallIntegerField()
+    confidence_rating = models.PositiveSmallIntegerField()
+    note = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(
+                    helpfulness_rating__gte=1, helpfulness_rating__lte=5
+                ),
+                name="today_plan_feedback_helpfulness_between_1_and_5",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(confidence_rating__gte=1, confidence_rating__lte=5),
+                name="today_plan_feedback_confidence_between_1_and_5",
+            ),
+        ]
+
+
 class PlanItem(models.Model):
     class Status(models.TextChoices):
         SUGGESTED = "suggested", "Suggested"

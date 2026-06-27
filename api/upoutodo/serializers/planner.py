@@ -3,7 +3,13 @@ from datetime import timedelta
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from upoutodo.models import EnergyCheckIn, PlanItem, Project, TodayPlan
+from upoutodo.models import (
+    EnergyCheckIn,
+    PlanItem,
+    Project,
+    TodayPlan,
+    TodayPlanFeedback,
+)
 from upoutodo.services.planner import (
     normalized_priority,
     priority_label,
@@ -111,9 +117,35 @@ class PlanItemSerializer(serializers.ModelSerializer):
         }
 
 
+class TodayPlanFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TodayPlanFeedback
+        fields = [
+            "id",
+            "helpfulness_rating",
+            "confidence_rating",
+            "note",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate_helpfulness_rating(self, value):
+        return validate_rating(value)
+
+    def validate_confidence_rating(self, value):
+        return validate_rating(value)
+
+    def validate_note(self, value):
+        if len(value) > 1000:
+            raise serializers.ValidationError("Note must be 1000 characters or less.")
+        return value
+
+
 class TodayPlanSerializer(serializers.ModelSerializer):
     check_in = EnergyCheckInSerializer(read_only=True)
     suggestions = PlanItemSerializer(source="items", many=True, read_only=True)
+    feedback = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = TodayPlan
@@ -124,14 +156,29 @@ class TodayPlanSerializer(serializers.ModelSerializer):
             "generated_at",
             "check_in",
             "suggestions",
+            "feedback",
             "created_at",
             "updated_at",
         ]
         read_only_fields = fields
 
+    @extend_schema_field(TodayPlanFeedbackSerializer(allow_null=True))
+    def get_feedback(self, obj):
+        try:
+            feedback = obj.feedback
+        except TodayPlanFeedback.DoesNotExist:
+            return None
+        return TodayPlanFeedbackSerializer(feedback).data
+
 
 class SnoozePlanItemSerializer(serializers.Serializer):
     minutes = serializers.IntegerField(default=60, min_value=1, max_value=10080)
+
+
+def validate_rating(value):
+    if value < 1 or value > 5:
+        raise serializers.ValidationError("Rating must be between 1 and 5.")
+    return value
 
 
 def get_due_status(due_date, plan_date):

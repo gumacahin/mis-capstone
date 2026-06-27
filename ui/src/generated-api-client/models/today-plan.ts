@@ -20,6 +20,9 @@ import type { EnergyCheckIn } from "./energy-check-in";
 import type { PlanItem } from "./plan-item";
 // May contain unused imports in some cases
 // @ts-ignore
+import type { TodayPlanFeedback } from "./today-plan-feedback";
+// May contain unused imports in some cases
+// @ts-ignore
 import type { TodayPlanStatusEnum } from "./today-plan-status-enum";
 
 export interface TodayPlan {
@@ -29,6 +32,7 @@ export interface TodayPlan {
   generated_at: string;
   check_in: EnergyCheckIn;
   suggestions: Array<PlanItem>;
+  feedback: TodayPlanFeedback | null;
   created_at: string;
   updated_at: string;
 }

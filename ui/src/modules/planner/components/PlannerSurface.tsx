@@ -5,13 +5,16 @@ import {
   usePlannerSuggestionAction,
   usePlannerToday,
   useSubmitPlannerCheckIn,
+  useSubmitPlannerFeedback,
 } from "../hooks";
 import { renderPlannerComponent } from "../registry";
 import { buildPlannerUiSchema } from "../uiSchema";
+import PlannerFeedbackCard from "./PlannerFeedbackCard";
 
 export default function PlannerSurface() {
   const plannerQuery = usePlannerToday();
   const submitCheckIn = useSubmitPlannerCheckIn();
+  const submitFeedback = useSubmitPlannerFeedback();
   const suggestionAction = usePlannerSuggestionAction();
   const schemas = buildPlannerUiSchema({
     isError: plannerQuery.isError,
@@ -35,6 +38,13 @@ export default function PlannerSurface() {
           },
         }),
       )}
+      <PlannerFeedbackCard
+        disabled={plannerQuery.isPending || submitFeedback.isPending}
+        plan={plannerQuery.data}
+        onSubmit={(input) => {
+          submitFeedback.mutate(input);
+        }}
+      />
       <Divider />
     </Stack>
   );
