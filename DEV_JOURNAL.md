@@ -956,6 +956,56 @@ repo: git diff --cached --check
   planner helps users decide what to do today, not whether the app replaces all
   existing planning tools.
 
+## 2026-06-28: Planner Evaluation Demo Seed
+
+### Goal
+
+Make the evaluation method easier to run by adding a repeatable local demo
+dataset for `/today` walkthroughs, screenshots, and pilot testing.
+
+### Human Decisions And Constraints
+
+- The seed should support the capstone evaluation method without adding generic
+  todo-product scope.
+- The data should use faculty/staff-oriented planning examples aligned with the
+  source-study scope.
+- Sample outcomes should be optional so a clean walkthrough can be run without
+  pre-filled feedback.
+- The command should be repeatable and scoped to a clearly named demo user and
+  project.
+
+### Codex-Assisted Actions
+
+- Added the `seed_planner_evaluation_demo` Django management command.
+- The command creates or updates a `planner-demo` user, marks the profile as
+  faculty/onboarded, creates a `Capstone Evaluation Demo` project, and seeds six
+  teaching, admin, and research tasks.
+- The command creates a low-energy, 90-minute, light-work check-in and rebuilds
+  the current today plan.
+- Added `--reset` for a clean repeatable dataset.
+- Added `--include-outcomes` to seed accepted, snoozed, dismissed, and feedback
+  records for admin dashboard demonstration.
+- Added focused tests for dataset creation, idempotency, sample outcomes, and
+  reset behavior.
+- Updated `CAPSTONE_EVALUATION_METHOD.md` with the seeded walkthrough command.
+
+### Verification
+
+```text
+api: uv run ruff check upoutodo/management/commands/seed_planner_evaluation_demo.py upoutodo/tests/management/test_seed_planner_evaluation_demo.py
+api: uv run ruff format --check upoutodo/management/commands/seed_planner_evaluation_demo.py upoutodo/tests/management/test_seed_planner_evaluation_demo.py
+api: uv run pytest --no-cov upoutodo/tests/management/test_seed_planner_evaluation_demo.py
+repo: git diff --check
+```
+
+### Study Notes
+
+- This gives the capstone a practical demonstration artifact: the same planner
+  scenario can be recreated locally before screenshots, pilot walkthroughs, or
+  adviser demos.
+- Seeded data should be labeled as demo data. It should not be mixed with
+  actual participant results.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

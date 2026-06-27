@@ -70,6 +70,28 @@ this implementation.
 8. Review only aggregate evaluation metrics through the admin dashboard or the
    admin-only planner evaluation endpoint.
 
+## Seeded Walkthrough Dataset
+
+For repeatable local demos, screenshots, or pilot walkthroughs, seed the demo
+dataset from the `api/` directory:
+
+```text
+DEBUG=True uv run python manage.py seed_planner_evaluation_demo --reset
+```
+
+This creates a `planner-demo` user, a `Capstone Evaluation Demo` project,
+faculty/staff-oriented tasks, a low-energy check-in, and a generated today
+plan. To also populate sample suggestion actions and plan feedback for the
+aggregate admin dashboard, run:
+
+```text
+DEBUG=True uv run python manage.py seed_planner_evaluation_demo --reset --include-outcomes
+```
+
+The seeded data is for demonstration and pilot testing only. Actual study
+results should come from participant walkthroughs or clearly labeled observed
+evaluation sessions.
+
 ## In-App Measures
 
 The current implementation can support these quantitative measures:
