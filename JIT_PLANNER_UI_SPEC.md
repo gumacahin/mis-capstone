@@ -560,6 +560,8 @@ The current implementation supports the first JIT planner UI slice:
   notes, or user identifiers.
 - The admin dashboard renders the aggregate planner evaluation summary for
   demo and reporting use.
+- `CAPSTONE_EVALUATION_METHOD.md` documents how the feedback and aggregate
+  evaluation summary should be used in the paper.
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
   `SuggestionReasonCard`, `TaskSignalBreakdown`, and `PlannerFeedbackCard`.
@@ -579,8 +581,8 @@ The current implementation supports the first JIT planner UI slice:
 
 Next implementation steps:
 
-1. Draft the paper-facing evaluation method using the feedback and aggregate
-   metrics now captured by the app.
+1. Use the paper-facing evaluation method to run a small walkthrough with the
+   target participant group or a seeded demo task set.
 2. Keep the OpenAPI planner contract test updated as planner operations evolve.
 3. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.

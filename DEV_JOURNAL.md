@@ -909,6 +909,53 @@ ui build: passed
 - The dashboard can be used as a paper artifact showing how the system supports
   HCI-oriented evaluation without requiring access to individual task content.
 
+## 2026-06-28: Capstone Evaluation Method Draft
+
+### Goal
+
+Turn the implemented planner feedback and aggregate dashboard work into a
+paper-facing evaluation method.
+
+### Human Decisions And Constraints
+
+- The method should stay aligned with Crisanto's source-study scope: UPOU
+  faculty and staff are the primary validation group.
+- Student use cases should remain adjacent or future work unless a separate
+  student evaluation is added.
+- The evaluation should measure planner decision support, not generic todo-app
+  completeness.
+- Reporting should remain aggregate and privacy-preserving.
+- Codex-assisted development should be documented as part of the engineering
+  process, not treated as user validation.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_EVALUATION_METHOD.md`.
+- Defined evaluation questions for `/today`, suggestion explanations,
+  check-in fit, planner actions, and privacy-preserving reporting.
+- Drafted participant scope, procedure, in-app measures, qualitative prompts,
+  data-handling rules, success criteria, limitations, and a paper-ready method
+  paragraph.
+- Linked the evaluation method from `CAPSTONE_NOTES.md`.
+- Updated `JIT_PLANNER_UI_SPEC.md` so the paper-facing evaluation method is no
+  longer listed as pending implementation work.
+
+### Verification
+
+```text
+repo: git diff --check
+repo: git diff --cached --check
+```
+
+### Study Notes
+
+- This closes the loop between implementation and the paper: `/today` now has
+  feedback capture, aggregate evaluation reporting, and a written method for how
+  those artifacts support the capstone.
+- The method intentionally avoids overclaiming. It evaluates whether the
+  planner helps users decide what to do today, not whether the app replaces all
+  existing planning tools.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

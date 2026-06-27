@@ -125,6 +125,20 @@ development artifacts and validated through automated tests and manual review.
 
 Ongoing session notes should be kept in `DEV_JOURNAL.md`.
 
+## Evaluation Method
+
+The paper-facing evaluation plan is captured in
+`CAPSTONE_EVALUATION_METHOD.md`.
+
+The short version:
+
+```text
+Evaluate the planner-first slice by asking UPOU faculty and staff to use
+`/today`, complete a check-in, review and act on suggested tasks, inspect
+suggestion reasons, and submit helpfulness/confidence feedback. Report only
+aggregate planner metrics and anonymized qualitative observations.
+```
+
 ## Just-in-Time Planner UI
 
 The next product exploration is captured in `JIT_PLANNER_UI_SPEC.md`. The
