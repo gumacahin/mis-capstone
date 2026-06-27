@@ -26,13 +26,16 @@ evaluation evidence.
 Run from the `ui/` directory:
 
 ```text
-CI=1 PLAYWRIGHT_PORT=3104 PORT=3104 PLAYWRIGHT_BASE_URL=http://localhost:3104 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+npm run test:e2e:planner-demo
 ```
+
+Use Node 18 or newer before running the command. The UI package includes
+`.nvmrc` for Node 22.11.0.
 
 ## Result
 
 ```text
-2 passed (6.8s)
+2 passed (7.2s)
 ```
 
 The two Playwright tests were:
@@ -75,13 +78,16 @@ local run artifact rather than a committed source artifact.
 Run from the `ui/` directory:
 
 ```text
-E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3106 PORT=3106 PLAYWRIGHT_BACKEND_PORT=8001 PLAYWRIGHT_BASE_URL=http://localhost:3106 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+npm run test:e2e:planner-real
 ```
+
+Use Node 18 or newer before running the command. The UI package includes
+`.nvmrc` for Node 22.11.0.
 
 ## Real-Backend Result
 
 ```text
-2 passed (9.6s)
+2 passed (10.8s)
 ```
 
 The real-backend Playwright run verified:

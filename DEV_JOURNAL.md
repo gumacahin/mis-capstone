@@ -1180,3 +1180,42 @@ Playwright real-backend demo: 2 passed (9.6s)
 - The test-only bearer-token path is typed and still goes through DRF
   permissions, serializers, and viewsets; it does not give the chat/UI direct
   database access.
+
+## 2026-06-28: Planner Demo Script Shortcuts
+
+### Goal
+
+Make the capstone planner walkthrough demos repeatable without copying
+machine-specific Playwright commands into the terminal.
+
+### Codex-Assisted Actions
+
+- Added `npm run test:e2e:planner-demo` for the fixture-backed planner
+  walkthrough.
+- Added `npm run test:e2e:planner-real` for the Django-backed planner
+  walkthrough.
+- Added `ui/.nvmrc` and a `node >=18` package engine because the default shell
+  resolved Node 14, which cannot run Playwright.
+- Updated `CAPSTONE_DEMO_RUN.md` and
+  `CAPSTONE_EVALUATION_WALKTHROUGH.md` to reference the short commands.
+
+### Verification
+
+```text
+ui: npm run test:e2e:planner-demo
+ui: npm run test:e2e:planner-real
+```
+
+Observed result with Node 22.11.0 active:
+
+```text
+Planner fixture-backed demo: 2 passed (7.2s)
+Planner real-backend demo: 2 passed (10.8s)
+```
+
+### Study Notes
+
+- The short commands make the demo protocol easier to rerun during adviser
+  reviews, screenshots, and future Codex-assisted sessions.
+- The first shortcut run failed under Node 14, so future demo runs should use
+  `nvm use` or otherwise activate Node 18+ before running `npm run`.
