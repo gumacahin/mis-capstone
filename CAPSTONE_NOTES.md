@@ -124,3 +124,20 @@ development artifacts and validated through automated tests and manual review.
 ```
 
 Ongoing session notes should be kept in `DEV_JOURNAL.md`.
+
+## Just-in-Time Planner UI
+
+The next product exploration is captured in `JIT_PLANNER_UI_SPEC.md`. The
+important design decision is that the assistant should not generate arbitrary
+frontend code. Instead, it should choose from a fixed registry of planner UI
+components and call typed backend operations.
+
+Short explanation:
+
+```text
+Just-in-time UI means the planner shows the interface needed for the user's
+current planning situation. For example, if the user has low energy, the app can
+show a low-energy planning card with lighter suggested tasks. The assistant can
+select the card and explain the plan, but React renders only registered
+components and Django validates all state-changing actions.
+```

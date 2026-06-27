@@ -408,6 +408,49 @@ ui E2E: 3 passed
 - The next API-contract improvement is to include planner endpoints in the
   generated OpenAPI client after the planner API stabilizes.
 
+## 2026-06-28: Just-in-Time Planner UI Spec
+
+### Goal
+
+Explore generative UI and just-in-time UI as a product direction without
+resuming implementation work.
+
+### Human Decisions And Constraints
+
+- Coding was intentionally paused to explore the product concept further.
+- Key terms needed to be clarified before adding new design artifacts.
+- The just-in-time UI direction must preserve the existing architecture:
+  Django owns state and validation, React renders known components, and any
+  assistant or chat layer calls typed operations only.
+
+### Codex-Assisted Actions
+
+- Clarified HCI as Human-Computer Interaction.
+- Clarified "artifact" as a concrete capstone output that documents,
+  demonstrates, or validates part of the work.
+- Added `JIT_PLANNER_UI_SPEC.md` as a product/design artifact.
+- Added key terms for generative UI, just-in-time UI, intent, component
+  registry, UI schema, grounding, human-in-the-loop, and cognitive load.
+- Defined core user situations for the planner:
+  - the user does not know what to do today
+  - the user has low energy
+  - the user has limited time
+  - the user has too many overdue tasks
+  - the user asks why a task was suggested
+- Defined a planner component catalog and mapped each component to typed
+  backend operations.
+- Added safety rules, evaluation criteria, MVP flow, implementation notes, and
+  open questions.
+
+### Study Notes
+
+- This is a design artifact, not an implementation commit for product behavior.
+- The strongest capstone framing is that generative UI should mean structured
+  UI selection from a safe component registry, not runtime generation of raw
+  frontend code.
+- The just-in-time UI idea supports the planner-first narrative because it
+  targets the decision moment: what should the user do next?
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
