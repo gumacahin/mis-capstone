@@ -130,6 +130,9 @@ Ongoing session notes should be kept in `DEV_JOURNAL.md`.
 The paper-facing evaluation plan is captured in
 `CAPSTONE_EVALUATION_METHOD.md`.
 
+The practical moderator walkthrough is captured in
+`CAPSTONE_EVALUATION_WALKTHROUGH.md`.
+
 The short version:
 
 ```text

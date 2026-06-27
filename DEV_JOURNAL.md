@@ -1006,6 +1006,49 @@ repo: git diff --check
 - Seeded data should be labeled as demo data. It should not be mixed with
   actual participant results.
 
+## 2026-06-28: Capstone Evaluation Walkthrough Protocol
+
+### Goal
+
+Turn the evaluation method and seeded demo dataset into a practical moderator
+protocol that can be used for adviser demos, pilot testing, screenshots, or a
+small capstone walkthrough.
+
+### Human Decisions And Constraints
+
+- The walkthrough should evaluate the planner-first daily decision flow, not the
+  full generic task-management surface.
+- The protocol should preserve the faculty/staff scope and keep student use
+  cases as adjacent or future work.
+- The protocol should separate seeded demo evidence from actual participant
+  findings.
+- Observation notes should avoid private task content, names, emails, and raw
+  identifying feedback.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_EVALUATION_WALKTHROUGH.md`.
+- Included setup commands, seeded demo credentials, participant scenario,
+  moderator script, walkthrough tasks, observation checklist, post-task
+  questions, recording template, metric review guidance, interpretation guide,
+  privacy rules, and a paper-ready walkthrough paragraph.
+- Linked the walkthrough from `CAPSTONE_EVALUATION_METHOD.md` and
+  `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+repo: git diff --check
+repo: git diff --cached --check
+```
+
+### Study Notes
+
+- This artifact makes the evaluation runnable. The method explains what is
+  being evaluated; the walkthrough explains exactly how to conduct it.
+- The walkthrough gives the capstone a cleaner bridge from implementation
+  artifacts to evaluation data collection.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

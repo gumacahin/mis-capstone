@@ -92,6 +92,9 @@ The seeded data is for demonstration and pilot testing only. Actual study
 results should come from participant walkthroughs or clearly labeled observed
 evaluation sessions.
 
+The step-by-step moderator protocol is captured in
+`CAPSTONE_EVALUATION_WALKTHROUGH.md`.
+
 ## In-App Measures
 
 The current implementation can support these quantitative measures:
