@@ -5,6 +5,7 @@ All URIs are relative to _http://localhost_
 | Method                                                                  | HTTP request                                         | Description |
 | ----------------------------------------------------------------------- | ---------------------------------------------------- | ----------- |
 | [**plannerCheckInCreate**](#plannercheckincreate)                       | **POST** /api/planner/check-in/                      |             |
+| [**plannerEvaluationRetrieve**](#plannerevaluationretrieve)             | **GET** /api/planner/evaluation/                     |             |
 | [**plannerFeedbackCreate**](#plannerfeedbackcreate)                     | **POST** /api/planner/feedback/                      |             |
 | [**plannerRebuildCreate**](#plannerrebuildcreate)                       | **POST** /api/planner/rebuild/                       |             |
 | [**plannerSuggestionsAcceptCreate**](#plannersuggestionsacceptcreate)   | **POST** /api/planner/suggestions/{item_id}/accept/  |             |
@@ -47,6 +48,46 @@ const { status, data } =
 ### HTTP request headers
 
 - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **plannerEvaluationRetrieve**
+
+> PlannerEvaluationSummary plannerEvaluationRetrieve()
+
+### Example
+
+```typescript
+import { PlannerApi, Configuration } from "./api";
+
+const configuration = new Configuration();
+const apiInstance = new PlannerApi(configuration);
+
+const { status, data } = await apiInstance.plannerEvaluationRetrieve();
+```
+
+### Parameters
+
+This endpoint does not have any parameters.
+
+### Return type
+
+**PlannerEvaluationSummary**
+
+### Authorization
+
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 ### HTTP response details

@@ -26,6 +26,20 @@ def auth_client(api_client, user):
 
 
 @pytest.fixture
+def admin_user():
+    user = UserFactory()
+    user.profile.is_admin = True
+    user.profile.save(update_fields=["is_admin"])
+    return user
+
+
+@pytest.fixture
+def admin_client(api_client, admin_user):
+    api_client.force_authenticate(user=admin_user)
+    return api_client
+
+
+@pytest.fixture
 def section(user):
     project = ProjectFactory(created_by=user, updated_by=user)
     return project.sections.first()
@@ -284,6 +298,126 @@ def test_feedback_rejects_invalid_ratings(auth_client):
 
 
 @pytest.mark.django_db
+def test_planner_evaluation_requires_admin(auth_client):
+    response = auth_client.get("/api/planner/evaluation/", format="json")
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_planner_evaluation_handles_empty_dataset(admin_client):
+    response = admin_client.get("/api/planner/evaluation/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {
+        "plan_count": 0,
+        "feedback_count": 0,
+        "feedback_response_rate": 0.0,
+        "average_helpfulness_rating": None,
+        "average_confidence_rating": None,
+        "total_suggestions": 0,
+        "suggestion_status_counts": {
+            "suggested": 0,
+            "accepted": 0,
+            "snoozed": 0,
+            "dismissed": 0,
+            "done": 0,
+        },
+        "suggestion_action_rates": {
+            "accepted": 0.0,
+            "snoozed": 0.0,
+            "dismissed": 0.0,
+        },
+    }
+
+
+@pytest.mark.django_db
+def test_planner_evaluation_returns_anonymized_aggregate_metrics(admin_client):
+    first_user = UserFactory(
+        username="private-first-user", email="private-first@example.test"
+    )
+    second_user = UserFactory(
+        username="private-second-user", email="private-second@example.test"
+    )
+    third_user = UserFactory(
+        username="private-third-user", email="private-third@example.test"
+    )
+    today = timezone.localdate()
+    first_plan, first_section = create_plan_for_user(first_user, today)
+    second_plan, second_section = create_plan_for_user(
+        second_user, today - timedelta(days=1)
+    )
+    create_plan_for_user(third_user, today - timedelta(days=2))
+
+    private_task = TaskFactory(
+        section=first_section,
+        title="Private planner task title",
+        due_date=timezone.now(),
+    )
+    PlanItem.objects.create(
+        plan=first_plan, task=private_task, status=PlanItem.Status.ACCEPTED
+    )
+    PlanItem.objects.create(
+        plan=first_plan,
+        task=TaskFactory(section=first_section, due_date=timezone.now()),
+        status=PlanItem.Status.SNOOZED,
+    )
+    PlanItem.objects.create(
+        plan=second_plan,
+        task=TaskFactory(section=second_section, due_date=timezone.now()),
+        status=PlanItem.Status.DISMISSED,
+    )
+    PlanItem.objects.create(
+        plan=second_plan,
+        task=TaskFactory(section=second_section, due_date=timezone.now()),
+        status=PlanItem.Status.SUGGESTED,
+    )
+    TodayPlanFeedback.objects.create(
+        user=first_user,
+        plan=first_plan,
+        helpfulness_rating=5,
+        confidence_rating=4,
+        note="Private feedback note",
+    )
+    TodayPlanFeedback.objects.create(
+        user=second_user,
+        plan=second_plan,
+        helpfulness_rating=3,
+        confidence_rating=5,
+        note="Another private feedback note",
+    )
+
+    response = admin_client.get("/api/planner/evaluation/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {
+        "plan_count": 3,
+        "feedback_count": 2,
+        "feedback_response_rate": 66.67,
+        "average_helpfulness_rating": 4.0,
+        "average_confidence_rating": 4.5,
+        "total_suggestions": 4,
+        "suggestion_status_counts": {
+            "suggested": 1,
+            "accepted": 1,
+            "snoozed": 1,
+            "dismissed": 1,
+            "done": 0,
+        },
+        "suggestion_action_rates": {
+            "accepted": 25.0,
+            "snoozed": 25.0,
+            "dismissed": 25.0,
+        },
+    }
+    response_text = str(response.data)
+    assert "Private planner task title" not in response_text
+    assert "Private feedback note" not in response_text
+    assert "private-first@example.test" not in response_text
+    assert "private-first-user" not in response_text
+
+
+@pytest.mark.django_db
 def test_planner_requires_authentication(api_client):
     response = api_client.get("/api/planner/today/", format="json")
 
@@ -327,6 +461,12 @@ def test_openapi_schema_documents_planner_contract(auth_client):
         ]["schema"]["$ref"]
         == "#/components/schemas/TodayPlanFeedbackRequest"
     )
+    assert (
+        planner_paths["/api/planner/evaluation/"]["get"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/PlannerEvaluationSummary"
+    )
     signal_properties = schema["components"]["schemas"]["PlanItemSignals"]["properties"]
     assert (
         signal_properties["due_status"]["$ref"] == "#/components/schemas/DueStatusEnum"
@@ -338,3 +478,24 @@ def test_openapi_schema_documents_planner_contract(auth_client):
     ]
     assert feedback_properties["helpfulness_rating"]["type"] == "integer"
     assert feedback_properties["confidence_rating"]["type"] == "integer"
+    evaluation_properties = schema["components"]["schemas"]["PlannerEvaluationSummary"][
+        "properties"
+    ]
+    assert evaluation_properties["feedback_response_rate"]["type"] == "number"
+    assert evaluation_properties["suggestion_status_counts"]["$ref"] == (
+        "#/components/schemas/PlannerSuggestionStatusCounts"
+    )
+
+
+def create_plan_for_user(user, target_date):
+    project = ProjectFactory(created_by=user, updated_by=user)
+    check_in = EnergyCheckIn.objects.create(
+        user=user, date=target_date, available_minutes=90
+    )
+    plan = TodayPlan.objects.create(
+        user=user,
+        date=target_date,
+        check_in=check_in,
+        generated_at=timezone.now(),
+    )
+    return plan, project.sections.first()

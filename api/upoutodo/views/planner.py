@@ -8,14 +8,17 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from upoutodo.models import PlanItem, TodayPlanFeedback
+from upoutodo.permissions import IsAdmin
 from upoutodo.serializers.planner import (
     EnergyCheckInSerializer,
     PlanItemSerializer,
+    PlannerEvaluationSummarySerializer,
     SnoozePlanItemSerializer,
     TodayPlanFeedbackSerializer,
     TodayPlanSerializer,
 )
 from upoutodo.services.planner import (
+    get_planner_evaluation_summary,
     get_today_plan,
     rebuild_today_plan,
     save_check_in,
@@ -24,6 +27,12 @@ from upoutodo.services.planner import (
 
 class PlannerViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        permission_classes = [permissions.IsAuthenticated]
+        if getattr(self, "action", None) == "evaluation":
+            permission_classes.append(IsAdmin)
+        return [permission() for permission in permission_classes]
 
     def get_serializer_context(self):
         return {"request": self.request}
@@ -75,6 +84,14 @@ class PlannerViewSet(viewsets.ViewSet):
         )
         output_serializer = TodayPlanFeedbackSerializer(feedback)
         return Response(output_serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(responses=PlannerEvaluationSummarySerializer)
+    @action(detail=False, methods=["get"], url_path="evaluation")
+    def evaluation(self, request):
+        serializer = PlannerEvaluationSummarySerializer(
+            get_planner_evaluation_summary()
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         parameters=[

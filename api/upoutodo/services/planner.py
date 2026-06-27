@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from django.db import transaction
+from django.db.models import Avg, Count
 from django.utils import timezone
 
-from upoutodo.models import EnergyCheckIn, PlanItem, Task, TodayPlan
+from upoutodo.models import EnergyCheckIn, PlanItem, Task, TodayPlan, TodayPlanFeedback
 
 DEFAULT_AVAILABLE_MINUTES = 120
 MAX_PLAN_ITEMS = 6
@@ -78,6 +79,42 @@ def get_today_plan(user, target_date=None):
     return plan
 
 
+def get_planner_evaluation_summary():
+    plan_count = TodayPlan.objects.count()
+    feedback_count = TodayPlanFeedback.objects.count()
+    feedback_averages = TodayPlanFeedback.objects.aggregate(
+        average_helpfulness_rating=Avg("helpfulness_rating"),
+        average_confidence_rating=Avg("confidence_rating"),
+    )
+    total_suggestions = PlanItem.objects.count()
+    status_counts = get_suggestion_status_counts()
+
+    return {
+        "plan_count": plan_count,
+        "feedback_count": feedback_count,
+        "feedback_response_rate": percentage(feedback_count, plan_count),
+        "average_helpfulness_rating": rounded_average(
+            feedback_averages["average_helpfulness_rating"]
+        ),
+        "average_confidence_rating": rounded_average(
+            feedback_averages["average_confidence_rating"]
+        ),
+        "total_suggestions": total_suggestions,
+        "suggestion_status_counts": status_counts,
+        "suggestion_action_rates": {
+            "accepted": percentage(
+                status_counts[PlanItem.Status.ACCEPTED], total_suggestions
+            ),
+            "snoozed": percentage(
+                status_counts[PlanItem.Status.SNOOZED], total_suggestions
+            ),
+            "dismissed": percentage(
+                status_counts[PlanItem.Status.DISMISSED], total_suggestions
+            ),
+        },
+    }
+
+
 @transaction.atomic
 def rebuild_today_plan(user, target_date=None):
     target_date = target_date or today_for_user()
@@ -138,6 +175,22 @@ def rebuild_today_plan(user, target_date=None):
         task_id__in=selected_task_ids
     ).delete()
     return plan
+
+
+def get_suggestion_status_counts():
+    counts = {status: 0 for status, _ in PlanItem.Status.choices}
+    status_rows = PlanItem.objects.values("status").annotate(count=Count("id"))
+    for row in status_rows:
+        counts[row["status"]] = row["count"]
+    return counts
+
+
+def rounded_average(value):
+    return round(value, 2) if value is not None else None
+
+
+def percentage(part, whole):
+    return round((part / whole) * 100, 2) if whole else 0.0
 
 
 def rank_task_suggestions(user, check_in, plan, target_date):

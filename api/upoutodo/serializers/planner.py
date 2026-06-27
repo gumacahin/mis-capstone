@@ -171,6 +171,31 @@ class TodayPlanSerializer(serializers.ModelSerializer):
         return TodayPlanFeedbackSerializer(feedback).data
 
 
+class PlannerSuggestionStatusCountsSerializer(serializers.Serializer):
+    suggested = serializers.IntegerField()
+    accepted = serializers.IntegerField()
+    snoozed = serializers.IntegerField()
+    dismissed = serializers.IntegerField()
+    done = serializers.IntegerField()
+
+
+class PlannerSuggestionActionRatesSerializer(serializers.Serializer):
+    accepted = serializers.FloatField()
+    snoozed = serializers.FloatField()
+    dismissed = serializers.FloatField()
+
+
+class PlannerEvaluationSummarySerializer(serializers.Serializer):
+    plan_count = serializers.IntegerField()
+    feedback_count = serializers.IntegerField()
+    feedback_response_rate = serializers.FloatField()
+    average_helpfulness_rating = serializers.FloatField(allow_null=True)
+    average_confidence_rating = serializers.FloatField(allow_null=True)
+    total_suggestions = serializers.IntegerField()
+    suggestion_status_counts = PlannerSuggestionStatusCountsSerializer()
+    suggestion_action_rates = PlannerSuggestionActionRatesSerializer()
+
+
 class SnoozePlanItemSerializer(serializers.Serializer):
     minutes = serializers.IntegerField(default=60, min_value=1, max_value=10080)
 

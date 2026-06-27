@@ -43,6 +43,8 @@ import type { EnergyCheckInRequest } from "../models";
 // @ts-ignore
 import type { PlanItem } from "../models";
 // @ts-ignore
+import type { PlannerEvaluationSummary } from "../models";
+// @ts-ignore
 import type { SnoozePlanItemRequest } from "../models";
 // @ts-ignore
 import type { TodayPlan } from "../models";
@@ -108,6 +110,54 @@ export const PlannerApiAxiosParamCreator = function (
         localVarRequestOptions,
         configuration,
       );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerEvaluationRetrieve: async (
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/planner/evaluation/`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication basicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication cookieAuth required
+
+      // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -489,6 +539,34 @@ export const PlannerApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async plannerEvaluationRetrieve(
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<PlannerEvaluationSummary>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.plannerEvaluationRetrieve(options);
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap["PlannerApi.plannerEvaluationRetrieve"]?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
      * @param {TodayPlanFeedbackRequest} todayPlanFeedbackRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -692,6 +770,18 @@ export const PlannerApiFactory = function (
     },
     /**
      *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerEvaluationRetrieve(
+      options?: RawAxiosRequestConfig,
+    ): AxiosPromise<PlannerEvaluationSummary> {
+      return localVarFp
+        .plannerEvaluationRetrieve(options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
      * @param {PlannerApiPlannerFeedbackCreateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -794,6 +884,15 @@ export interface PlannerApiInterface {
     requestParameters?: PlannerApiPlannerCheckInCreateRequest,
     options?: RawAxiosRequestConfig,
   ): AxiosPromise<TodayPlan>;
+
+  /**
+   *
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  plannerEvaluationRetrieve(
+    options?: RawAxiosRequestConfig,
+  ): AxiosPromise<PlannerEvaluationSummary>;
 
   /**
    *
@@ -911,6 +1010,17 @@ export class PlannerApi extends BaseAPI implements PlannerApiInterface {
   ) {
     return PlannerApiFp(this.configuration)
       .plannerCheckInCreate(requestParameters.energyCheckInRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  public plannerEvaluationRetrieve(options?: RawAxiosRequestConfig) {
+    return PlannerApiFp(this.configuration)
+      .plannerEvaluationRetrieve(options)
       .then((request) => request(this.axios, this.basePath));
   }
 

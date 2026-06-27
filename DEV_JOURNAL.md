@@ -656,7 +656,7 @@ to do next.
 ```text
 api: uv run ruff check targeted planner files
 api: uv run ruff format --check targeted planner files
-api: uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py
+api: uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py upoutodo/tests/endpoints/test_admin.py
 ui: targeted ESLint for planner and Today E2E files
 ui: vitest run src/modules/planner/__tests__/uiSchema.test.ts
 ui: npm run build
@@ -789,6 +789,71 @@ ui E2E: 8 passed
   explanation easier to inspect and evaluate.
 - The explanation UI remains grounded in backend-provided typed signals rather
   than generated free-form reasoning.
+
+## 2026-06-28: Anonymized Planner Evaluation Summary
+
+### Goal
+
+Turn captured planner feedback into aggregate evidence that can support the
+capstone paper without exposing individual task content, user identities, or
+free-form feedback notes.
+
+### Human Decisions And Constraints
+
+- Reporting should remain aggregate/anonymized unless individual content access
+  is explicitly justified later.
+- The endpoint should be admin-only because it summarizes cross-user planner
+  behavior.
+- The summary should stay planner-specific and avoid restarting generic admin
+  task browsing.
+
+### Codex-Assisted Actions
+
+- Added `get_planner_evaluation_summary()` to the planner service.
+- Added `PlannerEvaluationSummarySerializer` and nested summary serializers for
+  suggestion status counts and action rates.
+- Added `GET /api/planner/evaluation/` as an admin-only typed planner
+  operation.
+- The endpoint returns:
+  - total plan count
+  - feedback count
+  - feedback response rate
+  - average helpfulness rating
+  - average confidence rating
+  - total suggestion count
+  - suggestion status counts
+  - accepted, snoozed, and dismissed rates
+- Added tests for admin-only access, empty datasets, aggregate metric values,
+  and privacy boundaries.
+- Updated the OpenAPI contract test and regenerated the TypeScript client,
+  adding `plannerEvaluationRetrieve`.
+- Updated `JIT_PLANNER_UI_SPEC.md` so aggregate evaluation reporting is part of
+  the typed operation map and safety rules.
+
+### Verification
+
+```text
+api: uv run ruff check targeted planner files
+api: uv run ruff format --check targeted planner files
+api: uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py
+ui: npm run build
+```
+
+Observed results:
+
+```text
+api planner/admin endpoint tests: 19 passed
+ui build: passed
+```
+
+### Study Notes
+
+- This makes the feedback capture useful for the paper: raw qualitative notes
+  remain private, while aggregate helpfulness/confidence and action rates can be
+  discussed as evaluation data.
+- The endpoint supports the capstone narrative that the app is planner-first:
+  it measures whether users interact with and trust the generated daily plan,
+  not how many generic task-management records exist.
 
 ## Running Notes For Future Sessions
 

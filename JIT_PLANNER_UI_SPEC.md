@@ -477,6 +477,7 @@ such as `TodayPlanCard` or a plain text message.
 | Operation | User Confirmation Needed | Mutates State | Current Status |
 | --- | --- | --- | --- |
 | `get_today_plan` | No | No | Implemented |
+| `get_planner_evaluation_summary` | Admin access | No | Implemented |
 | `submit_check_in` | Submit button | Yes | Implemented |
 | `rebuild_today_plan` | Button click | Yes | Implemented |
 | `accept_suggestion` | Button click | Yes | Implemented |
@@ -497,6 +498,8 @@ such as `TodayPlanCard` or a plain text message.
   events.
 - Calendar sync should be opt-in and reversible where possible.
 - Suggestion reasons should reference real task signals.
+- Evaluation reporting should expose aggregate planner metrics only, not task
+  titles, user identifiers, or free-form feedback notes.
 
 ## Evaluation Criteria
 
@@ -516,6 +519,8 @@ Possible measures:
 - number of plan rebuilds
 - helpfulness rating for the generated daily plan
 - confidence rating after reviewing the plan
+- feedback response rate
+- accepted, snoozed, and dismissed suggestion rates
 - user rating of suggestion clarity
 - user rating of confidence after planning
 - user rating of workload fit
@@ -550,6 +555,9 @@ The current implementation supports the first JIT planner UI slice:
 - `/today` renders planner UI through a component registry and UI schema.
 - `/today` captures daily-plan feedback through `PlannerFeedbackCard`, backed
   by the typed `submit_plan_feedback` operation.
+- `GET /api/planner/evaluation/` exposes admin-only aggregate metrics for
+  capstone evaluation without returning individual task content, feedback
+  notes, or user identifiers.
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
   `SuggestionReasonCard`, `TaskSignalBreakdown`, and `PlannerFeedbackCard`.
@@ -569,8 +577,10 @@ The current implementation supports the first JIT planner UI slice:
 
 Next implementation steps:
 
-1. Keep the OpenAPI planner contract test updated as planner operations evolve.
-2. Defer chat and Google Calendar sync until the component registry and typed
+1. Add a small admin/reporting UI for the aggregate planner evaluation summary
+   if the capstone demo needs it.
+2. Keep the OpenAPI planner contract test updated as planner operations evolve.
+3. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.
 
 ## Open Questions

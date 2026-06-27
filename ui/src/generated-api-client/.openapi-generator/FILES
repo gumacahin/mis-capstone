@@ -49,6 +49,9 @@ docs/PlanItem.md
 docs/PlanItemSignals.md
 docs/PlanItemStatusEnum.md
 docs/PlannerApi.md
+docs/PlannerEvaluationSummary.md
+docs/PlannerSuggestionActionRates.md
+docs/PlannerSuggestionStatusCounts.md
 docs/PriorityEnum.md
 docs/ProductivityApi.md
 docs/Project.md
@@ -108,6 +111,9 @@ models/patched-user-request.ts
 models/plan-item-signals.ts
 models/plan-item-status-enum.ts
 models/plan-item.ts
+models/planner-evaluation-summary.ts
+models/planner-suggestion-action-rates.ts
+models/planner-suggestion-status-counts.ts
 models/priority-enum.ts
 models/project-detail-request.ts
 models/project-detail.ts
