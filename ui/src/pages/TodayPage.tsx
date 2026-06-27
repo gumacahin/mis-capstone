@@ -18,8 +18,6 @@ import TextField from "@mui/material/TextField";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
-import type { ProjectViewType, Task } from "@shared";
-import SkeletonList from "@shared/components/SkeletonList";
 import {
   type PlannerEnergyLevel,
   type PlannerFocusMode,
@@ -28,8 +26,10 @@ import {
   usePlannerSuggestionAction,
   usePlannerToday,
   useSubmitPlannerCheckIn,
-  useTasksToday,
-} from "@shared/hooks/queries";
+} from "@planner";
+import type { ProjectViewType, Task } from "@shared";
+import SkeletonList from "@shared/components/SkeletonList";
+import { useTasksToday } from "@shared/hooks/queries";
 import useToolbarContext from "@shared/hooks/useToolbarContext";
 import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
 import TodayView from "@views/components/TodayView";

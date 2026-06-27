@@ -351,11 +351,68 @@ This framing avoids claiming Codex as a research participant. It instead treats
 Codex-assisted development as part of the engineering method and implementation
 workflow.
 
+## 2026-06-27: Typed Planner Frontend Client
+
+### Goal
+
+Make the frontend planner API contract explicit before adding more planner
+behavior.
+
+### Human Decisions And Constraints
+
+- The `/today` page already worked, but planner types and mutations were mixed
+  into the broad shared query module.
+- Since typed operations are part of the capstone architecture, the frontend
+  should expose planner operations as a clear module instead of spreading them
+  through generic app hooks.
+- The generated API client is still useful, but the planner API is new enough
+  that a small dedicated typed client is the pragmatic next step.
+
+### Codex-Assisted Actions
+
+- Added `ui/src/modules/planner/types.ts` for planner check-ins, suggestions,
+  actions, and today plans.
+- Added `ui/src/modules/planner/client.ts` with typed planner operations:
+  - `getTodayPlan`
+  - `submitPlannerCheckIn`
+  - `rebuildTodayPlan`
+  - `updatePlannerSuggestion`
+- Added `ui/src/modules/planner/hooks.ts` for React Query integration.
+- Added an `@planner` path alias.
+- Refactored `/today` to import planner behavior from `@planner`.
+- Removed planner-specific types and hooks from
+  `ui/src/modules/shared/hooks/queries.ts`.
+- Updated `FREEZE_NOTES.md` so the typed planner client is no longer listed as
+  unfinished work.
+
+### Verification
+
+```text
+ui: targeted ESLint for planner, Today page, and shared query files
+ui: npm run build
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed result:
+
+```text
+ui E2E: 3 passed
+```
+
+### Study Notes
+
+- This change makes the typed-operations concept visible in frontend code, not
+  only in backend routes and capstone notes.
+- The planner client is a bridge toward future chat or MCP-style tools because
+  it names the operations the UI can perform.
+- The next API-contract improvement is to include planner endpoints in the
+  generated OpenAPI client after the planner API stabilizes.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
 - Prioritize planner-specific work on `/today`.
-- Add typed planner client code or generated API support.
+- Add generated API support for planner endpoints after the API stabilizes.
 - Extend E2E coverage for snooze, dismiss, empty-state, and no-suggestion flows.
 - Polish suggestion reasons so they are clear enough to discuss in the paper.
 - Add Google Calendar sync only after planner operations stabilize.

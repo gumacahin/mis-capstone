@@ -28,6 +28,8 @@
       "@admin/*": ["src/modules/admin/*"],
       "@projects": ["src/modules/projects"],
       "@projects/*": ["src/modules/projects/*"],
+      "@planner": ["src/modules/planner"],
+      "@planner/*": ["src/modules/planner/*"],
       "@views": ["src/modules/views"],
       "@views/*": ["src/modules/views/*"],
       "@labels": ["src/modules/labels"],
