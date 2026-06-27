@@ -97,6 +97,19 @@ class TaskViewSet(viewsets.ModelViewSet):
             )
 
         partial = request.method == "PATCH" or request.method == "PUT"
+        task_ids = [task_data.get("id") for task_data in request.data]
+        tasks_by_id = self.get_queryset().in_bulk(task_ids)
+        missing_task_ids = [
+            task_id for task_id in task_ids if task_id and task_id not in tasks_by_id
+        ]
+
+        if missing_task_ids:
+            return Response(
+                {"error": f"Task with id {missing_task_ids[0]} does not exist."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializers = []
 
         for task_data in request.data:
             task_id = task_data.get("id")
@@ -106,16 +119,14 @@ class TaskViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            try:
-                task = Task.objects.get(id=task_id)
-            except Task.DoesNotExist:
-                return Response(
-                    {"error": f"Task with id {task_id} does not exist."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
+            task = tasks_by_id[task_id]
             serializer = self.get_serializer(task, data=task_data, partial=partial)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+
+            serializers.append(serializer)
+
+        with transaction.atomic():
+            for serializer in serializers:
+                serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

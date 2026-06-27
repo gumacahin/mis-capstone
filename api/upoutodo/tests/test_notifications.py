@@ -88,6 +88,10 @@ class TestCommentNotification:
 
 @pytest.mark.django_db
 class TestDailyDigestNotifications:
+    @pytest.fixture(autouse=True)
+    def daily_digest_secret(self, settings):
+        settings.DAILY_DIGEST_SCHEDULER_SECRET = "test-secret"
+
     @pytest.fixture()
     def user(self):
         return UserFactory(email="test@example.com")
@@ -103,7 +107,7 @@ class TestDailyDigestNotifications:
 
         client = APIClient()
         url = reverse("daily-digest")
-        client.post(url, format="json")
+        client.post(url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret")
 
         assert (
             Notification.objects.filter(
@@ -118,7 +122,7 @@ class TestDailyDigestNotifications:
 
         client = APIClient()
         url = reverse("daily-digest")
-        client.post(url, format="json")
+        client.post(url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret")
 
         assert (
             Notification.objects.filter(
@@ -133,8 +137,8 @@ class TestDailyDigestNotifications:
 
         client = APIClient()
         url = reverse("daily-digest")
-        client.post(url, format="json")
-        client.post(url, format="json")
+        client.post(url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret")
+        client.post(url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret")
 
         assert (
             Notification.objects.filter(
@@ -149,7 +153,7 @@ class TestDailyDigestNotifications:
 
         client = APIClient()
         url = reverse("daily-digest")
-        client.post(url, format="json")
+        client.post(url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret")
 
         assert not Notification.objects.filter(
             user=user, type=Notification.Type.TASK_DUE

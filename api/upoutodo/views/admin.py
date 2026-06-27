@@ -29,6 +29,7 @@ class AdminPagination(PageNumberPagination):
 class AdminViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdmin]
     pagination_class = AdminPagination
+    http_method_names = ["head", "options"]
 
 
 class AdminTaskViewSet(AdminViewSet):

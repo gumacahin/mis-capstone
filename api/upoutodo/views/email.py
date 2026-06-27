@@ -1,4 +1,5 @@
 import logging
+from hmac import compare_digest
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -14,6 +15,21 @@ from upoutodo.models.task import Task
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
+SCHEDULER_SECRET_HEADER = "X-Scheduler-Secret"
+
+
+def _request_has_daily_digest_access(request):
+    scheduler_secret = getattr(settings, "DAILY_DIGEST_SCHEDULER_SECRET", "")
+    provided_secret = request.headers.get(SCHEDULER_SECRET_HEADER, "")
+    if scheduler_secret and provided_secret:
+        if compare_digest(str(scheduler_secret), str(provided_secret)):
+            return True
+
+    user = request.user
+    if not user or not user.is_authenticated:
+        return False
+
+    return hasattr(user, "profile") and user.profile.is_admin
 
 
 def _create_due_notifications(user, today):
@@ -68,6 +84,9 @@ def daily_digest(request):
     Triggered by Cloud Scheduler. Creates task_due / task_overdue
     notifications and sends digest emails.
     """
+    if not _request_has_daily_digest_access(request):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     try:
         today = timezone.now().date()
         active_users = User.objects.filter(is_active=True)

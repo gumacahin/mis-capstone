@@ -41,6 +41,20 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     comments_count = serializers.SerializerMethodField(read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return
+
+        owned_sections = ProjectSection.objects.filter(project__created_by=request.user)
+        owned_tasks = Task.objects.filter(section__project__created_by=request.user)
+
+        self.fields["section"].queryset = owned_sections
+        self.fields["above_task"].queryset = owned_tasks
+        self.fields["below_task"].queryset = owned_tasks
+        self.fields["source_section"].queryset = owned_sections
+
     class Meta:
         model = Task
         fields = [
