@@ -1219,3 +1219,46 @@ Planner real-backend demo: 2 passed (10.8s)
   reviews, screenshots, and future Codex-assisted sessions.
 - The first shortcut run failed under Node 14, so future demo runs should use
   `nvm use` or otherwise activate Node 18+ before running `npm run`.
+
+## 2026-06-28: Planner Schema Warning Cleanup
+
+### Goal
+
+Reduce high-signal OpenAPI noise from the real-backend planner demo without
+turning this into a broad schema refactor.
+
+### Codex-Assisted Actions
+
+- Added a default serializer class to `PlannerViewSet` so drf-spectacular can
+  discover the planner viewset without falling back.
+- Made `NotificationViewSet.get_queryset()` safe during schema generation by
+  returning `Notification.objects.none()` for fake schema views.
+- Added an `E2ETestBearer` drf-spectacular authentication extension for the
+  test-only E2E bearer authenticator.
+- Loaded the schema extension from the app config.
+- Extended the planner OpenAPI test to assert the E2E bearer scheme.
+
+### Verification
+
+```text
+api: ruff check upoutodo/apps.py upoutodo/schema.py upoutodo/views/planner.py upoutodo/views/notification.py upoutodo/tests/endpoints/test_planner.py
+api: pytest --no-cov upoutodo/tests/endpoints/test_planner.py upoutodo/tests/endpoints/test_e2e_authentication.py upoutodo/tests/test_notifications.py
+api: DEBUG=True uv run python manage.py spectacular --file /private/tmp/upoutodo-schema.yaml
+ui: npm run test:e2e:planner-real
+```
+
+Observed result:
+
+```text
+Backend focused tests: 31 passed
+Real-backend planner demo: 2 passed (9.8s)
+```
+
+### Study Notes
+
+- The cleanup removed the planner serializer warning, notification fake-queryset
+  warning, and repeated E2E authenticator schema warnings from the real-backend
+  demo output.
+- Remaining schema output is older generic contract work: serializer method
+  field type hints, duplicate nested user serializers, and serializer
+  declarations for admin/productivity/email API views.

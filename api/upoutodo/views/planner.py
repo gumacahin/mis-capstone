@@ -27,6 +27,7 @@ from upoutodo.services.planner import (
 
 class PlannerViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TodayPlanSerializer
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]

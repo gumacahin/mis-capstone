@@ -467,6 +467,10 @@ def test_openapi_schema_documents_planner_contract(auth_client):
         ]["schema"]["$ref"]
         == "#/components/schemas/PlannerEvaluationSummary"
     )
+    e2e_scheme = schema["components"]["securitySchemes"]["E2ETestBearer"]
+    assert e2e_scheme["type"] == "http"
+    assert e2e_scheme["scheme"] == "bearer"
+    assert e2e_scheme["bearerFormat"] == "E2E"
     signal_properties = schema["components"]["schemas"]["PlanItemSignals"]["properties"]
     assert (
         signal_properties["due_status"]["$ref"] == "#/components/schemas/DueStatusEnum"

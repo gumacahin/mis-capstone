@@ -12,6 +12,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "patch", "post"]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Notification.objects.none()
         return Notification.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
