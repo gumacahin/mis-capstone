@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from upoutodo.models import EnergyCheckIn, PlanItem, Project, TodayPlan
@@ -35,6 +36,24 @@ class EnergyCheckInSerializer(serializers.ModelSerializer):
         return value
 
 
+class PlanItemSignalsSerializer(serializers.Serializer):
+    due_date = serializers.DateField(allow_null=True)
+    due_status = serializers.ChoiceField(
+        choices=["none", "overdue", "due_today", "due_soon", "later"]
+    )
+    due_label = serializers.CharField()
+    due_in_days = serializers.IntegerField(allow_null=True)
+    priority = serializers.CharField()
+    priority_label = serializers.CharField()
+    estimated_minutes = serializers.IntegerField()
+    is_recurring = serializers.BooleanField()
+    project_title = serializers.CharField()
+    section_title = serializers.CharField(allow_null=True)
+    score = serializers.IntegerField()
+    snoozed_count = serializers.IntegerField()
+    dismissed_count = serializers.IntegerField()
+
+
 class PlanItemSerializer(serializers.ModelSerializer):
     task = TaskSerializer(read_only=True)
     signals = serializers.SerializerMethodField(read_only=True)
@@ -58,6 +77,7 @@ class PlanItemSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(PlanItemSignalsSerializer)
     def get_signals(self, obj):
         due_date = task_due_date(obj.task)
         due_status = get_due_status(due_date, obj.plan.date)

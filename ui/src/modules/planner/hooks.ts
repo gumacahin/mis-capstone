@@ -1,5 +1,6 @@
-import { useApiClient } from "@shared/hooks/queries";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useGeneratedApiClient } from "@/api/client";
 
 import {
   getTodayPlan,
@@ -14,20 +15,20 @@ import type {
 } from "./types";
 
 export const usePlannerToday = () => {
-  const apiClient = useApiClient();
+  const { planner } = useGeneratedApiClient();
   return useQuery({
     queryKey: plannerQueryKeys.today,
-    queryFn: async () => getTodayPlan(apiClient),
+    queryFn: async () => getTodayPlan(planner),
   });
 };
 
 export const useSubmitPlannerCheckIn = () => {
-  const apiClient = useApiClient();
+  const { planner } = useGeneratedApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["planner", "check-in"],
     mutationFn: async (input: PlannerCheckInInput) =>
-      submitPlannerCheckIn(apiClient, input),
+      submitPlannerCheckIn(planner, input),
     onSuccess: (data) => {
       queryClient.setQueryData(plannerQueryKeys.today, data);
     },
@@ -35,11 +36,11 @@ export const useSubmitPlannerCheckIn = () => {
 };
 
 export const useRebuildTodayPlan = () => {
-  const apiClient = useApiClient();
+  const { planner } = useGeneratedApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["planner", "rebuild"],
-    mutationFn: async () => rebuildTodayPlan(apiClient),
+    mutationFn: async () => rebuildTodayPlan(planner),
     onSuccess: (data) => {
       queryClient.setQueryData(plannerQueryKeys.today, data);
     },
@@ -47,12 +48,12 @@ export const useRebuildTodayPlan = () => {
 };
 
 export const usePlannerSuggestionAction = () => {
-  const apiClient = useApiClient();
+  const { planner } = useGeneratedApiClient();
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ["planner", "suggestion-action"],
     mutationFn: async (input: PlannerSuggestionActionInput) =>
-      updatePlannerSuggestion(apiClient, input),
+      updatePlannerSuggestion(planner, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: plannerQueryKeys.today });
     },

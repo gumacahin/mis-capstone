@@ -1,21 +1,20 @@
 # TagAdminRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [default to undefined]
-**created_by** | **number** |  | [default to undefined]
+| Name           | Type       | Description | Notes                  |
+| -------------- | ---------- | ----------- | ---------------------- |
+| **name**       | **string** |             | [default to undefined] |
+| **created_by** | **number** |             | [default to undefined] |
 
 ## Example
 
 ```typescript
-import { TagAdminRequest } from './api';
+import { TagAdminRequest } from "./api";
 
 const instance: TagAdminRequest = {
-    name,
-    created_by,
+  name,
+  created_by,
 };
 ```
 

@@ -520,6 +520,8 @@ The current implementation supports the first JIT planner UI slice:
   priority, effort, recurrence, project/section, score, and snooze/dismiss
   history.
 - The React UI has a typed planner client in `ui/src/modules/planner`.
+- Planner endpoints are documented in the OpenAPI schema and available through
+  the generated TypeScript client.
 - `/today` renders planner UI through a component registry and UI schema.
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
@@ -534,7 +536,7 @@ The current implementation supports the first JIT planner UI slice:
 
 Next implementation steps:
 
-1. Add generated OpenAPI support for planner endpoints once the API stabilizes.
+1. Keep the OpenAPI planner contract test updated as planner operations evolve.
 2. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.
 

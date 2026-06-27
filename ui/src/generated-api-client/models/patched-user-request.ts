@@ -22,4 +22,5 @@ export interface PatchedUserRequest {
   is_onboarded?: boolean;
   projects?: Array<ProjectRequest>;
   theme?: string;
+  email_digest_enabled?: boolean;
 }

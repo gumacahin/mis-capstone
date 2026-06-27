@@ -1,66 +1,60 @@
 # ApiAdminApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to _http://localhost_
 
-|Method | HTTP request | Description|
-|------------- | ------------- | -------------|
-|[**apiAdminProjectsBulkUpdateUpdate**](#apiadminprojectsbulkupdateupdate) | **PUT** /api-admin/projects/bulk_update/ | |
-|[**apiAdminProjectsCreate**](#apiadminprojectscreate) | **POST** /api-admin/projects/ | |
-|[**apiAdminProjectsDestroy**](#apiadminprojectsdestroy) | **DELETE** /api-admin/projects/{id}/ | |
-|[**apiAdminProjectsList**](#apiadminprojectslist) | **GET** /api-admin/projects/ | |
-|[**apiAdminProjectsPartialUpdate**](#apiadminprojectspartialupdate) | **PATCH** /api-admin/projects/{id}/ | |
-|[**apiAdminProjectsRetrieve**](#apiadminprojectsretrieve) | **GET** /api-admin/projects/{id}/ | |
-|[**apiAdminProjectsUpdate**](#apiadminprojectsupdate) | **PUT** /api-admin/projects/{id}/ | |
-|[**apiAdminTagsCreate**](#apiadmintagscreate) | **POST** /api-admin/tags/ | |
-|[**apiAdminTagsDestroy**](#apiadmintagsdestroy) | **DELETE** /api-admin/tags/{id}/ | |
-|[**apiAdminTagsList**](#apiadmintagslist) | **GET** /api-admin/tags/ | |
-|[**apiAdminTagsPartialUpdate**](#apiadmintagspartialupdate) | **PATCH** /api-admin/tags/{id}/ | |
-|[**apiAdminTagsRetrieve**](#apiadmintagsretrieve) | **GET** /api-admin/tags/{id}/ | |
-|[**apiAdminTagsUpdate**](#apiadmintagsupdate) | **PUT** /api-admin/tags/{id}/ | |
-|[**apiAdminTasksCreate**](#apiadmintaskscreate) | **POST** /api-admin/tasks/ | |
-|[**apiAdminTasksDestroy**](#apiadmintasksdestroy) | **DELETE** /api-admin/tasks/{id}/ | |
-|[**apiAdminTasksList**](#apiadmintaskslist) | **GET** /api-admin/tasks/ | |
-|[**apiAdminTasksPartialUpdate**](#apiadmintaskspartialupdate) | **PATCH** /api-admin/tasks/{id}/ | |
-|[**apiAdminTasksRetrieve**](#apiadmintasksretrieve) | **GET** /api-admin/tasks/{id}/ | |
-|[**apiAdminTasksUpdate**](#apiadmintasksupdate) | **PUT** /api-admin/tasks/{id}/ | |
-|[**apiAdminUsersCreate**](#apiadminuserscreate) | **POST** /api-admin/users/ | |
-|[**apiAdminUsersDestroy**](#apiadminusersdestroy) | **DELETE** /api-admin/users/{id}/ | |
-|[**apiAdminUsersList**](#apiadminuserslist) | **GET** /api-admin/users/ | |
-|[**apiAdminUsersMeRetrieve**](#apiadminusersmeretrieve) | **GET** /api-admin/users/me/ | |
-|[**apiAdminUsersOptionsPartialUpdate**](#apiadminusersoptionspartialupdate) | **PATCH** /api-admin/users/options/ | |
-|[**apiAdminUsersPartialUpdate**](#apiadminuserspartialupdate) | **PATCH** /api-admin/users/{id}/ | |
-|[**apiAdminUsersRetrieve**](#apiadminusersretrieve) | **GET** /api-admin/users/{id}/ | |
-|[**apiAdminUsersUpdate**](#apiadminusersupdate) | **PUT** /api-admin/users/{id}/ | |
+| Method                                                                      | HTTP request                             | Description |
+| --------------------------------------------------------------------------- | ---------------------------------------- | ----------- |
+| [**apiAdminProjectsBulkUpdateUpdate**](#apiadminprojectsbulkupdateupdate)   | **PUT** /api-admin/projects/bulk_update/ |             |
+| [**apiAdminProjectsCreate**](#apiadminprojectscreate)                       | **POST** /api-admin/projects/            |             |
+| [**apiAdminProjectsDestroy**](#apiadminprojectsdestroy)                     | **DELETE** /api-admin/projects/{id}/     |             |
+| [**apiAdminProjectsList**](#apiadminprojectslist)                           | **GET** /api-admin/projects/             |             |
+| [**apiAdminProjectsPartialUpdate**](#apiadminprojectspartialupdate)         | **PATCH** /api-admin/projects/{id}/      |             |
+| [**apiAdminProjectsRetrieve**](#apiadminprojectsretrieve)                   | **GET** /api-admin/projects/{id}/        |             |
+| [**apiAdminProjectsUpdate**](#apiadminprojectsupdate)                       | **PUT** /api-admin/projects/{id}/        |             |
+| [**apiAdminTagsCreate**](#apiadmintagscreate)                               | **POST** /api-admin/tags/                |             |
+| [**apiAdminTagsDestroy**](#apiadmintagsdestroy)                             | **DELETE** /api-admin/tags/{id}/         |             |
+| [**apiAdminTagsList**](#apiadmintagslist)                                   | **GET** /api-admin/tags/                 |             |
+| [**apiAdminTagsPartialUpdate**](#apiadmintagspartialupdate)                 | **PATCH** /api-admin/tags/{id}/          |             |
+| [**apiAdminTagsRetrieve**](#apiadmintagsretrieve)                           | **GET** /api-admin/tags/{id}/            |             |
+| [**apiAdminTagsUpdate**](#apiadmintagsupdate)                               | **PUT** /api-admin/tags/{id}/            |             |
+| [**apiAdminTasksCreate**](#apiadmintaskscreate)                             | **POST** /api-admin/tasks/               |             |
+| [**apiAdminTasksDestroy**](#apiadmintasksdestroy)                           | **DELETE** /api-admin/tasks/{id}/        |             |
+| [**apiAdminTasksList**](#apiadmintaskslist)                                 | **GET** /api-admin/tasks/                |             |
+| [**apiAdminTasksPartialUpdate**](#apiadmintaskspartialupdate)               | **PATCH** /api-admin/tasks/{id}/         |             |
+| [**apiAdminTasksRetrieve**](#apiadmintasksretrieve)                         | **GET** /api-admin/tasks/{id}/           |             |
+| [**apiAdminTasksUpdate**](#apiadmintasksupdate)                             | **PUT** /api-admin/tasks/{id}/           |             |
+| [**apiAdminUsersCreate**](#apiadminuserscreate)                             | **POST** /api-admin/users/               |             |
+| [**apiAdminUsersDestroy**](#apiadminusersdestroy)                           | **DELETE** /api-admin/users/{id}/        |             |
+| [**apiAdminUsersList**](#apiadminuserslist)                                 | **GET** /api-admin/users/                |             |
+| [**apiAdminUsersMeRetrieve**](#apiadminusersmeretrieve)                     | **GET** /api-admin/users/me/             |             |
+| [**apiAdminUsersOptionsPartialUpdate**](#apiadminusersoptionspartialupdate) | **PATCH** /api-admin/users/options/      |             |
+| [**apiAdminUsersPartialUpdate**](#apiadminuserspartialupdate)               | **PATCH** /api-admin/users/{id}/         |             |
+| [**apiAdminUsersRetrieve**](#apiadminusersretrieve)                         | **GET** /api-admin/users/{id}/           |             |
+| [**apiAdminUsersUpdate**](#apiadminusersupdate)                             | **PUT** /api-admin/users/{id}/           |             |
 
 # **apiAdminProjectsBulkUpdateUpdate**
-> ProjectDetail apiAdminProjectsBulkUpdateUpdate(projectDetailRequest)
 
+> ProjectDetail apiAdminProjectsBulkUpdateUpdate(projectDetailRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    ProjectDetailRequest
-} from './api';
+import { ApiAdminApi, Configuration, ProjectDetailRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let projectDetailRequest: ProjectDetailRequest; //
 
-const { status, data } = await apiInstance.apiAdminProjectsBulkUpdateUpdate(
-    projectDetailRequest
-);
+const { status, data } =
+  await apiInstance.apiAdminProjectsBulkUpdateUpdate(projectDetailRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **projectDetailRequest** | **ProjectDetailRequest**|  | |
-
+| Name                     | Type                     | Description | Notes |
+| ------------------------ | ------------------------ | ----------- | ----- |
+| **projectDetailRequest** | **ProjectDetailRequest** |             |       |
 
 ### Return type
 
@@ -72,46 +66,40 @@ const { status, data } = await apiInstance.apiAdminProjectsBulkUpdateUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsCreate**
-> ProjectDetail apiAdminProjectsCreate(projectDetailRequest)
 
+> ProjectDetail apiAdminProjectsCreate(projectDetailRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    ProjectDetailRequest
-} from './api';
+import { ApiAdminApi, Configuration, ProjectDetailRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let projectDetailRequest: ProjectDetailRequest; //
 
-const { status, data } = await apiInstance.apiAdminProjectsCreate(
-    projectDetailRequest
-);
+const { status, data } =
+  await apiInstance.apiAdminProjectsCreate(projectDetailRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **projectDetailRequest** | **ProjectDetailRequest**|  | |
-
+| Name                     | Type                     | Description | Notes |
+| ------------------------ | ------------------------ | ----------- | ----- |
+| **projectDetailRequest** | **ProjectDetailRequest** |             |       |
 
 ### Return type
 
@@ -123,45 +111,39 @@ const { status, data } = await apiInstance.apiAdminProjectsCreate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**201** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **201**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsDestroy**
-> apiAdminProjectsDestroy()
 
+> apiAdminProjectsDestroy()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this project. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminProjectsDestroy(
-    id
-);
+const { status, data } = await apiInstance.apiAdminProjectsDestroy(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined|
-
+| Name   | Type         | Description                                      | Notes                 |
+| ------ | ------------ | ------------------------------------------------ | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined |
 
 ### Return type
 
@@ -173,28 +155,25 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 ### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**204** | No response body |  -  |
+
+| Status code | Description      | Response headers |
+| ----------- | ---------------- | ---------------- |
+| **204**     | No response body | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsList**
-> PaginatedProjectAdminList apiAdminProjectsList()
 
+> PaginatedProjectAdminList apiAdminProjectsList()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -202,19 +181,15 @@ const apiInstance = new ApiAdminApi(configuration);
 let page: number; //A page number within the paginated result set. (optional) (default to undefined)
 let pageSize: number; //Number of results to return per page. (optional) (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminProjectsList(
-    page,
-    pageSize
-);
+const { status, data } = await apiInstance.apiAdminProjectsList(page, pageSize);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **page** | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined|
-| **pageSize** | [**number**] | Number of results to return per page. | (optional) defaults to undefined|
-
+| Name         | Type         | Description                                    | Notes                            |
+| ------------ | ------------ | ---------------------------------------------- | -------------------------------- |
+| **page**     | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined |
+| **pageSize** | [**number**] | Number of results to return per page.          | (optional) defaults to undefined |
 
 ### Return type
 
@@ -226,29 +201,25 @@ const { status, data } = await apiInstance.apiAdminProjectsList(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsPartialUpdate**
-> ProjectDetail apiAdminProjectsPartialUpdate()
 
+> ProjectDetail apiAdminProjectsPartialUpdate()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    PatchedProjectDetailRequest
-} from './api';
+import { ApiAdminApi, Configuration, PatchedProjectDetailRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -257,18 +228,17 @@ let id: number; //A unique integer value identifying this project. (default to u
 let patchedProjectDetailRequest: PatchedProjectDetailRequest; // (optional)
 
 const { status, data } = await apiInstance.apiAdminProjectsPartialUpdate(
-    id,
-    patchedProjectDetailRequest
+  id,
+  patchedProjectDetailRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **patchedProjectDetailRequest** | **PatchedProjectDetailRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined|
-
+| Name                            | Type                            | Description                                      | Notes                 |
+| ------------------------------- | ------------------------------- | ------------------------------------------------ | --------------------- |
+| **patchedProjectDetailRequest** | **PatchedProjectDetailRequest** |                                                  |                       |
+| **id**                          | [**number**]                    | A unique integer value identifying this project. | defaults to undefined |
 
 ### Return type
 
@@ -280,45 +250,39 @@ const { status, data } = await apiInstance.apiAdminProjectsPartialUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsRetrieve**
-> ProjectDetail apiAdminProjectsRetrieve()
 
+> ProjectDetail apiAdminProjectsRetrieve()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this project. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminProjectsRetrieve(
-    id
-);
+const { status, data } = await apiInstance.apiAdminProjectsRetrieve(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined|
-
+| Name   | Type         | Description                                      | Notes                 |
+| ------ | ------------ | ------------------------------------------------ | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined |
 
 ### Return type
 
@@ -330,29 +294,25 @@ const { status, data } = await apiInstance.apiAdminProjectsRetrieve(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminProjectsUpdate**
-> ProjectDetail apiAdminProjectsUpdate(projectDetailRequest)
 
+> ProjectDetail apiAdminProjectsUpdate(projectDetailRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    ProjectDetailRequest
-} from './api';
+import { ApiAdminApi, Configuration, ProjectDetailRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -361,18 +321,17 @@ let id: number; //A unique integer value identifying this project. (default to u
 let projectDetailRequest: ProjectDetailRequest; //
 
 const { status, data } = await apiInstance.apiAdminProjectsUpdate(
-    id,
-    projectDetailRequest
+  id,
+  projectDetailRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **projectDetailRequest** | **ProjectDetailRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this project. | defaults to undefined|
-
+| Name                     | Type                     | Description                                      | Notes                 |
+| ------------------------ | ------------------------ | ------------------------------------------------ | --------------------- |
+| **projectDetailRequest** | **ProjectDetailRequest** |                                                  |                       |
+| **id**                   | [**number**]             | A unique integer value identifying this project. | defaults to undefined |
 
 ### Return type
 
@@ -384,46 +343,39 @@ const { status, data } = await apiInstance.apiAdminProjectsUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsCreate**
-> TagAdmin apiAdminTagsCreate(tagAdminRequest)
 
+> TagAdmin apiAdminTagsCreate(tagAdminRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    TagAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, TagAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let tagAdminRequest: TagAdminRequest; //
 
-const { status, data } = await apiInstance.apiAdminTagsCreate(
-    tagAdminRequest
-);
+const { status, data } = await apiInstance.apiAdminTagsCreate(tagAdminRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **tagAdminRequest** | **TagAdminRequest**|  | |
-
+| Name                | Type                | Description | Notes |
+| ------------------- | ------------------- | ----------- | ----- |
+| **tagAdminRequest** | **TagAdminRequest** |             |       |
 
 ### Return type
 
@@ -435,45 +387,39 @@ const { status, data } = await apiInstance.apiAdminTagsCreate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**201** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **201**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsDestroy**
-> apiAdminTagsDestroy()
 
+> apiAdminTagsDestroy()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this tag. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminTagsDestroy(
-    id
-);
+const { status, data } = await apiInstance.apiAdminTagsDestroy(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined|
-
+| Name   | Type         | Description                                  | Notes                 |
+| ------ | ------------ | -------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined |
 
 ### Return type
 
@@ -485,28 +431,25 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 ### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**204** | No response body |  -  |
+
+| Status code | Description      | Response headers |
+| ----------- | ---------------- | ---------------- |
+| **204**     | No response body | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsList**
-> PaginatedTagAdminList apiAdminTagsList()
 
+> PaginatedTagAdminList apiAdminTagsList()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -514,19 +457,15 @@ const apiInstance = new ApiAdminApi(configuration);
 let page: number; //A page number within the paginated result set. (optional) (default to undefined)
 let pageSize: number; //Number of results to return per page. (optional) (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminTagsList(
-    page,
-    pageSize
-);
+const { status, data } = await apiInstance.apiAdminTagsList(page, pageSize);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **page** | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined|
-| **pageSize** | [**number**] | Number of results to return per page. | (optional) defaults to undefined|
-
+| Name         | Type         | Description                                    | Notes                            |
+| ------------ | ------------ | ---------------------------------------------- | -------------------------------- |
+| **page**     | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined |
+| **pageSize** | [**number**] | Number of results to return per page.          | (optional) defaults to undefined |
 
 ### Return type
 
@@ -538,29 +477,25 @@ const { status, data } = await apiInstance.apiAdminTagsList(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsPartialUpdate**
-> TagAdmin apiAdminTagsPartialUpdate()
 
+> TagAdmin apiAdminTagsPartialUpdate()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    PatchedTagAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, PatchedTagAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -569,18 +504,17 @@ let id: number; //A unique integer value identifying this tag. (default to undef
 let patchedTagAdminRequest: PatchedTagAdminRequest; // (optional)
 
 const { status, data } = await apiInstance.apiAdminTagsPartialUpdate(
-    id,
-    patchedTagAdminRequest
+  id,
+  patchedTagAdminRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **patchedTagAdminRequest** | **PatchedTagAdminRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined|
-
+| Name                       | Type                       | Description                                  | Notes                 |
+| -------------------------- | -------------------------- | -------------------------------------------- | --------------------- |
+| **patchedTagAdminRequest** | **PatchedTagAdminRequest** |                                              |                       |
+| **id**                     | [**number**]               | A unique integer value identifying this tag. | defaults to undefined |
 
 ### Return type
 
@@ -592,45 +526,39 @@ const { status, data } = await apiInstance.apiAdminTagsPartialUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsRetrieve**
-> TagDetail apiAdminTagsRetrieve()
 
+> TagDetail apiAdminTagsRetrieve()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this tag. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminTagsRetrieve(
-    id
-);
+const { status, data } = await apiInstance.apiAdminTagsRetrieve(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined|
-
+| Name   | Type         | Description                                  | Notes                 |
+| ------ | ------------ | -------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined |
 
 ### Return type
 
@@ -642,29 +570,25 @@ const { status, data } = await apiInstance.apiAdminTagsRetrieve(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTagsUpdate**
-> TagAdmin apiAdminTagsUpdate(tagAdminRequest)
 
+> TagAdmin apiAdminTagsUpdate(tagAdminRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    TagAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, TagAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -673,18 +597,17 @@ let id: number; //A unique integer value identifying this tag. (default to undef
 let tagAdminRequest: TagAdminRequest; //
 
 const { status, data } = await apiInstance.apiAdminTagsUpdate(
-    id,
-    tagAdminRequest
+  id,
+  tagAdminRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **tagAdminRequest** | **TagAdminRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this tag. | defaults to undefined|
-
+| Name                | Type                | Description                                  | Notes                 |
+| ------------------- | ------------------- | -------------------------------------------- | --------------------- |
+| **tagAdminRequest** | **TagAdminRequest** |                                              |                       |
+| **id**              | [**number**]        | A unique integer value identifying this tag. | defaults to undefined |
 
 ### Return type
 
@@ -696,46 +619,40 @@ const { status, data } = await apiInstance.apiAdminTagsUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksCreate**
-> TaskAdmin apiAdminTasksCreate(taskAdminRequest)
 
+> TaskAdmin apiAdminTasksCreate(taskAdminRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    TaskAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, TaskAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let taskAdminRequest: TaskAdminRequest; //
 
-const { status, data } = await apiInstance.apiAdminTasksCreate(
-    taskAdminRequest
-);
+const { status, data } =
+  await apiInstance.apiAdminTasksCreate(taskAdminRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **taskAdminRequest** | **TaskAdminRequest**|  | |
-
+| Name                 | Type                 | Description | Notes |
+| -------------------- | -------------------- | ----------- | ----- |
+| **taskAdminRequest** | **TaskAdminRequest** |             |       |
 
 ### Return type
 
@@ -747,45 +664,39 @@ const { status, data } = await apiInstance.apiAdminTasksCreate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**201** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **201**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksDestroy**
-> apiAdminTasksDestroy()
 
+> apiAdminTasksDestroy()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this task. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminTasksDestroy(
-    id
-);
+const { status, data } = await apiInstance.apiAdminTasksDestroy(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined|
-
+| Name   | Type         | Description                                   | Notes                 |
+| ------ | ------------ | --------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined |
 
 ### Return type
 
@@ -797,28 +708,25 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 ### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**204** | No response body |  -  |
+
+| Status code | Description      | Response headers |
+| ----------- | ---------------- | ---------------- |
+| **204**     | No response body | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksList**
-> PaginatedTaskAdminList apiAdminTasksList()
 
+> PaginatedTaskAdminList apiAdminTasksList()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -829,22 +737,21 @@ let pageSize: number; //Number of results to return per page. (optional) (defaul
 let search: string; //A search term. (optional) (default to undefined)
 
 const { status, data } = await apiInstance.apiAdminTasksList(
-    ordering,
-    page,
-    pageSize,
-    search
+  ordering,
+  page,
+  pageSize,
+  search,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **ordering** | [**string**] | Which field to use when ordering the results. | (optional) defaults to undefined|
-| **page** | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined|
-| **pageSize** | [**number**] | Number of results to return per page. | (optional) defaults to undefined|
-| **search** | [**string**] | A search term. | (optional) defaults to undefined|
-
+| Name         | Type         | Description                                    | Notes                            |
+| ------------ | ------------ | ---------------------------------------------- | -------------------------------- |
+| **ordering** | [**string**] | Which field to use when ordering the results.  | (optional) defaults to undefined |
+| **page**     | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined |
+| **pageSize** | [**number**] | Number of results to return per page.          | (optional) defaults to undefined |
+| **search**   | [**string**] | A search term.                                 | (optional) defaults to undefined |
 
 ### Return type
 
@@ -856,29 +763,25 @@ const { status, data } = await apiInstance.apiAdminTasksList(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksPartialUpdate**
-> TaskAdmin apiAdminTasksPartialUpdate()
 
+> TaskAdmin apiAdminTasksPartialUpdate()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    PatchedTaskAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, PatchedTaskAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -887,18 +790,17 @@ let id: number; //A unique integer value identifying this task. (default to unde
 let patchedTaskAdminRequest: PatchedTaskAdminRequest; // (optional)
 
 const { status, data } = await apiInstance.apiAdminTasksPartialUpdate(
-    id,
-    patchedTaskAdminRequest
+  id,
+  patchedTaskAdminRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **patchedTaskAdminRequest** | **PatchedTaskAdminRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined|
-
+| Name                        | Type                        | Description                                   | Notes                 |
+| --------------------------- | --------------------------- | --------------------------------------------- | --------------------- |
+| **patchedTaskAdminRequest** | **PatchedTaskAdminRequest** |                                               |                       |
+| **id**                      | [**number**]                | A unique integer value identifying this task. | defaults to undefined |
 
 ### Return type
 
@@ -910,45 +812,39 @@ const { status, data } = await apiInstance.apiAdminTasksPartialUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksRetrieve**
-> TaskAdmin apiAdminTasksRetrieve()
 
+> TaskAdmin apiAdminTasksRetrieve()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this task. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminTasksRetrieve(
-    id
-);
+const { status, data } = await apiInstance.apiAdminTasksRetrieve(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined|
-
+| Name   | Type         | Description                                   | Notes                 |
+| ------ | ------------ | --------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined |
 
 ### Return type
 
@@ -960,29 +856,25 @@ const { status, data } = await apiInstance.apiAdminTasksRetrieve(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminTasksUpdate**
-> TaskAdmin apiAdminTasksUpdate(taskAdminRequest)
 
+> TaskAdmin apiAdminTasksUpdate(taskAdminRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    TaskAdminRequest
-} from './api';
+import { ApiAdminApi, Configuration, TaskAdminRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -991,18 +883,17 @@ let id: number; //A unique integer value identifying this task. (default to unde
 let taskAdminRequest: TaskAdminRequest; //
 
 const { status, data } = await apiInstance.apiAdminTasksUpdate(
-    id,
-    taskAdminRequest
+  id,
+  taskAdminRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **taskAdminRequest** | **TaskAdminRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this task. | defaults to undefined|
-
+| Name                 | Type                 | Description                                   | Notes                 |
+| -------------------- | -------------------- | --------------------------------------------- | --------------------- |
+| **taskAdminRequest** | **TaskAdminRequest** |                                               |                       |
+| **id**               | [**number**]         | A unique integer value identifying this task. | defaults to undefined |
 
 ### Return type
 
@@ -1014,46 +905,39 @@ const { status, data } = await apiInstance.apiAdminTasksUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersCreate**
-> User apiAdminUsersCreate(userRequest)
 
+> User apiAdminUsersCreate(userRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    UserRequest
-} from './api';
+import { ApiAdminApi, Configuration, UserRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let userRequest: UserRequest; //
 
-const { status, data } = await apiInstance.apiAdminUsersCreate(
-    userRequest
-);
+const { status, data } = await apiInstance.apiAdminUsersCreate(userRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userRequest** | **UserRequest**|  | |
-
+| Name            | Type            | Description | Notes |
+| --------------- | --------------- | ----------- | ----- |
+| **userRequest** | **UserRequest** |             |       |
 
 ### Return type
 
@@ -1065,45 +949,39 @@ const { status, data } = await apiInstance.apiAdminUsersCreate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**201** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **201**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersDestroy**
-> apiAdminUsersDestroy()
 
+> apiAdminUsersDestroy()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this user. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminUsersDestroy(
-    id
-);
+const { status, data } = await apiInstance.apiAdminUsersDestroy(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined|
-
+| Name   | Type         | Description                                   | Notes                 |
+| ------ | ------------ | --------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined |
 
 ### Return type
 
@@ -1115,28 +993,25 @@ void (empty response body)
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: Not defined
-
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 ### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**204** | No response body |  -  |
+
+| Status code | Description      | Response headers |
+| ----------- | ---------------- | ---------------- |
+| **204**     | No response body | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersList**
-> PaginatedUserList apiAdminUsersList()
 
+> PaginatedUserList apiAdminUsersList()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -1144,19 +1019,15 @@ const apiInstance = new ApiAdminApi(configuration);
 let page: number; //A page number within the paginated result set. (optional) (default to undefined)
 let pageSize: number; //Number of results to return per page. (optional) (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminUsersList(
-    page,
-    pageSize
-);
+const { status, data } = await apiInstance.apiAdminUsersList(page, pageSize);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **page** | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined|
-| **pageSize** | [**number**] | Number of results to return per page. | (optional) defaults to undefined|
-
+| Name         | Type         | Description                                    | Notes                            |
+| ------------ | ------------ | ---------------------------------------------- | -------------------------------- |
+| **page**     | [**number**] | A page number within the paginated result set. | (optional) defaults to undefined |
+| **pageSize** | [**number**] | Number of results to return per page.          | (optional) defaults to undefined |
 
 ### Return type
 
@@ -1168,28 +1039,25 @@ const { status, data } = await apiInstance.apiAdminUsersList(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersMeRetrieve**
-> User apiAdminUsersMeRetrieve()
 
+> User apiAdminUsersMeRetrieve()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -1198,8 +1066,8 @@ const { status, data } = await apiInstance.apiAdminUsersMeRetrieve();
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
 
+This endpoint does not have any parameters.
 
 ### Return type
 
@@ -1211,18 +1079,19 @@ This endpoint does not have any parameters.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersOptionsPartialUpdate**
+
 > User apiAdminUsersOptionsPartialUpdate()
 
 Handler method for HTTP \'OPTIONS\' request.
@@ -1230,28 +1099,22 @@ Handler method for HTTP \'OPTIONS\' request.
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    PatchedUserRequest
-} from './api';
+import { ApiAdminApi, Configuration, PatchedUserRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let patchedUserRequest: PatchedUserRequest; // (optional)
 
-const { status, data } = await apiInstance.apiAdminUsersOptionsPartialUpdate(
-    patchedUserRequest
-);
+const { status, data } =
+  await apiInstance.apiAdminUsersOptionsPartialUpdate(patchedUserRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **patchedUserRequest** | **PatchedUserRequest**|  | |
-
+| Name                   | Type                   | Description | Notes |
+| ---------------------- | ---------------------- | ----------- | ----- |
+| **patchedUserRequest** | **PatchedUserRequest** |             |       |
 
 ### Return type
 
@@ -1263,29 +1126,25 @@ const { status, data } = await apiInstance.apiAdminUsersOptionsPartialUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersPartialUpdate**
-> User apiAdminUsersPartialUpdate()
 
+> User apiAdminUsersPartialUpdate()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    PatchedUserRequest
-} from './api';
+import { ApiAdminApi, Configuration, PatchedUserRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -1294,18 +1153,17 @@ let id: number; //A unique integer value identifying this user. (default to unde
 let patchedUserRequest: PatchedUserRequest; // (optional)
 
 const { status, data } = await apiInstance.apiAdminUsersPartialUpdate(
-    id,
-    patchedUserRequest
+  id,
+  patchedUserRequest,
 );
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **patchedUserRequest** | **PatchedUserRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined|
-
+| Name                   | Type                   | Description                                   | Notes                 |
+| ---------------------- | ---------------------- | --------------------------------------------- | --------------------- |
+| **patchedUserRequest** | **PatchedUserRequest** |                                               |                       |
+| **id**                 | [**number**]           | A unique integer value identifying this user. | defaults to undefined |
 
 ### Return type
 
@@ -1317,45 +1175,39 @@ const { status, data } = await apiInstance.apiAdminUsersPartialUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersRetrieve**
-> User apiAdminUsersRetrieve()
 
+> User apiAdminUsersRetrieve()
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration
-} from './api';
+import { ApiAdminApi, Configuration } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
 
 let id: number; //A unique integer value identifying this user. (default to undefined)
 
-const { status, data } = await apiInstance.apiAdminUsersRetrieve(
-    id
-);
+const { status, data } = await apiInstance.apiAdminUsersRetrieve(id);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined|
-
+| Name   | Type         | Description                                   | Notes                 |
+| ------ | ------------ | --------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined |
 
 ### Return type
 
@@ -1367,29 +1219,25 @@ const { status, data } = await apiInstance.apiAdminUsersRetrieve(
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAdminUsersUpdate**
-> User apiAdminUsersUpdate(userRequest)
 
+> User apiAdminUsersUpdate(userRequest)
 
 ### Example
 
 ```typescript
-import {
-    ApiAdminApi,
-    Configuration,
-    UserRequest
-} from './api';
+import { ApiAdminApi, Configuration, UserRequest } from "./api";
 
 const configuration = new Configuration();
 const apiInstance = new ApiAdminApi(configuration);
@@ -1397,19 +1245,15 @@ const apiInstance = new ApiAdminApi(configuration);
 let id: number; //A unique integer value identifying this user. (default to undefined)
 let userRequest: UserRequest; //
 
-const { status, data } = await apiInstance.apiAdminUsersUpdate(
-    id,
-    userRequest
-);
+const { status, data } = await apiInstance.apiAdminUsersUpdate(id, userRequest);
 ```
 
 ### Parameters
 
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **userRequest** | **UserRequest**|  | |
-| **id** | [**number**] | A unique integer value identifying this user. | defaults to undefined|
-
+| Name            | Type            | Description                                   | Notes                 |
+| --------------- | --------------- | --------------------------------------------- | --------------------- |
+| **userRequest** | **UserRequest** |                                               |                       |
+| **id**          | [**number**]    | A unique integer value identifying this user. | defaults to undefined |
 
 ### Return type
 
@@ -1421,14 +1265,13 @@ const { status, data } = await apiInstance.apiAdminUsersUpdate(
 
 ### HTTP request headers
 
- - **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
- - **Accept**: application/json
-
+- **Content-Type**: application/json, application/x-www-form-urlencoded, multipart/form-data
+- **Accept**: application/json
 
 ### HTTP response details
+
 | Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** |  |  -  |
+| ----------- | ----------- | ---------------- |
+| **200**     |             | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-

@@ -1,23 +1,22 @@
 # TagAdmin
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **number** |  | [readonly] [default to undefined]
-**name** | **string** |  | [default to undefined]
-**created_by** | **number** |  | [default to undefined]
+| Name           | Type       | Description | Notes                             |
+| -------------- | ---------- | ----------- | --------------------------------- |
+| **id**         | **number** |             | [readonly] [default to undefined] |
+| **name**       | **string** |             | [default to undefined]            |
+| **created_by** | **number** |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { TagAdmin } from './api';
+import { TagAdmin } from "./api";
 
 const instance: TagAdmin = {
-    id,
-    name,
-    created_by,
+  id,
+  name,
+  created_by,
 };
 ```
 

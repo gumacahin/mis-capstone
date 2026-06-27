@@ -1,25 +1,24 @@
 # PaginatedTagAdminList
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**count** | **number** |  | [default to undefined]
-**next** | **string** |  | [optional] [default to undefined]
-**previous** | **string** |  | [optional] [default to undefined]
-**results** | [**Array&lt;TagAdmin&gt;**](TagAdmin.md) |  | [default to undefined]
+| Name         | Type                                     | Description | Notes                             |
+| ------------ | ---------------------------------------- | ----------- | --------------------------------- |
+| **count**    | **number**                               |             | [default to undefined]            |
+| **next**     | **string**                               |             | [optional] [default to undefined] |
+| **previous** | **string**                               |             | [optional] [default to undefined] |
+| **results**  | [**Array&lt;TagAdmin&gt;**](TagAdmin.md) |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { PaginatedTagAdminList } from './api';
+import { PaginatedTagAdminList } from "./api";
 
 const instance: PaginatedTagAdminList = {
-    count,
-    next,
-    previous,
-    results,
+  count,
+  next,
+  previous,
+  results,
 };
 ```
 

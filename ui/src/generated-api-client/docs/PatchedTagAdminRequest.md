@@ -1,21 +1,20 @@
 # PatchedTagAdminRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [optional] [default to undefined]
-**created_by** | **number** |  | [optional] [default to undefined]
+| Name           | Type       | Description | Notes                             |
+| -------------- | ---------- | ----------- | --------------------------------- |
+| **name**       | **string** |             | [optional] [default to undefined] |
+| **created_by** | **number** |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { PatchedTagAdminRequest } from './api';
+import { PatchedTagAdminRequest } from "./api";
 
 const instance: PatchedTagAdminRequest = {
-    name,
-    created_by,
+  name,
+  created_by,
 };
 ```
 

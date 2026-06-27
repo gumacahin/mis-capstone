@@ -94,9 +94,10 @@ Today E2E result:
 - Frontend co-located unit tests still have old type debt and are excluded from
   the app build gate. They should be repaired separately before relying on full
   unit-test typechecking as a quality gate.
-- Planner endpoints now have a dedicated typed frontend planner client module.
-  They should eventually be added to the generated OpenAPI client once the
-  planner API stabilizes.
+- Planner endpoints are now included in the generated OpenAPI client. Keep the
+  planner schema contract test updated as endpoint behavior changes.
+- Admin generated-client coverage should be revisited separately if the admin UI
+  needs generated operations again; the current planner UI does not rely on it.
 - Scheduler deployment still needs an actual `DAILY_DIGEST_SCHEDULER_SECRET`.
 - Production deployment still needs real environment values for Auth0, database,
   CORS origins, and secret key management.
@@ -105,10 +106,9 @@ Today E2E result:
 
 ## Recommended Next Work
 
-1. Add planner endpoints to the generated OpenAPI client once the API
-   stabilizes.
-2. Add E2E coverage for snooze, dismiss, and no-suggestion states.
-3. Polish `/today` planner UX and suggestion reasons.
-4. Update the capstone paper with the faculty/staff scope, task management vs.
+1. Polish `/today` planner UX and suggestion reasons.
+2. Update the capstone paper with the faculty/staff scope, task management vs.
    planning distinction, and typed-operations architecture.
-5. Add Google Calendar sync only after planner operations stabilize.
+3. Add Google Calendar sync only after planner operations stabilize.
+4. Decide whether admin/reporting APIs should remain aggregate-only or expose
+   individual content under an explicit admin contract.

@@ -1,21 +1,20 @@
 # ProjectRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**title** | **string** |  | [default to undefined]
-**sections** | [**Array&lt;ProjectSectionRequest&gt;**](ProjectSectionRequest.md) |  | [default to undefined]
+| Name         | Type                                                               | Description | Notes                  |
+| ------------ | ------------------------------------------------------------------ | ----------- | ---------------------- |
+| **title**    | **string**                                                         |             | [default to undefined] |
+| **sections** | [**Array&lt;ProjectSectionRequest&gt;**](ProjectSectionRequest.md) |             | [default to undefined] |
 
 ## Example
 
 ```typescript
-import { ProjectRequest } from './api';
+import { ProjectRequest } from "./api";
 
 const instance: ProjectRequest = {
-    title,
-    sections,
+  title,
+  sections,
 };
 ```
 

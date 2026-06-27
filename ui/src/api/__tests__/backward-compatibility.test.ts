@@ -37,11 +37,12 @@ const mockApiProjectsList = vi.fn();
 const mockApiProjectsRetrieve = vi.fn();
 
 vi.mock("../../generated-api-client/api", () => ({
-  ApiApi: vi.fn().mockImplementation(() => ({
-    apiProjectsList: mockApiProjectsList,
-    apiProjectsRetrieve: mockApiProjectsRetrieve,
+  PlannerApi: vi.fn().mockImplementation(() => ({})),
+  ProjectsApi: vi.fn().mockImplementation(() => ({
+    projectsList: mockApiProjectsList,
+    projectsRetrieve: mockApiProjectsRetrieve,
   })),
-  ApiAdminApi: vi.fn().mockImplementation(() => ({})),
+  TasksApi: vi.fn().mockImplementation(() => ({})),
 }));
 
 describe("Backward Compatibility Tests", () => {

@@ -14,8 +14,5 @@
 
 export interface PatchedCommentRequest {
   object_pk?: string;
-  user?: number | null;
-  user_name?: string;
   comment?: string;
-  submit_date?: string;
 }

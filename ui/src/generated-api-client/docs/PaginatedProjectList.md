@@ -1,25 +1,24 @@
 # PaginatedProjectList
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**count** | **number** |  | [default to undefined]
-**next** | **string** |  | [optional] [default to undefined]
-**previous** | **string** |  | [optional] [default to undefined]
-**results** | [**Array&lt;Project&gt;**](Project.md) |  | [default to undefined]
+| Name         | Type                                   | Description | Notes                             |
+| ------------ | -------------------------------------- | ----------- | --------------------------------- |
+| **count**    | **number**                             |             | [default to undefined]            |
+| **next**     | **string**                             |             | [optional] [default to undefined] |
+| **previous** | **string**                             |             | [optional] [default to undefined] |
+| **results**  | [**Array&lt;Project&gt;**](Project.md) |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { PaginatedProjectList } from './api';
+import { PaginatedProjectList } from "./api";
 
 const instance: PaginatedProjectList = {
-    count,
-    next,
-    previous,
-    results,
+  count,
+  next,
+  previous,
+  results,
 };
 ```
 

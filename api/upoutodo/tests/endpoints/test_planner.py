@@ -222,3 +222,36 @@ def test_planner_requires_authentication(api_client):
     response = api_client.get("/api/planner/today/", format="json")
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+def test_openapi_schema_documents_planner_contract(auth_client):
+    response = auth_client.get("/api/schema/", HTTP_ACCEPT="application/json")
+
+    assert response.status_code == status.HTTP_200_OK
+    schema = response.data
+    planner_paths = schema["paths"]
+    assert (
+        planner_paths["/api/planner/today/"]["get"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/TodayPlan"
+    )
+    assert (
+        planner_paths["/api/planner/suggestions/{item_id}/accept/"]["post"][
+            "responses"
+        ]["200"]["content"]["application/json"]["schema"]["$ref"]
+        == "#/components/schemas/PlanItem"
+    )
+    assert (
+        planner_paths["/api/planner/suggestions/{item_id}/snooze/"]["post"][
+            "requestBody"
+        ]["content"]["application/json"]["schema"]["$ref"]
+        == "#/components/schemas/SnoozePlanItemRequest"
+    )
+    signal_properties = schema["components"]["schemas"]["PlanItemSignals"]["properties"]
+    assert (
+        signal_properties["due_status"]["$ref"] == "#/components/schemas/DueStatusEnum"
+    )
+    assert signal_properties["priority_label"]["type"] == "string"
+    assert signal_properties["snoozed_count"]["type"] == "integer"

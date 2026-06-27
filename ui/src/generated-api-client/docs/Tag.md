@@ -1,19 +1,18 @@
 # Tag
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [default to undefined]
+| Name     | Type       | Description | Notes                  |
+| -------- | ---------- | ----------- | ---------------------- |
+| **name** | **string** |             | [default to undefined] |
 
 ## Example
 
 ```typescript
-import { Tag } from './api';
+import { Tag } from "./api";
 
 const instance: Tag = {
-    name,
+  name,
 };
 ```
 

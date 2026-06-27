@@ -618,11 +618,73 @@ ui E2E: 8 passed
   users can inspect due status, priority, effort, recurrence, location, score,
   and prior snooze or dismiss history.
 
+## 2026-06-28: Planner OpenAPI Contract And Generated Client
+
+### Goal
+
+Move planner endpoints from an ad hoc frontend transport layer into the
+generated OpenAPI contract so the typed-operations architecture is reflected in
+the backend schema and frontend client.
+
+### Human Decisions And Constraints
+
+- The planner API is now stable enough to document in the schema.
+- The frontend should call generated planner operations for `/today` behavior.
+- Existing project/task hooks should keep working while the broader generated
+  client migration continues.
+- Admin-generated client support should not rely on stale generated files; the
+  current UI does not use admin generated operations.
+
+### Codex-Assisted Actions
+
+- Exposed `GET /api/schema/` through DRF Spectacular.
+- Added schema annotations for planner endpoints and the structured
+  `PlanItemSignals` response object.
+- Added a backend test that asserts planner paths, request bodies, responses,
+  and signal fields appear in the OpenAPI schema.
+- Regenerated the TypeScript OpenAPI client, adding generated planner API
+  methods and planner models.
+- Added a `planner` generated client to `useGeneratedApiClient`.
+- Kept existing project/task hooks working through a small compatibility wrapper
+  around the new split generated `ProjectsApi` and `TasksApi`.
+- Refactored the planner frontend client to call generated planner methods
+  instead of raw Axios paths.
+
+### Verification
+
+```text
+api: uv run ruff check api/urls.py upoutodo/serializers/planner.py upoutodo/views/planner.py upoutodo/tests/endpoints/test_planner.py
+api: uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py
+ui: vitest run src/api/__tests__/client.test.ts src/api/__tests__/integration.test.ts src/api/__tests__/backward-compatibility.test.ts src/modules/planner/__tests__/uiSchema.test.ts
+ui: npm run build
+repo: git diff --check
+```
+
+Observed results:
+
+```text
+api planner tests: 9 passed
+ui focused tests: 37 passed
+ui build: passed
+```
+
+### Study Notes
+
+- This makes the "typed" architecture more concrete: planner actions are now
+  documented operations with generated client methods, not manually assembled
+  URLs.
+- The generated client exposed a separate debt item: admin routes are not part
+  of the current generated schema surface used by the UI. That should be handled
+  as a separate admin/reporting contract decision, not mixed into planner work.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
 - Prioritize planner-specific work on `/today`.
-- Add generated API support for planner endpoints after the API stabilizes.
+- Keep planner OpenAPI schema tests and generated client output current as
+  endpoint behavior changes.
+- Resolve admin/reporting schema coverage separately if admin UI generated
+  operations become necessary again.
 - Add Google Calendar sync only after planner operations stabilize.
 - Continue recording major Codex-assisted decisions, patches, tests, and
   verification outcomes in this file.

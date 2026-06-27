@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,12 +27,17 @@ class PlannerViewSet(viewsets.ViewSet):
     def get_serializer_context(self):
         return {"request": self.request}
 
+    @extend_schema(responses=TodayPlanSerializer)
     @action(detail=False, methods=["get"], url_path="today")
     def today(self, request):
         plan = get_today_plan(request.user)
         serializer = TodayPlanSerializer(plan, context=self.get_serializer_context())
         return Response(serializer.data)
 
+    @extend_schema(
+        request=EnergyCheckInSerializer,
+        responses=TodayPlanSerializer,
+    )
     @action(detail=False, methods=["post"], url_path="check-in")
     def check_in(self, request):
         serializer = EnergyCheckInSerializer(data=request.data)
@@ -43,12 +49,19 @@ class PlannerViewSet(viewsets.ViewSet):
         )
         return Response(output_serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(responses=TodayPlanSerializer)
     @action(detail=False, methods=["post"], url_path="rebuild")
     def rebuild(self, request):
         plan = rebuild_today_plan(request.user)
         serializer = TodayPlanSerializer(plan, context=self.get_serializer_context())
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("item_id", OpenApiTypes.INT, OpenApiParameter.PATH)
+        ],
+        responses=PlanItemSerializer,
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -65,6 +78,13 @@ class PlannerViewSet(viewsets.ViewSet):
         serializer = PlanItemSerializer(item, context=self.get_serializer_context())
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("item_id", OpenApiTypes.INT, OpenApiParameter.PATH)
+        ],
+        request=SnoozePlanItemSerializer,
+        responses=PlanItemSerializer,
+    )
     @action(
         detail=False,
         methods=["post"],
@@ -84,6 +104,12 @@ class PlannerViewSet(viewsets.ViewSet):
         )
         return Response(output_serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("item_id", OpenApiTypes.INT, OpenApiParameter.PATH)
+        ],
+        responses=PlanItemSerializer,
+    )
     @action(
         detail=False,
         methods=["post"],

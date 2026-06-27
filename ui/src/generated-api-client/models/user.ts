@@ -25,4 +25,5 @@ export interface User {
   is_onboarded: boolean;
   projects: Array<Project>;
   theme: string;
+  email_digest_enabled: boolean;
 }

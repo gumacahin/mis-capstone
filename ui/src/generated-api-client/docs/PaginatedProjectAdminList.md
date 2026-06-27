@@ -1,25 +1,24 @@
 # PaginatedProjectAdminList
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**count** | **number** |  | [default to undefined]
-**next** | **string** |  | [optional] [default to undefined]
-**previous** | **string** |  | [optional] [default to undefined]
-**results** | [**Array&lt;ProjectAdmin&gt;**](ProjectAdmin.md) |  | [default to undefined]
+| Name         | Type                                             | Description | Notes                             |
+| ------------ | ------------------------------------------------ | ----------- | --------------------------------- |
+| **count**    | **number**                                       |             | [default to undefined]            |
+| **next**     | **string**                                       |             | [optional] [default to undefined] |
+| **previous** | **string**                                       |             | [optional] [default to undefined] |
+| **results**  | [**Array&lt;ProjectAdmin&gt;**](ProjectAdmin.md) |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { PaginatedProjectAdminList } from './api';
+import { PaginatedProjectAdminList } from "./api";
 
 const instance: PaginatedProjectAdminList = {
-    count,
-    next,
-    previous,
-    results,
+  count,
+  next,
+  previous,
+  results,
 };
 ```
 

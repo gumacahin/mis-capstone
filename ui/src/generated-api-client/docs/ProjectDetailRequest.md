@@ -1,25 +1,24 @@
 # ProjectDetailRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**is_default** | **boolean** |  | [optional] [default to undefined]
-**title** | **string** |  | [default to undefined]
-**view** | [**ViewEnum**](ViewEnum.md) |  | [optional] [default to undefined]
-**order** | **number** |  | [optional] [default to undefined]
+| Name           | Type                        | Description | Notes                             |
+| -------------- | --------------------------- | ----------- | --------------------------------- |
+| **is_default** | **boolean**                 |             | [optional] [default to undefined] |
+| **title**      | **string**                  |             | [default to undefined]            |
+| **view**       | [**ViewEnum**](ViewEnum.md) |             | [optional] [default to undefined] |
+| **order**      | **number**                  |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { ProjectDetailRequest } from './api';
+import { ProjectDetailRequest } from "./api";
 
 const instance: ProjectDetailRequest = {
-    is_default,
-    title,
-    view,
-    order,
+  is_default,
+  title,
+  view,
+  order,
 };
 ```
 

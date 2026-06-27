@@ -1,4 +1,4 @@
-import type { AxiosInstance } from "axios";
+import type { PlannerApi } from "@/generated-api-client/api";
 
 import type {
   PlannerCheckInInput,
@@ -13,35 +13,42 @@ export const plannerQueryKeys = {
 };
 
 export const getTodayPlan = async (
-  apiClient: AxiosInstance,
+  plannerClient: PlannerApi,
 ): Promise<TodayPlan> => {
-  const { data } = await apiClient.get("planner/today/");
+  const { data } = await plannerClient.plannerTodayRetrieve();
   return data as TodayPlan;
 };
 
 export const submitPlannerCheckIn = async (
-  apiClient: AxiosInstance,
+  plannerClient: PlannerApi,
   input: PlannerCheckInInput,
 ): Promise<TodayPlan> => {
-  const { data } = await apiClient.post("planner/check-in/", input);
+  const { data } = await plannerClient.plannerCheckInCreate({
+    energyCheckInRequest: input,
+  });
   return data as TodayPlan;
 };
 
 export const rebuildTodayPlan = async (
-  apiClient: AxiosInstance,
+  plannerClient: PlannerApi,
 ): Promise<TodayPlan> => {
-  const { data } = await apiClient.post("planner/rebuild/");
+  const { data } = await plannerClient.plannerRebuildCreate();
   return data as TodayPlan;
 };
 
 export const updatePlannerSuggestion = async (
-  apiClient: AxiosInstance,
+  plannerClient: PlannerApi,
   { id, action, minutes }: PlannerSuggestionActionInput,
 ): Promise<PlannerSuggestion> => {
-  const body = action === "snooze" ? { minutes: minutes ?? 60 } : {};
-  const { data } = await apiClient.post(
-    `planner/suggestions/${id}/${action}/`,
-    body,
-  );
+  const response =
+    action === "accept"
+      ? await plannerClient.plannerSuggestionsAcceptCreate({ itemId: id })
+      : action === "dismiss"
+        ? await plannerClient.plannerSuggestionsDismissCreate({ itemId: id })
+        : await plannerClient.plannerSuggestionsSnoozeCreate({
+            itemId: id,
+            snoozePlanItemRequest: { minutes: minutes ?? 60 },
+          });
+  const { data } = response;
   return data as PlannerSuggestion;
 };
