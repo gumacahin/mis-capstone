@@ -515,12 +515,59 @@ ui E2E: 8 passed
 - The next research-facing improvement is to make task signals more structured
   so reason explanations can be evaluated more directly.
 
+## 2026-06-28: Planner UI Schema Unit Tests
+
+### Goal
+
+Add fast, focused tests for the JIT planner UI decision logic instead of relying
+only on Playwright coverage.
+
+### Human Decisions And Constraints
+
+- The schema selection rules are product logic, so they should be tested close
+  to the module that owns them.
+- E2E tests remain useful for user-visible behavior, but unit tests give clearer
+  evidence for the component-selection rules.
+
+### Codex-Assisted Actions
+
+- Added `ui/src/modules/planner/__tests__/uiSchema.test.ts`.
+- Covered default schema selection for `EnergyCheckInCard` and `TodayPlanCard`.
+- Covered low-energy mode selection.
+- Covered limited-time mode selection.
+- Covered overdue triage selection and precedence over low-energy or
+  limited-time modes.
+- Covered planner unavailable state.
+- Covered loading and empty states.
+- Covered dismissed suggestion filtering in both `visiblePlannerSuggestions`
+  and generated schema IDs.
+- Updated `JIT_PLANNER_UI_SPEC.md` so schema unit tests are recorded as
+  implemented.
+
+### Verification
+
+```text
+ui: targeted ESLint for planner schema and schema tests
+ui: vitest run src/modules/planner/__tests__/uiSchema.test.ts
+```
+
+Observed result:
+
+```text
+ui schema tests: 7 passed
+```
+
+### Study Notes
+
+- These tests are a verification artifact for the JIT UI component registry.
+- They help show that the UI adaptation is deterministic and reviewable rather
+  than arbitrary model-generated interface behavior.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
 - Prioritize planner-specific work on `/today`.
 - Add generated API support for planner endpoints after the API stabilizes.
-- Add unit coverage for planner UI schema selection.
 - Structure task signals so suggestion reasons are clearer for the paper.
 - Add Google Calendar sync only after planner operations stabilize.
 - Continue recording major Codex-assisted decisions, patches, tests, and

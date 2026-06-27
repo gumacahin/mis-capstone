@@ -523,18 +523,19 @@ The current implementation supports the first JIT planner UI slice:
   `SuggestionReasonCard`, and `TaskSignalBreakdown`.
 - The registry can select low-energy, limited-time, and overdue-triage modes
   while preserving the same typed backend operations.
+- Unit tests cover the schema selection rules for default, low-energy,
+  limited-time, overdue-triage, unavailable, loading or empty, and dismissed
+  suggestion states.
 - Playwright verifies check-in, acceptance, snooze, dismiss, empty-state,
   unavailable-state, low-energy mode, and reason-details behavior.
 
 Next implementation steps:
 
-1. Add unit tests for `buildPlannerUiSchema` so low-energy, limited-time, and
-   overdue-triage selection rules are covered without relying only on E2E tests.
-2. Improve task signals in the backend so reason details can expose structured
+1. Improve task signals in the backend so reason details can expose structured
    due-date, priority, effort, recurrence, and snooze history fields instead of
    deriving them from the suggestion summary.
-3. Add generated OpenAPI support for planner endpoints once the API stabilizes.
-4. Defer chat and Google Calendar sync until the component registry and typed
+2. Add generated OpenAPI support for planner endpoints once the API stabilizes.
+3. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.
 
 ## Open Questions
