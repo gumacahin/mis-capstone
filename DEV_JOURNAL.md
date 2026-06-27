@@ -677,6 +677,58 @@ ui build: passed
   of the current generated schema surface used by the UI. That should be handled
   as a separate admin/reporting contract decision, not mixed into planner work.
 
+## 2026-06-28: Planner Explanation Polish
+
+### Goal
+
+Improve `/today` suggestion explanations so users can understand why a task is
+recommended without reading a raw score or scanning unlabeled chips.
+
+### Human Decisions And Constraints
+
+- This should stay deterministic and grounded in existing planner signals.
+- No new LLM, chat, Google Calendar, or generic task-management behavior should
+  be added in this slice.
+- The UI should keep the just-in-time pattern: detailed reasoning appears when
+  the user asks "Why this?"
+
+### Codex-Assisted Actions
+
+- Added `ui/src/modules/planner/explanations.ts` for pure explanation helpers.
+- Replaced the inline suggestion sentence with a concise today line:
+  due status, priority, effort, and project/section.
+- Split expanded reasoning into:
+  - "Why this matters today"
+  - "Planner rationale"
+  - labeled task signals
+- Changed task signals from unlabeled chips into a compact evidence grid with
+  due, priority, effort, project, recurrence, history, and planner score.
+- Added unit tests for explanation helpers.
+- Updated Today E2E coverage for the new summary line and labeled evidence.
+
+### Verification
+
+```text
+ui: vitest run src/modules/planner/__tests__/explanations.test.ts src/modules/planner/__tests__/uiSchema.test.ts
+ui: npm run build
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed results:
+
+```text
+ui explanation/schema tests: 11 passed
+ui build: passed
+ui E2E: 8 passed
+```
+
+### Study Notes
+
+- This strengthens the HCI side of the capstone by making the recommendation
+  explanation easier to inspect and evaluate.
+- The explanation UI remains grounded in backend-provided typed signals rather
+  than generated free-form reasoning.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

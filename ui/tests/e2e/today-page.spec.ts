@@ -254,7 +254,9 @@ test.describe("Today Page", () => {
     ).toBeVisible();
     await expect(page.getByText("Review LMS submissions")).toBeVisible();
     await expect(
-      page.getByText("Due today, high priority, fits your available time."),
+      page.getByText(
+        "Due today | High priority | 45 min | Teaching / Assessments",
+      ),
     ).toBeVisible();
     await expect(page.getByText("45m")).toBeVisible();
 
@@ -278,30 +280,59 @@ test.describe("Today Page", () => {
 
     await page.getByRole("button", { name: "Why this?" }).click();
 
-    await expect(
-      page.getByRole("region", {
-        name: "Reason for Review LMS submissions",
-      }),
-    ).toBeVisible();
-    await expect(page.getByText("Task signals")).toBeVisible();
     const reasonRegion = page.getByRole("region", {
       name: "Reason for Review LMS submissions",
     });
+    await expect(reasonRegion).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Why this matters today"),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText(
+        "It is due today, is marked high priority, and is estimated at 45 minutes.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(reasonRegion.getByText("Planner rationale")).toBeVisible();
+    await expect(
+      reasonRegion.getByText(
+        "Due today, high priority, fits your available time.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(reasonRegion.getByText("Task signals")).toBeVisible();
+    await expect(reasonRegion.getByText("Due", { exact: true })).toBeVisible();
     await expect(
       reasonRegion.getByText("Due today", { exact: true }),
     ).toBeVisible();
     await expect(
-      reasonRegion.getByText("Priority high", { exact: true }),
+      reasonRegion.getByText("Priority", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("High priority", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Effort", { exact: true }),
     ).toBeVisible();
     await expect(
       reasonRegion.getByText("45 minutes", { exact: true }),
     ).toBeVisible();
     await expect(
+      reasonRegion.getByText("Project", { exact: true }),
+    ).toBeVisible();
+    await expect(
       reasonRegion.getByText("Teaching / Assessments", { exact: true }),
     ).toBeVisible();
     await expect(
-      reasonRegion.getByText("Score 94", { exact: true }),
+      reasonRegion.getByText("Recurrence", { exact: true }),
     ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("One-time", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Planner score", { exact: true }),
+    ).toBeVisible();
+    await expect(reasonRegion.getByText("94", { exact: true })).toBeVisible();
   });
 
   test("selects low-energy planner UI when check-in energy is low", async ({

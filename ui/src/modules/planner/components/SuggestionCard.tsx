@@ -11,6 +11,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 
+import { buildSuggestionTodayLine } from "../explanations";
 import type { PlannerSuggestion, PlannerSuggestionAction } from "../types";
 import SuggestionReasonCard from "./SuggestionReasonCard";
 
@@ -28,6 +29,7 @@ export default function SuggestionCard({
   onAction,
 }: SuggestionCardProps) {
   const [showReason, setShowReason] = useState(false);
+  const todayLine = buildSuggestionTodayLine(suggestion);
 
   return (
     <Card variant="outlined">
@@ -51,7 +53,7 @@ export default function SuggestionCard({
                 />
               </Stack>
               <Typography variant="body2" color="text.secondary">
-                {suggestion.reason}
+                {todayLine}
               </Typography>
             </Stack>
             <Stack

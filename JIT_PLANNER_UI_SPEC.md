@@ -526,11 +526,16 @@ The current implementation supports the first JIT planner UI slice:
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
   `SuggestionReasonCard`, and `TaskSignalBreakdown`.
+- The suggestion card now shows a concise today line derived from task signals,
+  while the expanded reason panel separates immediate relevance, planner
+  rationale, and labeled evidence.
 - The registry can select low-energy, limited-time, and overdue-triage modes
   while preserving the same typed backend operations.
 - Unit tests cover the schema selection rules for default, low-energy,
   limited-time, overdue-triage, unavailable, loading or empty, and dismissed
   suggestion states.
+- Unit tests cover deterministic explanation helpers for today-line,
+  relevance, and history text.
 - Playwright verifies check-in, acceptance, snooze, dismiss, empty-state,
   unavailable-state, low-energy mode, and reason-details behavior.
 
