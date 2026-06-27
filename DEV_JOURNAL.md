@@ -1,0 +1,363 @@
+# Development Journal
+
+This journal records product decisions, implementation work, verification, and
+Codex-assisted development observations for the capstone project. It is intended
+to support the project paper as an audit trail of how the implementation evolved
+from a generic todo backend into a planner-first productivity tracker.
+
+## Journal Method
+
+Each entry should capture:
+
+- Date
+- Goal or question for the session
+- Human decisions and constraints
+- Codex-assisted actions
+- Verification performed
+- Study notes or reflections
+
+The journal should distinguish between:
+
+- product decisions, such as changing the system direction
+- implementation work, such as models, endpoints, UI, and tests
+- research-method observations about working with Codex
+
+Codex output should be treated as an assisted development artifact, not as
+independent validation. Human review, tests, and alignment with the source paper
+remain required.
+
+## 2026-06-27: Direction Reset Toward Planning
+
+### Goal
+
+Clarify whether the project should continue expanding the Django REST todo
+backend or refocus on the differentiator from Crisanto's paper: "What should I
+do today?"
+
+### Human Decisions And Constraints
+
+- The original implementation had grown into a broad todo backend with projects,
+  sections, tasks, tags, recurrence, notifications, email digest, admin
+  dashboard, productivity page, generated API client, and tests.
+- Prior guidance warned that this risked recreating Todoist or Trello.
+- The project direction was reset to treat the current Django backend as a
+  minimal system of record rather than as the main innovation.
+- The differentiator is daily planning support: helping users decide what to do
+  today based on task state, deadlines, energy, available time, and context.
+
+### Codex-Assisted Actions
+
+- Reviewed the product direction and proposed an "Option 1.5" architecture:
+  Django/DRF owns state, permissions, validation, and audit-friendly operations;
+  React becomes planner-first; future chat or MCP-style integrations call typed
+  backend operations only.
+- Clarified that Google Calendar can be a sync or scheduling destination, but
+  should not be the primary todo database.
+- Clarified that "typed operations" means predefined backend actions with
+  structured inputs, not raw SQL, unrestricted ORM access, or free-form database
+  mutation.
+
+### Study Notes
+
+- This shift strengthens the capstone narrative because the project is no
+  longer framed as a generic task app.
+- The core distinction is:
+
+```text
+Generic task app:
+"What tasks do I have?"
+
+Planner-first app:
+"Given my tasks, deadlines, energy, and available time, what should I do today?"
+```
+
+## 2026-06-27: Source Paper Scope And Capstone Narrative
+
+### Goal
+
+Resolve whether the implementation and paper should target faculty, students, or
+both.
+
+### Human Decisions And Constraints
+
+- The project proposal previously mentioned "faculty and students."
+- The source paper by Crisanto studied UPOU employees, specifically faculty,
+  research assistants, and staff.
+- To stay aligned with the evidence base, the implementation should focus on
+  UPOU faculty and staff as the primary validated scope.
+- Student use cases can be described as adjacent or future work.
+
+### Codex-Assisted Actions
+
+- Drafted suggested wording for reframing the proposal without contradicting the
+  original proposal.
+- Added project notes explaining that faculty and staff are the primary current
+  scope, while students are outside the primary validation scope for this
+  version.
+- Captured the capstone narrative as a planner-first productivity tracker
+  grounded in the "What should I do today?" question.
+
+### Study Notes
+
+- The "wiggle" is to frame students as a future or adjacent user group rather
+  than claiming they were part of the source study's validated requirements.
+- This supports a defensible scope statement in the paper.
+
+## 2026-06-27: Security And Privacy Freeze
+
+### Goal
+
+Address critical security and privacy issues before adding planner features.
+
+### Human Decisions And Constraints
+
+- The backend already contained broad task-management functionality.
+- Before layering planning logic on top of task data, ownership and permission
+  boundaries needed to be made safer.
+- Admin and reporting behavior should align with the proposal's preference for
+  aggregated or anonymized usage insights unless individual content exposure is
+  explicitly justified.
+
+### Codex-Assisted Actions
+
+Implemented and committed:
+
+```text
+96d7616 Harden backend ownership and admin boundaries
+```
+
+Key fixes:
+
+- Prevented profile self-escalation by allowlisting mutable profile fields and
+  blocking client writes to protected fields such as `is_admin`.
+- Scoped task foreign-key validation to the authenticated user's objects.
+- Changed task bulk update to use the user-scoped queryset and reject missing or
+  foreign task IDs before saving.
+- Filtered and created comments only for tasks owned by the current user.
+- Protected the daily digest endpoint so it requires admin access or a scheduler
+  secret.
+- Reduced admin UI exposure by removing generic raw task/user CRUD surfaces.
+- Tightened production settings around debug mode, CORS defaults, default secret
+  key behavior, and SQLite deployment.
+
+### Verification
+
+- Added focused backend tests for the security and privacy fixes.
+- Ran backend linting and test suite later in the freeze process.
+
+### Study Notes
+
+- This step supports the typed-operations architecture because planner or chat
+  interfaces should rely on backend-enforced permissions rather than trusting
+  the client or an assistant.
+- The Codex workflow was useful for identifying cross-cutting ownership issues,
+  but the fixes required explicit test coverage to make the changes defensible.
+
+## 2026-06-27: Planner Backend MVP
+
+### Goal
+
+Add the first planner-specific backend slice without expanding generic todo
+features.
+
+### Codex-Assisted Actions
+
+Implemented and committed:
+
+```text
+0ca2e84 Add planner backend suggestions API
+```
+
+Added:
+
+- `EnergyCheckIn`: daily energy level, available time, focus mode, and optional
+  context.
+- `TodayPlan`: generated plan for a user and date.
+- `PlanItem`: ordered task suggestions with reason, estimated minutes, score,
+  and accepted, snoozed, or dismissed state.
+- Planner service logic for deterministic, explainable task scoring.
+- Planner API endpoints:
+  - `GET /api/planner/today/`
+  - `POST /api/planner/check-in/`
+  - `POST /api/planner/rebuild/`
+  - `POST /api/planner/suggestions/{id}/accept/`
+  - `POST /api/planner/suggestions/{id}/snooze/`
+  - `POST /api/planner/suggestions/{id}/dismiss/`
+
+### Verification
+
+- Added endpoint tests for planner behavior.
+- Confirmed the planner uses the existing task system as a source of record
+  rather than replacing it.
+
+### Study Notes
+
+- This is the first concrete implementation of the "What should I do today?"
+  differentiator.
+- The planner API creates a typed operation surface that can later be reused by
+  chat, widgets, or MCP-style tools.
+
+## 2026-06-27: Planner-First Today UI
+
+### Goal
+
+Move the visible product experience toward planning by making `/today` the
+planner dashboard.
+
+### Codex-Assisted Actions
+
+Implemented and committed:
+
+```text
+c8d199c Make Today page planner-first
+```
+
+Added to `/today`:
+
+- Energy and available-time check-in.
+- Focus mode and optional context entry.
+- Suggested tasks with reasons and estimated minutes.
+- Accept, snooze, and dismiss actions.
+- The normal task list remains below the planner section.
+
+### Study Notes
+
+- This keeps the existing task system useful while visually and functionally
+  shifting the product toward planning.
+- The UI now starts with a planning question instead of a generic task list.
+
+## 2026-06-27: E2E And Build Stabilization
+
+### Goal
+
+Add an end-to-end test that inspects `/today` and make the frontend build/test
+environment reliable enough for planner work.
+
+### Codex-Assisted Actions
+
+Implemented and committed:
+
+```text
+8ef3234 Stabilize frontend E2E and build gates
+```
+
+Added or updated:
+
+- Playwright configuration for configurable local ports and E2E auth bypass.
+- E2E Auth0-like storage state setup.
+- Auth wrapper behavior for E2E mode.
+- API client default base URL behavior in browser contexts.
+- Vite port configuration.
+- Type/build fixes required by the current UI.
+- Playwright `/today` spec that verifies:
+  - Today page navigation.
+  - Planner check-in controls.
+  - Suggested task title, reason, and estimated minutes.
+  - Check-in payload submission.
+  - Suggestion acceptance behavior.
+
+### Verification
+
+The following checks passed during the freeze:
+
+```text
+api: uv run ruff check .
+api: uv run pytest --no-cov
+ui: npm run build
+ui: targeted ESLint for changed frontend/config/E2E files
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed results:
+
+```text
+api: 221 passed, 7 known timezone warnings
+ui E2E: 3 passed
+```
+
+### Study Notes
+
+- The E2E test makes the planner-first direction observable at the product
+  level, not only in backend unit tests.
+- Codex helped wire the test environment, but this also exposed existing UI type
+  and build debt.
+
+## 2026-06-27: Freeze And Paper Notes
+
+### Goal
+
+Document the current project state so future work does not drift back into
+generic todo-app expansion.
+
+### Codex-Assisted Actions
+
+Implemented and committed:
+
+```text
+6edac64 Document capstone planner freeze baseline
+```
+
+Added:
+
+- `CAPSTONE_NOTES.md`: source scope, capstone narrative, and typed operations.
+- `FREEZE_NOTES.md`: frozen direction, security/privacy baseline, planner MVP,
+  verification, known debt, and recommended next work.
+
+### Study Notes
+
+- The freeze gives the project a stable baseline for the capstone paper.
+- The implementation now has a clearer claim: Django is the system of record;
+  the planner layer is the contribution; future assistant tools should operate
+  through typed backend actions.
+
+## 2026-06-27: Codex Collaboration As Study Artifact
+
+### Goal
+
+Record the use of Codex itself as part of the development process for the
+capstone study.
+
+### Human Decisions And Constraints
+
+- The human developer remains responsible for product direction, source-paper
+  alignment, acceptance of changes, and capstone claims.
+- Codex is used as an implementation and analysis assistant, not as an
+  autonomous evaluator of correctness.
+- Outputs must be verified through tests, code review, and consistency with the
+  source paper.
+
+### Codex-Assisted Actions
+
+- Helped interpret product direction from the study title and requirements
+  framing.
+- Identified security and privacy risks in the existing implementation.
+- Implemented backend hardening, planner endpoints, planner UI, and E2E tests.
+- Drafted capstone notes, freeze notes, and this development journal.
+
+### Study Notes
+
+Potential paper framing:
+
+```text
+The project also documents the use of an AI coding assistant as part of the
+software development process. Codex was used to support code review,
+implementation, test creation, and documentation. The developer retained
+decision authority over scope, requirements interpretation, and acceptance of
+changes. Generated changes were treated as development artifacts and validated
+through automated tests and manual review.
+```
+
+This framing avoids claiming Codex as a research participant. It instead treats
+Codex-assisted development as part of the engineering method and implementation
+workflow.
+
+## Running Notes For Future Sessions
+
+- Keep generic todo features frozen unless they directly support planning.
+- Prioritize planner-specific work on `/today`.
+- Add typed planner client code or generated API support.
+- Extend E2E coverage for snooze, dismiss, empty-state, and no-suggestion flows.
+- Polish suggestion reasons so they are clear enough to discuss in the paper.
+- Add Google Calendar sync only after planner operations stabilize.
+- Continue recording major Codex-assisted decisions, patches, tests, and
+  verification outcomes in this file.

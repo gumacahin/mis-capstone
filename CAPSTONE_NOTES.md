@@ -104,3 +104,23 @@ actions with structured inputs, such as accepting a suggestion or submitting a
 check-in. It cannot directly access or modify database tables. This keeps the
 planner controllable, testable, and permission-safe.
 ```
+
+## Codex-Assisted Development As Study Artifact
+
+Working with Codex can be documented as part of the capstone development method.
+The project should not treat Codex as an independent source of requirements or
+validation. Instead, Codex is best framed as an AI-assisted development tool used
+for code review, implementation support, test creation, and documentation.
+
+Suggested wording:
+
+```text
+This project also records the use of an AI coding assistant as part of the
+software development process. Codex was used to support implementation, code
+review, testing, and documentation. The developer retained decision authority
+over requirements interpretation, scope, acceptance of generated changes, and
+alignment with the source study. Codex-assisted changes were treated as
+development artifacts and validated through automated tests and manual review.
+```
+
+Ongoing session notes should be kept in `DEV_JOURNAL.md`.
