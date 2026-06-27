@@ -116,13 +116,24 @@ export interface AppNotification {
   created_at: string;
 }
 
+interface AppNotificationPage {
+  results?: AppNotification[];
+}
+
+export const normalizeNotifications = (
+  data: AppNotification[] | AppNotificationPage,
+): AppNotification[] =>
+  Array.isArray(data) ? data : Array.isArray(data.results) ? data.results : [];
+
 export const useNotifications = () => {
   const apiClient = useApiClient();
   return useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
       const { data } = await apiClient.get("notifications/");
-      return data as AppNotification[];
+      return normalizeNotifications(
+        data as AppNotification[] | AppNotificationPage,
+      );
     },
     refetchInterval: 60_000,
   });

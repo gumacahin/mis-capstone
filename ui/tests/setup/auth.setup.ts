@@ -70,7 +70,7 @@ function hasUsableE2EState(): boolean {
       if (!item.name.startsWith(authStoragePrefix)) return false;
       if (item.name.endsWith("::@@user@@")) return false;
       try {
-        return Boolean(JSON.parse(item.value).body?.access_token);
+        return JSON.parse(item.value).body?.access_token === e2eAccessToken();
       } catch {
         return false;
       }
@@ -79,7 +79,7 @@ function hasUsableE2EState(): boolean {
       if (!item.name.startsWith(authStoragePrefix)) return false;
       if (!item.name.endsWith("::@@user@@")) return false;
       try {
-        return Boolean(JSON.parse(item.value).email);
+        return JSON.parse(item.value).email === e2eUserEmail();
       } catch {
         return false;
       }
@@ -90,12 +90,33 @@ function hasUsableE2EState(): boolean {
   }
 }
 
+function e2eAccessToken(): string {
+  return (
+    process.env.VITE_E2E_ACCESS_TOKEN ??
+    process.env.E2E_BEARER_TOKEN ??
+    "e2e-token"
+  );
+}
+
+function e2eUserEmail(): string {
+  return (
+    process.env.E2E_USER_EMAIL ??
+    process.env.AUTH0_USERNAME ??
+    "e2e-user@example.test"
+  );
+}
+
+function e2eUserName(): string {
+  return process.env.AUTH0_NAME ?? "Todo User";
+}
+
 function saveE2EState(): void {
   fs.mkdirSync("playwright/.auth", { recursive: true });
   const now = Math.floor(Date.now() / 1000);
   const clientId = process.env.VITE_AUTH0_CLIENT_ID ?? "e2e-client";
   const audience = process.env.VITE_AUTH0_AUDIENCE ?? "http://todoappdev/api";
-  const userEmail = process.env.AUTH0_USERNAME ?? "e2e-user@example.test";
+  const userEmail = e2eUserEmail();
+  const userName = e2eUserName();
 
   const state = {
     cookies: [
@@ -118,7 +139,7 @@ function saveE2EState(): void {
             name: `${authStoragePrefix}${clientId}::${audience}::openid profile email`,
             value: JSON.stringify({
               body: {
-                access_token: "e2e-token",
+                access_token: e2eAccessToken(),
                 scope: "openid profile email",
                 expires_in: 86400,
                 token_type: "Bearer",
@@ -133,9 +154,9 @@ function saveE2EState(): void {
             value: JSON.stringify({
               email: userEmail,
               email_verified: true,
-              name: "Todo User",
-              nickname: "todo user",
-              sub: "auth0|e2e-user",
+              name: userName,
+              nickname: userName.toLowerCase(),
+              sub: `auth0|${userEmail.replace(/[@|]/g, ".")}`,
             }),
           },
           {

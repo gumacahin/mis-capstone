@@ -71,6 +71,16 @@ The latest automated demo run is recorded in `CAPSTONE_DEMO_RUN.md`.
 The Playwright demo is useful for repeatable UI verification and screenshots.
 It is not participant evidence and does not replace real walkthrough notes.
 
+For a stronger local integration check, run the real-backend Playwright demo:
+
+```text
+E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3106 PORT=3106 PLAYWRIGHT_BACKEND_PORT=8001 PLAYWRIGHT_BASE_URL=http://localhost:3106 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+```
+
+This starts Django and Vite, seeds the demo data, and exercises the same
+walkthrough through real backend endpoints. It validates persistence and API
+contracts for the demo flow, but it is still not participant evidence.
+
 ## Participant Scenario
 
 Give the participant this short scenario:

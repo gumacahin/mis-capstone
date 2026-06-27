@@ -186,6 +186,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 1000,
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "upoutodo.authentication.E2EBearerTokenAuthentication",
         "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",

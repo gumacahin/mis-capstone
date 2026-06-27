@@ -1114,3 +1114,69 @@ Playwright: 2 passed (6.8s)
 - Add Google Calendar sync only after planner operations stabilize.
 - Continue recording major Codex-assisted decisions, patches, tests, and
   verification outcomes in this file.
+
+## 2026-06-28: Real-Backend Planner Evaluation Demo
+
+### Goal
+
+Bridge the Playwright walkthrough from fixture-backed UI verification to a
+local Django-backed browser run that proves the seeded planner demo can persist
+through typed backend endpoints.
+
+### Human Decisions And Constraints
+
+- Keep the demo local and explicitly test-gated; do not make fake bearer-token
+  authentication available in normal development or production.
+- Preserve the existing Django backend as the system of record.
+- Keep `/today` planner-first and use the browser run as demo evidence, not
+  participant evidence.
+
+### Codex-Assisted Actions
+
+- Added a test-only `E2EBearerTokenAuthentication` class gated by `DEBUG` or
+  test mode plus `E2E_TEST_MODE=1` and `DJANGO_ALLOW_TEST_ENDPOINTS=1`.
+- Added backend tests proving the E2E token authenticates only when explicitly
+  enabled and rejects missing seeded users.
+- Added `playwright.real-backend.config.ts` to start Django, run migrations,
+  seed the planner evaluation demo, start Vite, and route `/api` through the
+  local backend.
+- Added `tests/e2e/planner-evaluation-real-backend.spec.ts` to exercise
+  check-in update, suggestion accept/snooze/dismiss, and feedback submission
+  through real API calls.
+- Made the Vite API proxy target configurable for isolated Playwright backend
+  ports.
+- Fixed `useNotifications()` to normalize both DRF paginated responses and
+  plain arrays, then added a focused unit test.
+- Updated `CAPSTONE_DEMO_RUN.md` and
+  `CAPSTONE_EVALUATION_WALKTHROUGH.md` with the real-backend command and
+  result.
+
+### Verification
+
+```text
+api: ruff check api/settings.py upoutodo/authentication.py upoutodo/tests/endpoints/test_e2e_authentication.py
+api: pytest --no-cov upoutodo/tests/endpoints/test_e2e_authentication.py
+ui: eslint vite.config.ts playwright.real-backend.config.ts tests/setup/auth.setup.ts tests/e2e/planner-evaluation-real-backend.spec.ts src/modules/shared/hooks/queries.ts src/modules/shared/hooks/__tests__/queries.test.ts --max-warnings 0
+ui: vitest run src/modules/shared/hooks/__tests__/queries.test.ts
+ui: Playwright real-backend planner evaluation demo
+```
+
+Observed result:
+
+```text
+Backend E2E auth tests: 3 passed
+Notification normalizer unit tests: 3 passed
+Playwright real-backend demo: 2 passed (9.6s)
+```
+
+### Study Notes
+
+- This run validates the planner workflow across UI, authentication, Django
+  routes, seeded database state, planner mutations, and feedback capture.
+- The browser run found a real integration mismatch between the frontend
+  notification hook and DRF pagination. That is useful study evidence for
+  Codex-assisted development: the E2E harness exposed a bug that isolated UI
+  fixtures did not.
+- The test-only bearer-token path is typed and still goes through DRF
+  permissions, serializers, and viewsets; it does not give the chat/UI direct
+  database access.
