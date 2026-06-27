@@ -76,10 +76,22 @@ const initialPlan = {
   updated_at: "2026-06-27T08:00:00Z",
 };
 
-async function mockTodayApis(page: Page) {
-  let plan = initialPlan;
+type TodayPlanMock = typeof initialPlan;
+
+interface MockTodayApisOptions {
+  plan?: TodayPlanMock;
+  plannerTodayStatus?: number;
+}
+
+const clonePlan = (plan: TodayPlanMock = initialPlan): TodayPlanMock =>
+  JSON.parse(JSON.stringify(plan));
+
+async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
+  let plan = clonePlan(options.plan);
   const calls = {
     accept: 0,
+    dismiss: 0,
+    snooze: 0,
     checkInPayload: undefined as
       | {
           energy_level: string;
@@ -113,6 +125,13 @@ async function mockTodayApis(page: Page) {
     });
   });
   await page.route(/\/(?:api\/)?planner\/today\/?$/, async (route) => {
+    if (options.plannerTodayStatus) {
+      await route.fulfill({
+        status: options.plannerTodayStatus,
+        json: { detail: "Planner unavailable" },
+      });
+      return;
+    }
     await route.fulfill({ json: plan });
   });
   await page.route(/\/(?:api\/)?planner\/check-in\/?$/, async (route) => {
@@ -132,38 +151,63 @@ async function mockTodayApis(page: Page) {
     /\/(?:api\/)?planner\/suggestions\/40\/accept\/?$/,
     async (route) => {
       calls.accept += 1;
-      const acceptedSuggestion = {
-        ...plan.suggestions[0],
+      const acceptedSuggestion = updateSuggestion(plan, {
         status: "accepted",
         accepted_at: "2026-06-27T08:20:00Z",
         updated_at: "2026-06-27T08:20:00Z",
-      };
-      plan = { ...plan, suggestions: [acceptedSuggestion] };
+      });
+      plan = replaceSuggestion(plan, acceptedSuggestion);
       await route.fulfill({ json: acceptedSuggestion });
     },
   );
   await page.route(
     /\/(?:api\/)?planner\/suggestions\/40\/snooze\/?$/,
     async (route) => {
-      await route.fulfill({
-        json: {
-          ...plan.suggestions[0],
-          status: "snoozed",
-          snoozed_until: "2026-06-27T09:20:00Z",
-        },
+      calls.snooze += 1;
+      const snoozedSuggestion = updateSuggestion(plan, {
+        status: "snoozed",
+        snoozed_until: "2026-06-27T09:20:00Z",
       });
+      plan = replaceSuggestion(plan, snoozedSuggestion);
+      await route.fulfill({ json: snoozedSuggestion });
     },
   );
   await page.route(
     /\/(?:api\/)?planner\/suggestions\/40\/dismiss\/?$/,
     async (route) => {
-      await route.fulfill({
-        json: { ...plan.suggestions[0], status: "dismissed" },
+      calls.dismiss += 1;
+      const dismissedSuggestion = updateSuggestion(plan, {
+        status: "dismissed",
+        dismissed_at: "2026-06-27T08:25:00Z",
       });
+      plan = replaceSuggestion(plan, dismissedSuggestion);
+      await route.fulfill({ json: dismissedSuggestion });
     },
   );
 
   return calls;
+}
+
+function updateSuggestion(
+  plan: TodayPlanMock,
+  patch: Partial<(typeof initialPlan.suggestions)[number]>,
+) {
+  return {
+    ...plan.suggestions[0],
+    ...patch,
+  };
+}
+
+function replaceSuggestion(
+  plan: TodayPlanMock,
+  suggestion: (typeof initialPlan.suggestions)[number],
+): TodayPlanMock {
+  return {
+    ...plan,
+    suggestions: plan.suggestions.map((item) =>
+      item.id === suggestion.id ? suggestion : item,
+    ),
+  };
 }
 
 test.describe("Today Page", () => {
@@ -206,5 +250,108 @@ test.describe("Today Page", () => {
 
     await expect.poll(() => calls.accept).toBe(1);
     await expect(page.getByText("accepted")).toBeVisible();
+  });
+
+  test("shows reason details and task signals just in time", async ({
+    page,
+  }) => {
+    await mockTodayApis(page);
+
+    await page.goto("/today");
+
+    await page.getByRole("button", { name: "Why this?" }).click();
+
+    await expect(
+      page.getByRole("region", {
+        name: "Reason for Review LMS submissions",
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Task signals")).toBeVisible();
+    const reasonRegion = page.getByRole("region", {
+      name: "Reason for Review LMS submissions",
+    });
+    await expect(
+      reasonRegion.getByText("Due today", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Priority high", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("45 minutes", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Teaching / Assessments", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      reasonRegion.getByText("Score 94", { exact: true }),
+    ).toBeVisible();
+  });
+
+  test("selects low-energy planner UI when check-in energy is low", async ({
+    page,
+  }) => {
+    await mockTodayApis(page, {
+      plan: {
+        ...clonePlan(),
+        check_in: {
+          ...clonePlan().check_in,
+          energy_level: "low",
+        },
+      },
+    });
+
+    await page.goto("/today");
+
+    await expect(
+      page.getByRole("heading", { name: "Low-energy plan" }),
+    ).toBeVisible();
+    await expect(page.getByText("Low energy")).toBeVisible();
+    await expect(
+      page.getByText("Lighter next actions for your current energy."),
+    ).toBeVisible();
+  });
+
+  test("snoozes and dismisses planner suggestions", async ({ page }) => {
+    const calls = await mockTodayApis(page);
+
+    await page.goto("/today");
+
+    await page.getByRole("button", { name: "Snooze" }).click();
+    await expect.poll(() => calls.snooze).toBe(1);
+    await expect(page.getByText("snoozed", { exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "Dismiss" }).click();
+    await expect.poll(() => calls.dismiss).toBe(1);
+    await expect(page.getByText("Review LMS submissions")).toBeHidden();
+    await expect(
+      page.getByText("No suggestions for the current check-in."),
+    ).toBeVisible();
+  });
+
+  test("shows empty planner state when there are no suggestions", async ({
+    page,
+  }) => {
+    await mockTodayApis(page, {
+      plan: {
+        ...clonePlan(),
+        suggestions: [],
+      },
+    });
+
+    await page.goto("/today");
+
+    await expect(
+      page.getByText("No suggestions for the current check-in."),
+    ).toBeVisible();
+  });
+
+  test("shows planner unavailable state", async ({ page }) => {
+    await mockTodayApis(page, { plannerTodayStatus: 503 });
+
+    await page.goto("/today");
+
+    await expect(
+      page.getByText("Planner is temporarily unavailable."),
+    ).toBeVisible({ timeout: 12_000 });
   });
 });

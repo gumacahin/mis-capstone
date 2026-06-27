@@ -451,13 +451,77 @@ resuming implementation work.
 - The just-in-time UI idea supports the planner-first narrative because it
   targets the decision moment: what should the user do next?
 
+## 2026-06-28: Just-in-Time Planner UI Implementation
+
+### Goal
+
+Implement the first practical slice of the JIT planner UI spec without adding
+chat, runtime-generated frontend code, or new generic task-management features.
+
+### Human Decisions And Constraints
+
+- The implementation should make the JIT architecture visible in code.
+- The assistant should still operate only through safe, typed planner actions.
+- Django remains the system of record.
+- React should render only known planner components from a registry.
+
+### Codex-Assisted Actions
+
+- Added `buildPlannerUiSchema` in `ui/src/modules/planner/uiSchema.ts`.
+- Added a planner component registry in `ui/src/modules/planner/registry.tsx`.
+- Extracted the inline `/today` planner panel into named planner components:
+  - `EnergyCheckInCard`
+  - `PlanSuggestionsCard`
+  - `PlannerSurface`
+  - `PlannerUnavailableCard`
+  - `SuggestionCard`
+  - `SuggestionReasonCard`
+  - `TaskSignalBreakdown`
+- Refactored `/today` so it renders `PlannerSurface` instead of owning planner
+  UI details directly.
+- Added low-energy, limited-time, and overdue-triage schema modes.
+- Added just-in-time reason details: the reason panel is mounted only after the
+  user asks "Why this?"
+- Expanded Playwright coverage for:
+  - existing check-in and accept behavior
+  - reason details and task signals
+  - low-energy UI selection
+  - snooze and dismiss actions
+  - empty planner suggestions
+  - planner unavailable state
+- Updated `JIT_PLANNER_UI_SPEC.md` to mark the first registry-based slice as
+  implemented.
+
+### Verification
+
+```text
+ui: targeted ESLint for planner, Today page, and Today E2E spec
+ui: npm run build
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed result:
+
+```text
+ui E2E: 8 passed
+```
+
+### Study Notes
+
+- This turns the JIT UI idea from a design artifact into an implementation
+  artifact.
+- The implementation keeps the safer interpretation of generative UI: structured
+  component selection and props, not arbitrary generated frontend code.
+- The next research-facing improvement is to make task signals more structured
+  so reason explanations can be evaluated more directly.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
 - Prioritize planner-specific work on `/today`.
 - Add generated API support for planner endpoints after the API stabilizes.
-- Extend E2E coverage for snooze, dismiss, empty-state, and no-suggestion flows.
-- Polish suggestion reasons so they are clear enough to discuss in the paper.
+- Add unit coverage for planner UI schema selection.
+- Structure task signals so suggestion reasons are clearer for the paper.
 - Add Google Calendar sync only after planner operations stabilize.
 - Continue recording major Codex-assisted decisions, patches, tests, and
   verification outcomes in this file.

@@ -512,22 +512,29 @@ sync, general chat, or runtime-generated frontend code.
 
 ## Implementation Notes
 
-The current implementation already supports part of this spec:
+The current implementation supports the first JIT planner UI slice:
 
 - Django owns planner state through `EnergyCheckIn`, `TodayPlan`, and `PlanItem`.
 - The planner API exposes typed endpoints for check-ins and suggestion actions.
 - The React UI has a typed planner client in `ui/src/modules/planner`.
-- `/today` already shows check-in controls and suggested next actions.
-- Playwright verifies the basic `/today` planner flow.
+- `/today` renders planner UI through a component registry and UI schema.
+- The current planner panel has been extracted into named catalog components:
+  `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
+  `SuggestionReasonCard`, and `TaskSignalBreakdown`.
+- The registry can select low-energy, limited-time, and overdue-triage modes
+  while preserving the same typed backend operations.
+- Playwright verifies check-in, acceptance, snooze, dismiss, empty-state,
+  unavailable-state, low-energy mode, and reason-details behavior.
 
 Next implementation steps:
 
-1. Add a UI component registry for planner components.
-2. Extract the current planner panel into named components from the catalog.
-3. Add a `SuggestionReasonCard` or reason-detail view.
-4. Add E2E coverage for snooze, dismiss, empty-state, and unavailable-state
-   planner flows.
-5. Defer chat and Google Calendar sync until the component registry and typed
+1. Add unit tests for `buildPlannerUiSchema` so low-energy, limited-time, and
+   overdue-triage selection rules are covered without relying only on E2E tests.
+2. Improve task signals in the backend so reason details can expose structured
+   due-date, priority, effort, recurrence, and snooze history fields instead of
+   deriving them from the suggestion summary.
+3. Add generated OpenAPI support for planner endpoints once the API stabilizes.
+4. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.
 
 ## Open Questions
