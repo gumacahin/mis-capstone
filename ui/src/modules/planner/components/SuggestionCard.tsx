@@ -18,7 +18,6 @@ interface SuggestionCardProps {
   allowedActions: PlannerSuggestionAction[];
   disabled: boolean;
   suggestion: PlannerSuggestion;
-  todayDate?: string;
   onAction: (action: PlannerSuggestionAction, minutes?: number) => void;
 }
 
@@ -26,7 +25,6 @@ export default function SuggestionCard({
   allowedActions,
   disabled,
   suggestion,
-  todayDate,
   onAction,
 }: SuggestionCardProps) {
   const [showReason, setShowReason] = useState(false);
@@ -112,10 +110,7 @@ export default function SuggestionCard({
             </Stack>
           </Stack>
           <Collapse in={showReason} unmountOnExit>
-            <SuggestionReasonCard
-              suggestion={suggestion}
-              todayDate={todayDate}
-            />
+            <SuggestionReasonCard suggestion={suggestion} />
           </Collapse>
         </Stack>
       </CardContent>

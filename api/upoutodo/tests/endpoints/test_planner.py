@@ -72,6 +72,43 @@ def test_today_builds_ranked_owned_suggestions(auth_client, section):
 
 
 @pytest.mark.django_db
+def test_today_suggestions_include_structured_task_signals(auth_client, section):
+    section.title = "Assessments"
+    section.save(update_fields=["title"])
+    due_at = timezone.now() - timedelta(days=1)
+    task = TaskFactory(
+        section=section,
+        title="Explainable suggestion",
+        due_date=due_at,
+        priority=Task.Priority.HIGH,
+        rrule="FREQ=WEEKLY",
+    )
+    target_date = timezone.localdate()
+    due_date = timezone.localtime(due_at).date()
+
+    response = auth_client.get("/api/planner/today/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    suggestion = response.data["suggestions"][0]
+    assert suggestion["task"]["id"] == task.id
+    assert suggestion["signals"] == {
+        "due_date": due_date.isoformat(),
+        "due_status": "overdue",
+        "due_label": f"Overdue {due_date.isoformat()}",
+        "due_in_days": (due_date - target_date).days,
+        "priority": Task.Priority.HIGH,
+        "priority_label": "High",
+        "estimated_minutes": 45,
+        "is_recurring": True,
+        "project_title": section.project.title,
+        "section_title": "Assessments",
+        "score": 140,
+        "snoozed_count": 0,
+        "dismissed_count": 0,
+    }
+
+
+@pytest.mark.django_db
 def test_check_in_rebuilds_plan_with_available_time(auth_client, section):
     for index in range(3):
         TaskFactory(

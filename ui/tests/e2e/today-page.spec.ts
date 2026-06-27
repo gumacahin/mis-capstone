@@ -41,6 +41,22 @@ const suggestedTask = {
   section_title: "Assessments",
 };
 
+const suggestedSignals = {
+  due_date: "2026-06-27",
+  due_status: "due_today",
+  due_label: "Due today",
+  due_in_days: 0,
+  priority: "HIGH",
+  priority_label: "High",
+  estimated_minutes: 45,
+  is_recurring: false,
+  project_title: "Teaching",
+  section_title: "Assessments",
+  score: 94,
+  snoozed_count: 0,
+  dismissed_count: 0,
+};
+
 const initialPlan = {
   id: 20,
   date: "2026-06-27",
@@ -64,6 +80,7 @@ const initialPlan = {
       reason: "Due today, high priority, fits your available time.",
       estimated_minutes: 45,
       score: 94,
+      signals: suggestedSignals,
       status: "suggested",
       snoozed_until: null,
       accepted_at: null,

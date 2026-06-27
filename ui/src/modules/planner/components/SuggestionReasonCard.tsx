@@ -7,12 +7,10 @@ import TaskSignalBreakdown from "./TaskSignalBreakdown";
 
 interface SuggestionReasonCardProps {
   suggestion: PlannerSuggestion;
-  todayDate?: string;
 }
 
 export default function SuggestionReasonCard({
   suggestion,
-  todayDate,
 }: SuggestionReasonCardProps) {
   return (
     <Box
@@ -30,7 +28,7 @@ export default function SuggestionReasonCard({
         <Typography variant="body2" color="text.secondary">
           {suggestion.reason}
         </Typography>
-        <TaskSignalBreakdown suggestion={suggestion} todayDate={todayDate} />
+        <TaskSignalBreakdown suggestion={suggestion} />
       </Stack>
     </Box>
   );

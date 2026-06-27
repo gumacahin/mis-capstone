@@ -563,12 +563,66 @@ ui schema tests: 7 passed
 - They help show that the UI adaptation is deterministic and reviewable rather
   than arbitrary model-generated interface behavior.
 
+## 2026-06-28: Structured Planner Task Signals
+
+### Goal
+
+Make suggestion explanations more explicit by returning structured task signals
+from the planner API instead of deriving every label in the frontend.
+
+### Human Decisions And Constraints
+
+- The signal payload should be read-only and derived from existing task and
+  plan data.
+- No schema migration should be needed for this first slice.
+- The frontend reason view should display backend-provided evidence while still
+  using the existing typed planner operations.
+
+### Codex-Assisted Actions
+
+- Added a `signals` object to `PlanItemSerializer` responses.
+- Included due date, due status, due label, due offset, priority, priority
+  label, estimated minutes, recurrence flag, project title, section title,
+  rounded score, snoozed count, and dismissed count.
+- Added backend planner endpoint coverage for the structured signal payload.
+- Added `PlannerTaskSignals` and `PlannerDueStatus` frontend types.
+- Updated `TaskSignalBreakdown` to render the API-provided signals.
+- Updated Today E2E and planner schema unit-test fixtures to include signals.
+- Updated `JIT_PLANNER_UI_SPEC.md` so structured task signals are recorded as
+  implemented.
+
+### Verification
+
+```text
+api: uv run ruff check .
+api: uv run pytest --no-cov
+ui: targeted ESLint for planner and Today E2E files
+ui: vitest run src/modules/planner/__tests__/uiSchema.test.ts
+ui: npm run build
+ui: Playwright tests/e2e/today-page.spec.ts --project=chromium
+```
+
+Observed results:
+
+```text
+api: 222 passed, 7 known timezone warnings
+ui schema tests: 7 passed
+ui E2E: 8 passed
+```
+
+### Study Notes
+
+- This strengthens the capstone claim that suggestions are explainable and
+  grounded in real application data.
+- The reason view now has a clearer evidence model for future evaluation:
+  users can inspect due status, priority, effort, recurrence, location, score,
+  and prior snooze or dismiss history.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.
 - Prioritize planner-specific work on `/today`.
 - Add generated API support for planner endpoints after the API stabilizes.
-- Structure task signals so suggestion reasons are clearer for the paper.
 - Add Google Calendar sync only after planner operations stabilize.
 - Continue recording major Codex-assisted decisions, patches, tests, and
   verification outcomes in this file.

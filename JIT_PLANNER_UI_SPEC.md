@@ -516,6 +516,9 @@ The current implementation supports the first JIT planner UI slice:
 
 - Django owns planner state through `EnergyCheckIn`, `TodayPlan`, and `PlanItem`.
 - The planner API exposes typed endpoints for check-ins and suggestion actions.
+- Planner suggestion responses include structured task signals for due status,
+  priority, effort, recurrence, project/section, score, and snooze/dismiss
+  history.
 - The React UI has a typed planner client in `ui/src/modules/planner`.
 - `/today` renders planner UI through a component registry and UI schema.
 - The current planner panel has been extracted into named catalog components:
@@ -531,11 +534,8 @@ The current implementation supports the first JIT planner UI slice:
 
 Next implementation steps:
 
-1. Improve task signals in the backend so reason details can expose structured
-   due-date, priority, effort, recurrence, and snooze history fields instead of
-   deriving them from the suggestion summary.
-2. Add generated OpenAPI support for planner endpoints once the API stabilizes.
-3. Defer chat and Google Calendar sync until the component registry and typed
+1. Add generated OpenAPI support for planner endpoints once the API stabilizes.
+2. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.
 
 ## Open Questions

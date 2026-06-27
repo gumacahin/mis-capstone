@@ -1,6 +1,13 @@
+from datetime import timedelta
+
 from rest_framework import serializers
 
-from upoutodo.models import EnergyCheckIn, PlanItem, TodayPlan
+from upoutodo.models import EnergyCheckIn, PlanItem, Project, TodayPlan
+from upoutodo.services.planner import (
+    normalized_priority,
+    priority_label,
+    task_due_date,
+)
 
 from .task import TaskSerializer
 
@@ -30,6 +37,7 @@ class EnergyCheckInSerializer(serializers.ModelSerializer):
 
 class PlanItemSerializer(serializers.ModelSerializer):
     task = TaskSerializer(read_only=True)
+    signals = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = PlanItem
@@ -40,6 +48,7 @@ class PlanItemSerializer(serializers.ModelSerializer):
             "reason",
             "estimated_minutes",
             "score",
+            "signals",
             "status",
             "snoozed_until",
             "accepted_at",
@@ -48,6 +57,38 @@ class PlanItemSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = fields
+
+    def get_signals(self, obj):
+        due_date = task_due_date(obj.task)
+        due_status = get_due_status(due_date, obj.plan.date)
+        priority = normalized_priority(obj.task)
+        section_title = obj.task.section.title
+        if section_title == Project.DEFAULT_PROJECT_SECTION_TITLE:
+            section_title = None
+
+        return {
+            "due_date": due_date.isoformat() if due_date else None,
+            "due_status": due_status,
+            "due_label": get_due_label(due_status, due_date),
+            "due_in_days": get_due_in_days(due_date, obj.plan.date),
+            "priority": priority,
+            "priority_label": priority_label(priority),
+            "estimated_minutes": obj.estimated_minutes,
+            "is_recurring": bool(obj.task.rrule),
+            "project_title": obj.task.section.project.title,
+            "section_title": section_title,
+            "score": round(obj.score),
+            "snoozed_count": PlanItem.objects.filter(
+                plan__user=obj.plan.user,
+                task=obj.task,
+                status=PlanItem.Status.SNOOZED,
+            ).count(),
+            "dismissed_count": PlanItem.objects.filter(
+                plan__user=obj.plan.user,
+                task=obj.task,
+                status=PlanItem.Status.DISMISSED,
+            ).count(),
+        }
 
 
 class TodayPlanSerializer(serializers.ModelSerializer):
@@ -71,3 +112,31 @@ class TodayPlanSerializer(serializers.ModelSerializer):
 
 class SnoozePlanItemSerializer(serializers.Serializer):
     minutes = serializers.IntegerField(default=60, min_value=1, max_value=10080)
+
+
+def get_due_status(due_date, plan_date):
+    if due_date is None:
+        return "none"
+    if due_date < plan_date:
+        return "overdue"
+    if due_date == plan_date:
+        return "due_today"
+    if due_date <= plan_date + timedelta(days=7):
+        return "due_soon"
+    return "later"
+
+
+def get_due_label(due_status, due_date):
+    if due_status == "none":
+        return "No due date"
+    if due_status == "overdue":
+        return f"Overdue {due_date.isoformat()}"
+    if due_status == "due_today":
+        return "Due today"
+    return f"Due {due_date.isoformat()}"
+
+
+def get_due_in_days(due_date, plan_date):
+    if due_date is None:
+        return None
+    return (due_date - plan_date).days

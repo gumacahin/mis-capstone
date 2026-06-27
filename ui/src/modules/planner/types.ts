@@ -28,6 +28,29 @@ export interface PlannerTask {
   section_title?: string | null;
 }
 
+export type PlannerDueStatus =
+  | "none"
+  | "overdue"
+  | "due_today"
+  | "due_soon"
+  | "later";
+
+export interface PlannerTaskSignals {
+  due_date: string | null;
+  due_status: PlannerDueStatus;
+  due_label: string;
+  due_in_days: number | null;
+  priority: string;
+  priority_label: string;
+  estimated_minutes: number;
+  is_recurring: boolean;
+  project_title: string;
+  section_title: string | null;
+  score: number;
+  snoozed_count: number;
+  dismissed_count: number;
+}
+
 export interface PlannerSuggestion {
   id: number;
   task: PlannerTask;
@@ -35,6 +58,7 @@ export interface PlannerSuggestion {
   reason: string;
   estimated_minutes: number;
   score: number;
+  signals: PlannerTaskSignals;
   status: PlannerSuggestionStatus;
   snoozed_until: string | null;
   accepted_at: string | null;

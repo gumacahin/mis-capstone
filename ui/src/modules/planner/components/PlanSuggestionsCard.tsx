@@ -62,7 +62,6 @@ export default function PlanSuggestionsCard({
           allowedActions={schema.allowedActions}
           disabled={disabled}
           suggestion={suggestion}
-          todayDate={plan?.date}
           onAction={(action: PlannerSuggestionAction, minutes?: number) => {
             onAction({
               id: suggestion.id,
