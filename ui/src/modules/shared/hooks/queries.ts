@@ -1,6 +1,7 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api`
@@ -201,6 +202,62 @@ export interface ProductivityData {
   streak: { current: number };
 }
 
+export type PlannerEnergyLevel = "low" | "medium" | "high";
+export type PlannerFocusMode = "flexible" | "deep" | "admin" | "light";
+export type PlannerSuggestionStatus =
+  | "suggested"
+  | "accepted"
+  | "snoozed"
+  | "dismissed"
+  | "done";
+
+export interface PlannerCheckIn {
+  id: number;
+  date: string;
+  energy_level: PlannerEnergyLevel;
+  available_minutes: number;
+  focus_mode: PlannerFocusMode;
+  context: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlannerTask {
+  id: number;
+  title: string;
+  description?: string | null;
+  priority?: string;
+  due_date?: string | null;
+  project_title?: string;
+  section_title?: string | null;
+}
+
+export interface PlannerSuggestion {
+  id: number;
+  task: PlannerTask;
+  order: number;
+  reason: string;
+  estimated_minutes: number;
+  score: number;
+  status: PlannerSuggestionStatus;
+  snoozed_until: string | null;
+  accepted_at: string | null;
+  dismissed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TodayPlan {
+  id: number;
+  date: string;
+  status: string;
+  generated_at: string;
+  check_in: PlannerCheckIn;
+  suggestions: PlannerSuggestion[];
+  created_at: string;
+  updated_at: string;
+}
+
 export const useProductivity = () => {
   const apiClient = useApiClient();
   return useQuery({
@@ -208,6 +265,64 @@ export const useProductivity = () => {
     queryFn: async () => {
       const { data } = await apiClient.get("productivity");
       return data as ProductivityData;
+    },
+  });
+};
+
+export const usePlannerToday = () => {
+  const apiClient = useApiClient();
+  return useQuery({
+    queryKey: ["planner", "today"],
+    queryFn: async () => {
+      const { data } = await apiClient.get("planner/today/");
+      return data as TodayPlan;
+    },
+  });
+};
+
+export const useSubmitPlannerCheckIn = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["planner", "check-in"],
+    mutationFn: async (
+      data: Pick<
+        PlannerCheckIn,
+        "energy_level" | "available_minutes" | "focus_mode" | "context"
+      >,
+    ) => {
+      const response = await apiClient.post("planner/check-in/", data);
+      return response.data as TodayPlan;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["planner", "today"], data);
+    },
+  });
+};
+
+export const usePlannerSuggestionAction = () => {
+  const apiClient = useApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["planner", "suggestion-action"],
+    mutationFn: async ({
+      id,
+      action,
+      minutes,
+    }: {
+      id: number;
+      action: "accept" | "snooze" | "dismiss";
+      minutes?: number;
+    }) => {
+      const body = action === "snooze" ? { minutes: minutes ?? 60 } : {};
+      const response = await apiClient.post(
+        `planner/suggestions/${id}/${action}/`,
+        body,
+      );
+      return response.data as PlannerSuggestion;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["planner", "today"] });
     },
   });
 };
