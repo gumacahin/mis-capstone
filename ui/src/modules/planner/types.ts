@@ -76,6 +76,31 @@ export interface PlannerFeedback {
   updated_at: string;
 }
 
+export interface PlannerSuggestionStatusCounts {
+  suggested: number;
+  accepted: number;
+  snoozed: number;
+  dismissed: number;
+  done: number;
+}
+
+export interface PlannerSuggestionActionRates {
+  accepted: number;
+  snoozed: number;
+  dismissed: number;
+}
+
+export interface PlannerEvaluationSummary {
+  plan_count: number;
+  feedback_count: number;
+  feedback_response_rate: number;
+  average_helpfulness_rating: number | null;
+  average_confidence_rating: number | null;
+  total_suggestions: number;
+  suggestion_status_counts: PlannerSuggestionStatusCounts;
+  suggestion_action_rates: PlannerSuggestionActionRates;
+}
+
 export interface TodayPlan {
   id: number;
   date: string;

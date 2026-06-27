@@ -2,6 +2,7 @@ import type { PlannerApi } from "@/generated-api-client/api";
 
 import type {
   PlannerCheckInInput,
+  PlannerEvaluationSummary,
   PlannerFeedback,
   PlannerFeedbackInput,
   PlannerSuggestion,
@@ -12,6 +13,7 @@ import type {
 export const plannerQueryKeys = {
   all: ["planner"] as const,
   today: ["planner", "today"] as const,
+  evaluation: ["planner", "evaluation"] as const,
 };
 
 export const getTodayPlan = async (
@@ -36,6 +38,13 @@ export const rebuildTodayPlan = async (
 ): Promise<TodayPlan> => {
   const { data } = await plannerClient.plannerRebuildCreate();
   return data as TodayPlan;
+};
+
+export const getPlannerEvaluationSummary = async (
+  plannerClient: PlannerApi,
+): Promise<PlannerEvaluationSummary> => {
+  const { data } = await plannerClient.plannerEvaluationRetrieve();
+  return data as PlannerEvaluationSummary;
 };
 
 export const submitPlannerFeedback = async (

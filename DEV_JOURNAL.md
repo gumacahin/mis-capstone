@@ -855,6 +855,60 @@ ui build: passed
   it measures whether users interact with and trust the generated daily plan,
   not how many generic task-management records exist.
 
+## 2026-06-28: Planner Evaluation Admin Dashboard
+
+### Goal
+
+Make the anonymized planner evaluation summary visible in the application so it
+can support capstone demos and paper discussion without exposing private task or
+feedback content.
+
+### Human Decisions And Constraints
+
+- The UI should stay aggregate-only and avoid task titles, feedback notes,
+  usernames, or emails.
+- The dashboard should consume the typed planner operation exposed by the
+  generated client.
+- This should be a compact reporting slice, not a restart of broad admin CRUD.
+
+### Codex-Assisted Actions
+
+- Added `PlannerEvaluationSummary` frontend types.
+- Added `getPlannerEvaluationSummary()` and `usePlannerEvaluationSummary()` to
+  the planner module.
+- Added a `Planner Evaluation` section to the admin dashboard showing:
+  - plans generated
+  - feedback response rate
+  - average helpfulness
+  - average confidence
+  - accepted, snoozed, and dismissed suggestion rates
+- Added a focused admin dashboard component test that mocks the dashboard and
+  planner evaluation hooks and asserts aggregate metrics render.
+- Added explicit Vitest aliases for planner/shared module paths so the focused
+  test can resolve the same aliases used by the app.
+
+### Verification
+
+```text
+ui: vitest run src/modules/admin/components/__tests__/AdminDashboard.test.tsx
+ui: targeted ESLint for planner/admin dashboard files and vitest.config.ts
+ui: npm run build
+```
+
+Observed results:
+
+```text
+admin dashboard test: 1 passed
+ui build: passed
+```
+
+### Study Notes
+
+- This makes the evaluation loop demonstrable: users provide planner feedback
+  on `/today`, and admins can inspect anonymized aggregate outcomes.
+- The dashboard can be used as a paper artifact showing how the system supports
+  HCI-oriented evaluation without requiring access to individual task content.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

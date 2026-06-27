@@ -558,6 +558,8 @@ The current implementation supports the first JIT planner UI slice:
 - `GET /api/planner/evaluation/` exposes admin-only aggregate metrics for
   capstone evaluation without returning individual task content, feedback
   notes, or user identifiers.
+- The admin dashboard renders the aggregate planner evaluation summary for
+  demo and reporting use.
 - The current planner panel has been extracted into named catalog components:
   `EnergyCheckInCard`, `TodayPlanCard` behavior through `PlanSuggestionsCard`,
   `SuggestionReasonCard`, `TaskSignalBreakdown`, and `PlannerFeedbackCard`.
@@ -577,8 +579,8 @@ The current implementation supports the first JIT planner UI slice:
 
 Next implementation steps:
 
-1. Add a small admin/reporting UI for the aggregate planner evaluation summary
-   if the capstone demo needs it.
+1. Draft the paper-facing evaluation method using the feedback and aggregate
+   metrics now captured by the app.
 2. Keep the OpenAPI planner contract test updated as planner operations evolve.
 3. Defer chat and Google Calendar sync until the component registry and typed
    planner operations are stable.

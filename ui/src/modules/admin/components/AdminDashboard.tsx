@@ -1,4 +1,5 @@
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PeopleIcon from "@mui/icons-material/People";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -10,11 +11,14 @@ import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
+import { usePlannerEvaluationSummary } from "@planner/hooks";
+import type { PlannerEvaluationSummary } from "@planner/types";
 import Spinner from "@shared/components/Spinner";
 import { useDashboard } from "@shared/hooks/queries";
 
 export default function AdminDashboard() {
   const { data, isLoading, isError } = useDashboard();
+  const plannerEvaluation = usePlannerEvaluationSummary();
 
   if (isLoading) {
     return (
@@ -286,8 +290,138 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </Grid>
+          <Grid size={12}>
+            <Card variant="outlined">
+              <CardHeader
+                title="Planner Evaluation"
+                avatar={<AssessmentIcon />}
+              />
+              <CardContent>
+                <PlannerEvaluationPanel
+                  isError={plannerEvaluation.isError}
+                  isLoading={plannerEvaluation.isLoading}
+                  summary={plannerEvaluation.data}
+                />
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
   );
 }
+
+interface PlannerEvaluationPanelProps {
+  isError: boolean;
+  isLoading: boolean;
+  summary?: PlannerEvaluationSummary;
+}
+
+function PlannerEvaluationPanel({
+  isError,
+  isLoading,
+  summary,
+}: PlannerEvaluationPanelProps) {
+  if (isLoading) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Loading planner evaluation...
+      </Typography>
+    );
+  }
+
+  if (isError || !summary) {
+    return (
+      <Alert severity="warning">
+        Planner evaluation metrics are unavailable.
+      </Alert>
+    );
+  }
+
+  return (
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <MetricBlock
+          label="Plans generated"
+          value={summary.plan_count.toLocaleString()}
+          detail={`${summary.total_suggestions.toLocaleString()} suggestions`}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <MetricBlock
+          label="Feedback response rate"
+          value={formatPercent(summary.feedback_response_rate)}
+          detail={`${summary.feedback_count.toLocaleString()} responses`}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <MetricBlock
+          label="Avg helpfulness"
+          value={formatRating(summary.average_helpfulness_rating)}
+          detail="Daily plan usefulness"
+        />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <MetricBlock
+          label="Avg confidence"
+          value={formatRating(summary.average_confidence_rating)}
+          detail="Confidence after planning"
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 4 }}>
+        <MetricBlock
+          label="Accepted"
+          value={formatPercent(summary.suggestion_action_rates.accepted)}
+          detail={`${summary.suggestion_status_counts.accepted.toLocaleString()} suggestions`}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 4 }}>
+        <MetricBlock
+          label="Snoozed"
+          value={formatPercent(summary.suggestion_action_rates.snoozed)}
+          detail={`${summary.suggestion_status_counts.snoozed.toLocaleString()} suggestions`}
+        />
+      </Grid>
+      <Grid size={{ xs: 12, md: 4 }}>
+        <MetricBlock
+          label="Dismissed"
+          value={formatPercent(summary.suggestion_action_rates.dismissed)}
+          detail={`${summary.suggestion_status_counts.dismissed.toLocaleString()} suggestions`}
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+interface MetricBlockProps {
+  detail: string;
+  label: string;
+  value: string;
+}
+
+function MetricBlock({ detail, label, value }: MetricBlockProps) {
+  return (
+    <Box sx={{ borderRadius: 1, bgcolor: "grey.100", p: 2 }}>
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+      <Typography variant="h5" sx={{ mt: 0.5 }}>
+        {value}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        {detail}
+      </Typography>
+    </Box>
+  );
+}
+
+const formatPercent = (value: number) => `${formatNumber(value)}%`;
+
+const formatRating = (value: number | null) =>
+  value === null ? "No data" : `${formatNumber(value)} / 5`;
+
+const formatNumber = (value: number) =>
+  value.toLocaleString(undefined, {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
+  });

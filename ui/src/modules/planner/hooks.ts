@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGeneratedApiClient } from "@/api/client";
 
 import {
+  getPlannerEvaluationSummary,
   getTodayPlan,
   plannerQueryKeys,
   rebuildTodayPlan,
@@ -22,6 +23,14 @@ export const usePlannerToday = () => {
   return useQuery({
     queryKey: plannerQueryKeys.today,
     queryFn: async () => getTodayPlan(planner),
+  });
+};
+
+export const usePlannerEvaluationSummary = () => {
+  const { planner } = useGeneratedApiClient();
+  return useQuery({
+    queryKey: plannerQueryKeys.evaluation,
+    queryFn: async () => getPlannerEvaluationSummary(planner),
   });
 };
 
