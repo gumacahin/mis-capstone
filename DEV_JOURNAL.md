@@ -1049,6 +1049,60 @@ repo: git diff --cached --check
 - The walkthrough gives the capstone a cleaner bridge from implementation
   artifacts to evaluation data collection.
 
+## 2026-06-28: Playwright Planner Evaluation Demo Run
+
+### Goal
+
+Run the capstone evaluation walkthrough through Playwright so the demo flow is
+verified in a real browser and recorded as a repeatable artifact.
+
+### Human Decisions And Constraints
+
+- The existing `/today` Playwright regression spec uses mocked API responses and
+  is not a capstone walkthrough artifact.
+- Full backend-authenticated browser execution is not ready because the
+  frontend E2E auth state uses a mock token while the backend JWT decoder still
+  expects real Auth0-style keys.
+- The practical demo should therefore use Playwright fixtures that mirror the
+  seeded planner evaluation dataset.
+- The result should be labeled as demo evidence, not participant evidence.
+
+### Codex-Assisted Actions
+
+- Added `ui/tests/e2e/planner-evaluation-demo.spec.ts`.
+- The spec exercises the walkthrough flow on `/today`:
+  low-energy planner mode, check-in update, reason inspection, accept, snooze,
+  dismiss, and feedback submission.
+- Added `CAPSTONE_DEMO_RUN.md` with the command, result, screenshot path,
+  walkthrough coverage, and demo-data boundary.
+- Updated `CAPSTONE_EVALUATION_WALKTHROUGH.md` with the automated Playwright
+  demo command.
+
+### Verification
+
+```text
+ui: eslint tests/e2e/planner-evaluation-demo.spec.ts --max-warnings 0
+ui: Playwright tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+repo: git diff --check
+repo: git diff --cached --check
+```
+
+Observed result:
+
+```text
+Playwright: 2 passed (6.8s)
+```
+
+### Study Notes
+
+- The demo run validates the visible HCI flow, including suggestion reasoning
+  and feedback capture.
+- It does not validate backend persistence because the browser run is currently
+  fixture-backed.
+- The failed first pass exposed two harness assumptions: the app shell requires
+  a default Inbox project, and broad action selectors can accidentally target
+  the wrong suggestion card.
+
 ## Running Notes For Future Sessions
 
 - Keep generic todo features frozen unless they directly support planning.

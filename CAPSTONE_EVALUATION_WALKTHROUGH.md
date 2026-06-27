@@ -57,6 +57,20 @@ Before the walkthrough:
 - Remind yourself not to record private task titles, email addresses, or user
   identifiers in evaluation notes.
 
+## Automated Playwright Demo
+
+The walkthrough can also be exercised through Playwright with fixture data that
+mirrors the seeded demo scenario:
+
+```text
+CI=1 PLAYWRIGHT_PORT=3104 PORT=3104 PLAYWRIGHT_BASE_URL=http://localhost:3104 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+```
+
+The latest automated demo run is recorded in `CAPSTONE_DEMO_RUN.md`.
+
+The Playwright demo is useful for repeatable UI verification and screenshots.
+It is not participant evidence and does not replace real walkthrough notes.
+
 ## Participant Scenario
 
 Give the participant this short scenario:
