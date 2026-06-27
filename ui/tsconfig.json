@@ -45,5 +45,10 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "eslint.config.js"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/__tests__/**"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

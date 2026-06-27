@@ -1,10 +1,13 @@
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 import { ApiAdminApi, ApiApi } from "../generated-api-client/api";
 import { Configuration } from "../generated-api-client/configuration";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window === "undefined"
+    ? "http://localhost:3000"
+    : window.location.origin);
 
 export const useGeneratedApiClient = () => {
   const { getAccessTokenSilently, loginWithRedirect } = useAuth0();

@@ -36,10 +36,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <CssBaseline />
       <AuthProviderWrapper
         auth0Config={{
-          domain: AUTH0_DOMAIN,
-          clientId: AUTH0_CLIENT_ID,
+          domain: AUTH0_DOMAIN ?? "",
+          clientId: AUTH0_CLIENT_ID ?? "",
           authorizationParams: {
-            redirect_uri: AUTH0_REDIRECT_URL,
+            redirect_uri: AUTH0_REDIRECT_URL ?? window.location.origin,
             audience: AUTH0_AUDIENCE,
             scope: AUTH0_SCOPE,
           },

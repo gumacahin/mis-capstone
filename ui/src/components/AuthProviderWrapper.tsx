@@ -1,4 +1,5 @@
 // AuthProviderWrapper.tsx - Conditionally uses Auth0 or E2E auth based on environment
+/* eslint-disable react-refresh/only-export-components */
 
 import {
   Auth0Provider,
@@ -6,6 +7,7 @@ import {
   useAuth0 as useAuth0Real,
 } from "@auth0/auth0-react";
 import React, {
+  ComponentType,
   createContext,
   ReactNode,
   useContext,
@@ -20,13 +22,41 @@ interface MockAuth0ContextValue {
   user?: Record<string, unknown>;
   error?: Error;
   getAccessTokenSilently: () => Promise<string>;
-  loginWithRedirect: () => Promise<void>;
-  logout: () => void;
+  loginWithRedirect: (options?: Record<string, unknown>) => Promise<void>;
+  logout: (options?: Record<string, unknown>) => Promise<void> | void;
 }
 
 const MockAuth0Context = createContext<MockAuth0ContextValue | undefined>(
   undefined,
 );
+
+type LoginOptions = Record<string, unknown> & {
+  appState?: Record<string, unknown>;
+};
+
+type WithAuthenticationRequiredOptions = {
+  onRedirecting?: () => ReactNode;
+  onBeforeAuthentication?: () => Promise<void> | void;
+  returnTo?: string | (() => string);
+  loginOptions?: LoginOptions;
+};
+
+const authStoragePrefix = "@@auth0spajs@@::";
+
+function findAuthStorageKeys() {
+  const keys = Object.keys(localStorage);
+  return {
+    authKey: keys.find(
+      (key) =>
+        key.startsWith(authStoragePrefix) &&
+        !key.endsWith("::@@user@@") &&
+        key.includes("::openid profile email"),
+    ),
+    userKey: keys.find(
+      (key) => key.startsWith(authStoragePrefix) && key.endsWith("::@@user@@"),
+    ),
+  };
+}
 
 // E2E Auth Provider that mimics Auth0Provider behavior
 const E2EAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -38,14 +68,9 @@ const E2EAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   useEffect(() => {
     const checkE2EAuth = () => {
       try {
-        const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-        const origin = window.location.origin;
-
-        const authKey = `@@auth0spajs@@::${clientId}::${origin}::openid profile email`;
-        const userKey = `@@auth0spajs@@::${clientId}::${origin}::@@user@@`;
-
-        const authData = localStorage.getItem(authKey);
-        const userData = localStorage.getItem(userKey);
+        const { authKey, userKey } = findAuthStorageKeys();
+        const authData = authKey ? localStorage.getItem(authKey) : null;
+        const userData = userKey ? localStorage.getItem(userKey) : null;
 
         if (authData && userData) {
           const parsedAuthData = JSON.parse(authData);
@@ -83,14 +108,11 @@ const E2EAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const logout = (): void => {
-    const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-    const origin = window.location.origin;
-
-    const authKey = `@@auth0spajs@@::${clientId}::${origin}::openid profile email`;
-    const userKey = `@@auth0spajs@@::${clientId}::${origin}::@@user@@`;
-
-    localStorage.removeItem(authKey);
-    localStorage.removeItem(userKey);
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(authStoragePrefix)) {
+        localStorage.removeItem(key);
+      }
+    });
 
     setIsAuthenticated(false);
     setUser(undefined);
@@ -134,6 +156,53 @@ export const useAuth0 = (): MockAuth0ContextValue => {
     // Use real Auth0 in normal mode
     return realAuth0Context as MockAuth0ContextValue;
   }
+};
+
+export const withAuthenticationRequired = <P extends object>(
+  Component: ComponentType<P>,
+  options: WithAuthenticationRequiredOptions = {},
+): React.FC<P> => {
+  const {
+    loginOptions,
+    onBeforeAuthentication = () => undefined,
+    onRedirecting = () => null,
+    returnTo = () => `${window.location.pathname}${window.location.search}`,
+  } = options;
+
+  const WithAuthenticationRequiredComponent: React.FC<P> = (props) => {
+    const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+
+    useEffect(() => {
+      if (isLoading || isAuthenticated) {
+        return;
+      }
+
+      const authenticate = async () => {
+        await onBeforeAuthentication();
+        await loginWithRedirect({
+          ...loginOptions,
+          appState: {
+            ...(loginOptions?.appState ?? {}),
+            returnTo: typeof returnTo === "function" ? returnTo() : returnTo,
+          },
+        });
+      };
+
+      void authenticate();
+    }, [isAuthenticated, isLoading, loginWithRedirect]);
+
+    if (!isAuthenticated) {
+      return <>{onRedirecting()}</>;
+    }
+
+    return <Component {...props} />;
+  };
+
+  WithAuthenticationRequiredComponent.displayName = `withAuthenticationRequired(${
+    Component.displayName ?? Component.name ?? "Component"
+  })`;
+
+  return WithAuthenticationRequiredComponent;
 };
 
 // Wrapper component that chooses the right provider

@@ -1,7 +1,7 @@
-import { ProjectDetail, Section } from "@shared";
+import { type ProfileProject, ProjectDetail, Section } from "@shared";
 import ProjectContext from "@shared/contexts/projectContext";
 import SectionContext from "@shared/contexts/sectionContext";
-import useInbox from "@shared/hooks/useInbox";
+import { useInbox } from "@shared/hooks/useInbox";
 import { ReactNode } from "react";
 
 export default function InboxDefaultSectionProvider({
@@ -29,22 +29,26 @@ export default function InboxDefaultSectionProvider({
     return <div>Error: Inbox has no sections</div>;
   }
 
+  const inboxSections = inbox.sections as ProfileProject["sections"];
+
   // Find the default section
-  const inboxDefaultSection = inbox.sections.find((s) => s.is_default);
+  const inboxDefaultSection = inboxSections.find((section) => {
+    return section.is_default;
+  });
 
   if (!inboxDefaultSection) {
     console.error("❌ InboxDefaultSectionProvider - No default section found!");
     console.error(
       "Available sections:",
-      inbox.sections.map((s) => ({
-        id: s.id,
-        title: s.title,
-        is_default: s.is_default,
+      inboxSections.map((section) => ({
+        id: section.id,
+        title: section.title,
+        is_default: section.is_default,
       })),
     );
 
     // Fallback: use the first section if no default section is found
-    const fallbackSection = inbox.sections[0];
+    const fallbackSection = inboxSections[0];
     console.warn("🔄 Using fallback section:", fallbackSection);
 
     return (

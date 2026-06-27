@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -13,6 +12,8 @@ import Spinner from "@shared/components/Spinner";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth0();

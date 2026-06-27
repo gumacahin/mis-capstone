@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -26,6 +25,8 @@ import { GraduationCap, Mail, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 function ConfirmDeleteDialog({
   open,
