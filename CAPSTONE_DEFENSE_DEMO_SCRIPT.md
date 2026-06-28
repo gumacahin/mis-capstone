@@ -230,6 +230,12 @@ status, priority, recurrence, estimated effort, project context, and prior
 snooze or dismiss history.
 ```
 
+Point out the current planner mode chip and mode highlights:
+
+- `Low energy` / `Energy low`
+- `Time boxed` / available minutes and number of fitting tasks
+- `Triage` / overdue count
+
 ### 3.4 Open A Suggestion Reason
 
 Expand the reason/details for one suggestion.
@@ -296,12 +302,15 @@ acted on suggestions.
 
 ## Step 4: Show Gen UI Modes
 
-If available during the live demo, show or explain:
+Show or explain the implemented just-in-time modes:
 
-- low-energy plan
-- limited-time plan
-- overdue triage
-- unavailable planner state
+- low-energy plan: keeps urgent work visible while favoring smaller next
+  actions
+- limited-time plan: shows tasks that fit the available minutes, or the shortest
+  next action when nothing fully fits
+- overdue triage: narrows the planner surface to overdue suggestions
+- unavailable planner state: shows a safe fallback when the planner request
+  fails
 
 Say:
 
@@ -309,6 +318,14 @@ Say:
 This is the just-in-time UI idea. The interface changes based on the planning
 situation. Low energy, limited time, and too many overdue tasks should not all
 produce the same static task list.
+```
+
+Then say:
+
+```text
+The system is not generating arbitrary UI code. It is generating a structured
+UI decision: which registered planner mode to show, which suggestion ids belong
+in the shortlist, and which typed actions are allowed.
 ```
 
 If live mode switching is awkward, show:
@@ -321,8 +338,8 @@ ui/src/modules/planner/__tests__/uiSchema.test.ts
 Say:
 
 ```text
-The schema tests show how the frontend chooses the planner surface from known
-states. This keeps Gen UI controlled and testable.
+The schema tests show low-energy, limited-time, and overdue-triage behavior.
+This keeps Gen UI controlled and testable.
 ```
 
 ## Step 5: Evaluation And Privacy

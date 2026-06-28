@@ -150,3 +150,58 @@ from browser UI to Django persistence and aggregate evaluation reporting.
 It remains implementation/demo evidence. The capstone paper should still label
 participant walkthroughs, adviser review, or faculty/staff feedback separately
 from automated Playwright evidence.
+
+## 2026-06-28: JIT Planner Modes Rehearsal
+
+### Purpose
+
+Verify that the first visible just-in-time planner UI slice works and remains
+demo-ready after adding mode-specific shortlists for low energy, limited time,
+and overdue triage.
+
+### Commands
+
+Run from `ui/` with Node 22 active:
+
+```text
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npx vitest run src/modules/planner/__tests__/uiSchema.test.ts
+CI=1 PLAYWRIGHT_PORT=3102 PORT=3102 PLAYWRIGHT_BASE_URL=http://localhost:3102 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/today-page.spec.ts --project=chromium
+CI=1 PLAYWRIGHT_PORT=3104 PORT=3104 PLAYWRIGHT_BASE_URL=http://localhost:3104 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3106 PORT=3106 PLAYWRIGHT_BACKEND_PORT=8001 PLAYWRIGHT_BASE_URL=http://localhost:3106 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run build
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run lint
+```
+
+### Result
+
+```text
+Planner UI schema tests: 8 passed
+Today page e2e: 9 passed
+Planner evaluation demo e2e: 2 passed
+Real-backend planner demo: 2 passed (10.1s)
+Frontend build: passed
+Frontend lint: passed
+```
+
+### Verified Behavior
+
+- Low-energy mode shows compact mode highlights and favors smaller next actions
+  while preserving urgent work.
+- Limited-time mode shows tasks that fit the available minutes, with a shortest
+  next-action fallback.
+- Overdue-triage mode narrows the visible shortlist to overdue suggestions.
+- The planner demo still supports check-in, accept, snooze, dismiss, and
+  feedback submission.
+- The real-backend demo still passes against Django, Vite, database
+  persistence, and typed planner endpoints.
+- The real-backend run fetched `/api/schema/` without the older schema warning
+  output.
+
+### Rehearsal Interpretation
+
+This is the first demo-ready evidence for controlled Gen UI in the product. The
+planner adapts the visible surface from structured task and check-in data, while
+state changes still go through typed backend operations.
+
+It remains implementation/demo evidence. Participant evaluation must still be
+reported separately.

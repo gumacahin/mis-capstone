@@ -1779,3 +1779,34 @@ Frontend lint: passed
 - The change supports the capstone claim that planning differs from task
   management: the same task data can produce different daily surfaces depending
   on energy, time, and urgency.
+
+## 2026-06-28: JIT Demo Materials Refresh
+
+### Goal
+
+Update the defense and rehearsal materials so the capstone walkthrough reflects
+the implemented just-in-time planner modes.
+
+### Codex-Assisted Actions
+
+- Updated the defense demo script to point out planner mode chips and mode
+  highlights during suggestion inspection.
+- Reframed the Gen UI section around the implemented low-energy, limited-time,
+  overdue-triage, and unavailable planner states.
+- Added language clarifying that the system generates a structured UI decision,
+  not arbitrary frontend code.
+- Added a rehearsal-notes entry summarizing the successful JIT planner checks.
+
+### Verification
+
+```text
+docs: npx prettier --check ../DEV_JOURNAL.md ../CAPSTONE_DEFENSE_DEMO_SCRIPT.md ../CAPSTONE_REHEARSAL_NOTES.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- This keeps the paper and defense artifacts synchronized with the actual
+  implemented UI behavior.
+- The walkthrough can now explicitly demonstrate why the project is a
+  planner-first system rather than a generic task manager.
