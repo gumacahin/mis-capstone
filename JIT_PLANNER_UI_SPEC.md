@@ -538,6 +538,12 @@ mocked payloads.
 | `schedule_plan_item`             | Explicit confirmation    | Yes           | Future         |
 | `sync_calendar_block`            | Explicit confirmation    | Yes           | Future         |
 
+The implemented planner operations are also represented by the internal
+`upoutodo.services.planner_tools` module. That module is the intended bridge for
+future chat, MCP-style, or generative UI controllers: it exposes named
+operations with structured input definitions while preserving backend ownership,
+permissions, and validation boundaries.
+
 ## Safety Rules
 
 - The assistant may suggest UI, but React renders only registered components.
@@ -597,6 +603,8 @@ The current implementation supports the first JIT planner UI slice:
 
 - Django owns planner state through `EnergyCheckIn`, `TodayPlan`, and `PlanItem`.
 - The planner API exposes typed endpoints for check-ins and suggestion actions.
+- `upoutodo.services.planner_tools` exposes the same planner actions as
+  backend-facing typed operations for future chat or MCP-style integrations.
 - Planner suggestion responses include structured task signals for due status,
   priority, effort, recurrence, project/section, score, and snooze/dismiss
   history.
@@ -637,8 +645,8 @@ Next implementation steps:
 1. Use the paper-facing evaluation method to run a small walkthrough with the
    target participant group or a seeded demo task set.
 2. Keep the OpenAPI planner contract test updated as planner operations evolve.
-3. Defer chat and Google Calendar sync until the component registry and typed
-   planner operations are stable.
+3. Prototype chat or MCP-style calls against `planner_tools` before adding
+   Google Calendar sync.
 
 ## Open Questions
 

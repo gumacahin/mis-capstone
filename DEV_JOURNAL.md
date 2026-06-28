@@ -1869,3 +1869,59 @@ Real-backend planner evaluation e2e: 2 passed
   that a future chat or MCP-style layer can request safely.
 - The frontend remains constrained to a known component registry. The system is
   generating a UI decision, not raw frontend code.
+
+## 2026-06-29: Internal Planner Tool Layer
+
+### Goal
+
+Create a narrow backend-facing tool layer that a future chat, MCP-style server,
+or generative UI controller can call without receiving raw database access.
+
+### Codex-Assisted Actions
+
+- Added `upoutodo.services.planner_tools` as the internal typed operation layer.
+- Added structured tool definitions for:
+  - `get_today_plan`
+  - `submit_check_in`
+  - `rebuild_today_plan`
+  - `accept_suggestion`
+  - `snooze_suggestion`
+  - `dismiss_suggestion`
+  - `submit_plan_feedback`
+- Added dataclass inputs for planner check-ins and plan feedback.
+- Moved suggestion mutations and feedback upsert behavior out of the viewset and
+  behind user-scoped tool functions.
+- Kept the REST endpoints as the public API while making them call the same
+  tool functions that a future conversational layer should use.
+- Added service-level tests for tool definitions, check-in rebuild behavior,
+  user-scoped suggestion actions, invalid suggestion IDs, and feedback upsert.
+
+### Verification
+
+```text
+api: DEBUG=True uv run ruff check upoutodo/services/planner_tools.py upoutodo/views/planner.py upoutodo/tests/services/test_planner_tools.py
+api: DEBUG=True uv run ruff format --check upoutodo/services/planner_tools.py upoutodo/views/planner.py upoutodo/tests/services/test_planner_tools.py
+api: DEBUG=True uv run pytest --no-cov upoutodo/tests/services/test_planner_tools.py upoutodo/tests/endpoints/test_planner.py
+docs: npx prettier --check ../DEV_JOURNAL.md ../JIT_PLANNER_UI_SPEC.md
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Backend ruff: passed
+Backend ruff-format check: passed
+Planner tool and endpoint tests: 23 passed
+Docs prettier check: passed
+Real-backend planner evaluation e2e: 2 passed
+```
+
+### Study Notes
+
+- This is the backend bridge from planner-first UI to future chat/MCP use. The
+  assistant-facing surface is a list of named operations with structured inputs,
+  validation upstream, and user-scoped object lookup.
+- The implementation preserves the project rule that an assistant should call
+  typed planner operations only, never raw SQL, ORM queries, or unrestricted
+  database mutations.
