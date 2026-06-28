@@ -258,6 +258,7 @@ Perform three actions:
 - accept one suggestion
 - snooze one suggestion
 - dismiss one suggestion
+- point out the visible confirmation messages after each action
 
 Say:
 
@@ -265,6 +266,14 @@ Say:
 These actions are typed planner operations. The UI does not directly edit the
 database. It calls specific backend endpoints, and the backend verifies the
 user owns the plan item before changing state.
+```
+
+Then say:
+
+```text
+The confirmation messages also make the evaluation trail visible. They show
+that accepted, snoozed, and dismissed suggestions are being captured as planner
+signals, not as generic todo edits.
 ```
 
 ### 3.6 Submit Feedback
@@ -332,6 +341,14 @@ reference:
 ```text
 GET /api/planner/evaluation/
 ```
+
+In the admin dashboard, point out:
+
+- the aggregate-only privacy notice
+- adoption and feedback response metrics
+- helpfulness and confidence metrics
+- suggestion action signals
+- evidence labels under each metric
 
 Say:
 

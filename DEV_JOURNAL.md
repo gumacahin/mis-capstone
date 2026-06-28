@@ -1591,3 +1591,43 @@ Frontend build: passed
   or participant notes in the evaluation surface.
 - The metrics now connect the implementation to evaluation claims: adoption,
   feedback response, perceived usefulness, confidence, and action quality.
+
+## 2026-06-28: Post-Polish Capstone Demo Rehearsal
+
+### Goal
+
+Refresh the demo-readiness evidence after the planner feedback and admin
+evaluation dashboard polish.
+
+### Codex-Assisted Actions
+
+- Re-ran the real-backend planner Playwright walkthrough against Django and
+  Vite using the seeded planner demo user.
+- Re-ran the targeted admin dashboard unit test for the aggregate evaluation
+  panel.
+- Updated the rehearsal notes with the latest verification results and known
+  non-blocking warnings.
+- Updated the defense demo script to explicitly call out planner action
+  confirmation messages and aggregate dashboard evidence.
+
+### Verification
+
+```text
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+ui: npx vitest run src/modules/admin/components/__tests__/AdminDashboard.test.tsx
+```
+
+Observed result:
+
+```text
+Real-backend planner demo: 2 passed (10.1s)
+Admin dashboard test: 1 passed
+```
+
+### Study Notes
+
+- The latest evidence supports a defense claim that `/today` persists planner
+  actions through typed backend endpoints and reports evaluation signals only in
+  aggregate form.
+- This remains implementation/demo evidence. Participant or adviser feedback
+  should be recorded separately from automated Playwright verification.
