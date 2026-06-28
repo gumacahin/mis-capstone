@@ -9,6 +9,7 @@ from upoutodo.models import EnergyCheckIn, PlanItem, Task, TodayPlan, TodayPlanF
 
 DEFAULT_AVAILABLE_MINUTES = 120
 MAX_PLAN_ITEMS = 6
+PLANNER_ALLOWED_SUGGESTION_ACTIONS = ["accept", "snooze", "dismiss"]
 LEGACY_PRIORITY_MAP = {
     "0": Task.Priority.NONE,
     "1": Task.Priority.LOW,
@@ -23,6 +24,17 @@ class TaskSuggestion:
     score: float
     reason: str
     estimated_minutes: int
+
+
+@dataclass(frozen=True)
+class PlannerUiSchema:
+    component: str
+    mode: str
+    title: str
+    message: str
+    highlights: list[str]
+    suggestion_ids: list[int]
+    allowed_actions: list[str]
 
 
 def today_for_user():
@@ -183,6 +195,194 @@ def get_suggestion_status_counts():
     for row in status_rows:
         counts[row["status"]] = row["count"]
     return counts
+
+
+def build_plan_ui_schema(plan):
+    suggestions = list(
+        plan.items.exclude(status=PlanItem.Status.DISMISSED)
+        .select_related("task")
+        .order_by("order", "-score", "id")
+    )
+
+    card_schema = get_plan_card_schema(plan, suggestions)
+    selected_suggestions = select_suggestions_for_mode(
+        plan, suggestions, card_schema.mode
+    )
+
+    return PlannerUiSchema(
+        component=card_schema.component,
+        mode=card_schema.mode,
+        title=card_schema.title,
+        message=card_schema.message,
+        highlights=card_schema.highlights,
+        suggestion_ids=[suggestion.id for suggestion in selected_suggestions],
+        allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+    )
+
+
+def get_plan_card_schema(plan, suggestions):
+    if not suggestions:
+        return PlannerUiSchema(
+            component="TodayPlanCard",
+            mode="default",
+            title="Suggested next",
+            message="",
+            highlights=[],
+            suggestion_ids=[],
+            allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+        )
+
+    overdue_count = sum(
+        1 for suggestion in suggestions if is_overdue_plan_item(suggestion, plan.date)
+    )
+
+    if overdue_count >= 2:
+        return PlannerUiSchema(
+            component="TaskTriagePanel",
+            mode="overdue_triage",
+            title="Overdue triage",
+            message="Focus on overdue work before scanning the full task list.",
+            highlights=[f"{overdue_count} overdue", "Urgent first"],
+            suggestion_ids=[],
+            allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+        )
+
+    if plan.check_in.energy_level == EnergyCheckIn.EnergyLevel.LOW:
+        return PlannerUiSchema(
+            component="LowEnergyPlanCard",
+            mode="low_energy",
+            title="Low-energy plan",
+            message="Start with smaller next actions while preserving urgent work.",
+            highlights=[
+                "Energy low",
+                format_focus_mode(plan.check_in.focus_mode),
+            ],
+            suggestion_ids=[],
+            allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+        )
+
+    if plan.check_in.available_minutes <= 60:
+        fitting_count = sum(
+            1
+            for suggestion in suggestions
+            if suggestion.estimated_minutes <= plan.check_in.available_minutes
+        )
+        return PlannerUiSchema(
+            component="TimeBoxPlanCard",
+            mode="limited_time",
+            title="Fits your time",
+            message=(
+                f"Showing tasks that fit within {plan.check_in.available_minutes} minutes."
+                if fitting_count > 0
+                else (
+                    f"No task fully fits {plan.check_in.available_minutes} minutes, "
+                    "so the shortest next action is shown."
+                )
+            ),
+            highlights=[
+                f"{plan.check_in.available_minutes} minutes",
+                f"{fitting_count} fit" if fitting_count > 0 else "Closest fit",
+            ],
+            suggestion_ids=[],
+            allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+        )
+
+    return PlannerUiSchema(
+        component="TodayPlanCard",
+        mode="default",
+        title="Suggested next",
+        message="",
+        highlights=[],
+        suggestion_ids=[],
+        allowed_actions=PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+    )
+
+
+def select_suggestions_for_mode(plan, suggestions, mode):
+    if not suggestions:
+        return suggestions
+
+    if mode == "limited_time":
+        return select_time_box_suggestions(plan, suggestions)
+    if mode == "low_energy":
+        return sorted(suggestions, key=low_energy_sort_key(plan))
+    if mode == "overdue_triage":
+        return sorted(
+            [
+                suggestion
+                for suggestion in suggestions
+                if is_overdue_plan_item(suggestion, plan.date)
+            ],
+            key=urgency_sort_key(plan),
+        )
+    return suggestions
+
+
+def select_time_box_suggestions(plan, suggestions):
+    fitting_suggestions = sorted(
+        [
+            suggestion
+            for suggestion in suggestions
+            if suggestion.estimated_minutes <= plan.check_in.available_minutes
+        ],
+        key=urgency_sort_key(plan),
+    )
+
+    if fitting_suggestions:
+        return fitting_suggestions
+
+    return sorted(
+        suggestions,
+        key=lambda suggestion: (
+            suggestion.estimated_minutes,
+            *urgency_sort_key(plan)(suggestion),
+        ),
+    )[:1]
+
+
+def low_energy_sort_key(plan):
+    return lambda suggestion: (
+        due_rank(suggestion, plan.date),
+        suggestion.estimated_minutes,
+        suggestion.order,
+        suggestion.id,
+    )
+
+
+def urgency_sort_key(plan):
+    return lambda suggestion: (
+        due_rank(suggestion, plan.date),
+        -suggestion.score,
+        suggestion.order,
+        suggestion.id,
+    )
+
+
+def due_rank(suggestion, plan_date):
+    due_date = task_due_date(suggestion.task)
+    if due_date is None:
+        return 4
+    if due_date < plan_date:
+        return 0
+    if due_date == plan_date:
+        return 1
+    if due_date <= plan_date + timedelta(days=7):
+        return 2
+    return 3
+
+
+def is_overdue_plan_item(suggestion, plan_date):
+    due_date = task_due_date(suggestion.task)
+    return due_date is not None and due_date < plan_date
+
+
+def format_focus_mode(focus_mode):
+    return {
+        EnergyCheckIn.FocusMode.ADMIN: "Admin focus",
+        EnergyCheckIn.FocusMode.DEEP: "Deep focus",
+        EnergyCheckIn.FocusMode.FLEXIBLE: "Flexible focus",
+        EnergyCheckIn.FocusMode.LIGHT: "Light focus",
+    }[focus_mode]
 
 
 def rounded_average(value):

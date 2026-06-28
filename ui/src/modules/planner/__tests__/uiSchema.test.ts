@@ -106,6 +106,38 @@ describe("buildPlannerUiSchema", () => {
     });
   });
 
+  it("uses backend-provided planner UI schema when present", () => {
+    const schema = buildPlannerUiSchema({
+      isError: false,
+      isPending: false,
+      plan: makePlan({
+        checkIn: {
+          energy_level: "low",
+          available_minutes: 120,
+        },
+        uiSchema: {
+          component: "TimeBoxPlanCard",
+          mode: "limited_time",
+          title: "Fits your time",
+          message: "Showing tasks from the typed backend planner schema.",
+          highlights: ["45 minutes", "1 fit"],
+          suggestion_ids: [40],
+          allowed_actions: ["accept", "snooze"],
+        },
+      }),
+    });
+
+    expect(schema[1]).toMatchObject({
+      component: "TimeBoxPlanCard",
+      mode: "limited_time",
+      title: "Fits your time",
+      message: "Showing tasks from the typed backend planner schema.",
+      highlights: ["45 minutes", "1 fit"],
+      suggestionIds: [40],
+      allowedActions: ["accept", "snooze"],
+    });
+  });
+
   it("selects the time-box card and only includes tasks that fit", () => {
     const schema = buildPlannerUiSchema({
       isError: false,
@@ -291,9 +323,11 @@ describe("buildPlannerUiSchema", () => {
 function makePlan({
   checkIn = {},
   suggestions = [baseSuggestion],
+  uiSchema,
 }: {
   checkIn?: Partial<TodayPlan["check_in"]>;
   suggestions?: PlannerSuggestion[];
+  uiSchema?: TodayPlan["ui_schema"];
 } = {}): TodayPlan {
   return {
     ...basePlan,
@@ -302,6 +336,7 @@ function makePlan({
       ...checkIn,
     },
     suggestions,
+    ui_schema: uiSchema,
   };
 }
 

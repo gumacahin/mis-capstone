@@ -152,6 +152,142 @@ def test_check_in_rebuilds_plan_with_available_time(auth_client, section):
 
 
 @pytest.mark.django_db
+def test_today_includes_default_planner_ui_schema(auth_client, section):
+    TaskFactory(
+        section=section,
+        title="Default next task",
+        due_date=timezone.now(),
+        priority=Task.Priority.MEDIUM,
+    )
+
+    response = auth_client.get("/api/planner/today/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    suggestion_ids = [item["id"] for item in response.data["suggestions"]]
+    assert response.data["ui_schema"] == {
+        "component": "TodayPlanCard",
+        "mode": "default",
+        "title": "Suggested next",
+        "message": "",
+        "highlights": [],
+        "suggestion_ids": suggestion_ids,
+        "allowed_actions": ["accept", "snooze", "dismiss"],
+    }
+
+
+@pytest.mark.django_db
+def test_today_includes_low_energy_planner_ui_schema(auth_client, section):
+    TaskFactory(
+        section=section,
+        title="Low energy next task",
+        due_date=timezone.now(),
+        priority=Task.Priority.MEDIUM,
+    )
+
+    response = auth_client.post(
+        "/api/planner/check-in/",
+        {
+            "energy_level": EnergyCheckIn.EnergyLevel.LOW,
+            "available_minutes": 90,
+            "focus_mode": EnergyCheckIn.FocusMode.LIGHT,
+            "context": "Limited energy between meetings",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ui_schema"]["component"] == "LowEnergyPlanCard"
+    assert response.data["ui_schema"]["mode"] == "low_energy"
+    assert response.data["ui_schema"]["title"] == "Low-energy plan"
+    assert response.data["ui_schema"]["message"] == (
+        "Start with smaller next actions while preserving urgent work."
+    )
+    assert response.data["ui_schema"]["highlights"] == ["Energy low", "Light focus"]
+    assert response.data["ui_schema"]["suggestion_ids"] == [
+        item["id"] for item in response.data["suggestions"]
+    ]
+
+
+@pytest.mark.django_db
+def test_today_includes_limited_time_planner_ui_schema(auth_client, section):
+    TaskFactory(
+        section=section,
+        title="Fits the short window",
+        due_date=timezone.now(),
+        priority=Task.Priority.LOW,
+    )
+    TaskFactory(
+        section=section,
+        title="Important but longer",
+        due_date=None,
+        priority=Task.Priority.HIGH,
+    )
+
+    response = auth_client.post(
+        "/api/planner/check-in/",
+        {
+            "energy_level": EnergyCheckIn.EnergyLevel.MEDIUM,
+            "available_minutes": 30,
+            "focus_mode": EnergyCheckIn.FocusMode.FLEXIBLE,
+            "context": "Short break before class",
+        },
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ui_schema"]["component"] == "TimeBoxPlanCard"
+    assert response.data["ui_schema"]["mode"] == "limited_time"
+    assert response.data["ui_schema"]["title"] == "Fits your time"
+    assert response.data["ui_schema"]["message"] == (
+        "Showing tasks that fit within 30 minutes."
+    )
+    assert response.data["ui_schema"]["highlights"] == ["30 minutes", "1 fit"]
+    assert task_titles(response) == ["Fits the short window"]
+    assert response.data["ui_schema"]["suggestion_ids"] == [
+        response.data["suggestions"][0]["id"]
+    ]
+
+
+@pytest.mark.django_db
+def test_today_includes_overdue_triage_planner_ui_schema(auth_client, section):
+    TaskFactory(
+        section=section,
+        title="First overdue task",
+        due_date=timezone.now() - timedelta(days=2),
+        priority=Task.Priority.HIGH,
+    )
+    TaskFactory(
+        section=section,
+        title="Second overdue task",
+        due_date=timezone.now() - timedelta(days=1),
+        priority=Task.Priority.MEDIUM,
+    )
+    TaskFactory(
+        section=section,
+        title="Due today task",
+        due_date=timezone.now(),
+        priority=Task.Priority.HIGH,
+    )
+
+    response = auth_client.get("/api/planner/today/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ui_schema"]["component"] == "TaskTriagePanel"
+    assert response.data["ui_schema"]["mode"] == "overdue_triage"
+    assert response.data["ui_schema"]["title"] == "Overdue triage"
+    assert response.data["ui_schema"]["message"] == (
+        "Focus on overdue work before scanning the full task list."
+    )
+    assert response.data["ui_schema"]["highlights"] == ["2 overdue", "Urgent first"]
+    visible_titles = [
+        item["task"]["title"]
+        for item in response.data["suggestions"]
+        if item["id"] in response.data["ui_schema"]["suggestion_ids"]
+    ]
+    assert visible_titles == ["First overdue task", "Second overdue task"]
+
+
+@pytest.mark.django_db
 def test_suggestion_actions_update_status(auth_client, section):
     TaskFactory(section=section, due_date=timezone.now(), title="Actionable task")
     today_response = auth_client.get("/api/planner/today/", format="json")
@@ -482,6 +618,15 @@ def test_openapi_schema_documents_planner_contract(auth_client):
     ]
     assert feedback_properties["helpfulness_rating"]["type"] == "integer"
     assert feedback_properties["confidence_rating"]["type"] == "integer"
+    today_plan_properties = schema["components"]["schemas"]["TodayPlan"]["properties"]
+    assert today_plan_properties["ui_schema"]["allOf"][0]["$ref"] == (
+        "#/components/schemas/PlannerUiSchema"
+    )
+    ui_schema_properties = schema["components"]["schemas"]["PlannerUiSchema"][
+        "properties"
+    ]
+    assert ui_schema_properties["mode"]["$ref"] == ("#/components/schemas/ModeEnum")
+    assert ui_schema_properties["suggestion_ids"]["type"] == "array"
     evaluation_properties = schema["components"]["schemas"]["PlannerEvaluationSummary"][
         "properties"
     ]

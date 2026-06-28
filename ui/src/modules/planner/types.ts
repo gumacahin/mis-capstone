@@ -7,6 +7,31 @@ export type PlannerSuggestionStatus =
   | "dismissed"
   | "done";
 
+export type PlannerUiComponentName =
+  | "EnergyCheckInCard"
+  | "LowEnergyPlanCard"
+  | "PlannerUnavailableCard"
+  | "TaskTriagePanel"
+  | "TimeBoxPlanCard"
+  | "TodayPlanCard";
+
+export type PlannerUiMode =
+  | "default"
+  | "limited_time"
+  | "low_energy"
+  | "overdue_triage"
+  | "unavailable";
+
+export interface PlannerBackendUiSchema {
+  component: PlannerUiComponentName;
+  mode: PlannerUiMode;
+  title: string;
+  message: string;
+  highlights: string[];
+  suggestion_ids: number[];
+  allowed_actions: PlannerSuggestionAction[];
+}
+
 export interface PlannerCheckIn {
   id: number;
   date: string;
@@ -109,6 +134,7 @@ export interface TodayPlan {
   check_in: PlannerCheckIn;
   suggestions: PlannerSuggestion[];
   feedback: PlannerFeedback | null;
+  ui_schema?: PlannerBackendUiSchema;
   created_at: string;
   updated_at: string;
 }

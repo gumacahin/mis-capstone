@@ -19,11 +19,13 @@ docs/AdminDashboard.md
 docs/AdminMetricTrend.md
 docs/AdminPriorityDistribution.md
 docs/AdminWeeklyTrend.md
+docs/AllowedActionsEnum.md
 docs/AnchorModeEnum.md
 docs/BlankEnum.md
 docs/Comment.md
 docs/CommentRequest.md
 docs/CommentsApi.md
+docs/ComponentEnum.md
 docs/DashboardApi.md
 docs/DueStatusEnum.md
 docs/EmailApi.md
@@ -31,6 +33,7 @@ docs/EnergyCheckIn.md
 docs/EnergyCheckInRequest.md
 docs/EnergyLevelEnum.md
 docs/FocusModeEnum.md
+docs/ModeEnum.md
 docs/Notification.md
 docs/NotificationRequest.md
 docs/NotificationsApi.md
@@ -56,6 +59,7 @@ docs/PlannerApi.md
 docs/PlannerEvaluationSummary.md
 docs/PlannerSuggestionActionRates.md
 docs/PlannerSuggestionStatusCounts.md
+docs/PlannerUiSchema.md
 docs/PriorityEnum.md
 docs/ProductivityApi.md
 docs/ProductivityPriorityDistribution.md
@@ -97,16 +101,19 @@ models/admin-dashboard.ts
 models/admin-metric-trend.ts
 models/admin-priority-distribution.ts
 models/admin-weekly-trend.ts
+models/allowed-actions-enum.ts
 models/anchor-mode-enum.ts
 models/blank-enum.ts
 models/comment-request.ts
 models/comment.ts
+models/component-enum.ts
 models/due-status-enum.ts
 models/energy-check-in-request.ts
 models/energy-check-in.ts
 models/energy-level-enum.ts
 models/focus-mode-enum.ts
 models/index.ts
+models/mode-enum.ts
 models/notification-request.ts
 models/notification.ts
 models/null-enum.ts
@@ -130,6 +137,7 @@ models/plan-item.ts
 models/planner-evaluation-summary.ts
 models/planner-suggestion-action-rates.ts
 models/planner-suggestion-status-counts.ts
+models/planner-ui-schema.ts
 models/priority-enum.ts
 models/productivity-priority-distribution.ts
 models/productivity-streak.ts

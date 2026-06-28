@@ -1810,3 +1810,62 @@ repo: git diff --check
   implemented UI behavior.
 - The walkthrough can now explicitly demonstrate why the project is a
   planner-first system rather than a generic task manager.
+
+## 2026-06-29: Backend-Owned Planner UI Schema
+
+### Goal
+
+Move the just-in-time planner mode decision into the typed backend contract so
+the frontend renders a planner surface selected by Django rather than
+reconstructing the decision independently.
+
+### Codex-Assisted Actions
+
+- Added a backend `PlannerUiSchema` service object for `/api/planner/today/`.
+- Made the backend emit a typed `ui_schema` with component name, mode, title,
+  message, highlights, selected suggestion IDs, and allowed suggestion actions.
+- Covered default, low-energy, limited-time, and overdue-triage schema responses
+  with endpoint tests.
+- Documented the new schema in the generated OpenAPI contract.
+- Regenerated the frontend TypeScript API client from the updated schema.
+- Updated the React planner module so backend-provided `ui_schema` is preferred,
+  while the existing frontend inference remains as a safe fallback.
+- Fixed planner module exports so shared schema types are exported once through
+  the module barrel.
+- Updated `JIT_PLANNER_UI_SPEC.md` to record the backend-owned schema contract.
+
+### Verification
+
+```text
+api: DEBUG=True uv run ruff check upoutodo/services/planner.py upoutodo/serializers/planner.py upoutodo/tests/endpoints/test_planner.py
+api: DEBUG=True uv run pytest --no-cov upoutodo/tests/endpoints/test_planner.py::test_today_includes_default_planner_ui_schema upoutodo/tests/endpoints/test_planner.py::test_today_includes_low_energy_planner_ui_schema upoutodo/tests/endpoints/test_planner.py::test_today_includes_limited_time_planner_ui_schema upoutodo/tests/endpoints/test_planner.py::test_today_includes_overdue_triage_planner_ui_schema upoutodo/tests/endpoints/test_planner.py::test_openapi_schema_documents_planner_contract
+api: DEBUG=True uv run python manage.py spectacular --file /private/tmp/upoutodo-schema.yaml
+ui: npx prettier --check src/modules/planner/types.ts src/modules/planner/uiSchema.ts src/modules/planner/registry.tsx src/modules/planner/__tests__/uiSchema.test.ts src/generated-api-client
+ui: npx eslint src/modules/planner/types.ts src/modules/planner/uiSchema.ts src/modules/planner/registry.tsx src/modules/planner/__tests__/uiSchema.test.ts --max-warnings 0
+ui: npx vitest run src/modules/planner/__tests__/uiSchema.test.ts
+ui: npm run lint
+ui: npm run build
+ui: playwright test tests/e2e/today-page.spec.ts --project=chromium
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+```
+
+Observed result:
+
+```text
+Backend ruff: passed
+OpenAPI schema generation: passed with no warnings or errors
+Backend planner schema tests: 5 passed
+Planner UI schema tests: 9 passed
+Frontend lint: passed
+Frontend build: passed
+Today page e2e: 9 passed
+Real-backend planner evaluation e2e: 2 passed
+```
+
+### Study Notes
+
+- This strengthens the "typed operations only" architecture: the backend now
+  owns not only planner state and mutations, but also the structured UI decision
+  that a future chat or MCP-style layer can request safely.
+- The frontend remains constrained to a known component registry. The system is
+  generating a UI decision, not raw frontend code.

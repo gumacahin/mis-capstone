@@ -498,7 +498,7 @@ such as `TodayPlanCard` or a plain text message.
 
 ## Implemented Planner Modes
 
-As of 2026-06-28, `/today` implements the first just-in-time planner slice:
+As of 2026-06-29, `/today` implements the first just-in-time planner slice:
 
 - `low_energy`: selected when the check-in energy level is low. The planner
   keeps urgent work visible while ordering the shortlist around smaller next
@@ -511,13 +511,17 @@ As of 2026-06-28, `/today` implements the first just-in-time planner slice:
 - `default`: selected for the normal daily plan.
 - `unavailable`: selected when the planner request fails.
 
-The UI schema now includes `highlights` so the rendered card can surface compact
+The backend now emits the planner UI schema from `/api/planner/today/`. The
+schema includes `component`, `mode`, `title`, `message`, `highlights`,
+`suggestion_ids`, and `allowed_actions` so the rendered card can surface compact
 mode signals such as available minutes, number of fitting tasks, low-energy
 focus, or overdue count.
 
 This is intentionally a controlled Gen UI implementation: the frontend chooses
-from known registered components and mode-specific shortlists, while all state
-changes still go through typed planner operations.
+from known registered components and mode-specific shortlists selected by the
+typed backend contract, while all state changes still go through typed planner
+operations. Frontend mode inference remains only as a fallback for older or
+mocked payloads.
 
 ## Typed Operation Map
 
@@ -599,7 +603,8 @@ The current implementation supports the first JIT planner UI slice:
 - The React UI has a typed planner client in `ui/src/modules/planner`.
 - Planner endpoints are documented in the OpenAPI schema and available through
   the generated TypeScript client.
-- `/today` renders planner UI through a component registry and UI schema.
+- `/today` renders planner UI through a component registry and a backend-owned
+  UI schema returned by `/api/planner/today/`.
 - `/today` captures daily-plan feedback through `PlannerFeedbackCard`, backed
   by the typed `submit_plan_feedback` operation.
 - `GET /api/planner/evaluation/` exposes admin-only aggregate metrics for
@@ -615,8 +620,9 @@ The current implementation supports the first JIT planner UI slice:
 - The suggestion card now shows a concise today line derived from task signals,
   while the expanded reason panel separates immediate relevance, planner
   rationale, and labeled evidence.
-- The registry can select low-energy, limited-time, and overdue-triage modes
-  while preserving the same typed backend operations.
+- The backend can select low-energy, limited-time, and overdue-triage modes
+  while preserving the same typed backend operations; React maps the returned
+  schema to registered components.
 - Unit tests cover the schema selection rules for default, low-energy,
   limited-time, overdue-triage, unavailable, loading or empty, and dismissed
   suggestion states.

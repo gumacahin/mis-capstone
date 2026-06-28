@@ -1,23 +1,11 @@
 import type {
+  PlannerBackendUiSchema,
   PlannerSuggestion,
   PlannerSuggestionAction,
+  PlannerUiComponentName,
+  PlannerUiMode,
   TodayPlan,
 } from "./types";
-
-export type PlannerUiComponentName =
-  | "EnergyCheckInCard"
-  | "LowEnergyPlanCard"
-  | "PlannerUnavailableCard"
-  | "TaskTriagePanel"
-  | "TimeBoxPlanCard"
-  | "TodayPlanCard";
-
-export type PlannerUiMode =
-  | "default"
-  | "limited_time"
-  | "low_energy"
-  | "overdue_triage"
-  | "unavailable";
 
 export interface PlannerUiSchema {
   component: PlannerUiComponentName;
@@ -65,6 +53,11 @@ export const buildPlannerUiSchema = ({
     },
   ];
 
+  if (!isPending && plan?.ui_schema) {
+    schema.push(toPlannerUiSchema(plan.ui_schema));
+    return schema;
+  }
+
   const suggestions = visiblePlannerSuggestions(plan);
   const suggestionCard = getSuggestionCardSchema(plan, suggestions, isPending);
   const selectedSuggestions = selectSuggestionsForMode(
@@ -82,6 +75,18 @@ export const buildPlannerUiSchema = ({
 
   return schema;
 };
+
+const toPlannerUiSchema = (
+  backendSchema: PlannerBackendUiSchema,
+): PlannerUiSchema => ({
+  component: backendSchema.component,
+  mode: backendSchema.mode,
+  title: backendSchema.title,
+  message: backendSchema.message || undefined,
+  highlights: backendSchema.highlights,
+  suggestionIds: backendSchema.suggestion_ids,
+  allowedActions: backendSchema.allowed_actions,
+});
 
 const getSuggestionCardSchema = (
   plan: TodayPlan | undefined,

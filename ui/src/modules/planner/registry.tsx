@@ -8,9 +8,10 @@ import {
 import type {
   PlannerCheckInInput,
   PlannerSuggestionActionInput,
+  PlannerUiComponentName,
   TodayPlan,
 } from "./types";
-import type { PlannerUiComponentName, PlannerUiSchema } from "./uiSchema";
+import type { PlannerUiSchema } from "./uiSchema";
 
 interface PlannerRenderContext {
   isPending: boolean;

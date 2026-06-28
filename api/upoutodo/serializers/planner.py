@@ -11,6 +11,8 @@ from upoutodo.models import (
     TodayPlanFeedback,
 )
 from upoutodo.services.planner import (
+    PLANNER_ALLOWED_SUGGESTION_ACTIONS,
+    build_plan_ui_schema,
     normalized_priority,
     priority_label,
     task_due_date,
@@ -142,10 +144,32 @@ class TodayPlanFeedbackSerializer(serializers.ModelSerializer):
         return value
 
 
+class PlannerUiSchemaSerializer(serializers.Serializer):
+    component = serializers.ChoiceField(
+        choices=[
+            "LowEnergyPlanCard",
+            "TaskTriagePanel",
+            "TimeBoxPlanCard",
+            "TodayPlanCard",
+        ]
+    )
+    mode = serializers.ChoiceField(
+        choices=["default", "limited_time", "low_energy", "overdue_triage"]
+    )
+    title = serializers.CharField()
+    message = serializers.CharField(allow_blank=True)
+    highlights = serializers.ListField(child=serializers.CharField())
+    suggestion_ids = serializers.ListField(child=serializers.IntegerField())
+    allowed_actions = serializers.ListField(
+        child=serializers.ChoiceField(choices=PLANNER_ALLOWED_SUGGESTION_ACTIONS)
+    )
+
+
 class TodayPlanSerializer(serializers.ModelSerializer):
     check_in = EnergyCheckInSerializer(read_only=True)
     suggestions = PlanItemSerializer(source="items", many=True, read_only=True)
     feedback = serializers.SerializerMethodField(read_only=True)
+    ui_schema = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = TodayPlan
@@ -157,6 +181,7 @@ class TodayPlanSerializer(serializers.ModelSerializer):
             "check_in",
             "suggestions",
             "feedback",
+            "ui_schema",
             "created_at",
             "updated_at",
         ]
@@ -169,6 +194,10 @@ class TodayPlanSerializer(serializers.ModelSerializer):
         except TodayPlanFeedback.DoesNotExist:
             return None
         return TodayPlanFeedbackSerializer(feedback).data
+
+    @extend_schema_field(PlannerUiSchemaSerializer)
+    def get_ui_schema(self, obj):
+        return PlannerUiSchemaSerializer(build_plan_ui_schema(obj)).data
 
 
 class PlannerSuggestionStatusCountsSerializer(serializers.Serializer):
