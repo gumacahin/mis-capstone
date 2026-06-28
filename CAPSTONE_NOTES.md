@@ -135,6 +135,9 @@ The paper-facing evaluation plan is captured in
 The practical moderator walkthrough is captured in
 `CAPSTONE_EVALUATION_WALKTHROUGH.md`.
 
+The defense-oriented demo script is captured in
+`CAPSTONE_DEFENSE_DEMO_SCRIPT.md`.
+
 The short version:
 
 ```text

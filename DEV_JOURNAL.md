@@ -1328,3 +1328,32 @@ evaluation method.
   existing task managers or calendars.
 - The implementation should be evaluated by helpfulness, confidence,
   explanation quality, and user action on suggestions.
+
+## 2026-06-28: Capstone Defense Demo Script
+
+### Goal
+
+Create a practical defense/demo script that presents the capstone argument,
+shows the planner-first implementation, and provides a fallback path if the live
+environment fails.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_DEFENSE_DEMO_SCRIPT.md`.
+- Structured the demo around Crisanto's study, the original SRS, typed
+  architecture, the live `/today` planner flow, Gen UI modes, evaluation, and
+  limitations.
+- Included setup commands for the real-backend Playwright demo and seeded
+  manual walkthrough data.
+- Added expected defense questions and answers.
+- Added a fallback plan using `CAPSTONE_DEMO_RUN.md`, the traceability matrix,
+  the argument document, the JIT UI spec, and the evaluation method.
+- Linked the demo script from `CAPSTONE_NOTES.md`.
+
+### Study Notes
+
+- The defense should show both product traceability and live behavior.
+- The live demo should focus on check-in, suggestion reasons, accept/snooze or
+  dismiss actions, and feedback submission.
+- The fallback path matters because browser/backend demos can fail for
+  environmental reasons even when the implementation is valid.
