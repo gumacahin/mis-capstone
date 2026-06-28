@@ -9,7 +9,9 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
+import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid2";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { usePlannerEvaluationSummary } from "@planner/hooks";
 import type { PlannerEvaluationSummary } from "@planner/types";
@@ -339,69 +341,109 @@ function PlannerEvaluationPanel({
   }
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <MetricBlock
-          label="Plans generated"
-          value={summary.plan_count.toLocaleString()}
-          detail={`${summary.total_suggestions.toLocaleString()} suggestions`}
-        />
+    <Stack spacing={2}>
+      <Alert severity="info">
+        Aggregate planner evaluation only. These metrics summarize plan
+        generation, suggestion actions, and feedback ratings without exposing
+        individual task titles or participant notes.
+      </Alert>
+      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+        <Chip size="small" label="Capstone evidence" />
+        <Chip size="small" variant="outlined" label="Just-in-time planning" />
+        <Chip size="small" variant="outlined" label="Anonymized aggregates" />
+      </Stack>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            Adoption and response
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail={`${summary.total_suggestions.toLocaleString()} suggestions`}
+            evidence="Planner was invoked enough to generate recommendation sets."
+            label="Plans generated"
+            value={summary.plan_count.toLocaleString()}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail={`${summary.feedback_count.toLocaleString()} responses`}
+            evidence="Participants gave direct feedback on plan usefulness."
+            label="Feedback response rate"
+            value={formatPercent(summary.feedback_response_rate)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail="Daily plan usefulness"
+            evidence="Higher ratings support the claim that the plan helped."
+            label="Avg helpfulness"
+            value={formatRating(summary.average_helpfulness_rating)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail="Confidence after planning"
+            evidence="Higher ratings suggest users felt more ready to act."
+            label="Avg confidence"
+            value={formatRating(summary.average_confidence_rating)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            Suggestion action signals
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.accepted.toLocaleString()} suggestions`}
+            evidence="Accepted suggestions indicate the recommendation matched immediate intent."
+            label="Accepted"
+            value={formatPercent(summary.suggestion_action_rates.accepted)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.snoozed.toLocaleString()} suggestions`}
+            evidence="Snoozes show partial fit: relevant, but not right now."
+            label="Snoozed"
+            value={formatPercent(summary.suggestion_action_rates.snoozed)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.dismissed.toLocaleString()} suggestions`}
+            evidence="Dismissals identify recommendation misses for iteration."
+            label="Dismissed"
+            value={formatPercent(summary.suggestion_action_rates.dismissed)}
+          />
+        </Grid>
       </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <MetricBlock
-          label="Feedback response rate"
-          value={formatPercent(summary.feedback_response_rate)}
-          detail={`${summary.feedback_count.toLocaleString()} responses`}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <MetricBlock
-          label="Avg helpfulness"
-          value={formatRating(summary.average_helpfulness_rating)}
-          detail="Daily plan usefulness"
-        />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <MetricBlock
-          label="Avg confidence"
-          value={formatRating(summary.average_confidence_rating)}
-          detail="Confidence after planning"
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 4 }}>
-        <MetricBlock
-          label="Accepted"
-          value={formatPercent(summary.suggestion_action_rates.accepted)}
-          detail={`${summary.suggestion_status_counts.accepted.toLocaleString()} suggestions`}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 4 }}>
-        <MetricBlock
-          label="Snoozed"
-          value={formatPercent(summary.suggestion_action_rates.snoozed)}
-          detail={`${summary.suggestion_status_counts.snoozed.toLocaleString()} suggestions`}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, md: 4 }}>
-        <MetricBlock
-          label="Dismissed"
-          value={formatPercent(summary.suggestion_action_rates.dismissed)}
-          detail={`${summary.suggestion_status_counts.dismissed.toLocaleString()} suggestions`}
-        />
-      </Grid>
-    </Grid>
+    </Stack>
   );
 }
 
 interface MetricBlockProps {
   detail: string;
+  evidence: string;
   label: string;
   value: string;
 }
 
-function MetricBlock({ detail, label, value }: MetricBlockProps) {
+function MetricBlock({ detail, evidence, label, value }: MetricBlockProps) {
   return (
-    <Box sx={{ borderRadius: 1, bgcolor: "grey.100", p: 2 }}>
+    <Box
+      sx={{
+        bgcolor: "grey.100",
+        borderRadius: 1,
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.5,
+        height: "100%",
+        p: 2,
+      }}
+    >
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
@@ -410,6 +452,9 @@ function MetricBlock({ detail, label, value }: MetricBlockProps) {
       </Typography>
       <Typography variant="caption" color="text.secondary">
         {detail}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        Evidence: {evidence}
       </Typography>
     </Box>
   );

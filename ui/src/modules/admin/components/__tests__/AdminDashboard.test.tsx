@@ -74,16 +74,34 @@ describe("AdminDashboard", () => {
     render(<AdminDashboard />);
 
     expect(screen.getByText("Planner Evaluation")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Aggregate planner evaluation only/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Capstone evidence")).toBeInTheDocument();
+    expect(screen.getByText("Just-in-time planning")).toBeInTheDocument();
+    expect(screen.getByText("Anonymized aggregates")).toBeInTheDocument();
+    expect(screen.getByText("Adoption and response")).toBeInTheDocument();
     expect(screen.getByText("Plans generated")).toBeInTheDocument();
     expect(screen.getByText("42")).toBeInTheDocument();
     expect(screen.getByText("12 suggestions")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Evidence: Planner was invoked enough to generate recommendation sets/i,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("Feedback response rate")).toBeInTheDocument();
     expect(screen.getByText("66.67%")).toBeInTheDocument();
     expect(screen.getByText("7 responses")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Evidence: Participants gave direct feedback on plan usefulness/i,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("Avg helpfulness")).toBeInTheDocument();
     expect(screen.getByText("4.4 / 5")).toBeInTheDocument();
     expect(screen.getByText("Avg confidence")).toBeInTheDocument();
     expect(screen.getByText("3.8 / 5")).toBeInTheDocument();
+    expect(screen.getByText("Suggestion action signals")).toBeInTheDocument();
     expect(screen.getByText("41.67%")).toBeInTheDocument();
     expect(screen.getByText("25%")).toBeInTheDocument();
     expect(screen.getByText("16.67%")).toBeInTheDocument();

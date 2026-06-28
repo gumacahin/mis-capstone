@@ -1545,3 +1545,49 @@ Full frontend lint: passed
   evaluation method.
 - The change keeps persistence behind existing typed planner operations; no raw
   database access or generic task-management expansion was introduced.
+
+## 2026-06-28: Planner Evaluation Dashboard Polish
+
+### Goal
+
+Make the admin planner evaluation panel defense-ready by presenting only
+aggregate/anonymized metrics and explaining what each metric contributes to the
+capstone claim.
+
+### Codex-Assisted Actions
+
+- Added an aggregate-only privacy note to the planner evaluation panel.
+- Added presentation chips for capstone evidence, just-in-time planning, and
+  anonymized aggregates.
+- Grouped planner metrics into adoption/response metrics and suggestion action
+  signals.
+- Added evidence labels to each metric so the dashboard can be used directly in
+  the capstone defense.
+- Updated the admin dashboard unit test to assert the aggregate privacy note,
+  evidence framing, and metric values.
+
+### Verification
+
+```text
+ui: npx prettier --check src/modules/admin/components/AdminDashboard.tsx src/modules/admin/components/__tests__/AdminDashboard.test.tsx
+ui: npx eslint src/modules/admin/components/AdminDashboard.tsx src/modules/admin/components/__tests__/AdminDashboard.test.tsx --max-warnings 0
+ui: npx vitest run src/modules/admin/components/__tests__/AdminDashboard.test.tsx
+ui: npm run lint
+ui: npm run build
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Admin dashboard test: 1 passed
+Full frontend lint: passed
+Frontend build: passed
+```
+
+### Study Notes
+
+- This supports the capstone narrative without exposing individual task content
+  or participant notes in the evaluation surface.
+- The metrics now connect the implementation to evaluation claims: adoption,
+  feedback response, perceived usefulness, confidence, and action quality.
