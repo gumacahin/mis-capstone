@@ -4,6 +4,7 @@ from hmac import compare_digest
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -75,6 +76,14 @@ def _create_due_notifications(user, today):
             )
 
 
+@extend_schema(
+    request=None,
+    responses={
+        201: OpenApiResponse(description="Daily digest processed."),
+        403: OpenApiResponse(description="Daily digest access denied."),
+        500: OpenApiResponse(description="Daily digest processing failed."),
+    },
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def daily_digest(request):

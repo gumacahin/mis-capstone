@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from upoutodo.models import Tag, Task
@@ -25,6 +26,7 @@ class TagSerializer(serializers.ModelSerializer):
 class TagDetailSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField()
 
+    @extend_schema_field(TaskSerializer(many=True))
     def get_tasks(self, obj):
         return TaskSerializer(
             Task.objects.filter(

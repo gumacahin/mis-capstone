@@ -1,4 +1,9 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import (
+    OpenApiTypes,
+    extend_schema_field,
+    extend_schema_serializer,
+)
 from rest_framework import serializers
 
 from upoutodo.models import Project, ProjectSection
@@ -6,6 +11,7 @@ from upoutodo.models import Project, ProjectSection
 User = get_user_model()
 
 
+@extend_schema_serializer(component_name="UserProjectSection")
 class ProjectSectionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
@@ -17,6 +23,7 @@ class ProjectSectionSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "title", "is_default"]
 
 
+@extend_schema_serializer(component_name="UserProject")
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -42,6 +49,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         projects = obj.projects.all()
         return ProjectSerializer(projects, many=True).data
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_name(self, obj):
         if obj.profile.name:
             return obj.profile.name

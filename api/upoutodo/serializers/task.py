@@ -1,11 +1,10 @@
 from django.contrib.contenttypes.models import ContentType
 from django_comments.models import Comment
+from drf_spectacular.utils import OpenApiTypes, extend_schema_field
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
-from upoutodo.models import Project, ProjectSection, Task
-
-from .tag import Tag
+from upoutodo.models import Project, ProjectSection, Tag, Task
 
 
 class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
@@ -81,15 +80,18 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
         read_only_fields = ["due_date"]
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_comments_count(self, obj):
         content_type = ContentType.objects.get_for_model(obj)
         return Comment.objects.filter(
             content_type=content_type, object_pk=obj.pk
         ).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_project_title(self, obj):
         return obj.section.project.title
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_section_title(self, obj):
         section_title = obj.section.title
         if section_title == Project.DEFAULT_PROJECT_SECTION_TITLE:

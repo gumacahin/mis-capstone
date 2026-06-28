@@ -2,6 +2,8 @@ from datetime import timedelta
 
 from django.db.models import Avg, Count, DurationField, ExpressionWrapper, F
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
+from rest_framework import serializers
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -53,9 +55,39 @@ class AdminTagViewSet(AdminViewSet, TagViewSet):
     lookup_field = "id"
 
 
+class AdminMetricTrendSerializer(serializers.Serializer):
+    total = serializers.FloatField()
+    percent_increase = serializers.FloatField()
+
+
+class AdminWeeklyTrendSerializer(serializers.Serializer):
+    day = serializers.CharField()
+    created = serializers.IntegerField()
+    completed = serializers.IntegerField()
+
+
+class AdminPriorityDistributionSerializer(serializers.Serializer):
+    priority = serializers.CharField()
+    count = serializers.IntegerField()
+    percent = serializers.FloatField()
+    completion_rate = serializers.FloatField()
+    avg_completion_time = serializers.FloatField(allow_null=True)
+    overdue_count = serializers.IntegerField()
+
+
+class AdminDashboardSerializer(serializers.Serializer):
+    total_tasks = AdminMetricTrendSerializer()
+    active_users = AdminMetricTrendSerializer()
+    pending_tasks = AdminMetricTrendSerializer()
+    completed_tasks = AdminMetricTrendSerializer()
+    weekly_trends = AdminWeeklyTrendSerializer(many=True)
+    priority_distribution = AdminPriorityDistributionSerializer(many=True)
+
+
 class AdminDashboardView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
+    @extend_schema(responses=AdminDashboardSerializer)
     def get(self, request):
         return Response(
             {

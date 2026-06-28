@@ -491,6 +491,39 @@ def test_openapi_schema_documents_planner_contract(auth_client):
     )
 
 
+@pytest.mark.django_db
+def test_openapi_schema_documents_reporting_contracts(auth_client):
+    response = auth_client.get("/api/schema/", HTTP_ACCEPT="application/json")
+
+    assert response.status_code == status.HTTP_200_OK
+    schema = response.data
+
+    assert (
+        schema["paths"]["/api/dashboard"]["get"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/AdminDashboard"
+    )
+    assert (
+        schema["paths"]["/api/productivity"]["get"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["$ref"]
+        == "#/components/schemas/UserProductivity"
+    )
+    assert (
+        schema["paths"]["/api/email/daily-digest"]["post"]["responses"]["201"][
+            "description"
+        ]
+        == "Daily digest processed."
+    )
+
+    components = schema["components"]["schemas"]
+    assert components["Task"]["properties"]["comments_count"]["type"] == "integer"
+    assert components["Task"]["properties"]["section_title"]["nullable"] is True
+    assert "UserProject" in components
+    assert "UserProjectSection" in components
+
+
 def create_plan_for_user(user, target_date):
     project = ProjectFactory(created_by=user, updated_by=user)
     check_in = EnergyCheckIn.objects.create(

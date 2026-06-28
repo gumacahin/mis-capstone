@@ -1631,3 +1631,46 @@ Admin dashboard test: 1 passed
   aggregate form.
 - This remains implementation/demo evidence. Participant or adviser feedback
   should be recorded separately from automated Playwright verification.
+
+## 2026-06-28: OpenAPI Contract Cleanup
+
+### Goal
+
+Reduce recurring schema-generation warnings so the API contract is clearer for
+the planner-first direction and future typed chat or MCP-style operations.
+
+### Codex-Assisted Actions
+
+- Added explicit drf-spectacular schema annotations for older serializer method
+  fields on tasks, project sections, tags, and users.
+- Gave nested user project serializers distinct schema component names to avoid
+  duplicate OpenAPI component warnings.
+- Added response serializers for the admin dashboard and user productivity
+  endpoints.
+- Added explicit response documentation for the protected daily digest trigger.
+- Extended backend schema tests to cover reporting contracts and daily digest
+  response documentation.
+
+### Verification
+
+```text
+api: DEBUG=True uv run python manage.py spectacular --file /private/tmp/upoutodo-schema.yaml
+api: DEBUG=True uv run ruff check upoutodo/serializers/task.py upoutodo/serializers/project_section.py upoutodo/serializers/tag.py upoutodo/serializers/user.py upoutodo/views/admin.py upoutodo/views/productivity.py upoutodo/views/email.py upoutodo/tests/endpoints/test_planner.py
+api: DEBUG=True uv run pytest --no-cov upoutodo/tests/endpoints/test_admin.py upoutodo/tests/endpoints/test_email.py upoutodo/tests/endpoints/test_planner.py::test_openapi_schema_documents_planner_contract upoutodo/tests/endpoints/test_planner.py::test_openapi_schema_documents_reporting_contracts
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+OpenAPI schema generation: passed with no warnings or errors
+Ruff targeted backend check: passed
+Admin/email/schema endpoint tests: 13 passed
+```
+
+### Study Notes
+
+- This strengthens the "typed operations" architecture because the backend
+  contract is now more explicit and less ambiguous.
+- The change is intentionally schema-facing; it does not expand generic todo
+  features or change endpoint payload behavior.

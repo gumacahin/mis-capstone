@@ -1,6 +1,9 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from upoutodo.models import Project, ProjectSection
+
+from .task import TaskSerializer
 
 
 class ProjectSectionSerializer(serializers.HyperlinkedModelSerializer):
@@ -51,10 +54,7 @@ class ProjectSectionSerializer(serializers.HyperlinkedModelSerializer):
         )
         return data
 
+    @extend_schema_field(TaskSerializer(many=True))
     def get_tasks(self, obj):
-        from upoutodo.serializers import (
-            TaskSerializer,  # Local import to avoid circular import
-        )
-
         tasks = obj.tasks.all()
         return TaskSerializer(tasks, many=True, read_only=True).data

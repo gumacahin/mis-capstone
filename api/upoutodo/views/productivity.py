@@ -2,11 +2,51 @@ from datetime import timedelta
 
 from django.db.models import Avg, DurationField, ExpressionWrapper, F
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
+from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from upoutodo.models import Task
+
+
+class ProductivitySummarySerializer(serializers.Serializer):
+    total = serializers.IntegerField()
+    completed = serializers.IntegerField()
+    pending = serializers.IntegerField()
+    overdue = serializers.IntegerField()
+    due_today = serializers.IntegerField()
+    completed_this_week = serializers.IntegerField()
+    created_this_week = serializers.IntegerField()
+    completion_rate = serializers.FloatField()
+    avg_completion_days = serializers.FloatField(allow_null=True)
+
+
+class ProductivityWeeklyTrendSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    day = serializers.CharField()
+    created = serializers.IntegerField()
+    completed = serializers.IntegerField()
+
+
+class ProductivityPriorityDistributionSerializer(serializers.Serializer):
+    priority = serializers.CharField()
+    label = serializers.CharField()
+    count = serializers.IntegerField()
+    percent = serializers.FloatField()
+    completion_rate = serializers.FloatField()
+
+
+class ProductivityStreakSerializer(serializers.Serializer):
+    current = serializers.IntegerField()
+
+
+class UserProductivitySerializer(serializers.Serializer):
+    summary = ProductivitySummarySerializer()
+    weekly_trends = ProductivityWeeklyTrendSerializer(many=True)
+    priority_distribution = ProductivityPriorityDistributionSerializer(many=True)
+    streak = ProductivityStreakSerializer()
 
 
 class UserProductivityView(APIView):
@@ -15,6 +55,7 @@ class UserProductivityView(APIView):
     def get_user_tasks(self, request):
         return Task.objects.filter(section__project__created_by=request.user)
 
+    @extend_schema(responses=UserProductivitySerializer)
     def get(self, request):
         return Response(
             {
