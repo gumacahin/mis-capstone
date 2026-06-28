@@ -38,6 +38,14 @@ def test_daily_digest_endpoint_rejects_public_requests(api_client):
 
 
 @pytest.mark.django_db
+def test_daily_digest_endpoint_rejects_non_admin_user(auth_client):
+    """Test that normal authenticated users cannot trigger the daily digest."""
+    url = reverse("daily-digest")
+    response = auth_client.post(url, format="json")
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
 def test_daily_digest_endpoint_allows_admin(auth_client, user):
     """Test that admins can trigger the daily digest endpoint."""
     user.profile.is_admin = True

@@ -111,7 +111,7 @@ def daily_digest(request):
 
                 overdue_tasks = Task.objects.filter(
                     section__project__created_by=user,
-                    due_date__lt=today,
+                    due_date__date__lt=today,
                     completion_date__isnull=True,
                 ).select_related("section__project")
 

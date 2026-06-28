@@ -90,3 +90,17 @@ def test_comment_create_rejects_foreign_task(auth_client):
     assert not Comment.objects.filter(
         object_pk=str(other_task.pk), comment="not allowed"
     ).exists()
+
+
+@pytest.mark.django_db
+def test_comment_detail_rejects_foreign_task_comment(auth_client):
+    other_user = UserFactory()
+    other_project = ProjectFactory(created_by=other_user, updated_by=other_user)
+    other_task = TaskFactory(section=other_project.sections.first())
+    foreign_comment = create_comment(other_task, other_user, "foreign detail")
+
+    response = auth_client.get(
+        reverse("comment-detail", args=[foreign_comment.id]), format="json"
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

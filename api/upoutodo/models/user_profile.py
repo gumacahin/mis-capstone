@@ -36,10 +36,10 @@ class UserProfile(models.Model):
         return Project.get_user_inbox(self.user)
 
     def update_from_request(self, request):
-        updated = False
+        update_fields = set()
         for key, value in request.data.items():
             if key in self.MUTABLE_REQUEST_FIELDS:
                 setattr(self, key, value)
-                updated = True
-        if updated:
-            self.save(update_fields=self.MUTABLE_REQUEST_FIELDS)
+                update_fields.add(key)
+        if update_fields:
+            self.save(update_fields=update_fields)
