@@ -1,7 +1,7 @@
 import type { ProjectDetail } from "@shared";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, user, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import ProjectViewMenu from "../ProjectViewMenu";
 

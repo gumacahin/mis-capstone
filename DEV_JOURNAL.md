@@ -1442,3 +1442,54 @@ Planner demo e2e: 2 passed (8.7s)
   making the current capstone evaluation depend on student participants.
 - This keeps the implemented product closer to Crisanto's original faculty
   planning problem while preserving the original SRS history.
+
+## 2026-06-28: Frontend Lint Baseline Cleanup
+
+### Goal
+
+Make the frontend lint command trustworthy again before adding more planner
+features, so future UI changes can rely on a clean full-project lint signal.
+
+### Codex-Assisted Actions
+
+- Reproduced the full `npm run lint` failure from a clean worktree.
+- Replaced `any` casts in task cache invalidation with TanStack Query types and
+  explicit query-key shape checks.
+- Replaced `import.meta` `any` casts in Auth0 config with a typed optional env
+  wrapper.
+- Cleaned duplicate and default/named import warnings in `InboxPage`.
+- Let ESLint/Prettier fix service worker formatting and removed stale unused
+  imports from project component tests.
+- Replaced skipped-test CommonJS `require()` mock access with typed Vitest
+  mocked hook imports.
+- Removed focused `.only` markers from project tests.
+- Updated stale project divider and upcoming-page tests to assert current UI
+  behavior.
+
+### Verification
+
+```text
+ui: npm run lint
+ui: npm run build
+ui: npx vitest run src/modules/projects/components/__tests__
+ui: npm run test:e2e:planner-demo
+ui: playwright test tests/e2e/upcoming-page.spec.ts --project=chromium
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Full frontend lint: passed
+Frontend build: passed
+Project component tests: 15 passed, 5 skipped; 26 tests passed, 19 skipped
+Planner demo e2e: 2 passed (5.8s)
+Upcoming page e2e: 2 passed (6.1s)
+```
+
+### Study Notes
+
+- A clean lint baseline makes future Codex-assisted UI work easier to audit
+  because unrelated lint noise no longer hides new regressions.
+- The skipped project component tests still represent test-suite debt, but they
+  no longer block lint or contain focused-test markers.

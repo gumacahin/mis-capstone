@@ -1,50 +1,45 @@
+import type { ProjectDetail, Section } from "@shared";
 import ProjectContext from "@shared/contexts/projectContext";
-import { useDeleteSection as originalUseDeleteSection } from "@shared/hooks/queries";
+import { useDeleteSection } from "@shared/hooks/queries";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import { toast } from "react-hot-toast";
 import { describe, expect, it, vi } from "vitest";
 
 import ProjectSectionDeleteDialog from "../ProjectSectionDeleteDialog";
-/**
- * NOTE: To avoid "Cannot find module '@shared/hooks/queries'" error,
- * Vitest should be instructed to mock the module properly *before* imports use it.
- * This block ensures the module resolver works in test.
- * You should use the actual file path (relative from the project root)
- */
-
-// If running in Vitest, ensure mocks are hoisted above other imports.
-// This solves the test error for missing '@shared/hooks/queries' during mocking.
-
 vi.mock("@shared/hooks/queries", () => {
   return {
     useDeleteSection: vi.fn(),
   };
 });
 
-vi.mock("react-hot-toast", async () => {
+vi.mock("react-hot-toast", () => {
   // mock `promise` as async passthrough for test
   return {
     toast: {
-      promise: vi.fn((fn, opts) => (fn.then ? fn : Promise.resolve())),
+      promise: vi.fn((promise: Promise<unknown>) => promise),
     },
   };
 });
-vi.mock("@shared/hooks/queries", async (mod) => {
-  return {
-    ...mod,
-    useDeleteSection: vi.fn(),
-  };
-});
 
-const fakeProject = { id: 1, title: "Project" };
-const fakeSection = { id: 2, title: "Section Title" };
+const fakeProject: ProjectDetail = {
+  id: 1,
+  title: "Project",
+  view: "list",
+  sections: [],
+};
+const fakeSection: Section = {
+  id: 2,
+  title: "Section Title",
+  order: 0,
+  project: 1,
+  is_default: false,
+  tasks: [],
+};
 
 function renderWithProjectContext(ui: React.ReactNode) {
   return render(
-    <ProjectContext.Provider value={fakeProject as any}>
-      {ui}
-    </ProjectContext.Provider>,
+    <ProjectContext.Provider value={fakeProject}>{ui}</ProjectContext.Provider>,
   );
 }
 
@@ -53,10 +48,10 @@ describe.skip("ProjectSectionDeleteDialog", () => {
 
   beforeEach(() => {
     mutateAsync.mockReset();
-    (require("@shared/hooks/queries").useDeleteSection as any).mockReturnValue({
+    vi.mocked(useDeleteSection).mockReturnValue({
       mutateAsync,
-    });
-    (toast.promise as any).mockClear();
+    } as unknown as ReturnType<typeof useDeleteSection>);
+    vi.mocked(toast.promise).mockClear();
   });
 
   it("renders dialog and calls handleClose on Cancel", () => {
@@ -64,7 +59,7 @@ describe.skip("ProjectSectionDeleteDialog", () => {
     renderWithProjectContext(
       <ProjectSectionDeleteDialog
         open={true}
-        section={fakeSection as any}
+        section={fakeSection}
         handleClose={handleClose}
       />,
     );
@@ -85,7 +80,7 @@ describe.skip("ProjectSectionDeleteDialog", () => {
     renderWithProjectContext(
       <ProjectSectionDeleteDialog
         open={true}
-        section={fakeSection as any}
+        section={fakeSection}
         handleClose={handleClose}
       />,
     );

@@ -7,10 +7,14 @@ type ViteEnv = {
   VITE_AUTH0_REDIRECT_URL?: string;
 };
 
+type ImportMetaWithOptionalEnv = ImportMeta & {
+  env?: ViteEnv;
+};
+
 // Vite runtime (browser) provides import.meta.env; Node/Playwright does not.
 const viteEnv: ViteEnv | undefined =
-  typeof import.meta !== "undefined" && (import.meta as any).env
-    ? ((import.meta as any).env as ViteEnv)
+  typeof import.meta !== "undefined"
+    ? (import.meta as ImportMetaWithOptionalEnv).env
     : undefined;
 
 // Always available in Node; also available in Vite dev via dotenv.

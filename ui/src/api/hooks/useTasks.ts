@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  type Query,
+  type QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import dayjs, { type Dayjs } from "dayjs";
 import toast from "react-hot-toast";
 
@@ -307,8 +313,26 @@ export const useInboxTasksList = () => {
 /**
  * Invalidate all task-related queries including date ranges
  */
+const isTaskRangeQuery = (query: Query): boolean => {
+  const [scope, range] = query.queryKey;
+  return (
+    scope === "tasks" &&
+    typeof range === "object" &&
+    range !== null &&
+    "start" in range &&
+    "end" in range
+  );
+};
+
+const isTaskDateQuery = (query: Query): boolean => {
+  const [scope, dateMarker, dateValue] = query.queryKey;
+  return (
+    scope === "tasks" && dateMarker === "date" && typeof dateValue === "string"
+  );
+};
+
 const invalidateTaskQueries = (
-  queryClient: any,
+  queryClient: QueryClient,
   additionalInvalidations?: () => void,
 ) => {
   // Invalidate basic task queries
@@ -319,20 +343,12 @@ const invalidateTaskQueries = (
 
   // Invalidate all date range queries (for upcoming page: useTasks)
   queryClient.invalidateQueries({
-    predicate: (query: any) =>
-      query.queryKey[0] === "tasks" &&
-      typeof query.queryKey[1] === "object" &&
-      query.queryKey[1] !== null &&
-      "start" in query.queryKey[1] &&
-      "end" in query.queryKey[1],
+    predicate: isTaskRangeQuery,
   });
 
   // Invalidate all single date queries (for useTasksDueOn)
   queryClient.invalidateQueries({
-    predicate: (query: any) =>
-      query.queryKey[0] === "tasks" &&
-      query.queryKey[1] === "date" &&
-      typeof query.queryKey[2] === "string",
+    predicate: isTaskDateQuery,
   });
 
   // Run any additional invalidations

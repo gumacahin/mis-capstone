@@ -13,13 +13,15 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key)),
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
       ),
-    ),
   );
   self.clients.claim();
 });
@@ -33,10 +35,13 @@ self.addEventListener("fetch", (event) => {
   // API calls: network-first with no cache fallback (stale API data is risky)
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
-      fetch(request).catch(() => new Response(
-        JSON.stringify({ detail: "You are offline." }),
-        { status: 503, headers: { "Content-Type": "application/json" } },
-      )),
+      fetch(request).catch(
+        () =>
+          new Response(JSON.stringify({ detail: "You are offline." }), {
+            status: 503,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
     );
     return;
   }

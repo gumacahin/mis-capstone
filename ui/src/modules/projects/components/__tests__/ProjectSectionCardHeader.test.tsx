@@ -52,7 +52,7 @@ describe.skip("ProjectSectionCardHeader", () => {
     duplicateSectionMock.mockClear();
   });
 
-  test.only("renders section title and menu button", () => {
+  test("renders section title and menu button", () => {
     render(wrapper(<ProjectSectionCardHeader />));
 
     expect(screen.getByText(fakeSection.title)).toBeVisible();
