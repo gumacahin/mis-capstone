@@ -206,7 +206,7 @@ REST_FRAMEWORK = {
 # DRF Spectacular Settings
 SPECTACULAR_SETTINGS = {
     "TITLE": "UPOU TODO API",
-    "DESCRIPTION": "Task management API for UPOU students and faculty",
+    "DESCRIPTION": "Planner-first productivity API for UPOU faculty and staff",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,

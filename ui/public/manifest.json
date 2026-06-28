@@ -1,7 +1,7 @@
 {
   "name": "UPOU Todo — What should I do today?",
   "short_name": "UPOU Todo",
-  "description": "Task management for the UPOU community — capture tasks, plan schedules, and track progress.",
+  "description": "Planner-first productivity support for UPOU faculty and staff - capture tasks, plan today, and track progress.",
   "start_url": "/today",
   "display": "standalone",
   "background_color": "#ffffff",

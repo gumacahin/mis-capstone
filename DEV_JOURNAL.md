@@ -1397,3 +1397,48 @@ Real-backend planner demo: 2 passed (11.5s)
   persistence, typed planner actions, and planner feedback submission.
 - Remaining schema and naive datetime warnings are non-blocking but should stay
   visible as known engineering debt.
+
+## 2026-06-28: Faculty/Staff Scope Copy Alignment
+
+### Goal
+
+Align user-facing product copy with the capstone narrative that focuses the
+current planner evaluation on UPOU faculty and staff, while keeping existing
+student profile fields as compatibility and future-scope data.
+
+### Codex-Assisted Actions
+
+- Updated the DRF schema description to describe the backend as a
+  planner-first productivity API for UPOU faculty and staff.
+- Updated homepage, PWA metadata, onboarding, and settings copy from generic
+  student/faculty task-management language to faculty/staff planning language.
+- Kept `is_student` and `is_faculty` behavior intact so existing profile data
+  and API contracts are not broken by a wording-only scope alignment.
+- Regenerated the OpenAPI schema successfully and observed the known schema
+  warnings.
+- Deferred full generated-client refresh because it created broad formatting
+  churn unrelated to this change, then mechanically aligned the stale generated
+  file headers with the new schema description.
+
+### Verification
+
+```text
+api: uv run ruff check api/settings.py
+ui: npx eslint src/pages/HomePage.tsx src/pages/OnboardingPage.tsx src/pages/SettingsPage.tsx --max-warnings 0
+ui: npx prettier --check index.html public/manifest.json src/pages/HomePage.tsx src/pages/OnboardingPage.tsx src/pages/SettingsPage.tsx
+ui: npm run test:e2e:planner-demo
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Planner demo e2e: 2 passed (8.7s)
+```
+
+### Study Notes
+
+- The project can acknowledge students as adjacent or future scope without
+  making the current capstone evaluation depend on student participants.
+- This keeps the implemented product closer to Crisanto's original faculty
+  planning problem while preserving the original SRS history.

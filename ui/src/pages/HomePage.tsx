@@ -82,8 +82,9 @@ function HomePage() {
               lineHeight: 1.6,
             }}
           >
-            For UPOU faculty and students&mdash;capture tasks, plan schedules,
-            and track progress for courses, teaching, research, and campus work.
+            For UPOU faculty and staff&mdash;capture tasks, plan today, and
+            track progress for teaching, research, administrative, and campus
+            work.
           </Typography>
 
           <Button
