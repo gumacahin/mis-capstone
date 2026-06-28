@@ -66,6 +66,8 @@ planning and productivity tracking, with future extensibility for Google
 Calendar synchronization and conversational planning through typed tool actions.
 ```
 
+The fuller paper and defense outline is captured in `CAPSTONE_ARGUMENT.md`.
+
 ## Typed Operations
 
 In this project, **typed** means that the application exposes a small set of

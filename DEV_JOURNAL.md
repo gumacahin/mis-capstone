@@ -1300,3 +1300,31 @@ repo and reconcile them with the Django/React planner-first implementation.
 - Optional SRS items such as Google Calendar integration, OUIC integration,
   group scheduling, motivation, and full voice/conversational UI remain future
   work unless the capstone scope changes.
+
+## 2026-06-28: Capstone Argument Outline
+
+### Goal
+
+Create a concise paper and defense narrative that connects Crisanto's study,
+the original WSIDT SRS, the current implementation, generative UI, and the
+evaluation method.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_ARGUMENT.md` as the high-level argument document.
+- Framed the current implementation as a planner-first MVP that preserves the
+  SRS baseline while focusing the contribution on suggested daily planning.
+- Clarified that generative UI is the design strategy for the SRS planning
+  requirements, not a separate requirement invented outside the SRS.
+- Added paper-section mapping, defense talking points, claims to make, and
+  claims to avoid.
+- Linked the argument document from `CAPSTONE_NOTES.md`.
+
+### Study Notes
+
+- The strongest capstone claim is that just-in-time UI turns task data into
+  contextual planning support.
+- The defense should avoid claiming that the app is a full replacement for
+  existing task managers or calendars.
+- The implementation should be evaluated by helpfulness, confidence,
+  explanation quality, and user action on suggestions.
