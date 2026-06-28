@@ -404,6 +404,9 @@ test.describe("Planner evaluation demo", () => {
     await expect
       .poll(() => calls.checkInPayload?.context)
       .toBe("Pilot walkthrough: choose a realistic next task.");
+    await expect(
+      page.getByText("Check-in updated. Suggestions were rebuilt"),
+    ).toBeVisible();
 
     await page
       .locator("div")
@@ -413,17 +416,21 @@ test.describe("Planner evaluation demo", () => {
       .click();
     await expect.poll(() => calls.accepted).toBe(1);
     await expect(page.getByText("accepted", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: accepted.")).toBeVisible();
 
     await page.getByRole("button", { name: "Snooze" }).nth(1).click();
     await expect.poll(() => calls.snoozed).toBe(1);
     await expect(page.getByText("snoozed", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: snoozed for later.")).toBeVisible();
 
     await page.getByRole("button", { name: "Dismiss" }).nth(2).click();
     await expect.poll(() => calls.dismissed).toBe(1);
+    await expect(page.getByText("Recorded: dismissed.")).toBeVisible();
     await expect(
       page.getByText("Review thesis proposal comments"),
     ).toBeHidden();
 
+    await expect(page.getByText("aggregate evaluation evidence")).toBeVisible();
     await page.getByLabel("Helpful rating").fill("4");
     await page.getByLabel("Confidence rating").fill("4");
     await page
@@ -432,7 +439,12 @@ test.describe("Planner evaluation demo", () => {
     await page.getByRole("button", { name: "Save feedback" }).click();
     await expect.poll(() => calls.feedbackPayload?.helpfulness_rating).toBe(4);
     await expect.poll(() => calls.feedbackPayload?.confidence_rating).toBe(4);
-    await expect(page.getByText("Feedback saved")).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved for evaluation."),
+    ).toBeVisible();
 
     await page.screenshot({
       fullPage: true,

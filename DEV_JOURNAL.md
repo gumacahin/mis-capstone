@@ -1493,3 +1493,55 @@ Upcoming page e2e: 2 passed (6.1s)
   because unrelated lint noise no longer hides new regressions.
 - The skipped project component tests still represent test-suite debt, but they
   no longer block lint or contain focused-test markers.
+
+## 2026-06-28: Planner Evaluation Feedback Polish
+
+### Goal
+
+Make the `/today` planner flow more explicit as a capstone evaluation artifact:
+when a user updates the check-in, accepts/snoozes/dismisses a suggestion, or
+saves feedback, the UI should visibly confirm that the action was captured as
+planner evaluation evidence.
+
+### Codex-Assisted Actions
+
+- Added planner surface notices for successful and failed check-in updates.
+- Added planner surface notices for accepted, snoozed, and dismissed
+  suggestions.
+- Added planner surface notices for saved or failed feedback submission.
+- Added feedback-card copy explaining that ratings are aggregate evaluation
+  evidence for whether the suggestions helped the user decide what to do today.
+- Updated mocked and real-backend Playwright tests to assert the new evaluation
+  confirmations.
+
+### Verification
+
+```text
+ui: npx eslint src/modules/planner/components/PlannerSurface.tsx src/modules/planner/components/PlannerFeedbackCard.tsx tests/e2e/today-page.spec.ts tests/e2e/planner-evaluation-demo.spec.ts tests/e2e/planner-evaluation-real-backend.spec.ts --max-warnings 0
+ui: npx vitest run src/modules/planner/__tests__
+ui: npm run test:e2e:planner-demo
+ui: playwright test tests/e2e/today-page.spec.ts --project=chromium
+ui: npm run build
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+ui: npm run lint
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Planner unit tests: 2 files passed, 11 tests passed
+Planner demo e2e: 2 passed (7.6s)
+Today page e2e: 8 passed (24.8s)
+Frontend build: passed
+Real-backend planner demo: 2 passed (15.3s)
+Full frontend lint: passed
+```
+
+### Study Notes
+
+- This makes the just-in-time planner UI more defensible in the capstone
+  narrative because user actions and feedback are visibly connected to the
+  evaluation method.
+- The change keeps persistence behind existing typed planner operations; no raw
+  database access or generic task-management expansion was introduced.

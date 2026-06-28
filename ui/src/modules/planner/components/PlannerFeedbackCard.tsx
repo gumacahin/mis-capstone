@@ -70,6 +70,11 @@ export default function PlannerFeedbackCard({
               <Chip size="small" color="success" label="Feedback saved" />
             )}
           </Stack>
+          <Typography variant="body2" color="text.secondary">
+            Rate whether the suggestions helped you decide what to do today.
+            These responses are stored as aggregate evaluation evidence for the
+            planner.
+          </Typography>
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={1.5}

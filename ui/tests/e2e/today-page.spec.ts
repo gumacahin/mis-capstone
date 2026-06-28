@@ -302,15 +302,20 @@ test.describe("Today Page", () => {
     await page.getByRole("button", { name: "Update" }).click();
 
     await expect.poll(() => calls.checkInPayload?.available_minutes).toBe(45);
+    await expect(
+      page.getByText("Check-in updated. Suggestions were rebuilt"),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Accept" }).click();
 
     await expect.poll(() => calls.accept).toBe(1);
-    await expect(page.getByText("accepted")).toBeVisible();
+    await expect(page.getByText("accepted", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: accepted.")).toBeVisible();
 
     await expect(
       page.getByRole("heading", { name: "Was this plan useful?" }),
     ).toBeVisible();
+    await expect(page.getByText("aggregate evaluation evidence")).toBeVisible();
     await page.getByLabel("Helpful rating").fill("4");
     await page.getByLabel("Confidence rating").fill("5");
     await page.getByLabel("Feedback note").fill("Clear next step.");
@@ -321,7 +326,12 @@ test.describe("Today Page", () => {
     await expect
       .poll(() => calls.feedbackPayload?.note)
       .toBe("Clear next step.");
-    await expect(page.getByText("Feedback saved")).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved for evaluation."),
+    ).toBeVisible();
   });
 
   test("shows reason details and task signals just in time", async ({
@@ -420,9 +430,11 @@ test.describe("Today Page", () => {
     await page.getByRole("button", { name: "Snooze" }).click();
     await expect.poll(() => calls.snooze).toBe(1);
     await expect(page.getByText("snoozed", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: snoozed for later.")).toBeVisible();
 
     await page.getByRole("button", { name: "Dismiss" }).click();
     await expect.poll(() => calls.dismiss).toBe(1);
+    await expect(page.getByText("Recorded: dismissed.")).toBeVisible();
     await expect(page.getByText("Review LMS submissions")).toBeHidden();
     await expect(
       page.getByText("No suggestions for the current check-in."),

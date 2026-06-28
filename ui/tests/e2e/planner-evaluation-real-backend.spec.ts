@@ -49,25 +49,37 @@ test.describe("Planner evaluation real backend demo", () => {
     await expect(page.getByLabel("Context")).toHaveValue(
       "Real backend walkthrough: choose a realistic next task.",
     );
+    await expect(
+      page.getByText("Check-in updated. Suggestions were rebuilt"),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Accept" }).first().click();
     await expect(page.getByText("accepted", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: accepted.")).toBeVisible();
 
     await page.getByRole("button", { name: "Snooze" }).nth(1).click();
     await expect(page.getByText("snoozed", { exact: true })).toBeVisible();
+    await expect(page.getByText("Recorded: snoozed for later.")).toBeVisible();
 
     await page.getByRole("button", { name: "Dismiss" }).nth(2).click();
+    await expect(page.getByText("Recorded: dismissed.")).toBeVisible();
     await expect(
       suggestionHeading("Review thesis proposal comments"),
     ).toBeHidden();
 
+    await expect(page.getByText("aggregate evaluation evidence")).toBeVisible();
     await page.getByLabel("Helpful rating").fill("4");
     await page.getByLabel("Confidence rating").fill("4");
     await page
       .getByLabel("Feedback note")
       .fill("Real backend demo run: recommendation was understandable.");
     await page.getByRole("button", { name: "Save feedback" }).click();
-    await expect(page.getByText("Feedback saved")).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Feedback saved for evaluation."),
+    ).toBeVisible();
 
     await page.screenshot({
       fullPage: true,
