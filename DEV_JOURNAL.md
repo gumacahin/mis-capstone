@@ -1357,3 +1357,43 @@ environment fails.
   dismiss actions, and feedback submission.
 - The fallback path matters because browser/backend demos can fail for
   environmental reasons even when the implementation is valid.
+
+## 2026-06-28: Real-Backend Defense Rehearsal
+
+### Goal
+
+Run the defense demo path against the real Django backend and Vite frontend,
+then record the result as demo-readiness evidence.
+
+### Codex-Assisted Actions
+
+- Checked that the repository was clean before rehearsal.
+- Confirmed the default shell resolves Node 14.18.1, which is too old for this
+  Playwright flow.
+- Ran `npm run test:e2e:planner-real` with the project Node 22.11.0 path.
+- The first sandboxed run failed because `uv` could not access
+  `/Users/marcoenrico/.cache/uv`.
+- Reran the same command with elevated local access so Django could start.
+- Added `CAPSTONE_REHEARSAL_NOTES.md` with the command, result, local
+  screenshot path, non-blocking warnings, and interpretation.
+- Linked rehearsal notes from `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+ui: npm run test:e2e:planner-real
+```
+
+Observed result:
+
+```text
+Real-backend planner demo: 2 passed (11.5s)
+```
+
+### Study Notes
+
+- This is demo-readiness evidence, not participant evaluation evidence.
+- The real-backend run exercised browser UI, backend routes, database
+  persistence, typed planner actions, and planner feedback submission.
+- Remaining schema and naive datetime warnings are non-blocking but should stay
+  visible as known engineering debt.

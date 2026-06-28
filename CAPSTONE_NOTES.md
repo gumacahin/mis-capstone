@@ -138,6 +138,8 @@ The practical moderator walkthrough is captured in
 The defense-oriented demo script is captured in
 `CAPSTONE_DEFENSE_DEMO_SCRIPT.md`.
 
+Rehearsal results are captured in `CAPSTONE_REHEARSAL_NOTES.md`.
+
 The short version:
 
 ```text
