@@ -1262,3 +1262,41 @@ Real-backend planner demo: 2 passed (9.8s)
 - Remaining schema output is older generic contract work: serializer method
   field type hints, duplicate nested user serializers, and serializer
   declarations for admin/productivity/email API views.
+
+## 2026-06-28: Original SRS Import And Traceability
+
+### Goal
+
+Bring the original ReadySET SRS/proposal documents into the current capstone
+repo and reconcile them with the Django/React planner-first implementation.
+
+### Codex-Assisted Actions
+
+- Located the local repository that hosts
+  `https://gumacahin.github.io/is295proj/` at
+  `/Users/marcoenrico/Projects/is295proj`.
+- Verified that its Git remote is `https://github.com/gumacahin/is295proj`.
+- Copied the original `docs/` folder into the current capstone repository.
+- Reviewed the ReadySET SRS, feature set, use case suite, proposal, user needs,
+  and relevant templates.
+- Identified the most useful ReadySET templates for the current study: SRS,
+  feature set, use cases, user needs, UI design, architecture, security, QA,
+  demo script, and interview notes.
+- Created `SRS_TRACEABILITY_MATRIX.md` to map the original SRS items to current
+  implementation evidence, status, and planner-first interpretation.
+- Updated `CAPSTONE_NOTES.md`, `FREEZE_NOTES.md`, and
+  `JIT_PLANNER_UI_SPEC.md` to reference the traceability matrix.
+
+### Study Notes
+
+- The current project can be defended as satisfying the original SRS baseline
+  while reinterpreting the differentiating requirement around suggested tasks.
+- Generic task-management features are now framed as the system of record.
+- The capstone contribution is the just-in-time planner UI that helps faculty
+  and staff answer "What should I do today?"
+- Gen UI should be described as the design strategy for SRS items `F-12`
+  suggested tasks, `F-21` personal scheduling, `F-41` productivity analytics,
+  and `F-42` energy tracking, not as an unrelated new requirement.
+- Optional SRS items such as Google Calendar integration, OUIC integration,
+  group scheduling, motivation, and full voice/conversational UI remain future
+  work unless the capstone scope changes.

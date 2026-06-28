@@ -26,6 +26,9 @@ required by planning.
   broad "update anything" APIs.
 - Google Calendar should be treated as a scheduling/sync destination for plan
   blocks, not the primary todo database.
+- The original SRS is reconciled in `SRS_TRACEABILITY_MATRIX.md`; that matrix is
+  the current scope boundary for what is implemented, reinterpreted, deferred,
+  or outside the capstone MVP.
 
 ## Security And Privacy Baseline
 
@@ -106,9 +109,11 @@ Today E2E result:
 
 ## Recommended Next Work
 
-1. Polish `/today` planner UX and suggestion reasons.
-2. Update the capstone paper with the faculty/staff scope, task management vs.
+1. Use `SRS_TRACEABILITY_MATRIX.md` to keep the paper and demo aligned with the
+   original SRS.
+2. Polish `/today` planner UX and suggestion reasons.
+3. Update the capstone paper with the faculty/staff scope, task management vs.
    planning distinction, and typed-operations architecture.
-3. Add Google Calendar sync only after planner operations stabilize.
-4. Decide whether admin/reporting APIs should remain aggregate-only or expose
+4. Add Google Calendar sync only after planner operations stabilize.
+5. Decide whether admin/reporting APIs should remain aggregate-only or expose
    individual content under an explicit admin contract.

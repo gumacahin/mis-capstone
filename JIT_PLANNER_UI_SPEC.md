@@ -102,6 +102,26 @@ Just-in-time UI supports this thesis by showing the right planning interface at
 the moment the user needs it, rather than forcing every planning scenario into a
 static task list.
 
+## Relationship To The Original SRS
+
+The original ReadySET SRS is reconciled against the current implementation in
+`SRS_TRACEABILITY_MATRIX.md`.
+
+Generative UI is not a new replacement for the SRS. It is the design strategy
+for making the most planning-relevant SRS requirements useful in practice:
+
+- `F-12 Suggested tasks`: the planner generates an ordered daily plan with
+  reasons and typed actions.
+- `F-21 Personal scheduling`: the planner uses due dates, recurrence,
+  available minutes, and focus mode as scheduling context.
+- `F-41 Productivity report`: the planner captures feedback and aggregate
+  action rates that can be reported without exposing task content.
+- `F-42 Energy tracking`: the check-in changes which planner surface is shown,
+  such as low-energy, limited-time, or overdue-triage modes.
+- The SRS's voice/conversational interface note is deferred, but the typed
+  planner operations and component registry prepare for a future chat, MCP, or
+  voice layer without giving an assistant raw database access.
+
 ## Non-Goals
 
 - Do not generate arbitrary JSX, HTML, CSS, SQL, or ORM queries at runtime.
@@ -464,7 +484,11 @@ The assistant or planner can return a structured UI decision like this:
   "title": "Suggested next actions",
   "message": "Here are tasks that fit your low-energy check-in.",
   "suggestion_ids": [40, 41, 42],
-  "allowed_actions": ["accept_suggestion", "snooze_suggestion", "dismiss_suggestion"]
+  "allowed_actions": [
+    "accept_suggestion",
+    "snooze_suggestion",
+    "dismiss_suggestion"
+  ]
 }
 ```
 
@@ -474,18 +498,18 @@ such as `TodayPlanCard` or a plain text message.
 
 ## Typed Operation Map
 
-| Operation | User Confirmation Needed | Mutates State | Current Status |
-| --- | --- | --- | --- |
-| `get_today_plan` | No | No | Implemented |
-| `get_planner_evaluation_summary` | Admin access | No | Implemented |
-| `submit_check_in` | Submit button | Yes | Implemented |
-| `rebuild_today_plan` | Button click | Yes | Implemented |
-| `accept_suggestion` | Button click | Yes | Implemented |
-| `snooze_suggestion` | Button click | Yes | Implemented |
-| `dismiss_suggestion` | Button click | Yes | Implemented |
-| `submit_plan_feedback` | Submit button | Yes | Implemented |
-| `schedule_plan_item` | Explicit confirmation | Yes | Future |
-| `sync_calendar_block` | Explicit confirmation | Yes | Future |
+| Operation                        | User Confirmation Needed | Mutates State | Current Status |
+| -------------------------------- | ------------------------ | ------------- | -------------- |
+| `get_today_plan`                 | No                       | No            | Implemented    |
+| `get_planner_evaluation_summary` | Admin access             | No            | Implemented    |
+| `submit_check_in`                | Submit button            | Yes           | Implemented    |
+| `rebuild_today_plan`             | Button click             | Yes           | Implemented    |
+| `accept_suggestion`              | Button click             | Yes           | Implemented    |
+| `snooze_suggestion`              | Button click             | Yes           | Implemented    |
+| `dismiss_suggestion`             | Button click             | Yes           | Implemented    |
+| `submit_plan_feedback`           | Submit button            | Yes           | Implemented    |
+| `schedule_plan_item`             | Explicit confirmation    | Yes           | Future         |
+| `sync_calendar_block`            | Explicit confirmation    | Yes           | Future         |
 
 ## Safety Rules
 

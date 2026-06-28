@@ -33,7 +33,7 @@ The capstone narrative should emphasize that the project is **not simply another
 generic todo list**. The stronger framing is:
 
 > `"What should I do today?": a planner-first productivity tracker for UPOU
-> faculty and staff.`
+faculty and staff.`
 
 The problem is not only that users need somewhere to store tasks. Crisanto's
 study shows that UPOU faculty and staff already use different planning and
@@ -157,4 +157,27 @@ current planning situation. For example, if the user has low energy, the app can
 show a low-energy planning card with lighter suggested tasks. The assistant can
 select the card and explain the plan, but React renders only registered
 components and Django validates all state-changing actions.
+```
+
+## SRS Reconciliation
+
+The original ReadySET project documents have been copied into `docs/` from the
+earlier WSIDT project repository. The reconciliation between that SRS and the
+current implementation is captured in `SRS_TRACEABILITY_MATRIX.md`.
+
+The important conclusion is that the project does not abandon the original SRS.
+It treats the existing task-management features as the system-of-record
+foundation, then elevates the SRS's suggested-tasks and energy-tracking
+requirements into the planner-first capstone contribution.
+
+Suggested wording:
+
+```text
+The original SRS defined WSIDT as a web-based task-management and
+productivity-tracking application. This implementation preserves that baseline
+through task, project, label, scheduling, notification, productivity, and
+administrative features. The capstone contribution is the planner-first
+reinterpretation of the SRS's suggested-tasks requirement: a just-in-time daily
+planning interface that uses task signals, energy, available time, focus mode,
+and user feedback to help faculty and staff decide what to do today.
 ```
