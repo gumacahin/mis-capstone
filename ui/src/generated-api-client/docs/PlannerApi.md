@@ -43,7 +43,7 @@ const { status, data } =
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -83,7 +83,7 @@ This endpoint does not have any parameters.
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -129,7 +129,7 @@ const { status, data } = await apiInstance.plannerFeedbackCreate(
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -169,7 +169,7 @@ This endpoint does not have any parameters.
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -214,7 +214,7 @@ const { status, data } =
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -259,7 +259,7 @@ const { status, data } =
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -308,7 +308,7 @@ const { status, data } = await apiInstance.plannerSuggestionsSnoozeCreate(
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -348,7 +348,7 @@ This endpoint does not have any parameters.
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 

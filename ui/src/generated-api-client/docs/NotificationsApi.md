@@ -42,7 +42,7 @@ const { status, data } =
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -86,7 +86,7 @@ const { status, data } = await apiInstance.notificationsList(page);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -117,7 +117,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new NotificationsApi(configuration);
 
-let id: string; // (default to undefined)
+let id: number; //A unique integer value identifying this notification. (default to undefined)
 let patchedNotificationRequest: PatchedNotificationRequest; // (optional)
 
 const { status, data } = await apiInstance.notificationsPartialUpdate(
@@ -128,10 +128,10 @@ const { status, data } = await apiInstance.notificationsPartialUpdate(
 
 ### Parameters
 
-| Name                           | Type                           | Description | Notes                 |
-| ------------------------------ | ------------------------------ | ----------- | --------------------- |
-| **patchedNotificationRequest** | **PatchedNotificationRequest** |             |                       |
-| **id**                         | [**string**]                   |             | defaults to undefined |
+| Name                           | Type                           | Description                                           | Notes                 |
+| ------------------------------ | ------------------------------ | ----------------------------------------------------- | --------------------- |
+| **patchedNotificationRequest** | **PatchedNotificationRequest** |                                                       |                       |
+| **id**                         | [**number**]                   | A unique integer value identifying this notification. | defaults to undefined |
 
 ### Return type
 
@@ -139,7 +139,7 @@ const { status, data } = await apiInstance.notificationsPartialUpdate(
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -184,7 +184,7 @@ const { status, data } =
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -211,7 +211,7 @@ import { NotificationsApi, Configuration, NotificationRequest } from "./api";
 const configuration = new Configuration();
 const apiInstance = new NotificationsApi(configuration);
 
-let id: string; // (default to undefined)
+let id: number; //A unique integer value identifying this notification. (default to undefined)
 let notificationRequest: NotificationRequest; // (optional)
 
 const { status, data } = await apiInstance.notificationsReadCreate(
@@ -222,10 +222,10 @@ const { status, data } = await apiInstance.notificationsReadCreate(
 
 ### Parameters
 
-| Name                    | Type                    | Description | Notes                 |
-| ----------------------- | ----------------------- | ----------- | --------------------- |
-| **notificationRequest** | **NotificationRequest** |             |                       |
-| **id**                  | [**string**]            |             | defaults to undefined |
+| Name                    | Type                    | Description                                           | Notes                 |
+| ----------------------- | ----------------------- | ----------------------------------------------------- | --------------------- |
+| **notificationRequest** | **NotificationRequest** |                                                       |                       |
+| **id**                  | [**number**]            | A unique integer value identifying this notification. | defaults to undefined |
 
 ### Return type
 
@@ -233,7 +233,7 @@ const { status, data } = await apiInstance.notificationsReadCreate(
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -260,16 +260,16 @@ import { NotificationsApi, Configuration } from "./api";
 const configuration = new Configuration();
 const apiInstance = new NotificationsApi(configuration);
 
-let id: string; // (default to undefined)
+let id: number; //A unique integer value identifying this notification. (default to undefined)
 
 const { status, data } = await apiInstance.notificationsRetrieve(id);
 ```
 
 ### Parameters
 
-| Name   | Type         | Description | Notes                 |
-| ------ | ------------ | ----------- | --------------------- |
-| **id** | [**string**] |             | defaults to undefined |
+| Name   | Type         | Description                                           | Notes                 |
+| ------ | ------------ | ----------------------------------------------------- | --------------------- |
+| **id** | [**number**] | A unique integer value identifying this notification. | defaults to undefined |
 
 ### Return type
 
@@ -277,7 +277,7 @@ const { status, data } = await apiInstance.notificationsRetrieve(id);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -317,7 +317,7 @@ This endpoint does not have any parameters.
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 

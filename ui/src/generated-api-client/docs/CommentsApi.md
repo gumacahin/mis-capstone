@@ -40,7 +40,7 @@ const { status, data } = await apiInstance.commentsCreate(commentRequest);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -84,7 +84,7 @@ void (empty response body)
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -130,7 +130,7 @@ const { status, data } = await apiInstance.commentsList(page, task);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -179,7 +179,7 @@ const { status, data } = await apiInstance.commentsPartialUpdate(
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -223,7 +223,7 @@ const { status, data } = await apiInstance.commentsRetrieve(id);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -269,7 +269,7 @@ const { status, data } = await apiInstance.commentsUpdate(id, commentRequest);
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 

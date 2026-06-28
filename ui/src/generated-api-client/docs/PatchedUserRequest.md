@@ -2,14 +2,14 @@
 
 ## Properties
 
-| Name                     | Type                                                 | Description | Notes                             |
-| ------------------------ | ---------------------------------------------------- | ----------- | --------------------------------- |
-| **is_faculty**           | **boolean**                                          |             | [optional] [default to undefined] |
-| **is_student**           | **boolean**                                          |             | [optional] [default to undefined] |
-| **is_onboarded**         | **boolean**                                          |             | [optional] [default to undefined] |
-| **projects**             | [**Array&lt;ProjectRequest&gt;**](ProjectRequest.md) |             | [optional] [default to undefined] |
-| **theme**                | **string**                                           |             | [optional] [default to undefined] |
-| **email_digest_enabled** | **boolean**                                          |             | [optional] [default to undefined] |
+| Name                     | Type                                                         | Description | Notes                             |
+| ------------------------ | ------------------------------------------------------------ | ----------- | --------------------------------- |
+| **is_faculty**           | **boolean**                                                  |             | [optional] [default to undefined] |
+| **is_student**           | **boolean**                                                  |             | [optional] [default to undefined] |
+| **is_onboarded**         | **boolean**                                                  |             | [optional] [default to undefined] |
+| **projects**             | [**Array&lt;UserProjectRequest&gt;**](UserProjectRequest.md) |             | [optional] [default to undefined] |
+| **theme**                | **string**                                                   |             | [optional] [default to undefined] |
+| **email_digest_enabled** | **boolean**                                                  |             | [optional] [default to undefined] |
 
 ## Example
 

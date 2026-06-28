@@ -38,6 +38,8 @@ import {
   RequiredError,
   operationServerMap,
 } from "../base";
+// @ts-ignore
+import type { UserProductivity } from "../models";
 /**
  * ProductivityApi - axios parameter creator
  */
@@ -79,6 +81,10 @@ export const ProductivityApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -111,7 +117,10 @@ export const ProductivityApiFp = function (configuration?: Configuration) {
     async productivityRetrieve(
       options?: RawAxiosRequestConfig,
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<UserProductivity>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.productivityRetrieve(options);
@@ -146,7 +155,9 @@ export const ProductivityApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    productivityRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+    productivityRetrieve(
+      options?: RawAxiosRequestConfig,
+    ): AxiosPromise<UserProductivity> {
       return localVarFp
         .productivityRetrieve(options)
         .then((request) => request(axios, basePath));
@@ -163,7 +174,9 @@ export interface ProductivityApiInterface {
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    */
-  productivityRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<void>;
+  productivityRetrieve(
+    options?: RawAxiosRequestConfig,
+  ): AxiosPromise<UserProductivity>;
 }
 
 /**

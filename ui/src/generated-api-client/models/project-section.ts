@@ -12,11 +12,15 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Task } from "./task";
+
 export interface ProjectSection {
   id: number;
   project: number;
   title: string;
   order?: number;
-  tasks: string;
+  tasks: Array<Task>;
   is_default?: boolean;
 }

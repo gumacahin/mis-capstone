@@ -89,6 +89,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       localVarHeaderParameter["Content-Type"] = "application/json";
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -146,6 +150,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -166,13 +174,13 @@ export const NotificationsApiAxiosParamCreator = function (
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {PatchedNotificationRequest} [patchedNotificationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     notificationsPartialUpdate: async (
-      id: string,
+      id: number,
       patchedNotificationRequest?: PatchedNotificationRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
@@ -204,6 +212,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // authentication cookieAuth required
 
       // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      // authentication E2ETestBearer required
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
@@ -264,6 +276,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       localVarHeaderParameter["Content-Type"] = "application/json";
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -287,13 +303,13 @@ export const NotificationsApiAxiosParamCreator = function (
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {NotificationRequest} [notificationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     notificationsReadCreate: async (
-      id: string,
+      id: number,
       notificationRequest?: NotificationRequest,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
@@ -328,6 +344,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       localVarHeaderParameter["Content-Type"] = "application/json";
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -351,12 +371,12 @@ export const NotificationsApiAxiosParamCreator = function (
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     notificationsRetrieve: async (
-      id: string,
+      id: number,
       options: RawAxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       // verify required parameter 'id' is not null or undefined
@@ -387,6 +407,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // authentication cookieAuth required
 
       // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      // authentication E2ETestBearer required
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
@@ -435,6 +459,10 @@ export const NotificationsApiAxiosParamCreator = function (
       // authentication cookieAuth required
 
       // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      // authentication E2ETestBearer required
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
@@ -524,13 +552,13 @@ export const NotificationsApiFp = function (configuration?: Configuration) {
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {PatchedNotificationRequest} [patchedNotificationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async notificationsPartialUpdate(
-      id: string,
+      id: number,
       patchedNotificationRequest?: PatchedNotificationRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
@@ -587,13 +615,13 @@ export const NotificationsApiFp = function (configuration?: Configuration) {
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {NotificationRequest} [notificationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async notificationsReadCreate(
-      id: string,
+      id: number,
       notificationRequest?: NotificationRequest,
       options?: RawAxiosRequestConfig,
     ): Promise<
@@ -620,12 +648,12 @@ export const NotificationsApiFp = function (configuration?: Configuration) {
     },
     /**
      *
-     * @param {string} id
+     * @param {number} id A unique integer value identifying this notification.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async notificationsRetrieve(
-      id: string,
+      id: number,
       options?: RawAxiosRequestConfig,
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Notification>
@@ -896,7 +924,10 @@ export interface NotificationsApiNotificationsListRequest {
  * Request parameters for notificationsPartialUpdate operation in NotificationsApi.
  */
 export interface NotificationsApiNotificationsPartialUpdateRequest {
-  readonly id: string;
+  /**
+   * A unique integer value identifying this notification.
+   */
+  readonly id: number;
 
   readonly patchedNotificationRequest?: PatchedNotificationRequest;
 }
@@ -912,7 +943,10 @@ export interface NotificationsApiNotificationsReadAllCreateRequest {
  * Request parameters for notificationsReadCreate operation in NotificationsApi.
  */
 export interface NotificationsApiNotificationsReadCreateRequest {
-  readonly id: string;
+  /**
+   * A unique integer value identifying this notification.
+   */
+  readonly id: number;
 
   readonly notificationRequest?: NotificationRequest;
 }
@@ -921,7 +955,10 @@ export interface NotificationsApiNotificationsReadCreateRequest {
  * Request parameters for notificationsRetrieve operation in NotificationsApi.
  */
 export interface NotificationsApiNotificationsRetrieveRequest {
-  readonly id: string;
+  /**
+   * A unique integer value identifying this notification.
+   */
+  readonly id: number;
 }
 
 /**

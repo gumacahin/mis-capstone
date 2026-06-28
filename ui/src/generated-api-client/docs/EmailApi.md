@@ -33,7 +33,7 @@ void (empty response body)
 
 ### Authorization
 
-[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth)
+[basicAuth](../README.md#basicAuth), [cookieAuth](../README.md#cookieAuth), [jwtAuth](../README.md#jwtAuth), [E2ETestBearer](../README.md#E2ETestBearer)
 
 ### HTTP request headers
 
@@ -42,8 +42,10 @@ void (empty response body)
 
 ### HTTP response details
 
-| Status code | Description      | Response headers |
-| ----------- | ---------------- | ---------------- |
-| **200**     | No response body | -                |
+| Status code | Description                     | Response headers |
+| ----------- | ------------------------------- | ---------------- |
+| **201**     | Daily digest processed.         | -                |
+| **403**     | Daily digest access denied.     | -                |
+| **500**     | Daily digest processing failed. | -                |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

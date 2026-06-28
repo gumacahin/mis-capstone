@@ -1,6 +1,6 @@
 # DueStatusEnum
 
-- `none` - none _ `overdue` - overdue _ `due_today` - due_today _ `due_soon` - due_soon _ `later` - later
+- `none` - none _ `overdue` - overdue _ `due_today` - due*today * `due_soon` - due*soon * `later` - later
 
 ## Enum
 

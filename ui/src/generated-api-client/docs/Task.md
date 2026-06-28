@@ -19,7 +19,7 @@
 | **project**         | **number**                          |             | [readonly] [default to undefined] |
 | **section_title**   | **string**                          |             | [readonly] [default to undefined] |
 | **project_title**   | **string**                          |             | [readonly] [default to undefined] |
-| **comments_count**  | **string**                          |             | [readonly] [default to undefined] |
+| **comments_count**  | **number**                          |             | [readonly] [default to undefined] |
 
 ## Example
 

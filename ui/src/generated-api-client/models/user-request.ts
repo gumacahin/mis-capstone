@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ProjectRequest } from "./project-request";
+import type { UserProjectRequest } from "./user-project-request";
 
 export interface UserRequest {
   is_faculty: boolean;
   is_student: boolean;
   is_onboarded: boolean;
-  projects: Array<ProjectRequest>;
+  projects: Array<UserProjectRequest>;
   theme: string;
   email_digest_enabled: boolean;
 }

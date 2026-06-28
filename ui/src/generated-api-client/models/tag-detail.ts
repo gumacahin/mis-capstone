@@ -12,9 +12,13 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Task } from "./task";
+
 export interface TagDetail {
   id: number;
   name: string;
-  tasks: string;
+  tasks: Array<Task>;
   created_by: number;
 }

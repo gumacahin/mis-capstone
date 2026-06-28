@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Project } from "./project";
+import type { UserProject } from "./user-project";
 
 export interface User {
   id: number;
@@ -23,7 +23,7 @@ export interface User {
   is_faculty: boolean;
   is_student: boolean;
   is_onboarded: boolean;
-  projects: Array<Project>;
+  projects: Array<UserProject>;
   theme: string;
   email_digest_enabled: boolean;
 }

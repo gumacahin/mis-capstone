@@ -30,9 +30,9 @@ export interface Task {
   order?: number;
   section: number;
   project: number;
-  section_title: string;
+  section_title: string | null;
   project_title: string;
-  comments_count: string;
+  comments_count: number;
 }
 
 export const TaskAnchorModeEnum = {

@@ -38,6 +38,8 @@ import {
   RequiredError,
   operationServerMap,
 } from "../base";
+// @ts-ignore
+import type { AdminDashboard } from "../models";
 /**
  * DashboardApi - axios parameter creator
  */
@@ -79,6 +81,10 @@ export const DashboardApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -111,7 +117,7 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     async dashboardRetrieve(
       options?: RawAxiosRequestConfig,
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AdminDashboard>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.dashboardRetrieve(options);
@@ -146,7 +152,9 @@ export const DashboardApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    dashboardRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+    dashboardRetrieve(
+      options?: RawAxiosRequestConfig,
+    ): AxiosPromise<AdminDashboard> {
       return localVarFp
         .dashboardRetrieve(options)
         .then((request) => request(axios, basePath));
@@ -163,7 +171,9 @@ export interface DashboardApiInterface {
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    */
-  dashboardRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<void>;
+  dashboardRetrieve(
+    options?: RawAxiosRequestConfig,
+  ): AxiosPromise<AdminDashboard>;
 }
 
 /**

@@ -1674,3 +1674,51 @@ Admin/email/schema endpoint tests: 13 passed
   contract is now more explicit and less ambiguous.
 - The change is intentionally schema-facing; it does not expand generic todo
   features or change endpoint payload behavior.
+
+## 2026-06-28: Frontend API Client Sync
+
+### Goal
+
+Regenerate the frontend TypeScript API client from the cleaned backend OpenAPI
+schema so React consumes the same typed contract that Django publishes.
+
+### Codex-Assisted Actions
+
+- Generated a fresh backend OpenAPI schema with no warnings.
+- Regenerated `ui/src/generated-api-client` from the local schema file.
+- Formatted the generated client with the repository Prettier settings to keep
+  the diff focused on contract changes.
+- Updated task adapters now that `comments_count` is correctly typed as a
+  number and `section_title` is nullable.
+- Kept the task hook tolerant of older string-shaped comment counts in tests or
+  cached payloads.
+
+### Verification
+
+```text
+api: DEBUG=True uv run python manage.py spectacular --file /private/tmp/upoutodo-schema.yaml
+ui: npx prettier --check src/api/hooks/useTasks.ts src/api/migration-helpers.ts src/generated-api-client
+ui: npx vitest run src/api/__tests__/client.test.ts src/api/hooks/__tests__/useTasks.test.tsx
+ui: npm run build
+ui: npx eslint src/api/hooks/useTasks.ts src/api/migration-helpers.ts --max-warnings 0
+ui: npm run lint
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+OpenAPI schema generation: passed with no warnings or errors
+API client and task hook tests: 16 passed
+Frontend build: passed
+Frontend lint: passed
+Real-backend planner demo: 2 passed (11.5s)
+```
+
+### Study Notes
+
+- This completes the backend-to-frontend typed contract loop for the current
+  planner MVP.
+- The real-backend demo now fetches `/api/schema/` without the old schema
+  warning output, which makes the defense rehearsal cleaner.

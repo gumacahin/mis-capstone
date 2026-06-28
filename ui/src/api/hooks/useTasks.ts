@@ -46,6 +46,11 @@ interface ExtendedPatchedTaskRequest extends PatchedTaskRequest {
  */
 const transformTask = (apiTask: unknown): Task => {
   const task = apiTask as Record<string, unknown>;
+  const commentsCount =
+    typeof task.comments_count === "number"
+      ? task.comments_count
+      : parseInt(String(task.comments_count ?? 0), 10) || 0;
+
   return {
     id: task.id as number,
     title: task.title as string,
@@ -62,8 +67,7 @@ const transformTask = (apiTask: unknown): Task => {
     // Convert ISO string to Dayjs for frontend compatibility
     dtstart: task.dtstart ? dayjs(task.dtstart as string) : null,
     anchor_mode: task.anchor_mode as TaskAnchorModeEnum,
-    // Convert string to number for frontend compatibility
-    comments_count: parseInt(task.comments_count as string) || 0,
+    comments_count: commentsCount,
     due_date: task.due_date as string | null,
   };
 };
