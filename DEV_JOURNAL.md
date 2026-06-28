@@ -1722,3 +1722,60 @@ Real-backend planner demo: 2 passed (11.5s)
   planner MVP.
 - The real-backend demo now fetches `/api/schema/` without the old schema
   warning output, which makes the defense rehearsal cleaner.
+
+## 2026-06-28: Just-In-Time Planner Modes
+
+### Goal
+
+Make the `/today` planner demonstrate the capstone's Gen UI claim more clearly
+by letting the planner mode change the visible shortlist, not only the heading.
+
+### Codex-Assisted Actions
+
+- Extended the planner UI schema with mode highlights.
+- Made `limited_time` mode show only suggestions that fit the available minutes,
+  with a shortest-action fallback when nothing fits.
+- Made `low_energy` mode order the shortlist around smaller next actions while
+  preserving urgent work.
+- Made `overdue_triage` mode narrow the planner surface to overdue suggestions.
+- Rendered compact mode chips in the planner card so the user can see why the
+  surface adapted.
+- Added unit coverage for mode selection, time-box filtering, fallback
+  selection, and overdue triage filtering.
+- Added Playwright coverage for the visible low-energy and limited-time planner
+  surfaces.
+- Updated the just-in-time planner UI spec with the implemented mode behavior.
+
+### Verification
+
+```text
+ui: npx prettier --check src/modules/planner/uiSchema.ts src/modules/planner/components/PlanSuggestionsCard.tsx src/modules/planner/__tests__/uiSchema.test.ts tests/e2e/today-page.spec.ts tests/e2e/planner-evaluation-demo.spec.ts
+ui: npx eslint src/modules/planner/uiSchema.ts src/modules/planner/components/PlanSuggestionsCard.tsx src/modules/planner/__tests__/uiSchema.test.ts tests/e2e/today-page.spec.ts tests/e2e/planner-evaluation-demo.spec.ts --max-warnings 0
+ui: npx vitest run src/modules/planner/__tests__/uiSchema.test.ts
+ui: playwright test tests/e2e/today-page.spec.ts --project=chromium
+ui: playwright test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+ui: npm run build
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+ui: npm run lint
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Planner UI schema tests: 8 passed
+Today page e2e: 9 passed
+Planner evaluation demo e2e: 2 passed
+Frontend build: passed
+Real-backend planner demo: 2 passed (10.1s)
+Frontend lint: passed
+```
+
+### Study Notes
+
+- This is the first visible implementation of controlled Gen UI in the product.
+  The UI adapts from structured planner state, not from arbitrary generated
+  code.
+- The change supports the capstone claim that planning differs from task
+  management: the same task data can produce different daily surfaces depending
+  on energy, time, and urgency.

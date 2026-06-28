@@ -496,6 +496,29 @@ The frontend should only render components listed in the component registry. If
 the component name is unknown, the frontend should fall back to a safe default
 such as `TodayPlanCard` or a plain text message.
 
+## Implemented Planner Modes
+
+As of 2026-06-28, `/today` implements the first just-in-time planner slice:
+
+- `low_energy`: selected when the check-in energy level is low. The planner
+  keeps urgent work visible while ordering the shortlist around smaller next
+  actions.
+- `limited_time`: selected when available time is 60 minutes or less. The
+  planner shows suggestions that fit the available window, or the shortest next
+  action when nothing fully fits.
+- `overdue_triage`: selected when multiple visible suggestions are overdue. The
+  planner narrows the list to overdue work and orders it by urgency.
+- `default`: selected for the normal daily plan.
+- `unavailable`: selected when the planner request fails.
+
+The UI schema now includes `highlights` so the rendered card can surface compact
+mode signals such as available minutes, number of fitting tasks, low-energy
+focus, or overdue count.
+
+This is intentionally a controlled Gen UI implementation: the frontend chooses
+from known registered components and mode-specific shortlists, while all state
+changes still go through typed planner operations.
+
 ## Typed Operation Map
 
 | Operation                        | User Confirmation Needed | Mutates State | Current Status |

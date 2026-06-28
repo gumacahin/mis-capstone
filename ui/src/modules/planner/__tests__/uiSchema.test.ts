@@ -101,16 +101,32 @@ describe("buildPlannerUiSchema", () => {
       component: "LowEnergyPlanCard",
       mode: "low_energy",
       title: "Low-energy plan",
-      message: "Lighter next actions for your current energy.",
+      message: "Start with smaller next actions while preserving urgent work.",
+      highlights: ["Energy low", "Flexible focus"],
     });
   });
 
-  it("selects the time-box card when available time is limited", () => {
+  it("selects the time-box card and only includes tasks that fit", () => {
     const schema = buildPlannerUiSchema({
       isError: false,
       isPending: false,
       plan: makePlan({
         checkIn: { available_minutes: 45 },
+        suggestions: [
+          makeSuggestion({
+            id: 40,
+            estimatedMinutes: 45,
+          }),
+          makeSuggestion({
+            id: 41,
+            estimatedMinutes: 75,
+            task: {
+              id: 102,
+              title: "Longer task",
+              due_date: "2026-06-28",
+            },
+          }),
+        ],
       }),
     });
 
@@ -118,11 +134,48 @@ describe("buildPlannerUiSchema", () => {
       component: "TimeBoxPlanCard",
       mode: "limited_time",
       title: "Fits your time",
-      message: "Suggested work for 45 minutes.",
+      message: "Showing tasks that fit within 45 minutes.",
+      highlights: ["45 minutes", "1 fit"],
+      suggestionIds: [40],
     });
   });
 
-  it("prioritizes overdue triage when multiple visible tasks are overdue", () => {
+  it("shows the shortest next action when no task fits the available time", () => {
+    const schema = buildPlannerUiSchema({
+      isError: false,
+      isPending: false,
+      plan: makePlan({
+        checkIn: { available_minutes: 20 },
+        suggestions: [
+          makeSuggestion({
+            id: 40,
+            estimatedMinutes: 45,
+          }),
+          makeSuggestion({
+            id: 41,
+            estimatedMinutes: 30,
+            task: {
+              id: 102,
+              title: "Shortest task",
+              due_date: "2026-06-28",
+            },
+          }),
+        ],
+      }),
+    });
+
+    expect(schema[1]).toMatchObject({
+      component: "TimeBoxPlanCard",
+      mode: "limited_time",
+      title: "Fits your time",
+      message:
+        "No task fully fits 20 minutes, so the shortest next action is shown.",
+      highlights: ["20 minutes", "Closest fit"],
+      suggestionIds: [41],
+    });
+  });
+
+  it("prioritizes overdue triage and only includes overdue suggestions", () => {
     const schema = buildPlannerUiSchema({
       isError: false,
       isPending: false,
@@ -135,6 +188,7 @@ describe("buildPlannerUiSchema", () => {
           makeSuggestion({
             id: 40,
             task: { id: 101, due_date: "2026-06-27" },
+            dueStatus: "overdue",
           }),
           makeSuggestion({
             id: 41,
@@ -143,6 +197,16 @@ describe("buildPlannerUiSchema", () => {
               title: "Prepare overdue report",
               due_date: "2026-06-26",
             },
+            dueStatus: "overdue",
+          }),
+          makeSuggestion({
+            id: 42,
+            task: {
+              id: 103,
+              title: "Due today admin note",
+              due_date: "2026-06-28",
+            },
+            dueStatus: "due_today",
           }),
         ],
       }),
@@ -152,7 +216,8 @@ describe("buildPlannerUiSchema", () => {
       component: "TaskTriagePanel",
       mode: "overdue_triage",
       title: "Overdue triage",
-      message: "A smaller shortlist from overdue work.",
+      message: "Focus on overdue work before scanning the full task list.",
+      highlights: ["2 overdue", "Urgent first"],
       suggestionIds: [40, 41],
     });
   });
@@ -242,17 +307,31 @@ function makePlan({
 
 function makeSuggestion({
   id = baseSuggestion.id,
+  estimatedMinutes = baseSuggestion.estimated_minutes,
+  dueStatus = baseSuggestion.signals.due_status,
+  score = baseSuggestion.score,
   status = baseSuggestion.status,
   task = {},
 }: {
   id?: number;
+  estimatedMinutes?: number;
+  dueStatus?: PlannerSuggestion["signals"]["due_status"];
+  score?: number;
   status?: PlannerSuggestion["status"];
   task?: Partial<PlannerSuggestion["task"]>;
 } = {}): PlannerSuggestion {
   return {
     ...baseSuggestion,
     id,
+    estimated_minutes: estimatedMinutes,
+    score,
     status,
+    signals: {
+      ...baseSuggestion.signals,
+      due_status: dueStatus,
+      estimated_minutes: estimatedMinutes,
+      score,
+    },
     task: {
       ...baseSuggestion.task,
       ...task,

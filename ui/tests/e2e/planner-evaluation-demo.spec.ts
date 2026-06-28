@@ -367,8 +367,9 @@ test.describe("Planner evaluation demo", () => {
       "Evaluation walkthrough: limited energy between meetings.",
     );
     await expect(
-      page.getByText("Lighter next actions for your current energy."),
+      page.getByText("Start with smaller next actions"),
     ).toBeVisible();
+    await expect(page.getByText("Light focus")).toBeVisible();
 
     await expect(
       page.getByText("Grade overdue reflection submissions"),

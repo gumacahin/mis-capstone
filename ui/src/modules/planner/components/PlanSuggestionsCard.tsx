@@ -27,9 +27,14 @@ export default function PlanSuggestionsCard({
   schema,
   onAction,
 }: PlanSuggestionsCardProps) {
-  const suggestions = visiblePlannerSuggestions(plan).filter((suggestion) =>
-    schema.suggestionIds?.includes(suggestion.id),
+  const visibleSuggestions = visiblePlannerSuggestions(plan);
+  const suggestionsById = new Map(
+    visibleSuggestions.map((suggestion) => [suggestion.id, suggestion]),
   );
+  const suggestions = (schema.suggestionIds ?? []).flatMap((id) => {
+    const suggestion = suggestionsById.get(id);
+    return suggestion ? [suggestion] : [];
+  });
 
   return (
     <Stack spacing={1.5}>
@@ -51,6 +56,19 @@ export default function PlanSuggestionsCard({
           <Typography variant="body2" color="text.secondary">
             {schema.message}
           </Typography>
+        )}
+        {schema.highlights && schema.highlights.length > 0 && (
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            {schema.highlights.map((highlight) => (
+              <Chip
+                key={highlight}
+                size="small"
+                color="primary"
+                variant="outlined"
+                label={highlight}
+              />
+            ))}
+          </Stack>
         )}
       </Stack>
       {suggestions.length === 0 && !isPending && (

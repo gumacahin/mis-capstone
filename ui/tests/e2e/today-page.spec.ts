@@ -418,8 +418,53 @@ test.describe("Today Page", () => {
     ).toBeVisible();
     await expect(page.getByText("Low energy")).toBeVisible();
     await expect(
-      page.getByText("Lighter next actions for your current energy."),
+      page.getByText("Start with smaller next actions"),
     ).toBeVisible();
+    await expect(page.getByText("Flexible focus")).toBeVisible();
+  });
+
+  test("shows a time-boxed shortlist when available time is limited", async ({
+    page,
+  }) => {
+    const shortSuggestion = {
+      ...clonePlan().suggestions[0],
+      id: 41,
+      task: {
+        ...suggestedTask,
+        id: 102,
+        title: "Send quick advising reply",
+        due_date: "2026-06-27",
+      },
+      estimated_minutes: 25,
+      signals: {
+        ...suggestedSignals,
+        estimated_minutes: 25,
+      },
+    };
+
+    await mockTodayApis(page, {
+      plan: {
+        ...clonePlan(),
+        check_in: {
+          ...clonePlan().check_in,
+          available_minutes: 30,
+        },
+        suggestions: [clonePlan().suggestions[0], shortSuggestion],
+      },
+    });
+
+    await page.goto("/today");
+
+    await expect(
+      page.getByRole("heading", { name: "Fits your time" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Showing tasks that fit within 30 minutes."),
+    ).toBeVisible();
+    await expect(page.getByText("30 minutes", { exact: true })).toBeVisible();
+    await expect(page.getByText("1 fit")).toBeVisible();
+    await expect(page.getByText("Send quick advising reply")).toBeVisible();
+    await expect(page.getByText("Review LMS submissions")).toBeHidden();
   });
 
   test("snoozes and dismisses planner suggestions", async ({ page }) => {
