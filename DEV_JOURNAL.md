@@ -2131,3 +2131,36 @@ repo: git diff --check
 - The key evidence target is narrow and defensible: whether users can select a
   next task, understand the reason, and report higher confidence after using
   the planner.
+
+## 2026-06-29: Evaluation Results Log Preparation
+
+### Goal
+
+Prepare a place to record the first real adviser, pilot, or participant
+walkthrough without mixing it with seeded demo or automated Playwright evidence.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_EVALUATION_RESULTS.md`.
+- Defined evidence categories for `participant`, `adviser-review`, `pilot`, and
+  `demo`.
+- Added a session register, result entry template, aggregate summary template,
+  privacy rules, and a paper-ready results paragraph template.
+- Linked the results log from `CAPSTONE_EVALUATION_METHOD.md`,
+  `CAPSTONE_EVALUATION_PACKET.md`, `CAPSTONE_EVALUATION_WALKTHROUGH.md`, and
+  `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_EVALUATION_RESULTS.md ../CAPSTONE_EVALUATION_PACKET.md ../CAPSTONE_EVALUATION_METHOD.md ../CAPSTONE_EVALUATION_WALKTHROUGH.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- No adviser or participant results were fabricated. The results log starts
+  with a pending placeholder and should be filled only after an actual
+  walkthrough.
+- This gives the capstone paper a clean evidence chain: method, packet,
+  session log, then aggregate/anonymized results.

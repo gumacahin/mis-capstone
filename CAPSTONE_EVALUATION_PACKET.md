@@ -269,3 +269,9 @@ observations about whether the participant could choose a next task and explain
 the recommendation. Findings were reported using aggregate ratings, suggestion
 action rates, and anonymized qualitative summaries.
 ```
+
+## After The Session
+
+Record the completed walkthrough in `CAPSTONE_EVALUATION_RESULTS.md`. Keep the
+entry anonymized, label the evidence category, and complete the privacy review
+before using the session in the paper.

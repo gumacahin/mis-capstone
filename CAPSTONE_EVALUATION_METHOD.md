@@ -100,6 +100,10 @@ The field-ready participant/adviser packet is captured in
 sheet, post-task rating form, and privacy review checklist for an actual
 session.
 
+Completed adviser, pilot, or participant sessions should be recorded in
+`CAPSTONE_EVALUATION_RESULTS.md`. Keep automated demo runs separate from that
+results log unless they are explicitly labeled as `demo` evidence.
+
 ## In-App Measures
 
 The current implementation can support these quantitative measures:

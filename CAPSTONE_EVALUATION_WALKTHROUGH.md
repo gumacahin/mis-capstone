@@ -225,6 +225,10 @@ Post-task answer summary:
 Privacy review completed: yes / no
 ```
 
+After the walkthrough, copy the completed session summary into
+`CAPSTONE_EVALUATION_RESULTS.md` so evaluation evidence stays separate from
+automated demo evidence.
+
 ## Metric Review
 
 After one or more walkthroughs, review aggregate metrics only:
