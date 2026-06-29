@@ -2271,3 +2271,36 @@ repo: git diff --check
   results.
 - The next paper task is citation formatting and visuals, or recording a real
   walkthrough result.
+
+## 2026-06-29: Paper Visuals Pass
+
+### Goal
+
+Replace paper draft visual placeholders with concrete, privacy-safe paper
+artifacts where possible.
+
+### Codex-Assisted Actions
+
+- Added an SRS-to-implementation summary table to `CAPSTONE_PAPER_DRAFT.md`.
+- Replaced the architecture placeholder with a Mermaid diagram showing React,
+  Django/DRF, planner services, task system of record, typed planner tools, and
+  a future chat/voice/MCP layer.
+- Replaced the planner-flow placeholder with a Mermaid diagram showing check-in,
+  suggestion generation, reason inspection, accept/snooze/dismiss, feedback,
+  aggregate metrics, and planner assistant tool invocation.
+- Updated `CAPSTONE_PAPER_REVIEW.md` so visual findings reflect what has been
+  addressed and what remains.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_REVIEW.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- The remaining visual task is a privacy-safe `/today` screenshot if the course
+  requires screenshots.
+- Citation formatting remains unresolved until the required course style is
+  known.

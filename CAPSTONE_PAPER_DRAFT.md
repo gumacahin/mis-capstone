@@ -112,15 +112,17 @@ Deferred features, such as full Google Calendar sync, group scheduling,
 motivation systems, and full chat or voice control, are treated as future work.
 They are not required to defend the planner-first MVP.
 
-Table placeholder:
+Table 1 summarizes the SRS items most directly connected to the capstone
+contribution.
 
-```text
-Table 1. SRS-to-implementation summary.
-Source: SRS_TRACEABILITY_MATRIX.md.
-Show only the most important rows: suggested tasks, personal scheduling,
-productivity report, energy tracking, Google Calendar integration, and
-voice/conversational interface.
-```
+| SRS area                       | Current implementation                                                                                               | Capstone interpretation                                                                                  |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Suggested tasks                | `TodayPlan` and `PlanItem` generate ordered recommendations with reasons, task signals, estimates, and action state. | Main capstone contribution: the generic suggested-task requirement becomes an explainable daily planner. |
+| Personal scheduling            | Due dates, recurrence, Today/Upcoming views, available minutes, and time-fit planner modes are implemented.          | Scheduling is used as planning context rather than as a full calendar replacement.                       |
+| Productivity report            | Productivity views and admin-only aggregate planner evaluation metrics are implemented.                              | Reporting supports evaluation through aggregate helpfulness, confidence, and suggestion action rates.    |
+| Energy tracking                | `EnergyCheckIn` captures energy, available minutes, focus mode, and context.                                         | Energy and time become just-in-time planning inputs, not only retrospective logs.                        |
+| Google Calendar integration    | Deferred.                                                                                                            | Calendar should become opt-in scheduling context or sync, not the primary task backend.                  |
+| Voice/conversational interface | Deferred as a full interface; typed planner tools and assistant demo panel exist.                                    | Future chat, voice, or MCP layers should call typed backend operations only.                             |
 
 ## 4. System Design
 
@@ -133,13 +135,22 @@ The target architecture is Option 1.5:
 - The assistant layer never receives raw SQL, unrestricted ORM access, or
   arbitrary database mutation rights.
 
-Figure placeholder:
+Figure 1 shows the target architecture.
 
-```text
-Figure 1. Target architecture.
-Django/DRF owns state, permissions, validation, planner services, and typed
-tools. React renders the planner-first UI and just-in-time components. A future
-chat, voice, or MCP layer calls typed planner operations only.
+```mermaid
+flowchart LR
+    U[User] --> R[React planner-first UI]
+    R --> C[Generated TypeScript API client]
+    C --> A[Django REST API]
+    A --> P[Planner services]
+    A --> T[Task system of record]
+    P --> M[(Django database)]
+    T --> M
+    A --> V[Permissions, validation, ownership checks]
+    P --> S[Typed planner tools]
+    S --> A
+    X[Future chat / voice / MCP layer] -. typed operations only .-> S
+    X -. no raw SQL / ORM access .-> A
 ```
 
 This architecture supports controlled generative UI. In this project,
@@ -173,12 +184,25 @@ plan, limited-time plan, overdue triage, and unavailable planner state. These
 modes allow the same task data to produce different planning surfaces depending
 on the user's current situation.
 
-Figure placeholder:
+Figure 2 shows the planner-first flow evaluated in the walkthrough.
 
-```text
-Figure 2. Planner-first flow.
-Check-in -> suggestion generation -> reason inspection -> accept/snooze/dismiss
--> feedback -> aggregate evaluation reporting.
+```mermaid
+flowchart TD
+    A[Open /today] --> B[Energy, time, and focus check-in]
+    B --> C[Planner rebuilds today's plan]
+    C --> D[Suggested tasks with reasons]
+    D --> E[Inspect Why this?]
+    D --> F{Act on suggestion}
+    F --> G[Accept]
+    F --> H[Snooze]
+    F --> I[Dismiss]
+    G --> J[Planner action state]
+    H --> J
+    I --> J
+    J --> K[Helpfulness and confidence feedback]
+    K --> L[Aggregate evaluation metrics]
+    D --> M[Planner assistant invokes typed tools]
+    M --> C
 ```
 
 ## 5. Implementation
@@ -228,13 +252,11 @@ The assistant panel is not a full chat interface. It is a safe bridge toward
 future chat, MCP, or voice interfaces because it demonstrates that an assistant
 can call named backend tools without gaining raw database access.
 
-Screenshot placeholder:
-
-```text
-Figure 3. /today planner dashboard.
-Show check-in, suggested tasks, reason controls, mode highlights, feedback, and
-PlannerAssistantCard.
-```
+Figure 3 should be a screenshot of the `/today` planner dashboard for final
+submission. It should show the check-in, suggested tasks, reason controls, mode
+highlights, feedback card, and `PlannerAssistantCard`. The screenshot should be
+captured from seeded demo data or a privacy-safe account, not from a real
+participant account with identifying task content.
 
 ## 6. Evaluation Method
 

@@ -44,17 +44,18 @@ a literature-review claim.
 
 ### Medium: Figures Or Tables Would Strengthen The Design And Implementation Sections
 
-The draft is readable, but it would be easier to defend with at least two
-paper-facing visuals:
+Status: partially addressed in `CAPSTONE_PAPER_DRAFT.md`.
 
-- an architecture diagram showing Django/DRF, React, planner service, typed
-  tools, and future chat/MCP layer
-- a planner flow diagram showing check-in, suggestion generation, reason
-  inspection, accept/snooze/dismiss, feedback, and aggregate reporting
+The draft now includes:
 
-Optional additions:
+- an SRS-to-implementation summary table
+- a Mermaid architecture diagram showing Django/DRF, React, planner service,
+  typed tools, and future chat/MCP layer
+- a Mermaid planner flow diagram showing check-in, suggestion generation,
+  reason inspection, accept/snooze/dismiss, feedback, and aggregate reporting
 
-- a table mapping SRS features to planner reinterpretation
+Remaining optional addition:
+
 - a screenshot of `/today` showing planner suggestions and the assistant panel
 
 ### Medium: Evaluation Method Is Strong, But The Results Section Needs A Versioned Evidence Snapshot
@@ -96,10 +97,8 @@ and keep the "What should I do today?" phrase in the introduction.
 
 ## Recommended Immediate Fixes
 
-1. Add citation placeholders and a References section to
-   `CAPSTONE_PAPER_DRAFT.md`.
-2. Add figure/table placeholders for architecture, planner flow, SRS mapping,
-   and `/today` screenshot.
+1. Replace citation placeholders with course-required citation formatting.
+2. Capture or add a privacy-safe `/today` screenshot if required by the course.
 3. Add a note in the Results section that final verification numbers should be
    copied from `CAPSTONE_REHEARSAL_NOTES.md` at submission time.
 4. Keep `CAPSTONE_EVALUATION_RESULTS.md` as the only source for real
