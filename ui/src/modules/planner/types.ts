@@ -126,6 +126,38 @@ export interface PlannerEvaluationSummary {
   suggestion_action_rates: PlannerSuggestionActionRates;
 }
 
+export type PlannerToolName =
+  | "get_today_plan"
+  | "submit_check_in"
+  | "rebuild_today_plan"
+  | "accept_suggestion"
+  | "snooze_suggestion"
+  | "dismiss_suggestion"
+  | "submit_plan_feedback";
+
+export type PlannerToolResultType =
+  | "today_plan"
+  | "plan_item"
+  | "plan_feedback";
+
+export interface PlannerToolDefinition {
+  name: PlannerToolName;
+  description: string;
+  input_schema: Record<string, unknown>;
+  mutates_state: boolean;
+}
+
+export interface PlannerToolInvocationInput {
+  toolName: PlannerToolName;
+  arguments?: Record<string, unknown>;
+}
+
+export interface PlannerToolInvocationResult {
+  tool_name: PlannerToolName;
+  result_type: PlannerToolResultType;
+  result: Record<string, unknown>;
+}
+
 export interface TodayPlan {
   id: number;
   date: string;

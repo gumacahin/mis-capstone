@@ -12,6 +12,7 @@ import {
 import { renderPlannerComponent } from "../registry";
 import type { PlannerSuggestionAction } from "../types";
 import { buildPlannerUiSchema } from "../uiSchema";
+import PlannerAssistantCard from "./PlannerAssistantCard";
 import PlannerFeedbackCard from "./PlannerFeedbackCard";
 
 type PlannerNotice = {
@@ -86,6 +87,7 @@ export default function PlannerSurface() {
           {notice.message}
         </Alert>
       )}
+      <PlannerAssistantCard plan={plannerQuery.data} />
       <PlannerFeedbackCard
         disabled={plannerQuery.isPending || submitFeedback.isPending}
         plan={plannerQuery.data}

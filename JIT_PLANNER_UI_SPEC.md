@@ -618,6 +618,11 @@ The current implementation supports the first JIT planner UI slice:
 - `GET /api/planner/tools/` and
   `POST /api/planner/tools/{tool_name}/invoke/` expose a narrow authenticated
   tool catalog and invocation contract.
+- `/today` includes `PlannerAssistantCard`, a deterministic demo panel that
+  discovers the typed tool catalog and invokes canned planner actions through
+  the generated TypeScript API client.
+- The assistant panel intentionally does not expose arbitrary tool names, raw
+  JSON editing, SQL, ORM access, or runtime-generated frontend code.
 - Planner suggestion responses include structured task signals for due status,
   priority, effort, recurrence, project/section, score, and snooze/dismiss
   history.
@@ -658,8 +663,8 @@ Next implementation steps:
 1. Use the paper-facing evaluation method to run a small walkthrough with the
    target participant group or a seeded demo task set.
 2. Keep the OpenAPI planner contract test updated as planner operations evolve.
-3. Build a small planner assistant demo panel that calls the tool invocation
-   endpoint before adding Google Calendar sync.
+3. Evaluate whether the deterministic assistant panel should become a future
+   chat or MCP-style layer that still calls the same typed planner operations.
 
 ## Open Questions
 

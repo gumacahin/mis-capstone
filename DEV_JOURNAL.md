@@ -1985,3 +1985,60 @@ Real-backend planner evaluation e2e: 2 passed
 - The API still preserves the project safety claim. Tool names are allowlisted,
   arguments are structured and validated, and planner object lookup remains
   scoped to the authenticated user.
+
+## 2026-06-29: Planner Assistant Demo Panel
+
+### Goal
+
+Make the typed planner tool contract visible in the product UI before adding a
+free-form chat interface or Google Calendar sync.
+
+### Codex-Assisted Actions
+
+- Added `PlannerAssistantCard` to `/today`.
+- The card loads the authenticated planner tool catalog from
+  `GET /api/planner/tools/`.
+- Added deterministic, user-clicked actions for:
+  - `get_today_plan`
+  - `rebuild_today_plan`
+  - `submit_check_in`
+- Kept the demo constrained to canned actions. The UI does not expose arbitrary
+  tool names, raw JSON editing, SQL, ORM access, or generated frontend code.
+- Used the generated TypeScript API client for tool catalog and invocation
+  calls.
+- Updated the planner React query hooks so `today_plan` tool results refresh
+  the current `/today` planner state.
+- Added Playwright mocks and assertions for typed tool catalog discovery,
+  invocation envelopes, and a low-energy planner surface returned through the
+  tool invocation API.
+- Updated the capstone JIT planner UI spec to mark the assistant demo panel as
+  implemented.
+
+### Verification
+
+```text
+ui: npx prettier --write src/modules/planner/types.ts src/modules/planner/client.ts src/modules/planner/hooks.ts src/modules/planner/components/PlannerAssistantCard.tsx src/modules/planner/components/PlannerSurface.tsx src/modules/planner/components/index.ts tests/e2e/today-page.spec.ts tests/e2e/planner-evaluation-demo.spec.ts
+ui: npm run build
+ui: npm run lint
+ui: playwright test tests/e2e/today-page.spec.ts --project=chromium
+ui: playwright test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+```
+
+Observed result:
+
+```text
+Frontend build: passed
+Frontend lint: passed
+Today page e2e: 9 passed, 1 flaky navigation smoke test passed on retry
+Planner evaluation demo e2e: 2 passed
+```
+
+### Study Notes
+
+- This is the first user-visible bridge from just-in-time planner UI to typed
+  assistant operations.
+- The panel demonstrates the intended Gen UI safety boundary: the assistant or
+  controller can choose from known planner operations, while Django remains the
+  system of record and validator.
+- A future chat interface should call this same typed contract rather than
+  inventing database mutations or writing directly to task storage.

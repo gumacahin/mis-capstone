@@ -72,6 +72,21 @@ interface PlannerFeedbackPayload {
   note?: string;
 }
 
+interface PlannerToolInvocationMock {
+  toolName: string;
+  arguments: Record<string, unknown>;
+}
+
+interface PlannerUiSchemaMock {
+  component: string;
+  mode: string;
+  title: string;
+  message: string;
+  highlights: string[];
+  suggestion_ids: number[];
+  allowed_actions: string[];
+}
+
 const initialPlan = {
   id: 20,
   date: "2026-06-27",
@@ -109,7 +124,54 @@ const initialPlan = {
   updated_at: "2026-06-27T08:00:00Z",
 };
 
-type TodayPlanMock = typeof initialPlan;
+type TodayPlanMock = typeof initialPlan & {
+  ui_schema?: PlannerUiSchemaMock;
+};
+
+const plannerTools = [
+  {
+    name: "get_today_plan",
+    description: "Return the current planner plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: false,
+  },
+  {
+    name: "submit_check_in",
+    description: "Save the current planning context and rebuild suggestions.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "rebuild_today_plan",
+    description: "Rebuild the current planner plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "accept_suggestion",
+    description: "Accept a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "snooze_suggestion",
+    description: "Snooze a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "dismiss_suggestion",
+    description: "Dismiss a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "submit_plan_feedback",
+    description: "Save feedback about a generated plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+];
 
 interface MockTodayApisOptions {
   plan?: TodayPlanMock;
@@ -134,6 +196,7 @@ async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
         }
       | undefined,
     feedbackPayload: undefined as PlannerFeedbackPayload | undefined,
+    toolInvocations: [] as PlannerToolInvocationMock[],
   };
 
   await page.route(/\/(?:api\/)?users\/me\/?$/, async (route) => {
@@ -168,6 +231,67 @@ async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
     }
     await route.fulfill({ json: plan });
   });
+  await page.route(/\/(?:api\/)?planner\/tools\/?$/, async (route) => {
+    await route.fulfill({ json: plannerTools });
+  });
+  await page.route(
+    /\/(?:api\/)?planner\/tools\/[^/]+\/invoke\/?$/,
+    async (route) => {
+      const toolName = extractToolName(route.request().url());
+      const requestBody = route.request().postDataJSON() as
+        | { arguments?: Record<string, unknown> }
+        | undefined;
+      const toolArguments = requestBody?.arguments ?? {};
+
+      calls.toolInvocations.push({
+        toolName,
+        arguments: toolArguments,
+      });
+
+      if (toolName === "get_today_plan" || toolName === "rebuild_today_plan") {
+        if (toolName === "rebuild_today_plan") {
+          plan = {
+            ...plan,
+            updated_at: "2026-06-27T08:16:00Z",
+          };
+        }
+        await route.fulfill({
+          json: {
+            tool_name: toolName,
+            result_type: "today_plan",
+            result: plan,
+          },
+        });
+        return;
+      }
+
+      if (toolName === "submit_check_in") {
+        plan = {
+          ...plan,
+          check_in: {
+            ...plan.check_in,
+            ...toolArguments,
+            updated_at: "2026-06-27T08:17:00Z",
+          },
+          ui_schema: buildLowEnergyUiSchema(plan),
+          updated_at: "2026-06-27T08:17:00Z",
+        };
+        await route.fulfill({
+          json: {
+            tool_name: toolName,
+            result_type: "today_plan",
+            result: plan,
+          },
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 404,
+        json: { detail: `Unknown planner tool: ${toolName}` },
+      });
+    },
+  );
   await page.route(/\/(?:api\/)?planner\/check-in\/?$/, async (route) => {
     calls.checkInPayload = route.request().postDataJSON();
     plan = {
@@ -241,6 +365,25 @@ async function mockTodayApis(page: Page, options: MockTodayApisOptions = {}) {
   );
 
   return calls;
+}
+
+function extractToolName(url: string) {
+  const path = new URL(url).pathname;
+  return decodeURIComponent(
+    path.match(/planner\/tools\/([^/]+)\/invoke/)?.[1] ?? "",
+  );
+}
+
+function buildLowEnergyUiSchema(plan: TodayPlanMock): PlannerUiSchemaMock {
+  return {
+    component: "LowEnergyPlanCard",
+    mode: "low_energy",
+    title: "Low-energy plan",
+    message: "Start with smaller next actions while preserving urgent work.",
+    highlights: ["Energy low", "Light focus"],
+    suggestion_ids: plan.suggestions.map((suggestion) => suggestion.id),
+    allowed_actions: ["accept", "snooze", "dismiss"],
+  };
 }
 
 function updateSuggestion(
@@ -331,6 +474,44 @@ test.describe("Today Page", () => {
     ).toBeVisible();
     await expect(
       page.getByText("Feedback saved for evaluation."),
+    ).toBeVisible();
+  });
+
+  test("shows planner assistant and invokes typed tools", async ({ page }) => {
+    const calls = await mockTodayApis(page);
+
+    await page.goto("/today");
+
+    await expect(
+      page.getByRole("heading", { name: "Planner assistant" }),
+    ).toBeVisible();
+    await expect(page.getByText("7 typed tools")).toBeVisible();
+    await expect(page.getByText("get today plan")).toBeVisible();
+
+    await page.getByRole("button", { name: "Show current plan" }).click();
+
+    await expect
+      .poll(() => calls.toolInvocations.at(-1)?.toolName)
+      .toBe("get_today_plan");
+    await expect(page.getByText("result_type: today_plan")).toBeVisible();
+    await expect(page.getByText("1 suggestion | Default plan")).toBeVisible();
+
+    await page.getByRole("button", { name: "Refresh plan" }).click();
+
+    await expect
+      .poll(() => calls.toolInvocations.at(-1)?.toolName)
+      .toBe("rebuild_today_plan");
+
+    await page.getByRole("button", { name: "Use low-energy mode" }).click();
+
+    await expect
+      .poll(() => calls.toolInvocations.at(-1)?.toolName)
+      .toBe("submit_check_in");
+    await expect
+      .poll(() => calls.toolInvocations.at(-1)?.arguments.energy_level)
+      .toBe("low");
+    await expect(
+      page.getByRole("heading", { name: "Low-energy plan" }),
     ).toBeVisible();
   });
 

@@ -78,6 +78,21 @@ interface CheckInPayload {
   context: string;
 }
 
+interface PlannerToolInvocationMock {
+  toolName: string;
+  arguments: Record<string, unknown>;
+}
+
+interface PlannerUiSchemaMock {
+  component: string;
+  mode: string;
+  title: string;
+  message: string;
+  highlights: string[];
+  suggestion_ids: number[];
+  allowed_actions: string[];
+}
+
 const initialDemoPlan = {
   id: 300,
   date: "2026-06-28",
@@ -218,16 +233,65 @@ const initialDemoPlan = {
   updated_at: "2026-06-28T01:00:00Z",
 };
 
+type DemoPlan = typeof initialDemoPlan & {
+  ui_schema?: PlannerUiSchemaMock;
+};
+
 type DemoSuggestion = (typeof initialDemoPlan.suggestions)[number];
 
-function cloneDemoPlan(): typeof initialDemoPlan {
+const plannerTools = [
+  {
+    name: "get_today_plan",
+    description: "Return the current planner plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: false,
+  },
+  {
+    name: "submit_check_in",
+    description: "Save the current planning context and rebuild suggestions.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "rebuild_today_plan",
+    description: "Rebuild the current planner plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "accept_suggestion",
+    description: "Accept a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "snooze_suggestion",
+    description: "Snooze a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "dismiss_suggestion",
+    description: "Dismiss a planner suggestion.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+  {
+    name: "submit_plan_feedback",
+    description: "Save feedback about a generated plan.",
+    input_schema: { type: "object", properties: {} },
+    mutates_state: true,
+  },
+];
+
+function cloneDemoPlan(): DemoPlan {
   return JSON.parse(JSON.stringify(initialDemoPlan));
 }
 
 function replaceSuggestion(
-  plan: typeof initialDemoPlan,
+  plan: DemoPlan,
   suggestion: DemoSuggestion,
-): typeof initialDemoPlan {
+): DemoPlan {
   return {
     ...plan,
     suggestions: plan.suggestions.map((item) =>
@@ -244,6 +308,7 @@ async function mockPlannerEvaluationDemoApis(page: Page) {
     dismissed: 0,
     checkInPayload: undefined as CheckInPayload | undefined,
     feedbackPayload: undefined as FeedbackPayload | undefined,
+    toolInvocations: [] as PlannerToolInvocationMock[],
   };
 
   await page.route(/\/(?:api\/)?users\/me\/?$/, async (route) => {
@@ -276,6 +341,67 @@ async function mockPlannerEvaluationDemoApis(page: Page) {
   await page.route(/\/(?:api\/)?planner\/today\/?$/, async (route) => {
     await route.fulfill({ json: plan });
   });
+  await page.route(/\/(?:api\/)?planner\/tools\/?$/, async (route) => {
+    await route.fulfill({ json: plannerTools });
+  });
+  await page.route(
+    /\/(?:api\/)?planner\/tools\/[^/]+\/invoke\/?$/,
+    async (route) => {
+      const toolName = extractToolName(route.request().url());
+      const requestBody = route.request().postDataJSON() as
+        | { arguments?: Record<string, unknown> }
+        | undefined;
+      const toolArguments = requestBody?.arguments ?? {};
+
+      calls.toolInvocations.push({
+        toolName,
+        arguments: toolArguments,
+      });
+
+      if (toolName === "get_today_plan" || toolName === "rebuild_today_plan") {
+        if (toolName === "rebuild_today_plan") {
+          plan = {
+            ...plan,
+            updated_at: "2026-06-28T01:11:00Z",
+          };
+        }
+        await route.fulfill({
+          json: {
+            tool_name: toolName,
+            result_type: "today_plan",
+            result: plan,
+          },
+        });
+        return;
+      }
+
+      if (toolName === "submit_check_in") {
+        plan = {
+          ...plan,
+          check_in: {
+            ...plan.check_in,
+            ...toolArguments,
+            updated_at: "2026-06-28T01:12:00Z",
+          },
+          ui_schema: buildLowEnergyUiSchema(plan),
+          updated_at: "2026-06-28T01:12:00Z",
+        };
+        await route.fulfill({
+          json: {
+            tool_name: toolName,
+            result_type: "today_plan",
+            result: plan,
+          },
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 404,
+        json: { detail: `Unknown planner tool: ${toolName}` },
+      });
+    },
+  );
   await page.route(/\/(?:api\/)?planner\/check-in\/?$/, async (route) => {
     calls.checkInPayload = route.request().postDataJSON() as CheckInPayload;
     plan = {
@@ -351,6 +477,25 @@ async function mockPlannerEvaluationDemoApis(page: Page) {
   });
 
   return calls;
+}
+
+function extractToolName(url: string) {
+  const path = new URL(url).pathname;
+  return decodeURIComponent(
+    path.match(/planner\/tools\/([^/]+)\/invoke/)?.[1] ?? "",
+  );
+}
+
+function buildLowEnergyUiSchema(plan: DemoPlan): PlannerUiSchemaMock {
+  return {
+    component: "LowEnergyPlanCard",
+    mode: "low_energy",
+    title: "Low-energy plan",
+    message: "Start with smaller next actions while preserving urgent work.",
+    highlights: ["Energy low", "Light focus"],
+    suggestion_ids: plan.suggestions.map((suggestion) => suggestion.id),
+    allowed_actions: ["accept", "snooze", "dismiss"],
+  };
 }
 
 test.describe("Planner evaluation demo", () => {

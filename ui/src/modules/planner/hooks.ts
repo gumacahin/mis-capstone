@@ -4,7 +4,9 @@ import { useGeneratedApiClient } from "@/api/client";
 
 import {
   getPlannerEvaluationSummary,
+  getPlannerTools,
   getTodayPlan,
+  invokePlannerTool,
   plannerQueryKeys,
   rebuildTodayPlan,
   submitPlannerCheckIn,
@@ -15,6 +17,7 @@ import type {
   PlannerCheckInInput,
   PlannerFeedbackInput,
   PlannerSuggestionActionInput,
+  PlannerToolInvocationInput,
   TodayPlan,
 } from "./types";
 
@@ -31,6 +34,34 @@ export const usePlannerEvaluationSummary = () => {
   return useQuery({
     queryKey: plannerQueryKeys.evaluation,
     queryFn: async () => getPlannerEvaluationSummary(planner),
+  });
+};
+
+export const usePlannerTools = () => {
+  const { planner } = useGeneratedApiClient();
+  return useQuery({
+    queryKey: plannerQueryKeys.tools,
+    queryFn: async () => getPlannerTools(planner),
+  });
+};
+
+export const useInvokePlannerTool = () => {
+  const { planner } = useGeneratedApiClient();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["planner", "tool-invocation"],
+    mutationFn: async (input: PlannerToolInvocationInput) =>
+      invokePlannerTool(planner, input),
+    onSuccess: (data) => {
+      if (data.result_type === "today_plan") {
+        queryClient.setQueryData(
+          plannerQueryKeys.today,
+          data.result as unknown as TodayPlan,
+        );
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: plannerQueryKeys.today });
+    },
   });
 };
 

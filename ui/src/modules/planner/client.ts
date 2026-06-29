@@ -7,6 +7,9 @@ import type {
   PlannerFeedbackInput,
   PlannerSuggestion,
   PlannerSuggestionActionInput,
+  PlannerToolDefinition,
+  PlannerToolInvocationInput,
+  PlannerToolInvocationResult,
   TodayPlan,
 } from "./types";
 
@@ -14,6 +17,7 @@ export const plannerQueryKeys = {
   all: ["planner"] as const,
   today: ["planner", "today"] as const,
   evaluation: ["planner", "evaluation"] as const,
+  tools: ["planner", "tools"] as const,
 };
 
 export const getTodayPlan = async (
@@ -45,6 +49,26 @@ export const getPlannerEvaluationSummary = async (
 ): Promise<PlannerEvaluationSummary> => {
   const { data } = await plannerClient.plannerEvaluationRetrieve();
   return data as PlannerEvaluationSummary;
+};
+
+export const getPlannerTools = async (
+  plannerClient: PlannerApi,
+): Promise<PlannerToolDefinition[]> => {
+  const { data } = await plannerClient.plannerToolsList();
+  return data as PlannerToolDefinition[];
+};
+
+export const invokePlannerTool = async (
+  plannerClient: PlannerApi,
+  input: PlannerToolInvocationInput,
+): Promise<PlannerToolInvocationResult> => {
+  const { data } = await plannerClient.plannerToolsInvokeCreate({
+    toolName: input.toolName,
+    plannerToolInvokeRequest: {
+      arguments: input.arguments ?? {},
+    },
+  });
+  return data as PlannerToolInvocationResult;
 };
 
 export const submitPlannerFeedback = async (
