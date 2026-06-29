@@ -2207,3 +2207,34 @@ repo: git diff --check
 - The outline is now the best starting point for drafting the actual paper.
 - It preserves the distinction between implemented functionality, automated demo
   evidence, and still-pending adviser or participant evaluation evidence.
+
+## 2026-06-29: First Paper Draft Assembly
+
+### Goal
+
+Create a first full paper draft from the capstone outline and existing
+artifacts, while keeping the Results section clearly marked as pending real
+walkthrough evidence.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_PAPER_DRAFT.md`.
+- Drafted Abstract, Introduction, Background, Requirements/SRS Reconciliation,
+  System Design, Implementation, Evaluation Method, Results, Discussion,
+  Limitations, Future Work, and Conclusion sections.
+- Included explicit Results placeholders and language distinguishing automated
+  demo-readiness evidence from adviser, pilot, or participant evidence.
+- Linked the draft from `CAPSTONE_PAPER_OUTLINE.md` and `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_OUTLINE.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- This draft is now the main paper editing surface.
+- The Results section must be updated only from `CAPSTONE_EVALUATION_RESULTS.md`
+  after a real adviser, pilot, or participant walkthrough is recorded.

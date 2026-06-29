@@ -70,6 +70,8 @@ The fuller paper and defense outline is captured in `CAPSTONE_ARGUMENT.md`.
 
 The final paper assembly outline is captured in `CAPSTONE_PAPER_OUTLINE.md`.
 
+The first assembled paper draft is captured in `CAPSTONE_PAPER_DRAFT.md`.
+
 ## Typed Operations
 
 In this project, **typed** means that the application exposes a small set of
