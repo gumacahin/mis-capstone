@@ -141,3 +141,7 @@ helpfulness/confidence/action signals]. Qualitative notes suggested that
 [anonymized theme]. No private task titles, user identifiers, or raw
 identifiable feedback notes were included in the report.
 ```
+
+For the full paper section structure, use
+`CAPSTONE_RESULTS_DISCUSSION_TEMPLATE.md` after at least one real adviser,
+pilot, or participant entry has been recorded.

@@ -140,6 +140,9 @@ The field-ready participant/adviser packet is captured in
 
 The evaluation results log is captured in `CAPSTONE_EVALUATION_RESULTS.md`.
 
+The paper-facing results and discussion template is captured in
+`CAPSTONE_RESULTS_DISCUSSION_TEMPLATE.md`.
+
 The defense-oriented demo script is captured in
 `CAPSTONE_DEFENSE_DEMO_SCRIPT.md`.
 

@@ -2132,12 +2132,13 @@ repo: git diff --check
   next task, understand the reason, and report higher confidence after using
   the planner.
 
-## 2026-06-29: Evaluation Results Log Preparation
+## 2026-06-29: Evaluation Results And Discussion Preparation
 
 ### Goal
 
 Prepare a place to record the first real adviser, pilot, or participant
-walkthrough without mixing it with seeded demo or automated Playwright evidence.
+walkthrough without mixing it with seeded demo or automated Playwright evidence,
+and prepare a paper section template that can receive those findings later.
 
 ### Codex-Assisted Actions
 
@@ -2146,14 +2147,22 @@ walkthrough without mixing it with seeded demo or automated Playwright evidence.
   `demo`.
 - Added a session register, result entry template, aggregate summary template,
   privacy rules, and a paper-ready results paragraph template.
+- Added `CAPSTONE_RESULTS_DISCUSSION_TEMPLATE.md`.
+- Drafted paper-facing Results, Discussion, Limitations, Future Work, and
+  Conclusion sections with placeholders instead of fabricated findings.
+- Added evidence-boundary language separating implementation evidence,
+  automated demo evidence, adviser-review evidence, pilot evidence, and
+  participant evidence.
 - Linked the results log from `CAPSTONE_EVALUATION_METHOD.md`,
   `CAPSTONE_EVALUATION_PACKET.md`, `CAPSTONE_EVALUATION_WALKTHROUGH.md`, and
   `CAPSTONE_NOTES.md`.
+- Linked the results/discussion template from `CAPSTONE_ARGUMENT.md`,
+  `CAPSTONE_EVALUATION_RESULTS.md`, and `CAPSTONE_NOTES.md`.
 
 ### Verification
 
 ```text
-docs: npx prettier --check ../CAPSTONE_EVALUATION_RESULTS.md ../CAPSTONE_EVALUATION_PACKET.md ../CAPSTONE_EVALUATION_METHOD.md ../CAPSTONE_EVALUATION_WALKTHROUGH.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+docs: npx prettier --check ../CAPSTONE_EVALUATION_RESULTS.md ../CAPSTONE_RESULTS_DISCUSSION_TEMPLATE.md ../CAPSTONE_EVALUATION_PACKET.md ../CAPSTONE_EVALUATION_METHOD.md ../CAPSTONE_EVALUATION_WALKTHROUGH.md ../CAPSTONE_ARGUMENT.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
 repo: git diff --check
 ```
 
@@ -2164,3 +2173,6 @@ repo: git diff --check
   walkthrough.
 - This gives the capstone paper a clean evidence chain: method, packet,
   session log, then aggregate/anonymized results.
+- The results/discussion template keeps the eventual paper language narrow:
+  decision support, explanation quality, confidence, and formative usefulness,
+  not broad productivity claims.

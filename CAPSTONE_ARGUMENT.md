@@ -211,6 +211,11 @@ Do not claim:
 | Discussion       | Gen UI helps adapt the interface to context, but the current system is still an MVP.                                         |
 | Limitations      | Small sample, deterministic scoring, no full Google Calendar sync, no runtime chat/voice, students outside validation scope. |
 
+Use `CAPSTONE_RESULTS_DISCUSSION_TEMPLATE.md` when drafting the Results,
+Discussion, Limitations, Future Work, and Conclusion sections. It separates
+implementation evidence, automated demo evidence, adviser-review evidence,
+pilot evidence, and participant evidence so the paper does not overclaim.
+
 ## Defense Talking Points
 
 - The SRS baseline is still present; the traceability matrix shows what is
