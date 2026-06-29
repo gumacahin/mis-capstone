@@ -182,6 +182,6 @@ def test_user_viewset_permissions(auth_client):
             response = auth_client.patch(url, {}, format="json")
 
         # Should not be unauthorized (might be 200, 204, or other success codes)
-        assert (
-            response.status_code != status.HTTP_401_UNAUTHORIZED
-        ), f"{method} {url} should work when authenticated"
+        assert response.status_code != status.HTTP_401_UNAUTHORIZED, (
+            f"{method} {url} should work when authenticated"
+        )

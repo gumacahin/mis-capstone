@@ -261,9 +261,9 @@ class TestCompleteTaskWorkflows:
         # Step 2: Test basic task listing (filters are tested separately)
         response = self.client.get("/api/tasks/")
         assert response.status_code == status.HTTP_200_OK
-        assert (
-            response.data["count"] == 4
-        ), f"Expected 4 tasks, got {response.data['count']}"
+        assert response.data["count"] == 4, (
+            f"Expected 4 tasks, got {response.data['count']}"
+        )
 
         # Step 3: Test task tagging worked
         # Verify that tasks have tags assigned
@@ -271,9 +271,9 @@ class TestCompleteTaskWorkflows:
             response = self.client.get(f"/api/tasks/{task['id']}/")
             assert response.status_code == status.HTTP_200_OK
             # Each task should have 2 tags
-            assert (
-                len(response.data["tags"]) == 2
-            ), f"Task {i} should have 2 tags, got {len(response.data['tags'])}"
+            assert len(response.data["tags"]) == 2, (
+                f"Task {i} should have 2 tags, got {len(response.data['tags'])}"
+            )
 
     def test_error_handling_workflow(self):
         """Test error handling in various scenarios."""
