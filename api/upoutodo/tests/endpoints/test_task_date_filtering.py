@@ -110,7 +110,7 @@ class TestTaskDateFiltering:
                 datetime.combine(base_date + timedelta(days=i), datetime.min.time())
             )
             task = TaskFactory(
-                section=self.section, title=f"Task on day {i+1}", due_date=task_date
+                section=self.section, title=f"Task on day {i + 1}", due_date=task_date
             )
             tasks_in_range.append(task)
 
