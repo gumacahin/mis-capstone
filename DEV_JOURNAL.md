@@ -2304,3 +2304,34 @@ repo: git diff --check
   requires screenshots.
 - Citation formatting remains unresolved until the required course style is
   known.
+
+## 2026-06-29: Paper Citation Pass
+
+### Goal
+
+Replace raw Crisanto citation placeholders with a verified working citation
+without inventing background sources.
+
+### Codex-Assisted Actions
+
+- Verified Crisanto paper metadata from the IJITGEB article page and PDF:
+  author, title, journal, volume, issue, pages, and DOI.
+- Replaced raw Crisanto citation markers in `CAPSTONE_PAPER_DRAFT.md` with
+  APA-style working in-text citations.
+- Added a full working reference entry for Crisanto's paper.
+- Updated `CAPSTONE_PAPER_REVIEW.md` so citation findings now point to final
+  course-style confirmation instead of missing citations.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_REVIEW.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- HCI, Generative UI, and just-in-time UI remain framed as project design terms
+  unless the final paper adds outside background sources.
+- The remaining citation task is to convert the working reference if the course
+  requires a style other than APA.

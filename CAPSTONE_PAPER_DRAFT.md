@@ -7,16 +7,16 @@ software requirements specification (SRS), a web-based task-management and
 productivity-tracking system for the University of the Philippines Open
 University (UPOU) community. The implementation preserves task management as a
 system of record, then focuses the capstone contribution on the daily planning
-question raised by Crisanto's study: "What should I do today?" [CITATION:
-Crisanto]. The prototype uses task data, due dates, priority, recurrence,
-energy level, available time, focus mode, suggestion reasons, and user feedback
-to generate an explainable daily planning surface. The project treats
-generative UI as controlled just-in-time UI: the system selects from registered
-React planner components and calls typed Django backend operations, rather than
-generating arbitrary frontend code or giving an assistant raw database access.
-Evaluation is designed as a walkthrough with UPOU faculty and staff, measuring
-helpfulness, confidence, explanation quality, suggestion actions, and
-privacy-preserving aggregate evidence.
+question raised by Crisanto (2022): "What should I do today?" The prototype
+uses task data, due dates, priority, recurrence, energy level, available time,
+focus mode, suggestion reasons, and user feedback to generate an explainable
+daily planning surface. The project treats generative UI as controlled
+just-in-time UI: the system selects from registered React planner components
+and calls typed Django backend operations, rather than generating arbitrary
+frontend code or giving an assistant raw database access. Evaluation is designed
+as a walkthrough with UPOU faculty and staff, measuring helpfulness, confidence,
+explanation quality, suggestion actions, and privacy-preserving aggregate
+evidence.
 
 ## 1. Introduction
 
@@ -51,12 +51,13 @@ evaluation.
 
 Crisanto's study, `"What should I do today?" A Case Study on the Current
 Practices and Software Requirements Specification of a Web-Based Planner and
-Productivity Tracker`, provides the requirements grounding for this capstone.
-The source study focused on UPOU employees, including faculty, research
-assistants, and staff [CITATION: Crisanto]. That scope matters because the
-current prototype should be validated primarily against faculty and staff
-planning needs. Student use cases may be adjacent or future work, but they are
-not the primary validated scope for this version.
+Productivity Tracker`, provides the requirements grounding for this capstone
+(Crisanto, 2022). The source study focused on UPOU employees, including
+faculty, research assistants, and staff. It produced an SRS from an online focus
+group discussion and an online survey of UPOU employees (Crisanto, 2022). That
+scope matters because the current prototype should be validated primarily
+against faculty and staff planning needs. Student use cases may be adjacent or
+future work, but they are not the primary validated scope for this version.
 
 The study title foregrounds a planning problem rather than a storage problem.
 Users may already have tools for recording tasks, calendar events, or goals,
@@ -420,18 +421,16 @@ Before this draft is submitted as the final paper:
 - Fill the Results section from `CAPSTONE_EVALUATION_RESULTS.md`.
 - Remove or revise any statement that implies participant evidence before a
   real walkthrough exists.
-- Add required citation formatting for Crisanto's paper according to the
-  course style guide.
+- Convert the working APA-style reference to the final course-required style if
+  a different style guide is required.
 - Add screenshots, diagrams, or appendices only if they are required by the
   final submission format.
 - Confirm that privacy rules have removed task content and identifying details.
 
 ## References
 
-[CITATION: Crisanto] Replace with the course-required citation format for:
-
-```text
-Crisanto, "What should I do today?" A Case Study on the Current Practices and
-Software Requirements Specification of a Web-Based Planner and Productivity
-Tracker, IJITGEB, https://ijitgeb.org/ijitgeb/article/view/94/53
-```
+Crisanto, M. A. L. (2022). "What should I do today?" A case study on the
+current practices and software requirements specification of a web-based planner
+and productivity tracker. _International Journal in Information Technology in
+Governance, Education and Business, 4_(1), 12-28.
+https://doi.org/10.32664/ijitgeb.v4i1.94

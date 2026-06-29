@@ -31,11 +31,14 @@ submission, the author must decide whether the final paper will report:
 If no real walkthrough is recorded, the Results section should remain narrow and
 should avoid language such as "users found the planner helpful."
 
-### High: Citations Are Still Placeholders
+### Medium: Citation Style Still Needs Final Course-Format Check
 
-The draft names Crisanto's paper but does not yet include formal citation
-formatting, bibliography entries, or in-text citation style. This must be fixed
-according to the course format before final submission.
+Status: partially addressed in `CAPSTONE_PAPER_DRAFT.md`.
+
+The draft now includes an APA-style working in-text citation and reference entry
+for Crisanto's paper. Before final submission, confirm whether the course
+requires APA, IEEE, or another citation style and convert the reference if
+needed.
 
 The draft should also decide whether to cite any background sources for HCI,
 generative UI, or just-in-time interfaces. If no external sources are added,
@@ -97,7 +100,8 @@ and keep the "What should I do today?" phrase in the introduction.
 
 ## Recommended Immediate Fixes
 
-1. Replace citation placeholders with course-required citation formatting.
+1. Confirm the final required citation style and convert the current APA-style
+   working reference if needed.
 2. Capture or add a privacy-safe `/today` screenshot if required by the course.
 3. Add a note in the Results section that final verification numbers should be
    copied from `CAPSTONE_REHEARSAL_NOTES.md` at submission time.
@@ -109,7 +113,7 @@ and keep the "What should I do today?" phrase in the introduction.
 - Run at least one adviser or pilot walkthrough if possible.
 - Record anonymized results in `CAPSTONE_EVALUATION_RESULTS.md`.
 - Replace pending Results placeholders with actual recorded evidence.
-- Add formal citations and bibliography.
+- Confirm final citation style.
 - Add screenshots or diagrams if required by the course.
 - Check the final paper against the claims-to-avoid list in
   `CAPSTONE_ARGUMENT.md`.
