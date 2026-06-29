@@ -68,6 +68,8 @@ Calendar synchronization and conversational planning through typed tool actions.
 
 The fuller paper and defense outline is captured in `CAPSTONE_ARGUMENT.md`.
 
+The final paper assembly outline is captured in `CAPSTONE_PAPER_OUTLINE.md`.
+
 ## Typed Operations
 
 In this project, **typed** means that the application exposes a small set of

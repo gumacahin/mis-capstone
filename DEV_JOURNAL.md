@@ -2176,3 +2176,34 @@ repo: git diff --check
 - The results/discussion template keeps the eventual paper language narrow:
   decision support, explanation quality, confidence, and formative usefulness,
   not broad productivity claims.
+
+## 2026-06-29: Paper Assembly Outline
+
+### Goal
+
+Prepare a final paper outline that maps each capstone section to existing
+source artifacts and keeps the writing aligned with the implementation,
+evaluation boundary, and source-study scope.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_PAPER_OUTLINE.md`.
+- Mapped Introduction, Background, Requirements, System Design,
+  Implementation, Evaluation Method, Results, Discussion, Limitations, Future
+  Work, and Conclusion to the relevant project artifacts.
+- Added paper-ready claims, claims to avoid, required terms, evaluation
+  boundaries, and a final submission checklist.
+- Linked the outline from `CAPSTONE_ARGUMENT.md` and `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_OUTLINE.md ../CAPSTONE_ARGUMENT.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- The outline is now the best starting point for drafting the actual paper.
+- It preserves the distinction between implemented functionality, automated demo
+  evidence, and still-pending adviser or participant evaluation evidence.
