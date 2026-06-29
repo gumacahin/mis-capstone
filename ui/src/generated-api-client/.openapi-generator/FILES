@@ -59,6 +59,9 @@ docs/PlannerApi.md
 docs/PlannerEvaluationSummary.md
 docs/PlannerSuggestionActionRates.md
 docs/PlannerSuggestionStatusCounts.md
+docs/PlannerToolDefinition.md
+docs/PlannerToolInvocationResult.md
+docs/PlannerToolInvokeRequest.md
 docs/PlannerUiSchema.md
 docs/PriorityEnum.md
 docs/ProductivityApi.md
@@ -73,6 +76,7 @@ docs/ProjectSection.md
 docs/ProjectSectionRequest.md
 docs/ProjectSectionsApi.md
 docs/ProjectsApi.md
+docs/ResultTypeEnum.md
 docs/SnoozePlanItemRequest.md
 docs/Tag.md
 docs/TagDetail.md
@@ -137,6 +141,9 @@ models/plan-item.ts
 models/planner-evaluation-summary.ts
 models/planner-suggestion-action-rates.ts
 models/planner-suggestion-status-counts.ts
+models/planner-tool-definition.ts
+models/planner-tool-invocation-result.ts
+models/planner-tool-invoke-request.ts
 models/planner-ui-schema.ts
 models/priority-enum.ts
 models/productivity-priority-distribution.ts
@@ -148,6 +155,7 @@ models/project-detail.ts
 models/project-section-request.ts
 models/project-section.ts
 models/project.ts
+models/result-type-enum.ts
 models/snooze-plan-item-request.ts
 models/tag-detail.ts
 models/tag-request.ts

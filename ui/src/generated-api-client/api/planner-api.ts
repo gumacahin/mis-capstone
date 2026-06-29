@@ -45,6 +45,12 @@ import type { PlanItem } from "../models";
 // @ts-ignore
 import type { PlannerEvaluationSummary } from "../models";
 // @ts-ignore
+import type { PlannerToolDefinition } from "../models";
+// @ts-ignore
+import type { PlannerToolInvocationResult } from "../models";
+// @ts-ignore
+import type { PlannerToolInvokeRequest } from "../models";
+// @ts-ignore
 import type { SnoozePlanItemRequest } from "../models";
 // @ts-ignore
 import type { TodayPlan } from "../models";
@@ -530,6 +536,126 @@ export const PlannerApiAxiosParamCreator = function (
         options: localVarRequestOptions,
       };
     },
+    /**
+     *
+     * @param {string} toolName
+     * @param {PlannerToolInvokeRequest} [plannerToolInvokeRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerToolsInvokeCreate: async (
+      toolName: string,
+      plannerToolInvokeRequest?: PlannerToolInvokeRequest,
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'toolName' is not null or undefined
+      assertParamExists("plannerToolsInvokeCreate", "toolName", toolName);
+      const localVarPath = `/api/planner/tools/{tool_name}/invoke/`.replace(
+        `{${"tool_name"}}`,
+        encodeURIComponent(String(toolName)),
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication basicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication cookieAuth required
+
+      // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        plannerToolInvokeRequest,
+        localVarRequestOptions,
+        configuration,
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerToolsList: async (
+      options: RawAxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/planner/tools/`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication basicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication cookieAuth required
+
+      // authentication jwtAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      // authentication E2ETestBearer required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
   };
 };
 
@@ -773,6 +899,70 @@ export const PlannerApiFp = function (configuration?: Configuration) {
           configuration,
         )(axios, localVarOperationServerBasePath || basePath);
     },
+    /**
+     *
+     * @param {string} toolName
+     * @param {PlannerToolInvokeRequest} [plannerToolInvokeRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async plannerToolsInvokeCreate(
+      toolName: string,
+      plannerToolInvokeRequest?: PlannerToolInvokeRequest,
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<PlannerToolInvocationResult>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.plannerToolsInvokeCreate(
+          toolName,
+          plannerToolInvokeRequest,
+          options,
+        );
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap["PlannerApi.plannerToolsInvokeCreate"]?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async plannerToolsList(
+      options?: RawAxiosRequestConfig,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<Array<PlannerToolDefinition>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.plannerToolsList(options);
+      const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+      const localVarOperationServerBasePath =
+        operationServerMap["PlannerApi.plannerToolsList"]?.[
+          localVarOperationServerIndex
+        ]?.url;
+      return (axios, basePath) =>
+        createRequestFunction(
+          localVarAxiosArgs,
+          globalAxios,
+          BASE_PATH,
+          configuration,
+        )(axios, localVarOperationServerBasePath || basePath);
+    },
   };
 };
 
@@ -899,6 +1089,36 @@ export const PlannerApiFactory = function (
         .plannerTodayRetrieve(options)
         .then((request) => request(axios, basePath));
     },
+    /**
+     *
+     * @param {PlannerApiPlannerToolsInvokeCreateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerToolsInvokeCreate(
+      requestParameters: PlannerApiPlannerToolsInvokeCreateRequest,
+      options?: RawAxiosRequestConfig,
+    ): AxiosPromise<PlannerToolInvocationResult> {
+      return localVarFp
+        .plannerToolsInvokeCreate(
+          requestParameters.toolName,
+          requestParameters.plannerToolInvokeRequest,
+          options,
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    plannerToolsList(
+      options?: RawAxiosRequestConfig,
+    ): AxiosPromise<Array<PlannerToolDefinition>> {
+      return localVarFp
+        .plannerToolsList(options)
+        .then((request) => request(axios, basePath));
+    },
   };
 };
 
@@ -987,6 +1207,26 @@ export interface PlannerApiInterface {
   plannerTodayRetrieve(
     options?: RawAxiosRequestConfig,
   ): AxiosPromise<TodayPlan>;
+
+  /**
+   *
+   * @param {PlannerApiPlannerToolsInvokeCreateRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  plannerToolsInvokeCreate(
+    requestParameters: PlannerApiPlannerToolsInvokeCreateRequest,
+    options?: RawAxiosRequestConfig,
+  ): AxiosPromise<PlannerToolInvocationResult>;
+
+  /**
+   *
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  plannerToolsList(
+    options?: RawAxiosRequestConfig,
+  ): AxiosPromise<Array<PlannerToolDefinition>>;
 }
 
 /**
@@ -1024,6 +1264,15 @@ export interface PlannerApiPlannerSuggestionsSnoozeCreateRequest {
   readonly itemId: number;
 
   readonly snoozePlanItemRequest?: SnoozePlanItemRequest;
+}
+
+/**
+ * Request parameters for plannerToolsInvokeCreate operation in PlannerApi.
+ */
+export interface PlannerApiPlannerToolsInvokeCreateRequest {
+  readonly toolName: string;
+
+  readonly plannerToolInvokeRequest?: PlannerToolInvokeRequest;
 }
 
 /**
@@ -1142,6 +1391,36 @@ export class PlannerApi extends BaseAPI implements PlannerApiInterface {
   public plannerTodayRetrieve(options?: RawAxiosRequestConfig) {
     return PlannerApiFp(this.configuration)
       .plannerTodayRetrieve(options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {PlannerApiPlannerToolsInvokeCreateRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  public plannerToolsInvokeCreate(
+    requestParameters: PlannerApiPlannerToolsInvokeCreateRequest,
+    options?: RawAxiosRequestConfig,
+  ) {
+    return PlannerApiFp(this.configuration)
+      .plannerToolsInvokeCreate(
+        requestParameters.toolName,
+        requestParameters.plannerToolInvokeRequest,
+        options,
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   */
+  public plannerToolsList(options?: RawAxiosRequestConfig) {
+    return PlannerApiFp(this.configuration)
+      .plannerToolsList(options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

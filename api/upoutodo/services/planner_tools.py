@@ -12,12 +12,31 @@ class PlannerToolObjectNotFound(Exception):
     """Raised when a typed planner tool cannot access a requested object."""
 
 
+class PlannerToolNotFound(Exception):
+    """Raised when a requested planner tool is not allowlisted."""
+
+
+class PlannerToolValidationError(Exception):
+    """Raised when planner tool arguments do not match the tool schema."""
+
+    def __init__(self, errors):
+        self.errors = errors
+        super().__init__("Planner tool arguments are invalid.")
+
+
 @dataclass(frozen=True)
 class PlannerToolDefinition:
     name: str
     description: str
     input_schema: dict
     mutates_state: bool
+
+
+@dataclass(frozen=True)
+class PlannerToolInvocationResult:
+    tool_name: str
+    result_type: str
+    result: object
 
 
 @dataclass(frozen=True)
@@ -152,9 +171,128 @@ PLANNER_TOOL_DEFINITIONS = (
     ),
 )
 
+RESULT_TYPE_TODAY_PLAN = "today_plan"
+RESULT_TYPE_PLAN_ITEM = "plan_item"
+RESULT_TYPE_PLAN_FEEDBACK = "plan_feedback"
+
 
 def get_planner_tool_definitions():
     return PLANNER_TOOL_DEFINITIONS
+
+
+def invoke_planner_tool(user, tool_name, arguments=None):
+    tool_definition = get_planner_tool_definition(tool_name)
+    validated_arguments = validate_tool_arguments(
+        tool_definition, {} if arguments is None else arguments
+    )
+
+    if tool_name == "get_today_plan":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_TODAY_PLAN,
+            result=get_today_plan(user),
+        )
+    if tool_name == "submit_check_in":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_TODAY_PLAN,
+            result=submit_check_in(
+                user, PlannerCheckInInput.from_mapping(validated_arguments)
+            ),
+        )
+    if tool_name == "rebuild_today_plan":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_TODAY_PLAN,
+            result=rebuild_today_plan(user),
+        )
+    if tool_name == "accept_suggestion":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_PLAN_ITEM,
+            result=accept_suggestion(user, validated_arguments["suggestion_id"]),
+        )
+    if tool_name == "snooze_suggestion":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_PLAN_ITEM,
+            result=snooze_suggestion(
+                user,
+                validated_arguments["suggestion_id"],
+                validated_arguments["minutes"],
+            ),
+        )
+    if tool_name == "dismiss_suggestion":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_PLAN_ITEM,
+            result=dismiss_suggestion(user, validated_arguments["suggestion_id"]),
+        )
+    if tool_name == "submit_plan_feedback":
+        return PlannerToolInvocationResult(
+            tool_name=tool_name,
+            result_type=RESULT_TYPE_PLAN_FEEDBACK,
+            result=submit_plan_feedback(
+                user, PlannerFeedbackInput.from_mapping(validated_arguments)
+            ),
+        )
+
+    raise PlannerToolNotFound(f"Planner tool '{tool_name}' is not available.")
+
+
+def get_planner_tool_definition(tool_name):
+    for definition in PLANNER_TOOL_DEFINITIONS:
+        if definition.name == tool_name:
+            return definition
+    raise PlannerToolNotFound(f"Planner tool '{tool_name}' is not available.")
+
+
+def validate_tool_arguments(tool_definition, arguments):
+    if not isinstance(arguments, dict):
+        raise PlannerToolValidationError({"arguments": "Must be an object."})
+
+    schema = tool_definition.input_schema
+    properties = schema.get("properties", {})
+    required_fields = set(schema.get("required", []))
+    errors = {}
+
+    for field in required_fields:
+        if field not in arguments:
+            errors[field] = "This argument is required."
+
+    for field, value in arguments.items():
+        if field not in properties:
+            errors[field] = "Unknown argument."
+            continue
+        field_error = validate_tool_argument(field, value, properties[field])
+        if field_error:
+            errors[field] = field_error
+
+    if errors:
+        raise PlannerToolValidationError(errors)
+
+    return arguments
+
+
+def validate_tool_argument(field, value, schema):
+    expected_type = schema.get("type")
+    if expected_type == "string" and not isinstance(value, str):
+        return "Must be a string."
+    if expected_type == "integer" and (
+        not isinstance(value, int) or isinstance(value, bool)
+    ):
+        return "Must be an integer."
+
+    if "enum" in schema and value not in schema["enum"]:
+        return f"Must be one of: {', '.join(schema['enum'])}."
+    if "minimum" in schema and value < schema["minimum"]:
+        return f"Must be greater than or equal to {schema['minimum']}."
+    if "maximum" in schema and value > schema["maximum"]:
+        return f"Must be less than or equal to {schema['maximum']}."
+    if "maxLength" in schema and len(value) > schema["maxLength"]:
+        return f"Must be {schema['maxLength']} characters or fewer."
+
+    return None
 
 
 def get_today_plan(user):

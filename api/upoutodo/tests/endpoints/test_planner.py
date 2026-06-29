@@ -554,6 +554,128 @@ def test_planner_evaluation_returns_anonymized_aggregate_metrics(admin_client):
 
 
 @pytest.mark.django_db
+def test_planner_tools_list_exposes_typed_tool_catalog(auth_client):
+    response = auth_client.get("/api/planner/tools/", format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    tool_names = [tool["name"] for tool in response.data]
+    assert tool_names == [
+        "get_today_plan",
+        "submit_check_in",
+        "rebuild_today_plan",
+        "accept_suggestion",
+        "snooze_suggestion",
+        "dismiss_suggestion",
+        "submit_plan_feedback",
+    ]
+    accept_tool = next(
+        tool for tool in response.data if tool["name"] == "accept_suggestion"
+    )
+    assert accept_tool["mutates_state"] is True
+    assert accept_tool["input_schema"] == {
+        "type": "object",
+        "properties": {"suggestion_id": {"type": "integer"}},
+        "required": ["suggestion_id"],
+    }
+
+
+@pytest.mark.django_db
+def test_planner_tool_invoke_get_today_plan_returns_serialized_result(
+    auth_client, section
+):
+    TaskFactory(
+        section=section,
+        title="Tool-visible task",
+        due_date=timezone.now(),
+        priority=Task.Priority.HIGH,
+    )
+
+    response = auth_client.post(
+        "/api/planner/tools/get_today_plan/invoke/",
+        {"arguments": {}},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["tool_name"] == "get_today_plan"
+    assert response.data["result_type"] == "today_plan"
+    assert response.data["result"]["suggestions"][0]["task"]["title"] == (
+        "Tool-visible task"
+    )
+    assert response.data["result"]["ui_schema"]["allowed_actions"] == [
+        "accept",
+        "snooze",
+        "dismiss",
+    ]
+
+
+@pytest.mark.django_db
+def test_planner_tool_invoke_mutates_through_allowlisted_operation(
+    auth_client, section
+):
+    TaskFactory(section=section, title="Accept through tool", due_date=timezone.now())
+    today_response = auth_client.get("/api/planner/today/", format="json")
+    item_id = today_response.data["suggestions"][0]["id"]
+
+    response = auth_client.post(
+        "/api/planner/tools/accept_suggestion/invoke/",
+        {"arguments": {"suggestion_id": item_id}},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["tool_name"] == "accept_suggestion"
+    assert response.data["result_type"] == "plan_item"
+    assert response.data["result"]["status"] == PlanItem.Status.ACCEPTED
+    assert response.data["result"]["accepted_at"] is not None
+
+
+@pytest.mark.django_db
+def test_planner_tool_invoke_rejects_unavailable_and_invalid_calls(
+    auth_client, section
+):
+    response = auth_client.post(
+        "/api/planner/tools/raw_sql/invoke/",
+        {"arguments": {"query": "select * from tasks"}},
+        format="json",
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    missing_argument_response = auth_client.post(
+        "/api/planner/tools/accept_suggestion/invoke/",
+        {"arguments": {}},
+        format="json",
+    )
+    assert missing_argument_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert missing_argument_response.data["arguments"]["suggestion_id"] == (
+        "This argument is required."
+    )
+
+    invalid_argument_response = auth_client.post(
+        "/api/planner/tools/get_today_plan/invoke/",
+        {"arguments": []},
+        format="json",
+    )
+    assert invalid_argument_response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "arguments" in invalid_argument_response.data
+
+    other_user = UserFactory()
+    other_project = ProjectFactory(created_by=other_user, updated_by=other_user)
+    foreign_task = TaskFactory(
+        section=other_project.sections.first(),
+        due_date=timezone.now(),
+    )
+    foreign_plan, _ = create_plan_for_user(other_user, timezone.localdate())
+    foreign_item = PlanItem.objects.create(plan=foreign_plan, task=foreign_task)
+    foreign_response = auth_client.post(
+        "/api/planner/tools/accept_suggestion/invoke/",
+        {"arguments": {"suggestion_id": foreign_item.id}},
+        format="json",
+    )
+    assert foreign_response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
 def test_planner_requires_authentication(api_client):
     response = api_client.get("/api/planner/today/", format="json")
 
@@ -603,6 +725,24 @@ def test_openapi_schema_documents_planner_contract(auth_client):
         ]["schema"]["$ref"]
         == "#/components/schemas/PlannerEvaluationSummary"
     )
+    assert (
+        planner_paths["/api/planner/tools/"]["get"]["responses"]["200"]["content"][
+            "application/json"
+        ]["schema"]["items"]["$ref"]
+        == "#/components/schemas/PlannerToolDefinition"
+    )
+    assert (
+        planner_paths["/api/planner/tools/{tool_name}/invoke/"]["post"]["requestBody"][
+            "content"
+        ]["application/json"]["schema"]["$ref"]
+        == "#/components/schemas/PlannerToolInvokeRequest"
+    )
+    assert (
+        planner_paths["/api/planner/tools/{tool_name}/invoke/"]["post"]["responses"][
+            "200"
+        ]["content"]["application/json"]["schema"]["$ref"]
+        == "#/components/schemas/PlannerToolInvocationResult"
+    )
     e2e_scheme = schema["components"]["securitySchemes"]["E2ETestBearer"]
     assert e2e_scheme["type"] == "http"
     assert e2e_scheme["scheme"] == "bearer"
@@ -627,6 +767,16 @@ def test_openapi_schema_documents_planner_contract(auth_client):
     ]
     assert ui_schema_properties["mode"]["$ref"] == ("#/components/schemas/ModeEnum")
     assert ui_schema_properties["suggestion_ids"]["type"] == "array"
+    tool_definition_properties = schema["components"]["schemas"][
+        "PlannerToolDefinition"
+    ]["properties"]
+    assert tool_definition_properties["input_schema"]["type"] == "object"
+    invocation_properties = schema["components"]["schemas"][
+        "PlannerToolInvocationResult"
+    ]["properties"]
+    assert invocation_properties["result_type"]["$ref"] == (
+        "#/components/schemas/ResultTypeEnum"
+    )
     evaluation_properties = schema["components"]["schemas"]["PlannerEvaluationSummary"][
         "properties"
     ]

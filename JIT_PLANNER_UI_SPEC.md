@@ -544,6 +544,16 @@ future chat, MCP-style, or generative UI controllers: it exposes named
 operations with structured input definitions while preserving backend ownership,
 permissions, and validation boundaries.
 
+The tool layer is exposed through an authenticated HTTP contract:
+
+- `GET /api/planner/tools/` returns the allowlisted tool catalog.
+- `POST /api/planner/tools/{tool_name}/invoke/` invokes one allowlisted tool
+  with structured `arguments`.
+
+Tool invocation responses use an envelope with `tool_name`, `result_type`, and
+`result`. The `result` payload is the same serialized planner shape used by the
+REST API, such as `TodayPlan`, `PlanItem`, or `TodayPlanFeedback`.
+
 ## Safety Rules
 
 - The assistant may suggest UI, but React renders only registered components.
@@ -605,6 +615,9 @@ The current implementation supports the first JIT planner UI slice:
 - The planner API exposes typed endpoints for check-ins and suggestion actions.
 - `upoutodo.services.planner_tools` exposes the same planner actions as
   backend-facing typed operations for future chat or MCP-style integrations.
+- `GET /api/planner/tools/` and
+  `POST /api/planner/tools/{tool_name}/invoke/` expose a narrow authenticated
+  tool catalog and invocation contract.
 - Planner suggestion responses include structured task signals for due status,
   priority, effort, recurrence, project/section, score, and snooze/dismiss
   history.
@@ -645,8 +658,8 @@ Next implementation steps:
 1. Use the paper-facing evaluation method to run a small walkthrough with the
    target participant group or a seeded demo task set.
 2. Keep the OpenAPI planner contract test updated as planner operations evolve.
-3. Prototype chat or MCP-style calls against `planner_tools` before adding
-   Google Calendar sync.
+3. Build a small planner assistant demo panel that calls the tool invocation
+   endpoint before adding Google Calendar sync.
 
 ## Open Questions
 

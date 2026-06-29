@@ -2,6 +2,7 @@ from django.http import Http404
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from upoutodo.permissions import IsAdmin
@@ -9,6 +10,9 @@ from upoutodo.serializers.planner import (
     EnergyCheckInSerializer,
     PlanItemSerializer,
     PlannerEvaluationSummarySerializer,
+    PlannerToolDefinitionSerializer,
+    PlannerToolInvocationResultSerializer,
+    PlannerToolInvokeSerializer,
     SnoozePlanItemSerializer,
     TodayPlanFeedbackSerializer,
     TodayPlanSerializer,
@@ -18,7 +22,9 @@ from upoutodo.services.planner import get_planner_evaluation_summary
 from upoutodo.services.planner_tools import (
     PlannerCheckInInput,
     PlannerFeedbackInput,
+    PlannerToolNotFound,
     PlannerToolObjectNotFound,
+    PlannerToolValidationError,
 )
 
 
@@ -88,6 +94,52 @@ class PlannerViewSet(viewsets.ViewSet):
             get_planner_evaluation_summary()
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(responses=PlannerToolDefinitionSerializer(many=True))
+    @action(detail=False, methods=["get"], url_path="tools")
+    def tools(self, request):
+        serializer = PlannerToolDefinitionSerializer(
+            planner_tools.get_planner_tool_definitions(),
+            many=True,
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("tool_name", OpenApiTypes.STR, OpenApiParameter.PATH)
+        ],
+        request=PlannerToolInvokeSerializer,
+        responses=PlannerToolInvocationResultSerializer,
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path=r"tools/(?P<tool_name>[^/.]+)/invoke",
+    )
+    def invoke_tool(self, request, tool_name=None):
+        serializer = PlannerToolInvokeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            invocation = planner_tools.invoke_planner_tool(
+                request.user,
+                tool_name,
+                serializer.validated_data["arguments"],
+            )
+        except PlannerToolNotFound as exc:
+            raise Http404 from exc
+        except PlannerToolObjectNotFound as exc:
+            raise Http404 from exc
+        except PlannerToolValidationError as exc:
+            raise ValidationError({"arguments": exc.errors}) from exc
+
+        output_serializer = PlannerToolInvocationResultSerializer(
+            {
+                "tool_name": invocation.tool_name,
+                "result_type": invocation.result_type,
+                "result": self.serialize_tool_result(invocation),
+            }
+        )
+        return Response(output_serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         parameters=[
@@ -160,3 +212,18 @@ class PlannerViewSet(viewsets.ViewSet):
             return tool(user, item_id, *args)
         except PlannerToolObjectNotFound as exc:
             raise Http404 from exc
+
+    def serialize_tool_result(self, invocation):
+        if invocation.result_type == planner_tools.RESULT_TYPE_TODAY_PLAN:
+            return TodayPlanSerializer(
+                invocation.result,
+                context=self.get_serializer_context(),
+            ).data
+        if invocation.result_type == planner_tools.RESULT_TYPE_PLAN_ITEM:
+            return PlanItemSerializer(
+                invocation.result,
+                context=self.get_serializer_context(),
+            ).data
+        if invocation.result_type == planner_tools.RESULT_TYPE_PLAN_FEEDBACK:
+            return TodayPlanFeedbackSerializer(invocation.result).data
+        raise Http404

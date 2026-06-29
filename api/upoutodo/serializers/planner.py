@@ -225,6 +225,30 @@ class PlannerEvaluationSummarySerializer(serializers.Serializer):
     suggestion_action_rates = PlannerSuggestionActionRatesSerializer()
 
 
+class PlannerToolDefinitionSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+    input_schema = serializers.DictField()
+    mutates_state = serializers.BooleanField()
+
+
+class PlannerToolInvokeSerializer(serializers.Serializer):
+    arguments = serializers.DictField(required=False, default=dict)
+
+    def validate_arguments(self, value):
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Arguments must be an object.")
+        return value
+
+
+class PlannerToolInvocationResultSerializer(serializers.Serializer):
+    tool_name = serializers.CharField()
+    result_type = serializers.ChoiceField(
+        choices=["today_plan", "plan_item", "plan_feedback"]
+    )
+    result = serializers.DictField()
+
+
 class SnoozePlanItemSerializer(serializers.Serializer):
     minutes = serializers.IntegerField(default=60, min_value=1, max_value=10080)
 

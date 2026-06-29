@@ -1925,3 +1925,63 @@ Real-backend planner evaluation e2e: 2 passed
 - The implementation preserves the project rule that an assistant should call
   typed planner operations only, never raw SQL, ORM queries, or unrestricted
   database mutations.
+
+## 2026-06-29: Planner Tool Invocation API
+
+### Goal
+
+Expose the planner tool layer through a small authenticated HTTP contract so a
+future chat, MCP-style server, or generative UI controller can discover and call
+allowlisted planner operations without raw database access.
+
+### Codex-Assisted Actions
+
+- Added `GET /api/planner/tools/` to return the available planner tool
+  definitions, including names, descriptions, structured input schemas, and
+  mutation flags.
+- Added `POST /api/planner/tools/{tool_name}/invoke/` to invoke only allowlisted
+  planner tools through structured `arguments`.
+- Added strict service-side argument validation for required fields, unknown
+  arguments, primitive types, enums, numeric bounds, and string length.
+- Returned invocation envelopes with `tool_name`, `result_type`, and a
+  serialized planner result.
+- Added endpoint tests for catalog discovery, read invocation, mutation
+  invocation, unavailable tools, invalid arguments, foreign suggestion IDs, and
+  OpenAPI path/schema coverage.
+- Regenerated the frontend TypeScript API client from the updated OpenAPI
+  schema.
+
+### Verification
+
+```text
+api: DEBUG=True uv run ruff check upoutodo/services/planner_tools.py upoutodo/serializers/planner.py upoutodo/views/planner.py upoutodo/tests/services/test_planner_tools.py upoutodo/tests/endpoints/test_planner.py
+api: DEBUG=True uv run ruff format --check upoutodo/services/planner_tools.py upoutodo/serializers/planner.py upoutodo/views/planner.py upoutodo/tests/services/test_planner_tools.py upoutodo/tests/endpoints/test_planner.py
+api: DEBUG=True uv run pytest --no-cov upoutodo/tests/services/test_planner_tools.py upoutodo/tests/endpoints/test_planner.py
+api: DEBUG=True uv run python manage.py spectacular --file /private/tmp/upoutodo-schema.yaml
+ui: npx prettier --check src/generated-api-client
+ui: npm run lint
+ui: npm run build
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+repo: git diff --check
+```
+
+Observed result:
+
+```text
+Backend ruff: passed
+Backend ruff-format check: passed
+Planner tool and endpoint tests: 29 passed
+OpenAPI schema generation: passed with no warnings or errors
+Generated client prettier check: passed
+Frontend lint: passed
+Frontend build: passed
+Real-backend planner evaluation e2e: 2 passed
+```
+
+### Study Notes
+
+- This makes the capstone architecture demonstrable: the assistant-facing
+  surface is now discoverable and invokable through typed operations.
+- The API still preserves the project safety claim. Tool names are allowlisted,
+  arguments are structured and validated, and planner object lookup remains
+  scoped to the authenticated user.
