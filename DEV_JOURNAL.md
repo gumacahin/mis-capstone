@@ -2335,3 +2335,44 @@ repo: git diff --check
   unless the final paper adds outside background sources.
 - The remaining citation task is to convert the working reference if the course
   requires a style other than APA.
+
+## 2026-06-29: Code/Product Readiness Pass
+
+### Goal
+
+Verify whether the current planner-first implementation is ready to freeze as
+the capstone MVP before shifting focus to screenshots, walkthrough evidence,
+and final paper polish.
+
+### Codex-Assisted Actions
+
+- Ran backend lint and the full backend test suite.
+- Ran frontend lint, production build, and unit tests.
+- Ran the mocked `/today` Playwright regression suite.
+- Ran the fixture-backed planner evaluation demo.
+- Ran the real-backend planner demo against Django, Vite, database
+  persistence, typed planner endpoints, suggestion actions, and feedback.
+- Updated `CAPSTONE_REHEARSAL_NOTES.md` and `FREEZE_NOTES.md` with the latest
+  code-readiness baseline.
+
+### Verification
+
+```text
+api: DEBUG=True uv run ruff check . -> passed
+api: DEBUG=True uv run pytest --no-cov -> 255 passed, 2 warnings
+ui: npm run lint -> passed
+ui: npm run build -> passed with known large-bundle warning
+ui: npm run test:run -> 53 files passed, 6 skipped; 183 tests passed, 34 skipped
+ui: today-page Playwright e2e -> 10 passed
+ui: planner evaluation demo e2e -> 2 passed
+ui: real-backend planner demo -> 2 passed
+repo: git diff --check
+```
+
+### Study Notes
+
+- The code is now a freeze candidate for the current planner-first MVP.
+- Automated checks remain implementation/demo-readiness evidence, not
+  participant evaluation evidence.
+- New code should be limited to defects, `/today` demo polish, accessibility or
+  readability fixes, or issues discovered during adviser/pilot walkthroughs.

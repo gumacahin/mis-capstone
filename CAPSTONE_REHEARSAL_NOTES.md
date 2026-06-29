@@ -280,3 +280,93 @@ sync is complete.
 
 It remains implementation/demo evidence. Participant walkthroughs or adviser
 feedback should still be recorded separately from automated verification.
+
+## 2026-06-29: Code/Product Readiness Pass
+
+### Purpose
+
+Verify whether the current implementation is close enough to freeze as the
+capstone MVP before shifting attention to screenshots, walkthrough evidence,
+and final paper polish.
+
+This pass intentionally checked the implemented `/today` planner path rather
+than adding new generic task-management features.
+
+### Commands
+
+Run from `api/`:
+
+```text
+DEBUG=True uv run ruff check .
+DEBUG=True uv run pytest --no-cov
+```
+
+Run from `ui/` with Node 22 active:
+
+```text
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run lint
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run build
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run test:run
+CI=1 PLAYWRIGHT_PORT=3112 PORT=3112 PLAYWRIGHT_BASE_URL=http://localhost:3112 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/today-page.spec.ts --project=chromium
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run test:e2e:planner-demo
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run test:e2e:planner-real
+```
+
+### Result
+
+```text
+Backend ruff: passed
+Backend tests: 255 passed, 2 warnings
+Frontend lint: passed
+Frontend build: passed with known large-bundle warning
+Frontend unit tests: 53 files passed, 6 skipped; 183 tests passed, 34 skipped
+Today page e2e: 10 passed
+Planner evaluation demo e2e: 2 passed
+Real-backend planner demo: 2 passed
+```
+
+### Verified Behavior
+
+- `/today` still loads the planner-first surface.
+- The mocked `/today` suite still covers planner loading, check-in, low-energy
+  mode, limited-time mode, overdue triage, suggestion reasons, suggestion
+  actions, unavailable/empty states, feedback, and assistant behavior.
+- The fixture-backed evaluation demo still exercises the guided planner
+  walkthrough.
+- The real-backend demo still exercises Django, Vite, database persistence,
+  typed planner endpoints, suggestion action state, and feedback submission.
+- The real-backend run fetched `/api/schema/` successfully.
+
+### Local Artifacts
+
+The real-backend run produced a privacy-safe local screenshot artifact at:
+
+```text
+ui/test-results/e2e-planner-evaluation-rea-b9d05-through-flow-against-Django-chromium/planner-evaluation-real-backend.png
+```
+
+The `ui/test-results/` directory is ignored by Git, so the screenshot remains a
+local run artifact unless it is intentionally copied into a paper appendix or
+submission package later.
+
+### Observed Non-Blocking Issues
+
+- `uv run ruff check .` needed local cache access outside the sandbox because
+  the sandbox blocked `~/.cache/uv`.
+- Playwright needed local server access outside the sandbox because Vite and
+  Django bind localhost ports.
+- Backend tests still report two `drf_spectacular` deprecation warnings.
+- Frontend unit tests still emit existing console warnings from Auth0 test
+  stubs, expected error-path logging, React Router future flags, and an
+  existing `act(...)` warning in time-option tests.
+- Frontend build still reports the existing large-bundle warning.
+
+### Rehearsal Interpretation
+
+The implementation is code-freeze candidate for the current capstone MVP. The
+planner-first product path is passing backend, frontend, mocked browser, and
+real-backend browser checks.
+
+This does not mean final submission is complete. Remaining work is evidence and
+paper readiness: privacy-safe screenshot selection, adviser or pilot
+walkthroughs if possible, final Results text, and final citation/style checks.

@@ -92,6 +92,32 @@ Today E2E result:
 3 passed
 ```
 
+## 2026-06-29 Readiness Update
+
+The planner-first MVP is now a code-freeze candidate. A full readiness pass
+after the planner assistant, paper-support artifacts, and citation work produced
+the following results:
+
+```text
+api: DEBUG=True uv run ruff check . -> passed
+api: DEBUG=True uv run pytest --no-cov -> 255 passed, 2 warnings
+ui: npm run lint -> passed
+ui: npm run build -> passed with known large-bundle warning
+ui: npm run test:run -> 53 files passed, 6 skipped; 183 tests passed, 34 skipped
+ui: today-page Playwright e2e -> 10 passed
+ui: planner evaluation demo e2e -> 2 passed
+ui: real-backend planner demo -> 2 passed
+```
+
+The current implementation should be frozen against new generic todo features.
+Further code changes should be limited to defects found during demo rehearsal,
+accessibility/readability fixes for `/today`, or issues discovered during
+adviser/pilot walkthroughs.
+
+This code-readiness update does not complete the capstone submission. Remaining
+work is evidence and packaging: final screenshot selection, walkthrough results,
+Results section updates, and final citation/style checks.
+
 ## Known Remaining Debt
 
 - Frontend co-located unit tests still have old type debt and are excluded from
