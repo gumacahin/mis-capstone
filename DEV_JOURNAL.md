@@ -2042,3 +2042,54 @@ Planner evaluation demo e2e: 2 passed
   system of record and validator.
 - A future chat interface should call this same typed contract rather than
   inventing database mutations or writing directly to task storage.
+
+## 2026-06-29: Planner Assistant Demo Hardening
+
+### Goal
+
+Refresh the defense materials and verification baseline after adding the
+planner assistant typed-tool demo panel.
+
+### Codex-Assisted Actions
+
+- Updated `CAPSTONE_DEFENSE_DEMO_SCRIPT.md` so the live `/today` walkthrough
+  explicitly shows the planner assistant panel.
+- Added speaker notes that distinguish the deterministic assistant demo from a
+  future full chat interface.
+- Updated the demo evidence checklist and short defense flow to include typed
+  tool invocation.
+- Added a new rehearsal entry in `CAPSTONE_REHEARSAL_NOTES.md` with the latest
+  backend, frontend, fixture-backed, and real-backend verification results.
+
+### Verification
+
+```text
+api: uv run ruff check upoutodo
+api: DEBUG=True uv run pytest --no-cov
+ui: npm run build
+ui: npm run lint
+ui: playwright test tests/e2e/today-page.spec.ts --project=chromium
+ui: playwright test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+ui: playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+```
+
+Observed result:
+
+```text
+Backend ruff: passed
+Backend tests: 255 passed, 2 warnings
+Frontend build: passed
+Frontend lint: passed
+Today page e2e: 10 passed
+Planner evaluation demo e2e: 2 passed
+Real-backend planner demo: 2 passed
+```
+
+### Study Notes
+
+- This makes the capstone demo stronger because it can now show the exact
+  bridge from controlled Gen UI to typed assistant operations.
+- The assistant panel should still be described as a deterministic demo surface,
+  not as completed conversational AI.
+- Automated Playwright runs remain demo-readiness evidence. They do not replace
+  participant or adviser evaluation evidence.

@@ -205,3 +205,78 @@ state changes still go through typed backend operations.
 
 It remains implementation/demo evidence. Participant evaluation must still be
 reported separately.
+
+## 2026-06-29: Planner Assistant Demo Rehearsal
+
+### Purpose
+
+Verify that the defense demo path still works after adding the `/today` planner
+assistant panel that discovers and invokes typed planner tools.
+
+This rehearsal specifically checks that the assistant panel remains a
+deterministic typed-operation demo, not an unrestricted chat or raw database
+interface.
+
+### Commands
+
+Run from `api/`:
+
+```text
+uv run ruff check upoutodo
+DEBUG=True uv run pytest --no-cov
+```
+
+Run from `ui/` with Node 22 active:
+
+```text
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run build
+PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH npm run lint
+CI=1 PLAYWRIGHT_PORT=3110 PORT=3110 PLAYWRIGHT_BASE_URL=http://localhost:3110 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/today-page.spec.ts --project=chromium
+CI=1 PLAYWRIGHT_PORT=3104 PORT=3104 PLAYWRIGHT_BASE_URL=http://localhost:3104 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium
+E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3106 PORT=3106 PLAYWRIGHT_BACKEND_PORT=8001 PLAYWRIGHT_BASE_URL=http://localhost:3106 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium
+```
+
+### Result
+
+```text
+Backend ruff: passed
+Backend tests: 255 passed, 2 warnings
+Frontend build: passed
+Frontend lint: passed
+Today page e2e: 10 passed
+Planner evaluation demo e2e: 2 passed
+Real-backend planner demo: 2 passed
+```
+
+### Verified Behavior
+
+- `/today` still loads the planner-first surface.
+- The planner assistant discovers the typed tool catalog.
+- The planner assistant invokes canned typed operations and shows the returned
+  `tool` and `result_type`.
+- Low-energy, limited-time, suggestion reason, suggestion action, empty-state,
+  unavailable-state, feedback, and assistant flows pass in Playwright.
+- The fixture-backed evaluation demo still exercises the walkthrough flow.
+- The real-backend demo still passes against Django, Vite, database
+  persistence, typed planner endpoints, and planner feedback submission.
+
+### Observed Non-Blocking Issues
+
+- The first backend verification attempt failed under the sandbox because `uv`
+  could not read its cache under `~/.cache/uv`; rerunning with local cache
+  access fixed the environment issue.
+- Running multiple Playwright dev servers concurrently produced pre-content
+  shell timeouts in the fixture-backed specs. Sequential reruns on isolated
+  ports passed.
+- The backend test suite reported two `drf_spectacular` deprecation warnings.
+- The frontend build still reports the existing large bundle warning.
+
+### Rehearsal Interpretation
+
+This is the current demo-readiness baseline after adding the planner assistant
+panel. The defense can now show the safe bridge from just-in-time planner UI to
+typed assistant operations without claiming that full chat or Google Calendar
+sync is complete.
+
+It remains implementation/demo evidence. Participant walkthroughs or adviser
+feedback should still be recorded separately from automated verification.

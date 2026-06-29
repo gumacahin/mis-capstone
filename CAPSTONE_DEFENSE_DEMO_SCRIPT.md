@@ -282,7 +282,37 @@ that accepted, snoozed, and dismissed suggestions are being captured as planner
 signals, not as generic todo edits.
 ```
 
-### 3.6 Submit Feedback
+### 3.6 Show The Planner Assistant
+
+Show the `Planner assistant` panel.
+
+Point out:
+
+- the typed tool catalog chip
+- the named planner tools listed as chips
+- `Show current plan`
+- `Refresh plan`
+- `Use low-energy mode`
+- the returned `tool` and `result_type` after an action runs
+
+Say:
+
+```text
+This is not a full chat interface yet. It is the safe bridge toward chat,
+voice, MCP, or generative UI control. The assistant can discover and call
+allowlisted planner tools, but it cannot issue raw SQL, edit arbitrary JSON, or
+invent backend operations.
+```
+
+Then say:
+
+```text
+This demonstrates what I mean by typed operations. The operation name,
+arguments, validation, permissions, and result shape are all constrained by the
+Django backend.
+```
+
+### 3.7 Submit Feedback
 
 Submit:
 
@@ -429,7 +459,8 @@ and task signals.
 
 Chat without typed operations would be risky and hard to evaluate. The current
 planner endpoints create the safe action layer that future chat, MCP, or voice
-interfaces can call.
+interfaces can call. The current planner assistant panel demonstrates that
+bridge with deterministic buttons before adding free-form natural language.
 
 ### How will success be measured?
 
@@ -469,6 +500,8 @@ Before a defense or recording, confirm that at least one of these is available:
 
 - latest `npm run test:e2e:planner-real` result
 - latest `npm run test:e2e:planner-demo` result
+- latest `/today` Playwright result showing the planner assistant typed-tool
+  invocation
 - screenshot from `ui/test-results/`
 - seeded demo account
 - traceability matrix
@@ -477,10 +510,12 @@ Before a defense or recording, confirm that at least one of these is available:
 
 ## Short Version
 
-If time is limited, use this four-part flow:
+If time is limited, use this five-part flow:
 
 1. Show `SRS_TRACEABILITY_MATRIX.md`: the SRS baseline is preserved.
 2. Show `/today`: the planner asks for energy/time and recommends tasks.
 3. Show a reason panel: suggestions are explainable and grounded in task data.
-4. Show feedback/evaluation: success is measured through helpfulness,
+4. Show the planner assistant: typed tools are discoverable and invokable
+   without raw database access.
+5. Show feedback/evaluation: success is measured through helpfulness,
    confidence, action rates, and privacy-preserving aggregate metrics.
