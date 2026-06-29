@@ -8,6 +8,8 @@ material.
 
 The first assembled draft is in `CAPSTONE_PAPER_DRAFT.md`.
 
+The first paper-quality review is in `CAPSTONE_PAPER_REVIEW.md`.
+
 Use this file to draft the paper without overclaiming. The project argument is
 planner-first decision support for UPOU faculty and staff, not a claim that the
 prototype is a complete commercial productivity platform.

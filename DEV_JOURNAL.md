@@ -2238,3 +2238,36 @@ repo: git diff --check
 - This draft is now the main paper editing surface.
 - The Results section must be updated only from `CAPSTONE_EVALUATION_RESULTS.md`
   after a real adviser, pilot, or participant walkthrough is recorded.
+
+## 2026-06-29: Paper Draft Review Pass
+
+### Goal
+
+Review the first paper draft against the outline and paper-supporting artifacts,
+then patch high-value issues without inventing results.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_PAPER_REVIEW.md`.
+- Recorded findings for pending results, citation placeholders, missing visual
+  aids, evidence snapshot handling, implementation-section focus, and title
+  length.
+- Updated `CAPSTONE_PAPER_DRAFT.md` with citation placeholders, a References
+  section, architecture and planner-flow figure placeholders, an SRS mapping
+  table placeholder, a `/today` screenshot placeholder, and a reminder to copy
+  the final verification snapshot from `CAPSTONE_REHEARSAL_NOTES.md`.
+- Linked the review from `CAPSTONE_PAPER_OUTLINE.md` and `CAPSTONE_NOTES.md`.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_REVIEW.md ../CAPSTONE_PAPER_OUTLINE.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- The draft remains honest about missing adviser, pilot, or participant
+  results.
+- The next paper task is citation formatting and visuals, or recording a real
+  walkthrough result.

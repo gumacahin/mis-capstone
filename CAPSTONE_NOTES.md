@@ -72,6 +72,9 @@ The final paper assembly outline is captured in `CAPSTONE_PAPER_OUTLINE.md`.
 
 The first assembled paper draft is captured in `CAPSTONE_PAPER_DRAFT.md`.
 
+The paper review checklist and findings are captured in
+`CAPSTONE_PAPER_REVIEW.md`.
+
 ## Typed Operations
 
 In this project, **typed** means that the application exposes a small set of

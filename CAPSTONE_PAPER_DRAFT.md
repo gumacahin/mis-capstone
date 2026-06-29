@@ -7,16 +7,16 @@ software requirements specification (SRS), a web-based task-management and
 productivity-tracking system for the University of the Philippines Open
 University (UPOU) community. The implementation preserves task management as a
 system of record, then focuses the capstone contribution on the daily planning
-question raised by Crisanto's study: "What should I do today?" The prototype
-uses task data, due dates, priority, recurrence, energy level, available time,
-focus mode, suggestion reasons, and user feedback to generate an explainable
-daily planning surface. The project treats generative UI as controlled
-just-in-time UI: the system selects from registered React planner components and
-calls typed Django backend operations, rather than generating arbitrary
-frontend code or giving an assistant raw database access. Evaluation is designed
-as a walkthrough with UPOU faculty and staff, measuring helpfulness,
-confidence, explanation quality, suggestion actions, and privacy-preserving
-aggregate evidence.
+question raised by Crisanto's study: "What should I do today?" [CITATION:
+Crisanto]. The prototype uses task data, due dates, priority, recurrence,
+energy level, available time, focus mode, suggestion reasons, and user feedback
+to generate an explainable daily planning surface. The project treats
+generative UI as controlled just-in-time UI: the system selects from registered
+React planner components and calls typed Django backend operations, rather than
+generating arbitrary frontend code or giving an assistant raw database access.
+Evaluation is designed as a walkthrough with UPOU faculty and staff, measuring
+helpfulness, confidence, explanation quality, suggestion actions, and
+privacy-preserving aggregate evidence.
 
 ## 1. Introduction
 
@@ -53,10 +53,10 @@ Crisanto's study, `"What should I do today?" A Case Study on the Current
 Practices and Software Requirements Specification of a Web-Based Planner and
 Productivity Tracker`, provides the requirements grounding for this capstone.
 The source study focused on UPOU employees, including faculty, research
-assistants, and staff. That scope matters because the current prototype should
-be validated primarily against faculty and staff planning needs. Student use
-cases may be adjacent or future work, but they are not the primary validated
-scope for this version.
+assistants, and staff [CITATION: Crisanto]. That scope matters because the
+current prototype should be validated primarily against faculty and staff
+planning needs. Student use cases may be adjacent or future work, but they are
+not the primary validated scope for this version.
 
 The study title foregrounds a planning problem rather than a storage problem.
 Users may already have tools for recording tasks, calendar events, or goals,
@@ -112,6 +112,16 @@ Deferred features, such as full Google Calendar sync, group scheduling,
 motivation systems, and full chat or voice control, are treated as future work.
 They are not required to defend the planner-first MVP.
 
+Table placeholder:
+
+```text
+Table 1. SRS-to-implementation summary.
+Source: SRS_TRACEABILITY_MATRIX.md.
+Show only the most important rows: suggested tasks, personal scheduling,
+productivity report, energy tracking, Google Calendar integration, and
+voice/conversational interface.
+```
+
 ## 4. System Design
 
 The target architecture is Option 1.5:
@@ -122,6 +132,15 @@ The target architecture is Option 1.5:
 - Future chat, voice, or MCP-style interfaces call typed backend operations.
 - The assistant layer never receives raw SQL, unrestricted ORM access, or
   arbitrary database mutation rights.
+
+Figure placeholder:
+
+```text
+Figure 1. Target architecture.
+Django/DRF owns state, permissions, validation, planner services, and typed
+tools. React renders the planner-first UI and just-in-time components. A future
+chat, voice, or MCP layer calls typed planner operations only.
+```
 
 This architecture supports controlled generative UI. In this project,
 generative UI does not mean that an AI model generates arbitrary JSX, CSS, SQL,
@@ -153,6 +172,14 @@ The current just-in-time planner modes include default daily plan, low-energy
 plan, limited-time plan, overdue triage, and unavailable planner state. These
 modes allow the same task data to produce different planning surfaces depending
 on the user's current situation.
+
+Figure placeholder:
+
+```text
+Figure 2. Planner-first flow.
+Check-in -> suggestion generation -> reason inspection -> accept/snooze/dismiss
+-> feedback -> aggregate evaluation reporting.
+```
 
 ## 5. Implementation
 
@@ -200,6 +227,14 @@ refreshing the plan, or switching to low-energy mode.
 The assistant panel is not a full chat interface. It is a safe bridge toward
 future chat, MCP, or voice interfaces because it demonstrates that an assistant
 can call named backend tools without gaining raw database access.
+
+Screenshot placeholder:
+
+```text
+Figure 3. /today planner dashboard.
+Show check-in, suggested tasks, reason controls, mode highlights, feedback, and
+PlannerAssistantCard.
+```
 
 ## 6. Evaluation Method
 
@@ -254,6 +289,9 @@ Latest recorded verification evidence includes:
 - fixture-backed planner demo passing
 - real-backend planner demo passing
 - documentation formatting checks passing
+
+Before final submission, copy the exact verification snapshot from
+`CAPSTONE_REHEARSAL_NOTES.md` using the most recent completed rehearsal date.
 
 These automated checks show that the implemented planner flow works on seeded
 data and through the local backend, but they are not participant evaluation
@@ -365,3 +403,13 @@ Before this draft is submitted as the final paper:
 - Add screenshots, diagrams, or appendices only if they are required by the
   final submission format.
 - Confirm that privacy rules have removed task content and identifying details.
+
+## References
+
+[CITATION: Crisanto] Replace with the course-required citation format for:
+
+```text
+Crisanto, "What should I do today?" A Case Study on the Current Practices and
+Software Requirements Specification of a Web-Based Planner and Productivity
+Tracker, IJITGEB, https://ijitgeb.org/ijitgeb/article/view/94/53
+```
