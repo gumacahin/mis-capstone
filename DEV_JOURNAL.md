@@ -2093,3 +2093,41 @@ Real-backend planner demo: 2 passed
   not as completed conversational AI.
 - Automated Playwright runs remain demo-readiness evidence. They do not replace
   participant or adviser evaluation evidence.
+
+## 2026-06-29: Evaluation Packet Preparation
+
+### Goal
+
+Prepare field-ready participant or adviser evaluation material so the project
+can collect evidence beyond automated Playwright demo runs.
+
+### Codex-Assisted Actions
+
+- Added `CAPSTONE_EVALUATION_PACKET.md`.
+- Included a moderator opening script, participant task sheet, observation
+  sheet, post-task rating form, post-task questions, privacy review checklist,
+  analysis mapping, and paper-ready evidence statement.
+- Added an explicit task for the planner assistant typed-operation panel so the
+  evaluation can capture whether that bridge is understandable.
+- Linked the packet from `CAPSTONE_EVALUATION_METHOD.md`,
+  `CAPSTONE_EVALUATION_WALKTHROUGH.md`, and `CAPSTONE_NOTES.md`.
+- Preserved the existing faculty/staff scope and the distinction between
+  participant evidence, adviser review evidence, and seeded demo evidence.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_EVALUATION_PACKET.md ../CAPSTONE_EVALUATION_METHOD.md ../CAPSTONE_EVALUATION_WALKTHROUGH.md ../CAPSTONE_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- The evaluation packet gives the paper a cleaner path from implementation to
+  formative evidence.
+- The packet should be used carefully: it is not formal ethics approval, and
+  institutional requirements still apply before treating sessions as human
+  subjects research.
+- The key evidence target is narrow and defensible: whether users can select a
+  next task, understand the reason, and report higher confidence after using
+  the planner.

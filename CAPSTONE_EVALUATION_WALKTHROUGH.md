@@ -53,7 +53,8 @@ Before the walkthrough:
 - Confirm the backend and frontend are running.
 - Confirm the seeded user can access `/today`.
 - Confirm `/today` shows planner check-in controls and suggested tasks.
-- Prepare a note-taking sheet using the template in this document.
+- Prepare a note-taking sheet using the template in this document or the
+  field-ready packet in `CAPSTONE_EVALUATION_PACKET.md`.
 - Remind yourself not to record private task titles, email addresses, or user
   identifiers in evaluation notes.
 
@@ -135,9 +136,11 @@ Ask the participant to complete these tasks in order:
 8. Accept one suggestion.
 9. Snooze one suggestion if it is useful later, or dismiss one suggestion if it
    is not useful today.
-10. Submit plan feedback:
+10. Use the planner assistant panel to run one typed action, for example by
+    clicking `Show current plan`.
+11. Submit plan feedback:
     helpfulness rating, confidence rating, and optional note.
-11. State whether they would use this planner as part of their daily workflow.
+12. State whether they would use this planner as part of their daily workflow.
 
 ## Observation Checklist
 
@@ -152,6 +155,8 @@ Use these prompts:
 - Could the participant explain why a suggested task appeared?
 - Did the participant trust the suggested order?
 - Did the participant accept, snooze, or dismiss suggestions naturally?
+- Did the participant understand that the planner assistant panel calls typed
+  backend operations?
 - Did the participant's confidence appear to increase, decrease, or stay the
   same?
 - What information did the participant expect but not see?
@@ -174,6 +179,13 @@ Was the reason for the recommended task understandable?
 Did the check-in change how well the plan matched your current situation?
 What information was missing when deciding what to do next?
 Would you use this planner as part of your daily workflow? Why or why not?
+```
+
+Planner assistant follow-up:
+
+```text
+Did the planner assistant panel make the typed-operation idea clearer or more
+confusing?
 ```
 
 Optional follow-up:

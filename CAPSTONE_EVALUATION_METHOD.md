@@ -95,6 +95,11 @@ evaluation sessions.
 The step-by-step moderator protocol is captured in
 `CAPSTONE_EVALUATION_WALKTHROUGH.md`.
 
+The field-ready participant/adviser packet is captured in
+`CAPSTONE_EVALUATION_PACKET.md`. Use it when you need a task sheet, observation
+sheet, post-task rating form, and privacy review checklist for an actual
+session.
+
 ## In-App Measures
 
 The current implementation can support these quantitative measures:
@@ -187,6 +192,8 @@ The current project supports this method through:
   project or section context, score, and snooze or dismiss history
 - typed planner operations for check-in, rebuild, accept, snooze, dismiss, and
   feedback submission
+- planner assistant panel that demonstrates typed tool discovery and
+  invocation without unrestricted database access
 - admin-only aggregate planner evaluation summary
 - admin dashboard Planner Evaluation section
 - Playwright coverage for the visible `/today` planner flow
@@ -224,7 +231,6 @@ excluded from reporting to preserve privacy.
 
 ## Reference
 
-- Crisanto, `"What should I do today?" A Case Study on the Current Practices
-  and Software Requirements Specification of a Web-Based Planner and
-  Productivity Tracker`, IJITGEB:
-  https://ijitgeb.org/ijitgeb/article/view/94/53
+Crisanto, `"What should I do today?" A Case Study on the Current Practices and
+Software Requirements Specification of a Web-Based Planner and Productivity
+Tracker`, IJITGEB: https://ijitgeb.org/ijitgeb/article/view/94/53
