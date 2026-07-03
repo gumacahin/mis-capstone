@@ -370,3 +370,51 @@ real-backend browser checks.
 This does not mean final submission is complete. Remaining work is evidence and
 paper readiness: privacy-safe screenshot selection, adviser or pilot
 walkthroughs if possible, final Results text, and final citation/style checks.
+
+## 2026-06-29: Paper Screenshot Evidence Package
+
+### Purpose
+
+Create a committed, privacy-safe screenshot artifact for the paper and demo
+package without changing product code.
+
+### Command
+
+A temporary Playwright screenshot spec was used with the real-backend config,
+then deleted after the image was produced. The run used seeded demo data from
+the planner evaluation fixture:
+
+```text
+E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3114 PORT=3114 PLAYWRIGHT_BACKEND_PORT=8003 PLAYWRIGHT_BASE_URL=http://localhost:3114 PATH=/Users/marcoenrico/.nvm/versions/node/v22.11.0/bin:$PATH /Users/marcoenrico/.nvm/versions/node/v22.11.0/bin/node node_modules/@playwright/test/cli.js test --config=playwright.real-backend.config.ts tests/e2e/paper-screenshot.spec.ts --project=chromium
+```
+
+### Result
+
+```text
+Paper screenshot Playwright capture: 2 passed
+Screenshot size: 1440 x 1600
+```
+
+### Committed Artifact
+
+```text
+paper-assets/today-planner-dashboard.png
+```
+
+The screenshot shows seeded demo content only:
+
+- demo user label
+- demo project name
+- demo task titles and descriptions
+- planner check-in
+- low-energy just-in-time planner mode
+- suggestion reason details
+- typed planner assistant panel
+- feedback card
+- normal task list below the planner surface
+
+### Rehearsal Interpretation
+
+This screenshot is suitable as paper/demo evidence for the implemented
+planner-first UI. It is not participant evidence and should not be described as
+showing a real user's task data.

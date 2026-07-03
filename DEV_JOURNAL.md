@@ -2376,3 +2376,39 @@ repo: git diff --check
   participant evaluation evidence.
 - New code should be limited to defects, `/today` demo polish, accessibility or
   readability fixes, or issues discovered during adviser/pilot walkthroughs.
+
+## 2026-06-29: Paper Screenshot Evidence Package
+
+### Goal
+
+Create a privacy-safe `/today` screenshot for the paper and demo package while
+keeping product code frozen.
+
+### Codex-Assisted Actions
+
+- Used a temporary Playwright screenshot spec against the real-backend seeded
+  planner demo.
+- Captured a taller 1440 x 1600 screenshot showing the planner check-in,
+  low-energy just-in-time mode, suggestion reasons, typed planner assistant,
+  feedback card, and task list.
+- Deleted the temporary screenshot spec after capture.
+- Added `paper-assets/today-planner-dashboard.png`.
+- Embedded the screenshot in `CAPSTONE_PAPER_DRAFT.md` as Figure 3.
+- Updated `CAPSTONE_PAPER_REVIEW.md` and `CAPSTONE_REHEARSAL_NOTES.md` so the
+  screenshot task is recorded as addressed.
+
+### Verification
+
+```text
+ui: Playwright paper screenshot capture -> 2 passed
+asset: sips -g pixelWidth -g pixelHeight paper-assets/today-planner-dashboard.png -> 1440 x 1600
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_REVIEW.md ../CAPSTONE_REHEARSAL_NOTES.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- The screenshot uses seeded demo data only and should be described as
+  implementation/demo evidence, not participant evidence.
+- The remaining high-value paper task is a real adviser or pilot walkthrough
+  recorded in `CAPSTONE_EVALUATION_RESULTS.md`.

@@ -253,11 +253,12 @@ The assistant panel is not a full chat interface. It is a safe bridge toward
 future chat, MCP, or voice interfaces because it demonstrates that an assistant
 can call named backend tools without gaining raw database access.
 
-Figure 3 should be a screenshot of the `/today` planner dashboard for final
-submission. It should show the check-in, suggested tasks, reason controls, mode
-highlights, feedback card, and `PlannerAssistantCard`. The screenshot should be
-captured from seeded demo data or a privacy-safe account, not from a real
-participant account with identifying task content.
+Figure 3 shows the `/today` planner dashboard captured from seeded demo data.
+It shows the check-in, low-energy just-in-time planner mode, suggested tasks,
+reason controls, feedback card, `PlannerAssistantCard`, and the normal task
+list below the planner surface.
+
+![Figure 3. /today planner dashboard captured from seeded demo data.](paper-assets/today-planner-dashboard.png)
 
 ## 6. Evaluation Method
 
@@ -423,8 +424,8 @@ Before this draft is submitted as the final paper:
   real walkthrough exists.
 - Convert the working APA-style reference to the final course-required style if
   a different style guide is required.
-- Add screenshots, diagrams, or appendices only if they are required by the
-  final submission format.
+- Add any additional screenshots, diagrams, or appendices only if they are
+  required by the final submission format.
 - Confirm that privacy rules have removed task content and identifying details.
 
 ## References

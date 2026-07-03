@@ -47,7 +47,7 @@ a literature-review claim.
 
 ### Medium: Figures Or Tables Would Strengthen The Design And Implementation Sections
 
-Status: partially addressed in `CAPSTONE_PAPER_DRAFT.md`.
+Status: addressed in `CAPSTONE_PAPER_DRAFT.md`.
 
 The draft now includes:
 
@@ -56,10 +56,7 @@ The draft now includes:
   typed tools, and future chat/MCP layer
 - a Mermaid planner flow diagram showing check-in, suggestion generation,
   reason inspection, accept/snooze/dismiss, feedback, and aggregate reporting
-
-Remaining optional addition:
-
-- a screenshot of `/today` showing planner suggestions and the assistant panel
+- a privacy-safe `/today` screenshot captured from seeded demo data
 
 ### Medium: Evaluation Method Is Strong, But The Results Section Needs A Versioned Evidence Snapshot
 
@@ -102,10 +99,9 @@ and keep the "What should I do today?" phrase in the introduction.
 
 1. Confirm the final required citation style and convert the current APA-style
    working reference if needed.
-2. Capture or add a privacy-safe `/today` screenshot if required by the course.
-3. Add a note in the Results section that final verification numbers should be
+2. Add a note in the Results section that final verification numbers should be
    copied from `CAPSTONE_REHEARSAL_NOTES.md` at submission time.
-4. Keep `CAPSTONE_EVALUATION_RESULTS.md` as the only source for real
+3. Keep `CAPSTONE_EVALUATION_RESULTS.md` as the only source for real
    walkthrough findings.
 
 ## Remaining Before Final Submission
@@ -114,6 +110,5 @@ and keep the "What should I do today?" phrase in the introduction.
 - Record anonymized results in `CAPSTONE_EVALUATION_RESULTS.md`.
 - Replace pending Results placeholders with actual recorded evidence.
 - Confirm final citation style.
-- Add screenshots or diagrams if required by the course.
 - Check the final paper against the claims-to-avoid list in
   `CAPSTONE_ARGUMENT.md`.
