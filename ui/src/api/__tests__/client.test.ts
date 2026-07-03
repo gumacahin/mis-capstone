@@ -60,6 +60,9 @@ describe("API Client Configuration", () => {
 
     it("should handle unexpected token errors", async () => {
       const unexpectedError = new Error("Network error");
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       mockGetAccessTokenSilently.mockRejectedValue(unexpectedError);
 
       const { result } = renderHook(() => useGeneratedApiClient());
@@ -69,6 +72,11 @@ describe("API Client Configuration", () => {
 
       await expect(accessTokenFn()).rejects.toThrow("Network error");
       expect(mockLoginWithRedirect).not.toHaveBeenCalled();
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to get access token:",
+        unexpectedError,
+      );
+      consoleError.mockRestore();
     });
 
     it("should provide compatibility API, Admin, and Planner clients", () => {
@@ -142,6 +150,9 @@ describe("API Client Configuration", () => {
 
     it("should propagate authentication errors", async () => {
       const authError = new Error("Authentication failed");
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
       mockGetAccessTokenSilently.mockRejectedValue(authError);
 
       const { result } = renderHook(() => useGeneratedApiClient());
@@ -150,6 +161,11 @@ describe("API Client Configuration", () => {
         .accessToken as () => Promise<string>;
 
       await expect(accessTokenFn()).rejects.toThrow("Authentication failed");
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to get access token:",
+        authError,
+      );
+      consoleError.mockRestore();
     });
   });
 });

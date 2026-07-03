@@ -168,7 +168,7 @@ export default function TimeOptions() {
 
   return (
     <>
-      <TimeOptionsDialog open={open} onClose={() => setOpen(false)} />
+      {open && <TimeOptionsDialog open={open} onClose={() => setOpen(false)} />}
       <ListItem disablePadding>
         <ListItemButton onClick={() => setOpen(true)}>
           <ListItemIcon>

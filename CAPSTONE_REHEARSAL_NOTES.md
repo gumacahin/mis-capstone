@@ -418,3 +418,38 @@ The screenshot shows seeded demo content only:
 This screenshot is suitable as paper/demo evidence for the implemented
 planner-first UI. It is not participant evidence and should not be described as
 showing a real user's task data.
+
+## 2026-07-03: Frontend Test Noise-Reduction Verification
+
+### Purpose
+
+Reduce noisy unit-test console output and ensure targeted frontend tests remain
+stable after cleanup.
+
+### Commands
+
+Run from `ui/`:
+
+```text
+npx vitest run src/modules/tasks/components/__tests__/AddCommentForm.test.tsx --reporter=verbose
+npx vitest run src/modules/tasks/components/__tests__/AddTaskButton.test.tsx --reporter=verbose
+npx vitest run src/modules/tasks/components/__tests__/AddTaskDialog.test.tsx --reporter=verbose
+npx vitest run src/modules/tasks/components/__tests__/AddTaskForm.test.tsx --reporter=verbose
+npm run test:run -- src/api/__tests__/client.test.ts src/modules/shared/components/__tests__/NaturalLanguageInput.test.tsx src/modules/tasks/components/__tests__/AddCommentForm.test.tsx src/modules/tasks/components/__tests__/AddTaskButton.test.tsx src/modules/tasks/components/__tests__/AddTaskDialog.test.tsx src/modules/tasks/components/__tests__/AddTaskForm.test.tsx
+```
+
+### Result
+
+```text
+Targeted frontend suite: 6 files passed; 22 tests passed, 4 skipped
+```
+
+### Verified Behavior
+
+- Expected auth/token error-path logging is asserted explicitly in API client
+  tests.
+- React Router future-flag warning is filtered from global test output.
+- Task form/button/dialog/comment tests run without the previous heavy
+  mock/import instability.
+- Focused test suite completes successfully without leaving active background
+  test processes.

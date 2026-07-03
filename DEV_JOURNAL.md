@@ -2446,3 +2446,59 @@ repo: git diff --check
 - If a real walkthrough happens, record it first in
   `CAPSTONE_EVALUATION_RESULTS.md`, then replace the pending walkthrough
   placeholder in the Results section.
+
+## 2026-07-03: Frontend Test Console-Noise Cleanup
+
+### Goal
+
+Reduce low-signal frontend test output so genuine test failures are easier to
+spot during local verification and capstone rehearsal runs.
+
+### Human Decisions And Constraints
+
+- Keep the change scoped to test behavior and noise reduction.
+- Do not hide true failures; expected error-path logs should either be asserted
+  explicitly in the test or suppressed only for known benign warnings.
+- Avoid broad feature changes while in code-freeze mode.
+
+### Codex-Assisted Actions
+
+- Added a targeted warning filter in `ui/src/test/setup.ts` for the known React
+  Router future-flag warning.
+- Added explicit `console.error` spies/assertions in
+  `ui/src/api/__tests__/client.test.ts` for expected auth/token error paths.
+- Mocked `useTasksDueOn` in
+  `ui/src/modules/shared/components/__tests__/NaturalLanguageInput.test.tsx` to
+  avoid incidental query/hook noise.
+- Stabilized task-component tests by replacing heavy partial mocks with focused
+  lightweight mocks in:
+  - `ui/src/modules/tasks/components/__tests__/AddCommentForm.test.tsx`
+  - `ui/src/modules/tasks/components/__tests__/AddTaskButton.test.tsx`
+  - `ui/src/modules/tasks/components/__tests__/AddTaskDialog.test.tsx`
+  - `ui/src/modules/tasks/components/__tests__/AddTaskForm.test.tsx`
+- Simplified `AddTaskButton` test to mock `TaskForm` directly and assert open
+  behavior without mounting heavy internals.
+- Kept `TimeOptionsDialog` unmounted when closed in
+  `ui/src/modules/shared/components/TimeOptions.tsx` to reduce render-related
+  side effects in tests.
+
+### Verification
+
+```text
+ui: vitest single-file smoke runs for AddCommentForm/AddTaskButton/AddTaskDialog/AddTaskForm tests
+ui: npm run test:run -- src/api/__tests__/client.test.ts src/modules/shared/components/__tests__/NaturalLanguageInput.test.tsx src/modules/tasks/components/__tests__/AddCommentForm.test.tsx src/modules/tasks/components/__tests__/AddTaskButton.test.tsx src/modules/tasks/components/__tests__/AddTaskDialog.test.tsx src/modules/tasks/components/__tests__/AddTaskForm.test.tsx
+ui: npx eslint src/modules/tasks/components/__tests__/AddTaskDialog.test.tsx --fix
+```
+
+Observed result:
+
+```text
+Targeted frontend suite: 6 files passed; 22 tests passed, 4 skipped
+```
+
+### Study Notes
+
+- The cleanup improved signal-to-noise for frontend tests without changing the
+  planner-first product behavior.
+- One earlier Vitest run hit an OOM during heavy test setup; focused mocks and
+  scoped assertions resolved the instability for the targeted suite.

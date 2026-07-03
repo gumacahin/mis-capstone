@@ -2,9 +2,28 @@ import type { Task } from "@shared";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import AddCommentForm from "../AddCommentForm";
+
+const { mockAddComment, mockToastPromise } = vi.hoisted(() => ({
+  mockAddComment: vi.fn(),
+  mockToastPromise: vi.fn((promise: Promise<unknown>) => promise),
+}));
+
+vi.mock("@shared/hooks/queries", () => {
+  return {
+    useAddComment: () => ({
+      mutateAsync: mockAddComment,
+    }),
+  };
+});
+
+vi.mock("react-hot-toast", () => ({
+  default: {
+    promise: mockToastPromise,
+  },
+}));
 
 const mockTask: Task = {
   id: 1,
@@ -24,7 +43,24 @@ const mockTask: Task = {
   due_date: null,
 };
 
+interface MutationOptions {
+  onSettled?: () => void;
+  onSuccess?: () => void;
+}
+
 describe("AddCommentForm", () => {
+  beforeEach(() => {
+    mockAddComment.mockReset();
+    mockAddComment.mockImplementation(
+      async (_comment: unknown, options?: MutationOptions) => {
+        options?.onSuccess?.();
+        options?.onSettled?.();
+        return {};
+      },
+    );
+    mockToastPromise.mockClear();
+  });
+
   it("should render input and allow text entry, then call onSubmit with comment", async () => {
     const queryClient = new QueryClient();
 
@@ -46,6 +82,7 @@ describe("AddCommentForm", () => {
     expect(button).toBeInTheDocument();
 
     await userEvent.click(button);
+    expect(mockAddComment).toHaveBeenCalled();
   });
 
   it("should clear input after submit", async () => {

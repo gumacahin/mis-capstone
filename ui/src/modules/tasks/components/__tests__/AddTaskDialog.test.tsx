@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import React from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ProfileContextProvider } from "@/components/ProfileContextProvider";
@@ -8,6 +9,49 @@ import { ProjectSectionContextProvider } from "@/modules/projects/components/Pro
 import { Profile, ProjectDetail, Section } from "@/modules/shared";
 
 import AddTaskDialog from "../AddTaskDialog";
+
+const { mockAddTask } = vi.hoisted(() => ({
+  mockAddTask: vi.fn(),
+}));
+
+vi.mock("@shared/components/DatePicker", () => ({
+  default: () => <div data-testid="date-picker" />,
+}));
+
+vi.mock("../DescriptionField", () => ({
+  default: () => <textarea aria-label="description" />,
+}));
+
+vi.mock("../TaskPriorityMenu", () => ({
+  default: () => <div data-testid="task-priority-menu" />,
+}));
+
+vi.mock("../TaskProjectButton", () => ({
+  default: () => <button type="button">Project</button>,
+}));
+
+vi.mock("../TaskTagsButton", () => ({
+  default: () => <div data-testid="task-tags-button" />,
+}));
+
+vi.mock("../TitleField", () => ({
+  default: () => <input aria-label="task name" />,
+}));
+
+vi.mock("@shared/hooks/queries", () => {
+  return {
+    useAddTask: () => ({
+      mutateAsync: mockAddTask,
+    }),
+    useTags: () => ({
+      data: { results: [] },
+      isPending: false,
+    }),
+    useUpdateTask: () => ({
+      mutateAsync: vi.fn(),
+    }),
+  };
+});
 
 // Mocks and helpers
 const mockProfile: Profile = {

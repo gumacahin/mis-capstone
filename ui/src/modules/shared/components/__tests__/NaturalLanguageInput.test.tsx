@@ -2,11 +2,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import dayjs from "dayjs";
 import { FormProvider, useForm } from "react-hook-form";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { TaskFormFields, TaskPriority } from "@/api/migration-helpers";
 
 import NaturalLanguageInput from "../NaturalLanguageInput";
+
+vi.mock("../../hooks/useTasksDueOn", () => ({
+  useTasksDueOn: () => ({
+    data: { results: [] },
+    isLoading: false,
+  }),
+}));
 
 // FormProviderWrapper for context
 function FormProviderWrapper({ children }: { children: React.ReactNode }) {

@@ -2,7 +2,24 @@ import "@testing-library/jest-dom";
 
 import * as matchers from "@testing-library/jest-dom/matchers";
 import { cleanup } from "@testing-library/react";
-import { afterEach, expect } from "vitest";
+import { afterEach, beforeAll, expect, vi } from "vitest";
+
+vi.mock("@auth0/auth0-react", () => ({
+  Auth0Provider: ({ children }: { children: unknown }) => children,
+  useAuth0: () => ({
+    error: undefined,
+    getAccessTokenSilently: vi.fn(async () => "test-token"),
+    isAuthenticated: true,
+    isLoading: false,
+    loginWithRedirect: vi.fn(async () => {}),
+    logout: vi.fn(),
+    user: {
+      email: "test@example.com",
+      name: "Test User",
+      sub: "auth0|test-user",
+    },
+  }),
+}));
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
@@ -10,6 +27,22 @@ expect.extend(matchers);
 // Cleanup after each test case
 afterEach(() => {
   cleanup();
+});
+
+beforeAll(() => {
+  const originalWarn = console.warn.bind(console);
+
+  vi.spyOn(console, "warn").mockImplementation((...args: unknown[]) => {
+    const [message] = args;
+    if (
+      typeof message === "string" &&
+      message.includes("React Router Future Flag Warning")
+    ) {
+      return;
+    }
+
+    originalWarn(...args);
+  });
 });
 
 // Mock window.matchMedia
