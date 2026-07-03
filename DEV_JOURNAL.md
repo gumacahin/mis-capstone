@@ -2412,3 +2412,37 @@ repo: git diff --check
   implementation/demo evidence, not participant evidence.
 - The remaining high-value paper task is a real adviser or pilot walkthrough
   recorded in `CAPSTONE_EVALUATION_RESULTS.md`.
+
+## 2026-07-03: Results Snapshot Boundary Pass
+
+### Goal
+
+Make the paper Results section submission-safe without inventing adviser,
+pilot, or participant findings.
+
+### Codex-Assisted Actions
+
+- Reframed the Results section in `CAPSTONE_PAPER_DRAFT.md` around the latest
+  implementation and automated demo-readiness snapshot.
+- Added the 2026-06-29 rehearsal values directly to the draft as a table.
+- Kept real walkthrough results explicitly pending and tied only to
+  `CAPSTONE_EVALUATION_RESULTS.md`.
+- Updated `CAPSTONE_PAPER_REVIEW.md` so the evidence snapshot finding is marked
+  addressed for the current baseline.
+- Added a dated status note to `CAPSTONE_EVALUATION_RESULTS.md` clarifying that
+  no participant, adviser-review, or pilot findings exist yet.
+
+### Verification
+
+```text
+docs: npx prettier --check ../CAPSTONE_PAPER_DRAFT.md ../CAPSTONE_PAPER_REVIEW.md ../CAPSTONE_EVALUATION_RESULTS.md ../DEV_JOURNAL.md
+repo: git diff --check
+```
+
+### Study Notes
+
+- If no real walkthrough happens before submission, the paper should remain
+  narrow: implementation readiness and seeded demo evidence only.
+- If a real walkthrough happens, record it first in
+  `CAPSTONE_EVALUATION_RESULTS.md`, then replace the pending walkthrough
+  placeholder in the Results section.

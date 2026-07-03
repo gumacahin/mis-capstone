@@ -18,11 +18,15 @@ submission readiness. It is not a code review.
 
 ## Findings
 
-### High: Results Are Correctly Marked Pending, But The Paper Needs A Final Decision Before Submission
+### High: Results Are Clearly Bounded, But Real Walkthrough Evidence Is Still Pending
+
+Status: partially addressed in `CAPSTONE_PAPER_DRAFT.md`.
 
 The draft clearly states that no adviser, pilot, or participant walkthrough
-results have been recorded. That is honest and prevents overclaiming. Before
-submission, the author must decide whether the final paper will report:
+results have been recorded. It now reports implementation and automated
+demo-readiness evidence separately from real evaluation evidence. That is honest
+and prevents overclaiming. Before submission, the author must decide whether the
+final paper will report:
 
 - automated demo-readiness evidence only, or
 - at least one adviser, pilot, or participant walkthrough result recorded in
@@ -58,13 +62,14 @@ The draft now includes:
   reason inspection, accept/snooze/dismiss, feedback, and aggregate reporting
 - a privacy-safe `/today` screenshot captured from seeded demo data
 
-### Medium: Evaluation Method Is Strong, But The Results Section Needs A Versioned Evidence Snapshot
+### Medium: Evaluation Method Is Strong, And The Current Snapshot Is Versioned
 
-The draft lists verification results, but it should include a stable snapshot of
-the exact demo-readiness baseline if it is submitted before participant
-evidence exists. The current baseline is documented in
-`CAPSTONE_REHEARSAL_NOTES.md` and should be copied into final paper language
-only after deciding the submission date.
+Status: addressed for the current implementation baseline.
+
+The draft now includes a stable implementation and demo-readiness snapshot from
+the 2026-06-29 rehearsal notes. If another full rehearsal is run before
+submission, update the snapshot from `CAPSTONE_REHEARSAL_NOTES.md`; otherwise,
+keep the current values and maintain the distinction from participant evidence.
 
 ### Medium: The Implementation Section Should Avoid Becoming A Feature Inventory
 
@@ -99,16 +104,17 @@ and keep the "What should I do today?" phrase in the introduction.
 
 1. Confirm the final required citation style and convert the current APA-style
    working reference if needed.
-2. Add a note in the Results section that final verification numbers should be
-   copied from `CAPSTONE_REHEARSAL_NOTES.md` at submission time.
-3. Keep `CAPSTONE_EVALUATION_RESULTS.md` as the only source for real
+2. Keep `CAPSTONE_EVALUATION_RESULTS.md` as the only source for real
    walkthrough findings.
 
 ## Remaining Before Final Submission
 
 - Run at least one adviser or pilot walkthrough if possible.
 - Record anonymized results in `CAPSTONE_EVALUATION_RESULTS.md`.
-- Replace pending Results placeholders with actual recorded evidence.
+- Replace pending Results placeholders with actual recorded evidence if a real
+  walkthrough is completed.
+- If no real walkthrough is completed, keep the Results section limited to
+  implementation and automated demo-readiness evidence.
 - Confirm final citation style.
 - Check the final paper against the claims-to-avoid list in
   `CAPSTONE_ARGUMENT.md`.

@@ -41,6 +41,10 @@ The implementation currently has automated demo-readiness evidence in:
 - `CAPSTONE_REHEARSAL_NOTES.md`
 - `CAPSTONE_DEMO_RUN.md`
 
+Paper status as of 2026-07-03: the paper can report implementation and
+automated demo-readiness evidence, but it should not report participant,
+adviser-review, or pilot findings until a real entry is added below.
+
 ## Session Register
 
 | Session ID  | Date | Evidence Category                    | Participant Group | Dataset                                                 | Status      | Privacy Review |

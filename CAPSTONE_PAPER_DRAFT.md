@@ -294,33 +294,42 @@ in `CAPSTONE_EVALUATION_RESULTS.md`.
 
 ## 7. Results
 
-This section must be completed only after real adviser, pilot, or participant
-walkthroughs have been recorded.
-
 At the time of this draft, no adviser, pilot, or participant walkthrough results
 have been recorded in `CAPSTONE_EVALUATION_RESULTS.md`. The project does have
 implementation and automated demo-readiness evidence, including backend tests,
 frontend checks, fixture-backed Playwright walkthroughs, and a real-backend
-Playwright demo.
+Playwright demo. Therefore, the current Results section reports implementation
+readiness only. It should not be described as participant evaluation evidence.
 
-Latest recorded verification evidence includes:
+### Implementation And Demo-Readiness Snapshot
 
-- backend lint passing
-- backend test suite passing with 255 tests and 2 warnings
-- frontend build passing
-- frontend lint passing
-- `/today` Playwright e2e passing with 10 tests
-- fixture-backed planner demo passing
-- real-backend planner demo passing
-- documentation formatting checks passing
+The latest recorded rehearsal snapshot, dated 2026-06-29 in
+`CAPSTONE_REHEARSAL_NOTES.md`, reports:
 
-Before final submission, copy the exact verification snapshot from
-`CAPSTONE_REHEARSAL_NOTES.md` using the most recent completed rehearsal date.
+| Evidence item                   | Result                                                     |
+| ------------------------------- | ---------------------------------------------------------- |
+| Backend lint                    | Passed                                                     |
+| Backend tests                   | 255 passed, 2 warnings                                     |
+| Frontend lint                   | Passed                                                     |
+| Frontend build                  | Passed with known large-bundle warning                     |
+| Frontend unit tests             | 53 files passed, 6 skipped; 183 tests passed, 34 skipped   |
+| `/today` Playwright e2e         | 10 passed                                                  |
+| Fixture-backed planner demo e2e | 2 passed                                                   |
+| Real-backend planner demo e2e   | 2 passed                                                   |
+| Paper screenshot evidence       | 2 passed; committed screenshot artifact is 1440 x 1600 PNG |
+| Documentation formatting checks | Passed                                                     |
 
-These automated checks show that the implemented planner flow works on seeded
-data and through the local backend, but they are not participant evaluation
-evidence. The final paper should replace or supplement this section with
-recorded walkthrough results when available.
+These automated checks show that the implemented planner flow works with seeded
+data, browser automation, and the local Django backend. They also show that the
+paper screenshot in Figure 3 was captured from seeded demo data. These results
+are useful implementation evidence, but they are not adviser, pilot, or
+participant evidence.
+
+### Walkthrough Results Pending
+
+The final paper should replace or supplement this subsection after adviser,
+pilot, or participant walkthrough entries have been recorded in
+`CAPSTONE_EVALUATION_RESULTS.md`.
 
 Placeholder for future recorded results:
 
