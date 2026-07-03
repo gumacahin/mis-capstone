@@ -182,32 +182,3 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             instance._create_next_occurrence()
 
         return instance
-
-
-class TaskAdminSerializer(TaskSerializer):
-    created_by = serializers.PrimaryKeyRelatedField(
-        source="section.project.created_by.id", read_only=True
-    )
-    tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(),
-        many=True,
-        required=False,
-    )
-
-    class Meta:
-        model = Task
-        fields = [
-            "id",
-            "title",
-            "description",
-            "dtstart",
-            "rrule",
-            "anchor_mode",
-            "due_date",
-            "priority",
-            "tags",
-            "completion_date",
-            "order",
-            "project",
-            "created_by",
-        ]

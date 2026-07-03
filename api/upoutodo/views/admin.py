@@ -1,58 +1,18 @@
 from datetime import timedelta
 
+from django.contrib.auth import get_user_model
 from django.db.models import Avg, Count, DurationField, ExpressionWrapper, F
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 
 from upoutodo.models import Task
 from upoutodo.permissions import IsAdmin
-from upoutodo.serializers.project import ProjectAdminSerializer
-from upoutodo.serializers.tag import TagAdminSerializer
-from upoutodo.serializers.task import TaskAdminSerializer
-from upoutodo.views.project import ProjectViewSet
-from upoutodo.views.tag import TagViewSet
-from upoutodo.views.task import TaskViewSet
-from upoutodo.views.user import UserViewSet
 
-
-class AdminPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 100
-
-
-class AdminViewSet(ModelViewSet):
-    permission_classes = [IsAuthenticated, IsAdmin]
-    pagination_class = AdminPagination
-    http_method_names = ["head", "options"]
-
-
-class AdminTaskViewSet(AdminViewSet):
-    queryset = TaskViewSet.queryset
-    serializer_class = TaskAdminSerializer
-    filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ["title", "description"]
-    ordering_fields = ["id", "title", "due_date", "priority", "completion_date"]
-
-
-class AdminProjectViewSet(AdminViewSet, ProjectViewSet):
-    serializer_class = ProjectAdminSerializer
-
-
-class AdminUserViewSet(AdminViewSet, UserViewSet):
-    pass
-
-
-class AdminTagViewSet(AdminViewSet, TagViewSet):
-    serializer_class = TagAdminSerializer
-    lookup_field = "id"
+User = get_user_model()
 
 
 class AdminMetricTrendSerializer(serializers.Serializer):
@@ -101,8 +61,8 @@ class AdminDashboardView(APIView):
         )
 
     def priority_distribution(self):
-        priorities = TaskViewSet.queryset.values("priority").annotate(count=Count("id"))
-        total_tasks = TaskViewSet.queryset.count()
+        priorities = Task.objects.values("priority").annotate(count=Count("id"))
+        total_tasks = Task.objects.count()
         priority_data = []
         for priority in Task.Priority:
             count = next(
@@ -112,7 +72,7 @@ class AdminDashboardView(APIView):
             percent = (count / total_tasks) * 100 if total_tasks > 0 else 0
             completion_rate = round(
                 (
-                    TaskViewSet.queryset.filter(
+                    Task.objects.filter(
                         priority=priority, completion_date__isnull=False
                     ).count()
                     / count
@@ -123,9 +83,7 @@ class AdminDashboardView(APIView):
                 2,
             )
             avg_completion_time = (
-                TaskViewSet.queryset.filter(
-                    priority=priority, completion_date__isnull=False
-                )
+                Task.objects.filter(priority=priority, completion_date__isnull=False)
                 .annotate(
                     duration=ExpressionWrapper(
                         F("completion_date") - F("created_at"),
@@ -141,7 +99,7 @@ class AdminDashboardView(APIView):
             else:
                 avg_completion_time = None
 
-            overdue_count = TaskViewSet.queryset.filter(
+            overdue_count = Task.objects.filter(
                 priority=priority,
                 due_date__lt=timezone.now(),
                 completion_date__isnull=True,
@@ -165,10 +123,8 @@ class AdminDashboardView(APIView):
         trends = []
         for i in range(7):
             day = start_of_week + timedelta(days=i)
-            created_count = TaskViewSet.queryset.filter(created_at__date=day).count()
-            completed_count = TaskViewSet.queryset.filter(
-                completion_date__date=day
-            ).count()
+            created_count = Task.objects.filter(created_at__date=day).count()
+            completed_count = Task.objects.filter(completion_date__date=day).count()
             trends.append(
                 {
                     "day": day.strftime("%a"),
@@ -180,11 +136,11 @@ class AdminDashboardView(APIView):
 
     def active_users(self):
         thirty_days_ago = timezone.now() - timedelta(days=30)
-        active_users_count = UserViewSet.queryset.filter(
+        active_users_count = User.objects.filter(
             last_login__gte=thirty_days_ago
         ).count()
         last_month = thirty_days_ago - timedelta(days=30)
-        last_month_active_users_count = UserViewSet.queryset.filter(
+        last_month_active_users_count = User.objects.filter(
             last_login__gte=last_month, last_login__lt=thirty_days_ago
         ).count()
         if last_month_active_users_count == 0:
@@ -200,10 +156,10 @@ class AdminDashboardView(APIView):
         }
 
     def total_tasks(self):
-        total_tasks_count = TaskViewSet.queryset.count()
+        total_tasks_count = Task.objects.count()
         thirty_days_ago = timezone.now() - timedelta(days=30)
         last_month = thirty_days_ago - timedelta(days=30)
-        last_month_tasks_count = TaskViewSet.queryset.filter(
+        last_month_tasks_count = Task.objects.filter(
             created_at__gte=last_month, created_at__lt=thirty_days_ago
         ).count()
         if last_month_tasks_count == 0:
@@ -218,12 +174,10 @@ class AdminDashboardView(APIView):
         }
 
     def pending_tasks(self):
-        total_tasks_count = TaskViewSet.queryset.filter(
-            completion_date__isnull=True
-        ).count()
+        total_tasks_count = Task.objects.filter(completion_date__isnull=True).count()
         thirty_days_ago = timezone.now() - timedelta(days=30)
         last_month = thirty_days_ago - timedelta(days=30)
-        last_month_tasks_count = TaskViewSet.queryset.filter(
+        last_month_tasks_count = Task.objects.filter(
             created_at__gte=last_month,
             created_at__lt=thirty_days_ago,
             completion_date__isnull=True,
@@ -240,22 +194,22 @@ class AdminDashboardView(APIView):
         }
 
     def completion_rate(self):
-        completed_tasks_count = TaskViewSet.queryset.filter(
+        completed_tasks_count = Task.objects.filter(
             completion_date__isnull=False
         ).count()
-        total_tasks_count = TaskViewSet.queryset.count()
+        total_tasks_count = Task.objects.count()
         if total_tasks_count == 0:
             return 0.0
         completion_rate = (completed_tasks_count / total_tasks_count) * 100
 
         thirty_days_ago = timezone.now() - timedelta(days=30)
         last_month = thirty_days_ago - timedelta(days=30)
-        last_month_completed_tasks_count = TaskViewSet.queryset.filter(
+        last_month_completed_tasks_count = Task.objects.filter(
             created_at__gte=last_month,
             created_at__lt=thirty_days_ago,
             completion_date__isnull=False,
         ).count()
-        last_month_total_tasks_count = TaskViewSet.queryset.filter(
+        last_month_total_tasks_count = Task.objects.filter(
             created_at__gte=last_month, created_at__lt=thirty_days_ago
         ).count()
 

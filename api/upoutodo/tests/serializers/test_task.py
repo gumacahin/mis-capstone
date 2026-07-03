@@ -8,7 +8,7 @@ from faker import Faker
 
 from upoutodo.models import Project, Task
 from upoutodo.models.tag import Tag
-from upoutodo.serializers import TaskAdminSerializer, TaskSerializer
+from upoutodo.serializers import TaskSerializer
 from upoutodo.tests.factories import (
     ProjectFactory,
     ProjectSectionFactory,
@@ -414,51 +414,6 @@ class TestTaskSerializerTags:
 
         # Check that tags were cleared
         assert updated_task.tags.count() == 0
-
-
-class TestTaskAdminSerializer:
-    """Test TaskAdminSerializer functionality."""
-
-    @pytest.mark.django_db
-    def test_admin_serializer_includes_created_by(self, task):
-        """Test that TaskAdminSerializer includes created_by field."""
-        serializer = TaskAdminSerializer(task)
-        data = serializer.data
-
-        assert "created_by" in data
-        assert data["created_by"] == task.section.project.created_by.id
-
-    @pytest.mark.django_db
-    def test_admin_serializer_tags_as_pk_field(self, task, user):
-        """Test that TaskAdminSerializer uses PK field for tags."""
-        # Create some tags and assign to task
-        tag1 = Tag.objects.create(name="tag1", created_by=user)
-        tag2 = Tag.objects.create(name="tag2", created_by=user)
-        task.tags.set([tag1, tag2])
-
-        serializer = TaskAdminSerializer(task)
-        data = serializer.data
-
-        assert "tags" in data
-        assert isinstance(data["tags"], list)
-        assert tag1.id in data["tags"]
-        assert tag2.id in data["tags"]
-
-    @pytest.mark.django_db
-    def test_admin_serializer_validation_with_tag_pks(self, section, user):
-        """Test that TaskAdminSerializer validates with tag PKs."""
-        tag1 = Tag.objects.create(name="tag1", created_by=user)
-        tag2 = Tag.objects.create(name="tag2", created_by=user)
-
-        data = {
-            "title": fake.sentence(),
-            "section": section.id,
-            "tags": [tag1.id, tag2.id],
-        }
-
-        serializer = TaskAdminSerializer(data=data)
-        assert serializer.is_valid()
-        assert serializer.validated_data["tags"] == [tag1, tag2]
 
 
 # Note: due_date is read_only and calculated from rrule/dtstart, so direct validation is not applicable

@@ -1,4 +1,3 @@
-from .admin import AdminProjectViewSet, AdminTaskViewSet, AdminUserViewSet
 from .comment import CommentViewSet
 from .email import daily_digest
 from .notification import NotificationViewSet
@@ -10,9 +9,6 @@ from .task import TaskViewSet
 from .user import UserViewSet
 
 __all__ = [
-    "AdminProjectViewSet",
-    "AdminTaskViewSet",
-    "AdminUserViewSet",
     "CommentViewSet",
     "daily_digest",
     "NotificationViewSet",
