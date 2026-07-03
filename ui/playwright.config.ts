@@ -1,6 +1,8 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 const authFile = "playwright/.auth/user.json";
+const port = Number(process.env.PLAYWRIGHT_PORT ?? process.env.PORT ?? 3000);
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -26,7 +28,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: "http://localhost:3000",
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -42,6 +44,9 @@ export default defineConfig({
 
     /* Action timeout */
     actionTimeout: 5000,
+
+    /* Keep route mocks in control of API calls. */
+    serviceWorkers: "block",
   },
 
   /* Configure projects for major browsers */
@@ -56,8 +61,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
+    command: `VITE_APP_ENV=e2e VITE_E2E_BYPASS_AUTH=1 npm run dev -- --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

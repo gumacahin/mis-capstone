@@ -1,19 +1,18 @@
 # TagRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**name** | **string** |  | [default to undefined]
+| Name     | Type       | Description | Notes                  |
+| -------- | ---------- | ----------- | ---------------------- |
+| **name** | **string** |             | [default to undefined] |
 
 ## Example
 
 ```typescript
-import { TagRequest } from './api';
+import { TagRequest } from "./api";
 
 const instance: TagRequest = {
-    name,
+  name,
 };
 ```
 

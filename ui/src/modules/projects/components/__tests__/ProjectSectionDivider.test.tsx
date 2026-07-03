@@ -1,8 +1,8 @@
-import { Section } from "@shared";
+import type { Section } from "@shared";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import type { ReactElement } from "react";
+import { describe, expect, it } from "vitest";
 
 import ProjectSectionDivider from "../ProjectSectionDivider";
 
@@ -12,9 +12,11 @@ const fakeSection: Section = {
   title: "Section 1",
   order: 1,
   project: 1,
+  is_default: false,
+  tasks: [],
 };
 
-function renderWithQueryClient(ui: React.ReactElement) {
+function renderWithQueryClient(ui: ReactElement) {
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
@@ -22,7 +24,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 describe("ProjectSectionDivider", () => {
-  it.only("shows and hides divider UI on mouse enter/leave", async () => {
+  it("shows and hides divider UI on mouse enter/leave", async () => {
     renderWithQueryClient(
       <ProjectSectionDivider precedingSection={fakeSection} />,
     );
@@ -38,16 +40,11 @@ describe("ProjectSectionDivider", () => {
   });
 
   it("renders AddProjectSectionForm when open", () => {
-    // Override useState to always set open=true for this test
-    const realUseState = React.useState;
-    vi.spyOn(React, "useState").mockImplementationOnce(() => [true, vi.fn()]);
     renderWithQueryClient(
       <ProjectSectionDivider precedingSection={fakeSection} />,
     );
-    // AddProjectSectionForm input or element
-    expect(screen.getByRole("form")).toBeInTheDocument();
-    // Restore mock for safety
-    (React.useState as any).mockRestore?.();
+    fireEvent.click(screen.getByRole("separator"));
+    expect(screen.getByPlaceholderText(/name this section/i)).toBeVisible();
   });
 
   it("does not show interactive UI when disabled", () => {

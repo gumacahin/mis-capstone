@@ -44,14 +44,15 @@ const mockApiProjectsPartialUpdate = vi.fn();
 const mockApiProjectsDestroy = vi.fn();
 
 vi.mock("../../generated-api-client/api", () => ({
-  ApiApi: vi.fn().mockImplementation(() => ({
-    apiProjectsList: mockApiProjectsList,
-    apiProjectsRetrieve: mockApiProjectsRetrieve,
-    apiProjectsCreate: mockApiProjectsCreate,
-    apiProjectsPartialUpdate: mockApiProjectsPartialUpdate,
-    apiProjectsDestroy: mockApiProjectsDestroy,
+  PlannerApi: vi.fn().mockImplementation(() => ({})),
+  ProjectsApi: vi.fn().mockImplementation(() => ({
+    projectsList: mockApiProjectsList,
+    projectsRetrieve: mockApiProjectsRetrieve,
+    projectsCreate: mockApiProjectsCreate,
+    projectsPartialUpdate: mockApiProjectsPartialUpdate,
+    projectsDestroy: mockApiProjectsDestroy,
   })),
-  ApiAdminApi: vi.fn().mockImplementation(() => ({})),
+  TasksApi: vi.fn().mockImplementation(() => ({})),
 }));
 
 describe("API Integration Tests", () => {

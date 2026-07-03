@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -13,6 +12,8 @@ import Spinner from "@shared/components/Spinner";
 import useProfileContext from "@shared/hooks/useProfileContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -81,8 +82,9 @@ function HomePage() {
               lineHeight: 1.6,
             }}
           >
-            For UPOU faculty and students&mdash;capture tasks, plan schedules,
-            and track progress for courses, teaching, research, and campus work.
+            For UPOU faculty and staff&mdash;capture tasks, plan today, and
+            track progress for teaching, research, administrative, and campus
+            work.
           </Typography>
 
           <Button

@@ -1,4 +1,5 @@
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PeopleIcon from "@mui/icons-material/People";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -8,13 +9,18 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
+import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid2";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { usePlannerEvaluationSummary } from "@planner/hooks";
+import type { PlannerEvaluationSummary } from "@planner/types";
 import Spinner from "@shared/components/Spinner";
 import { useDashboard } from "@shared/hooks/queries";
 
 export default function AdminDashboard() {
   const { data, isLoading, isError } = useDashboard();
+  const plannerEvaluation = usePlannerEvaluationSummary();
 
   if (isLoading) {
     return (
@@ -286,8 +292,181 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </Grid>
+          <Grid size={12}>
+            <Card variant="outlined">
+              <CardHeader
+                title="Planner Evaluation"
+                avatar={<AssessmentIcon />}
+              />
+              <CardContent>
+                <PlannerEvaluationPanel
+                  isError={plannerEvaluation.isError}
+                  isLoading={plannerEvaluation.isLoading}
+                  summary={plannerEvaluation.data}
+                />
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </CardContent>
     </Card>
   );
 }
+
+interface PlannerEvaluationPanelProps {
+  isError: boolean;
+  isLoading: boolean;
+  summary?: PlannerEvaluationSummary;
+}
+
+function PlannerEvaluationPanel({
+  isError,
+  isLoading,
+  summary,
+}: PlannerEvaluationPanelProps) {
+  if (isLoading) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Loading planner evaluation...
+      </Typography>
+    );
+  }
+
+  if (isError || !summary) {
+    return (
+      <Alert severity="warning">
+        Planner evaluation metrics are unavailable.
+      </Alert>
+    );
+  }
+
+  return (
+    <Stack spacing={2}>
+      <Alert severity="info">
+        Aggregate planner evaluation only. These metrics summarize plan
+        generation, suggestion actions, and feedback ratings without exposing
+        individual task titles or participant notes.
+      </Alert>
+      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+        <Chip size="small" label="Capstone evidence" />
+        <Chip size="small" variant="outlined" label="Just-in-time planning" />
+        <Chip size="small" variant="outlined" label="Anonymized aggregates" />
+      </Stack>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            Adoption and response
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail={`${summary.total_suggestions.toLocaleString()} suggestions`}
+            evidence="Planner was invoked enough to generate recommendation sets."
+            label="Plans generated"
+            value={summary.plan_count.toLocaleString()}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail={`${summary.feedback_count.toLocaleString()} responses`}
+            evidence="Participants gave direct feedback on plan usefulness."
+            label="Feedback response rate"
+            value={formatPercent(summary.feedback_response_rate)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail="Daily plan usefulness"
+            evidence="Higher ratings support the claim that the plan helped."
+            label="Avg helpfulness"
+            value={formatRating(summary.average_helpfulness_rating)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <MetricBlock
+            detail="Confidence after planning"
+            evidence="Higher ratings suggest users felt more ready to act."
+            label="Avg confidence"
+            value={formatRating(summary.average_confidence_rating)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="subtitle2" color="text.secondary">
+            Suggestion action signals
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.accepted.toLocaleString()} suggestions`}
+            evidence="Accepted suggestions indicate the recommendation matched immediate intent."
+            label="Accepted"
+            value={formatPercent(summary.suggestion_action_rates.accepted)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.snoozed.toLocaleString()} suggestions`}
+            evidence="Snoozes show partial fit: relevant, but not right now."
+            label="Snoozed"
+            value={formatPercent(summary.suggestion_action_rates.snoozed)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <MetricBlock
+            detail={`${summary.suggestion_status_counts.dismissed.toLocaleString()} suggestions`}
+            evidence="Dismissals identify recommendation misses for iteration."
+            label="Dismissed"
+            value={formatPercent(summary.suggestion_action_rates.dismissed)}
+          />
+        </Grid>
+      </Grid>
+    </Stack>
+  );
+}
+
+interface MetricBlockProps {
+  detail: string;
+  evidence: string;
+  label: string;
+  value: string;
+}
+
+function MetricBlock({ detail, evidence, label, value }: MetricBlockProps) {
+  return (
+    <Box
+      sx={{
+        bgcolor: "grey.100",
+        borderRadius: 1,
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.5,
+        height: "100%",
+        p: 2,
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        {label}
+      </Typography>
+      <Typography variant="h5" sx={{ mt: 0.5 }}>
+        {value}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        {detail}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        Evidence: {evidence}
+      </Typography>
+    </Box>
+  );
+}
+
+const formatPercent = (value: number) => `${formatNumber(value)}%`;
+
+const formatRating = (value: number | null) =>
+  value === null ? "No data" : `${formatNumber(value)} / 5`;
+
+const formatNumber = (value: number) =>
+  value.toLocaleString(undefined, {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 1,
+  });

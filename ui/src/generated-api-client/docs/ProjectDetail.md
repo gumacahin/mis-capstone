@@ -1,29 +1,28 @@
 # ProjectDetail
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **number** |  | [readonly] [default to undefined]
-**is_default** | **boolean** |  | [optional] [default to undefined]
-**title** | **string** |  | [default to undefined]
-**view** | [**ViewEnum**](ViewEnum.md) |  | [optional] [default to undefined]
-**order** | **number** |  | [optional] [default to undefined]
-**sections** | [**Array&lt;ProjectSection&gt;**](ProjectSection.md) |  | [readonly] [default to undefined]
+| Name           | Type                                                 | Description | Notes                             |
+| -------------- | ---------------------------------------------------- | ----------- | --------------------------------- |
+| **id**         | **number**                                           |             | [readonly] [default to undefined] |
+| **is_default** | **boolean**                                          |             | [optional] [default to undefined] |
+| **title**      | **string**                                           |             | [default to undefined]            |
+| **view**       | [**ViewEnum**](ViewEnum.md)                          |             | [optional] [default to undefined] |
+| **order**      | **number**                                           |             | [optional] [default to undefined] |
+| **sections**   | [**Array&lt;ProjectSection&gt;**](ProjectSection.md) |             | [readonly] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { ProjectDetail } from './api';
+import { ProjectDetail } from "./api";
 
 const instance: ProjectDetail = {
-    id,
-    is_default,
-    title,
-    view,
-    order,
-    sections,
+  id,
+  is_default,
+  title,
+  view,
+  order,
+  sections,
 };
 ```
 

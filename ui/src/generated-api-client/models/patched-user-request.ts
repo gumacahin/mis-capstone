@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * UPOU TODO API
- * Task management API for UPOU students and faculty
+ * Planner-first productivity API for UPOU faculty and staff
  *
  * The version of the OpenAPI document: 1.0.0
  *
@@ -14,12 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ProjectRequest } from "./project-request";
+import type { UserProjectRequest } from "./user-project-request";
 
 export interface PatchedUserRequest {
   is_faculty?: boolean;
   is_student?: boolean;
   is_onboarded?: boolean;
-  projects?: Array<ProjectRequest>;
+  projects?: Array<UserProjectRequest>;
   theme?: string;
+  email_digest_enabled?: boolean;
 }

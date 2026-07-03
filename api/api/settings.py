@@ -11,25 +11,45 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+IS_TESTING = any("pytest" in arg for arg in sys.argv)
+
+
+def env_bool(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.lower() in ("true", "1", "yes", "on")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-hudu@f3o^*(a%-t!0rrfn4bpd0y0iwde%*2v+#@!@d#d8=90&p",  # Default for development
+DEFAULT_SECRET_KEY = (
+    "django-insecure-hudu@f3o^*(a%-t!0rrfn4bpd0y0iwde%*2v+#@!@d#d8=90&p"
 )
+SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes", "on")
+DEBUG = env_bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+if not DEBUG and not IS_TESTING and SECRET_KEY == DEFAULT_SECRET_KEY:
+    raise ImproperlyConfigured("SECRET_KEY must be set when DEBUG is false.")
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if host.strip()
+]
+if IS_TESTING and "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
 
 
 # Application definition
@@ -53,6 +73,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -60,7 +81,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.RemoteUserMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "api.urls"
@@ -87,12 +107,35 @@ WSGI_APPLICATION = "api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "django.db.backends.sqlite3")
+DATABASE_NAME = os.getenv("DATABASE_NAME", str(BASE_DIR / "db.sqlite3"))
+
+if (
+    not DEBUG
+    and not IS_TESTING
+    and DATABASE_ENGINE == "django.db.backends.sqlite3"
+    and not env_bool("ALLOW_SQLITE_IN_PRODUCTION")
+):
+    raise ImproperlyConfigured(
+        "SQLite is not allowed when DEBUG is false. Set DATABASE_ENGINE and "
+        "DATABASE_NAME, or explicitly set ALLOW_SQLITE_IN_PRODUCTION=true."
+    )
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": DATABASE_ENGINE,
+        "NAME": DATABASE_NAME,
     }
 }
+
+for env_key, db_key in (
+    ("DATABASE_USER", "USER"),
+    ("DATABASE_PASSWORD", "PASSWORD"),
+    ("DATABASE_HOST", "HOST"),
+    ("DATABASE_PORT", "PORT"),
+):
+    if os.getenv(env_key):
+        DATABASES["default"][db_key] = os.getenv(env_key)
 
 
 # Password validation
@@ -143,6 +186,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 1000,
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "upoutodo.authentication.E2EBearerTokenAuthentication",
         "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
@@ -162,7 +206,7 @@ REST_FRAMEWORK = {
 # DRF Spectacular Settings
 SPECTACULAR_SETTINGS = {
     "TITLE": "UPOU TODO API",
-    "DESCRIPTION": "Task management API for UPOU students and faculty",
+    "DESCRIPTION": "Planner-first productivity API for UPOU faculty and staff",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
@@ -170,14 +214,13 @@ SPECTACULAR_SETTINGS = {
 }
 
 # CORS Configuration - more secure for production
-CORS_ORIGIN_ALLOW_ALL = os.getenv("CORS_ALLOW_ALL", "True").lower() in (
-    "true",
-    "1",
-    "yes",
-    "on",
-)
+CORS_ORIGIN_ALLOW_ALL = env_bool("CORS_ALLOW_ALL", default=False)
 CORS_ALLOWED_ORIGINS = (
-    os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    [
+        origin.strip()
+        for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
     if os.getenv("CORS_ALLOWED_ORIGINS")
     else []
 )
@@ -214,9 +257,10 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 APP_URL = os.getenv("APP_URL")
 BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "upoutodo@gmail.com")
 BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "UPOU TODO")
+DAILY_DIGEST_SCHEDULER_SECRET = os.getenv("DAILY_DIGEST_SCHEDULER_SECRET", "")
 
 # Security Settings for Production
-if not DEBUG:
+if not DEBUG and not IS_TESTING:
     # HTTPS Settings
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

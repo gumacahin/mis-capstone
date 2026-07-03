@@ -26,6 +26,7 @@ describe("API Client Configuration", () => {
 
       expect(result.current.api).toBeDefined();
       expect(result.current.admin).toBeDefined();
+      expect(result.current.planner).toBeDefined();
       expect(result.current.configuration).toBeDefined();
 
       // The basePath should be set (either from env or fallback)
@@ -70,13 +71,19 @@ describe("API Client Configuration", () => {
       expect(mockLoginWithRedirect).not.toHaveBeenCalled();
     });
 
-    it("should provide both API and Admin clients", () => {
+    it("should provide compatibility API, Admin, and Planner clients", () => {
       const { result } = renderHook(() => useGeneratedApiClient());
 
       expect(result.current.api).toBeDefined();
       expect(result.current.admin).toBeDefined();
-      expect(result.current.api.constructor.name).toBe("ApiApi");
-      expect(result.current.admin.constructor.name).toBe("ApiAdminApi");
+      expect(result.current.planner).toBeDefined();
+      expect(result.current.api.constructor.name).toBe(
+        "GeneratedApiCompatibility",
+      );
+      expect(result.current.admin.constructor.name).toBe(
+        "AdminApiCompatibility",
+      );
+      expect(result.current.planner.constructor.name).toBe("PlannerApi");
     });
 
     it("should provide direct access to configuration", () => {
@@ -102,6 +109,7 @@ describe("API Client Configuration", () => {
       // Should be different instances
       expect(result1.current.api).not.toBe(result2.current.api);
       expect(result1.current.admin).not.toBe(result2.current.admin);
+      expect(result1.current.planner).not.toBe(result2.current.planner);
       expect(result1.current.configuration).not.toBe(
         result2.current.configuration,
       );

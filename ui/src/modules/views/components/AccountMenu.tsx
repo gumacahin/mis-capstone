@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Logout from "@mui/icons-material/Logout";
 import Settings from "@mui/icons-material/Settings";
@@ -12,6 +11,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
 import { type MouseEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

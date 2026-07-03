@@ -1,6 +1,5 @@
 import "./App.css";
 
-import { useAuth0 } from "@auth0/auth0-react";
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -10,6 +9,7 @@ import { useProfile } from "@shared/hooks/queries";
 import { Toaster } from "react-hot-toast";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import { useAuth0 } from "./components/AuthProviderWrapper";
 import { ProfileContextProvider } from "./components/ProfileContextProvider";
 import routes from "./routes";
 

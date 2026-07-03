@@ -1,25 +1,24 @@
 # PaginatedCommentList
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**count** | **number** |  | [default to undefined]
-**next** | **string** |  | [optional] [default to undefined]
-**previous** | **string** |  | [optional] [default to undefined]
-**results** | [**Array&lt;Comment&gt;**](Comment.md) |  | [default to undefined]
+| Name         | Type                                   | Description | Notes                             |
+| ------------ | -------------------------------------- | ----------- | --------------------------------- |
+| **count**    | **number**                             |             | [default to undefined]            |
+| **next**     | **string**                             |             | [optional] [default to undefined] |
+| **previous** | **string**                             |             | [optional] [default to undefined] |
+| **results**  | [**Array&lt;Comment&gt;**](Comment.md) |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { PaginatedCommentList } from './api';
+import { PaginatedCommentList } from "./api";
 
 const instance: PaginatedCommentList = {
-    count,
-    next,
-    previous,
-    results,
+  count,
+  next,
+  previous,
+  results,
 };
 ```
 

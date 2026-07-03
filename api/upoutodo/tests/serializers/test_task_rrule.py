@@ -118,25 +118,6 @@ class TestTaskSerializerRRuleFields:
         assert not serializer.is_valid()
         assert "anchor_mode" in serializer.errors
 
-    def test_admin_serializer_includes_rrule_fields(self):
-        """Test that TaskAdminSerializer includes RRule fields."""
-        from upoutodo.serializers import TaskAdminSerializer
-
-        task = Task.objects.create(
-            title="Admin Task",
-            section=self.section,
-            rrule="FREQ=MONTHLY",
-            anchor_mode=Task.AnchorMode.SCHEDULED,
-        )
-
-        serializer = TaskAdminSerializer(task)
-        data = serializer.data
-
-        assert "rrule" in data
-        assert "dtstart" in data
-        assert "anchor_mode" in data
-        assert data["rrule"] == "FREQ=MONTHLY"
-
     def test_serializer_handles_complex_rrule(self):
         """Test that serializer handles complex RRule strings."""
         complex_rrule = "FREQ=WEEKLY;BYDAY=MO,WE,FR;UNTIL=20241231T235959Z"

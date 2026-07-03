@@ -7,6 +7,15 @@ User = get_user_model()
 
 
 class UserProfile(models.Model):
+    MUTABLE_REQUEST_FIELDS = {
+        "name",
+        "is_student",
+        "is_faculty",
+        "is_onboarded",
+        "email_digest_enabled",
+        "theme",
+    }
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     name = models.CharField(max_length=100, blank=True)
     is_student = models.BooleanField(default=False)
@@ -27,10 +36,10 @@ class UserProfile(models.Model):
         return Project.get_user_inbox(self.user)
 
     def update_from_request(self, request):
-        updated = False
+        update_fields = set()
         for key, value in request.data.items():
-            if hasattr(self, key):
+            if key in self.MUTABLE_REQUEST_FIELDS:
                 setattr(self, key, value)
-                updated = True
-        if updated:
-            self.save()
+                update_fields.add(key)
+        if update_fields:
+            self.save(update_fields=update_fields)

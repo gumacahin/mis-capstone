@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noUnusedLocals false && vite build",
@@ -13,6 +16,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:planner-demo": "CI=1 PLAYWRIGHT_PORT=3104 PORT=3104 PLAYWRIGHT_BASE_URL=http://localhost:3104 playwright test tests/e2e/planner-evaluation-demo.spec.ts --project=chromium",
+    "test:e2e:planner-real": "E2E_USER_EMAIL=planner-demo@example.test AUTH0_USERNAME=planner-demo@example.test E2E_BEARER_TOKEN=e2e-token VITE_E2E_ACCESS_TOKEN=e2e-token CI=1 PLAYWRIGHT_PORT=3106 PORT=3106 PLAYWRIGHT_BACKEND_PORT=8001 PLAYWRIGHT_BASE_URL=http://localhost:3106 playwright test --config=playwright.real-backend.config.ts tests/e2e/planner-evaluation-real-backend.spec.ts --project=chromium",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "generate-api": "openapi-generator-cli generate -i http://localhost:8000/api/schema/ -g typescript-axios -o src/generated-api-client --additional-properties=supportsES6=true,withInterfaces=true,typescriptThreePlus=true,useSingleRequestParameter=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api",

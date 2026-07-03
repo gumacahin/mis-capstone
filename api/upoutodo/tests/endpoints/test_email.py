@@ -1,4 +1,5 @@
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -29,18 +30,41 @@ def auth_client(api_client, user):
 
 
 @pytest.mark.django_db
-def test_daily_digest_endpoint_does_not_require_authentication(api_client):
-    """Test that the daily digest endpoint does not require authentication"""
+def test_daily_digest_endpoint_rejects_public_requests(api_client):
+    """Test that the daily digest endpoint is not publicly callable."""
     url = reverse("daily-digest")
     response = api_client.post(url, format="json")
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
-def test_daily_digest_endpoint_returns_created(auth_client):
-    """Test that the daily digest endpoint returns 201 Created"""
+def test_daily_digest_endpoint_rejects_non_admin_user(auth_client):
+    """Test that normal authenticated users cannot trigger the daily digest."""
     url = reverse("daily-digest")
     response = auth_client.post(url, format="json")
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_daily_digest_endpoint_allows_admin(auth_client, user):
+    """Test that admins can trigger the daily digest endpoint."""
+    user.profile.is_admin = True
+    user.profile.save(update_fields=["is_admin"])
+
+    url = reverse("daily-digest")
+    response = auth_client.post(url, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.data is None
+
+
+@pytest.mark.django_db
+@override_settings(DAILY_DIGEST_SCHEDULER_SECRET="test-secret")
+def test_daily_digest_endpoint_allows_scheduler_secret(api_client):
+    """Test that the scheduler secret can trigger the daily digest endpoint."""
+    url = reverse("daily-digest")
+    response = api_client.post(
+        url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret"
+    )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data is None
 
@@ -53,6 +77,7 @@ def test_daily_digest_endpoint_url_is_correct():
 
 
 @pytest.mark.django_db
+@override_settings(DAILY_DIGEST_SCHEDULER_SECRET="test-secret")
 def test_daily_digest_with_user_and_tasks():
     """Test daily digest with a user that has tasks"""
     # Create a user with tasks
@@ -90,7 +115,9 @@ def test_daily_digest_with_user_and_tasks():
     # Test the endpoint
     api_client = APIClient()
     url = reverse("daily-digest")
-    response = api_client.post(url, format="json")
+    response = api_client.post(
+        url, format="json", HTTP_X_SCHEDULER_SECRET="test-secret"
+    )
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data is None

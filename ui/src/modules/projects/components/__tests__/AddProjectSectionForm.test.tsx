@@ -1,8 +1,13 @@
+import { useAddSection } from "@shared/hooks/queries";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import AddProjectSectionForm from "../AddProjectSectionForm";
+
+vi.mock("@shared/hooks/queries", () => ({
+  useAddSection: vi.fn(),
+}));
 
 // Helper to wrap component
 function renderWithClient(ui: React.ReactElement) {
@@ -76,11 +81,10 @@ describe.skip("AddProjectSectionForm", () => {
   test("submits the form and resets title, then calls handleClose", async () => {
     const handleClose = vi.fn();
     // Mock the hook to resolve immediately
-    vi.mocked = vi
-      .spyOn(require("@shared/hooks/queries"), "useAddSection")
-      .mockReturnValue({
-        mutateAsync: vi.fn().mockResolvedValue({}),
-      });
+    const useAddSectionMock = vi.mocked(useAddSection);
+    useAddSectionMock.mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue({}),
+    } as unknown as ReturnType<typeof useAddSection>);
     renderWithClient(
       <AddProjectSectionForm
         precedingSection={mockSection}
@@ -97,6 +101,6 @@ describe.skip("AddProjectSectionForm", () => {
     await waitFor(() => expect(handleClose).toHaveBeenCalled());
 
     // Clean up mock
-    vi.mocked.mockRestore();
+    useAddSectionMock.mockReset();
   });
 });

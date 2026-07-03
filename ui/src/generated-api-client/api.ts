@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * UPOU TODO API
- * Task management API for UPOU students and faculty
+ * Planner-first productivity API for UPOU faculty and staff
  *
  * The version of the OpenAPI document: 1.0.0
  *
@@ -12,5 +12,14 @@
  * Do not edit the class manually.
  */
 
-export * from "./api/api-api";
-export * from "./api/api-admin-api";
+export * from "./api/comments-api";
+export * from "./api/dashboard-api";
+export * from "./api/email-api";
+export * from "./api/notifications-api";
+export * from "./api/planner-api";
+export * from "./api/productivity-api";
+export * from "./api/project-sections-api";
+export * from "./api/projects-api";
+export * from "./api/tags-api";
+export * from "./api/tasks-api";
+export * from "./api/users-api";

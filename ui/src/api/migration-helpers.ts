@@ -187,8 +187,7 @@ export const transformApiTaskToFrontend = (apiTask: GeneratedTask): Task => {
     // Convert ISO string to Dayjs for frontend compatibility
     dtstart: apiTask.dtstart ? dayjs(apiTask.dtstart) : null,
     anchor_mode: apiTask.anchor_mode || null,
-    // Convert string to number for frontend compatibility
-    comments_count: parseInt(apiTask.comments_count) || 0,
+    comments_count: apiTask.comments_count ?? 0,
     due_date: apiTask.due_date || null,
   };
 };

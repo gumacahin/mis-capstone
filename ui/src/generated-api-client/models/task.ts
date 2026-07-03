@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * UPOU TODO API
- * Task management API for UPOU students and faculty
+ * Planner-first productivity API for UPOU faculty and staff
  *
  * The version of the OpenAPI document: 1.0.0
  *
@@ -30,9 +30,9 @@ export interface Task {
   order?: number;
   section: number;
   project: number;
-  section_title: string;
+  section_title: string | null;
   project_title: string;
-  comments_count: string;
+  comments_count: number;
 }
 
 export const TaskAnchorModeEnum = {

@@ -1,4 +1,3 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -26,6 +25,8 @@ import { GraduationCap, Mail, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
+import { useAuth0 } from "@/components/AuthProviderWrapper";
 
 function ConfirmDeleteDialog({
   open,
@@ -153,7 +154,7 @@ export default function SettingsPage() {
                         I’m a UPOU Student
                       </FormLabel>
                       <p className="text-gray-600 mt-1">
-                        Currently enrolled in UPOU programs
+                        Adjacent scope for future student planning support
                       </p>
                     </div>
                   </div>
@@ -184,10 +185,11 @@ export default function SettingsPage() {
                         htmlFor="faculty-switch"
                         className="text-lg font-semibold text-gray-800 cursor-pointer"
                       >
-                        I’m a UPOU Faculty
+                        I’m UPOU Faculty or Staff
                       </FormLabel>
                       <p className="text-gray-600 mt-1">
-                        Teaching or working at UPOU
+                        Teaching, research, administrative, or support work at
+                        UPOU
                       </p>
                     </div>
                   </div>
@@ -205,11 +207,10 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
             <Alert severity="info" title="Why we ask this">
-              By knowing your role at UPOU, we can provide you a better
-              experience. Students will get study-focused recommendations,
-              faculty members will receive teaching and research-oriented
-              suggestions, and those with both roles will get the best of both
-              worlds.
+              By knowing your role at UPOU, we can keep the planner grounded in
+              your context. This capstone evaluation focuses on faculty and
+              staff planning workflows; student-specific recommendations remain
+              adjacent or future scope.
             </Alert>
           </Stack>
           <Stack spacing={2}>

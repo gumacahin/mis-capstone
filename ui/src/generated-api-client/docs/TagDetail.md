@@ -1,25 +1,24 @@
 # TagDetail
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**id** | **number** |  | [readonly] [default to undefined]
-**name** | **string** |  | [default to undefined]
-**tasks** | **string** |  | [readonly] [default to undefined]
-**created_by** | **number** |  | [default to undefined]
+| Name           | Type                             | Description | Notes                             |
+| -------------- | -------------------------------- | ----------- | --------------------------------- |
+| **id**         | **number**                       |             | [readonly] [default to undefined] |
+| **name**       | **string**                       |             | [default to undefined]            |
+| **tasks**      | [**Array&lt;Task&gt;**](Task.md) |             | [readonly] [default to undefined] |
+| **created_by** | **number**                       |             | [default to undefined]            |
 
 ## Example
 
 ```typescript
-import { TagDetail } from './api';
+import { TagDetail } from "./api";
 
 const instance: TagDetail = {
-    id,
-    name,
-    tasks,
-    created_by,
+  id,
+  name,
+  tasks,
+  created_by,
 };
 ```
 

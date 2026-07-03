@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * UPOU TODO API
- * Task management API for UPOU students and faculty
+ * Planner-first productivity API for UPOU faculty and staff
  *
  * The version of the OpenAPI document: 1.0.0
  *
@@ -14,8 +14,5 @@
 
 export interface PatchedCommentRequest {
   object_pk?: string;
-  user?: number | null;
-  user_name?: string;
   comment?: string;
-  submit_date?: string;
 }

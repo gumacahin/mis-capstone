@@ -50,8 +50,8 @@ class TaskFilter(FilterSet):
 
     def filter_today(self, queryset, _, value):
         if value:
-            today = timezone.now().date()
-            return queryset.filter(due_date__lte=today)
+            today = timezone.localdate()
+            return queryset.filter(due_date__date__lte=today)
         return queryset
 
     def filter_inbox(self, queryset, _, value):
@@ -61,8 +61,8 @@ class TaskFilter(FilterSet):
 
     def filter_upcoming(self, queryset, _, value):
         if value:
-            today = timezone.now().date()
-            return queryset.filter(due_date__gt=today)
+            today = timezone.localdate()
+            return queryset.filter(due_date__date__gt=today)
         return queryset
 
     def filter_tag(self, queryset, _, value):

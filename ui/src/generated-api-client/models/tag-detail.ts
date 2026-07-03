@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * UPOU TODO API
- * Task management API for UPOU students and faculty
+ * Planner-first productivity API for UPOU faculty and staff
  *
  * The version of the OpenAPI document: 1.0.0
  *
@@ -12,9 +12,13 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Task } from "./task";
+
 export interface TagDetail {
   id: number;
   name: string;
-  tasks: string;
+  tasks: Array<Task>;
   created_by: number;
 }

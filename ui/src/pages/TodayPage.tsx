@@ -9,6 +9,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { PlannerSurface } from "@planner";
 import type { ProjectViewType, Task } from "@shared";
 import SkeletonList from "@shared/components/SkeletonList";
 import { useTasksToday } from "@shared/hooks/queries";
@@ -16,7 +17,7 @@ import useToolbarContext from "@shared/hooks/useToolbarContext";
 import InboxDefaultSectionProvider from "@views/components/InboxDefaultSectionProvider";
 import TodayView from "@views/components/TodayView";
 import ViewPageTitle from "@views/components/ViewPageTitle";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
+import { type MouseEvent, useCallback, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
 
 export default function TodayPage() {
@@ -69,7 +70,10 @@ export default function TodayPage() {
 
   return (
     <InboxDefaultSectionProvider>
-      <TodayView view={view} tasks={tasks} />
+      <Stack spacing={3}>
+        <PlannerSurface />
+        <TodayView view={view} tasks={tasks} />
+      </Stack>
     </InboxDefaultSectionProvider>
   );
 }

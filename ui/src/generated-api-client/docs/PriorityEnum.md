@@ -1,15 +1,15 @@
 # PriorityEnum
 
-* `NONE` - None * `LOW` - Low * `MEDIUM` - Medium * `HIGH` - High
+- `NONE` - None _ `LOW` - Low _ `MEDIUM` - Medium \* `HIGH` - High
 
 ## Enum
 
-* `None` (value: `'NONE'`)
+- `None` (value: `'NONE'`)
 
-* `Low` (value: `'LOW'`)
+- `Low` (value: `'LOW'`)
 
-* `Medium` (value: `'MEDIUM'`)
+- `Medium` (value: `'MEDIUM'`)
 
-* `High` (value: `'HIGH'`)
+- `High` (value: `'HIGH'`)
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

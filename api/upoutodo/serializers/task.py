@@ -1,11 +1,10 @@
 from django.contrib.contenttypes.models import ContentType
 from django_comments.models import Comment
+from drf_spectacular.utils import OpenApiTypes, extend_schema_field
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 
-from upoutodo.models import Project, ProjectSection, Task
-
-from .tag import Tag
+from upoutodo.models import Project, ProjectSection, Tag, Task
 
 
 class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
@@ -41,6 +40,20 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     comments_count = serializers.SerializerMethodField(read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return
+
+        owned_sections = ProjectSection.objects.filter(project__created_by=request.user)
+        owned_tasks = Task.objects.filter(section__project__created_by=request.user)
+
+        self.fields["section"].queryset = owned_sections
+        self.fields["above_task"].queryset = owned_tasks
+        self.fields["below_task"].queryset = owned_tasks
+        self.fields["source_section"].queryset = owned_sections
+
     class Meta:
         model = Task
         fields = [
@@ -67,15 +80,18 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
 
         read_only_fields = ["due_date"]
 
+    @extend_schema_field(OpenApiTypes.INT)
     def get_comments_count(self, obj):
         content_type = ContentType.objects.get_for_model(obj)
         return Comment.objects.filter(
             content_type=content_type, object_pk=obj.pk
         ).count()
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_project_title(self, obj):
         return obj.section.project.title
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_section_title(self, obj):
         section_title = obj.section.title
         if section_title == Project.DEFAULT_PROJECT_SECTION_TITLE:
@@ -166,32 +182,3 @@ class TaskSerializer(TaggitSerializer, serializers.ModelSerializer):
             instance._create_next_occurrence()
 
         return instance
-
-
-class TaskAdminSerializer(TaskSerializer):
-    created_by = serializers.PrimaryKeyRelatedField(
-        source="section.project.created_by.id", read_only=True
-    )
-    tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(),
-        many=True,
-        required=False,
-    )
-
-    class Meta:
-        model = Task
-        fields = [
-            "id",
-            "title",
-            "description",
-            "dtstart",
-            "rrule",
-            "anchor_mode",
-            "due_date",
-            "priority",
-            "tags",
-            "completion_date",
-            "order",
-            "project",
-            "created_by",
-        ]

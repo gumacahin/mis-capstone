@@ -110,7 +110,7 @@ class TestTaskDateFiltering:
                 datetime.combine(base_date + timedelta(days=i), datetime.min.time())
             )
             task = TaskFactory(
-                section=self.section, title=f"Task on day {i+1}", due_date=task_date
+                section=self.section, title=f"Task on day {i + 1}", due_date=task_date
             )
             tasks_in_range.append(task)
 
@@ -292,9 +292,9 @@ class TestTaskDateFiltering:
 
         assert response.status_code == status.HTTP_200_OK
         # With the fixed filter, both tasks should be included
-        assert (
-            response.data["count"] == 2
-        ), f"Expected 2 tasks (both midnight and morning), got {response.data['count']}. Response: {response.data}"
+        assert response.data["count"] == 2, (
+            f"Expected 2 tasks (both midnight and morning), got {response.data['count']}. Response: {response.data}"
+        )
 
         returned_ids = [task["id"] for task in response.data["results"]]
         assert task_midnight.id in returned_ids
@@ -336,9 +336,9 @@ class TestTaskDateFiltering:
 
         assert response.status_code == status.HTTP_200_OK
         # With the fixed filter, both tasks should be included
-        assert (
-            response.data["count"] == 2
-        ), f"Expected 2 tasks (midnight and end-of-day), got {response.data['count']}. Tasks: {[t['title'] for t in response.data['results']]}"
+        assert response.data["count"] == 2, (
+            f"Expected 2 tasks (midnight and end-of-day), got {response.data['count']}. Tasks: {[t['title'] for t in response.data['results']]}"
+        )
 
         returned_ids = [task["id"] for task in response.data["results"]]
         assert task_midnight.id in returned_ids

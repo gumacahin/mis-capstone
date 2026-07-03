@@ -129,7 +129,7 @@ export default function OnboardingPage() {
                             </Typography>
                           </FormLabel>
                           <Typography variant="body2">
-                            Currently enrolled in UPOU programs
+                            Adjacent scope for future student planning support
                           </Typography>
                         </div>
                       </div>
@@ -159,11 +159,12 @@ export default function OnboardingPage() {
                             className="text-lg font-semibold text-gray-800 cursor-pointer"
                           >
                             <Typography variant="subtitle1">
-                              I’m a UPOU Faculty
+                              I’m UPOU Faculty or Staff
                             </Typography>
                           </FormLabel>
                           <Typography variant="body2">
-                            Teaching or working at UPOU
+                            Teaching, research, administrative, or support work
+                            at UPOU
                           </Typography>
                         </div>
                       </div>
@@ -182,11 +183,10 @@ export default function OnboardingPage() {
 
               {/* Info Section */}
               <Alert title="Why we ask this" severity="info">
-                By knowing your role at UPOU, we can provide you a better
-                experience. Students will get study-focused recommendations,
-                faculty members will receive teaching and research-oriented
-                suggestions, and those with both roles will get the best of both
-                worlds.
+                By knowing your role at UPOU, we can keep the planner grounded
+                in your context. This capstone evaluation focuses on faculty and
+                staff planning workflows; student-specific recommendations
+                remain adjacent or future scope.
               </Alert>
             </div>
 

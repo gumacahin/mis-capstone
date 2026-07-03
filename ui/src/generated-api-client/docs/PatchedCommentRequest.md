@@ -1,27 +1,20 @@
 # PatchedCommentRequest
 
-
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**object_pk** | **string** |  | [optional] [default to undefined]
-**user** | **number** |  | [optional] [default to undefined]
-**user_name** | **string** |  | [optional] [default to undefined]
-**comment** | **string** |  | [optional] [default to undefined]
-**submit_date** | **string** |  | [optional] [default to undefined]
+| Name          | Type       | Description | Notes                             |
+| ------------- | ---------- | ----------- | --------------------------------- |
+| **object_pk** | **string** |             | [optional] [default to undefined] |
+| **comment**   | **string** |             | [optional] [default to undefined] |
 
 ## Example
 
 ```typescript
-import { PatchedCommentRequest } from './api';
+import { PatchedCommentRequest } from "./api";
 
 const instance: PatchedCommentRequest = {
-    object_pk,
-    user,
-    user_name,
-    comment,
-    submit_date,
+  object_pk,
+  comment,
 };
 ```
 

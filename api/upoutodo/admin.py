@@ -3,14 +3,15 @@ import os
 import taggit.models
 from django.contrib import admin
 
-from upoutodo.models import Project, Tag, Task, UserProfile
+from upoutodo.models import UserProfile
 
 # Register your models here.
 admin.site.register(UserProfile)
-admin.site.register(Project)
-admin.site.register(Task)
-admin.site.register(Tag)
 admin.site.unregister(taggit.models.Tag)
+
+# Raw task and planner data is user-private. Admin reporting for these models
+# should go through aggregate API endpoints such as /api/dashboard and
+# /api/planner/evaluation/.
 
 # Read the environment variable
 ENVIRONMENT = os.getenv("DJANGO_ENV", "development")

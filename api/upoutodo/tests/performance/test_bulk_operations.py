@@ -59,9 +59,9 @@ class TestBulkOperationPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time (adjust threshold as needed)
-        assert (
-            execution_time < 5.0
-        ), f"Bulk update took {execution_time:.2f}s, expected < 5.0s"
+        assert execution_time < 5.0, (
+            f"Bulk update took {execution_time:.2f}s, expected < 5.0s"
+        )
 
         # Verify updates were applied
         updated_tasks = Task.objects.filter(id__in=[task.id for task in tasks])
@@ -94,9 +94,9 @@ class TestBulkOperationPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert (
-            execution_time < 10.0
-        ), f"Bulk creation took {execution_time:.2f}s, expected < 10.0s"
+        assert execution_time < 10.0, (
+            f"Bulk creation took {execution_time:.2f}s, expected < 10.0s"
+        )
 
         # Verify all tasks were created
         assert len(created_tasks) == 100
@@ -124,9 +124,9 @@ class TestBulkOperationPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert (
-            execution_time < 2.0
-        ), f"Task list took {execution_time:.2f}s, expected < 2.0s"
+        assert execution_time < 2.0, (
+            f"Task list took {execution_time:.2f}s, expected < 2.0s"
+        )
         assert response.status_code == 200
         assert response.data["count"] == 500
 
@@ -155,9 +155,9 @@ class TestBulkOperationPerformance:
             end_time = time.time()
 
             execution_time = end_time - start_time
-            assert (
-                execution_time < 1.0
-            ), f"Filtered list {filter_param} took {execution_time:.2f}s"
+            assert execution_time < 1.0, (
+                f"Filtered list {filter_param} took {execution_time:.2f}s"
+            )
             assert response.status_code == 200
 
     @pytest.mark.slow
@@ -185,9 +185,9 @@ class TestBulkOperationPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert (
-            execution_time < 5.0
-        ), f"Task duplication took {execution_time:.2f}s, expected < 5.0s"
+        assert execution_time < 5.0, (
+            f"Task duplication took {execution_time:.2f}s, expected < 5.0s"
+        )
 
         # Verify all duplicates were created with tags
         all_tasks = Task.objects.filter(title="Original Task", section=self.section)
@@ -229,9 +229,9 @@ class TestBulkOperationPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert (
-            execution_time < 10.0
-        ), f"Recurring task completion took {execution_time:.2f}s"
+        assert execution_time < 10.0, (
+            f"Recurring task completion took {execution_time:.2f}s"
+        )
 
         # Verify next occurrences were created (some may have been created)
         total_tasks = Task.objects.filter(section=self.section).count()
@@ -257,9 +257,9 @@ class TestBulkOperationPerformance:
 
         # Should not generate excessive queries (adjust threshold as needed)
         query_count = len(connection.queries)
-        assert (
-            query_count < 50
-        ), f"Bulk update generated {query_count} queries, expected < 50"
+        assert query_count < 50, (
+            f"Bulk update generated {query_count} queries, expected < 50"
+        )
 
     @pytest.mark.slow
     def test_memory_usage_with_large_dataset(self):
@@ -283,9 +283,9 @@ class TestBulkOperationPerformance:
         memory_increase = final_memory - initial_memory
 
         # Memory increase should be reasonable (adjust threshold as needed)
-        assert (
-            memory_increase < 100
-        ), f"Memory increased by {memory_increase:.1f}MB, expected < 100MB"
+        assert memory_increase < 100, (
+            f"Memory increased by {memory_increase:.1f}MB, expected < 100MB"
+        )
 
 
 @pytest.mark.django_db
@@ -329,9 +329,9 @@ class TestConcurrencyPerformance:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time
-        assert (
-            execution_time < 10.0
-        ), f"Multi-user operations took {execution_time:.2f}s"
+        assert execution_time < 10.0, (
+            f"Multi-user operations took {execution_time:.2f}s"
+        )
 
         # Verify all tasks were created and users can only see their own
         assert len(all_tasks_created) == 15  # 3 users × 5 tasks each

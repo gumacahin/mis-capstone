@@ -103,6 +103,21 @@ def test_user_options_endpoint(auth_client, user):
 
 
 @pytest.mark.django_db
+def test_user_options_endpoint_does_not_allow_admin_escalation(auth_client, user):
+    """Test that profile option updates cannot grant admin access."""
+    url = "/api/users/options/"
+
+    response = auth_client.patch(
+        url, {"is_admin": True, "theme": "dark"}, format="json"
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+    user.profile.refresh_from_db()
+    assert user.profile.is_admin is False
+    assert user.profile.theme == "dark"
+
+
+@pytest.mark.django_db
 def test_user_options_endpoint_unauthenticated(api_client):
     """Test that options endpoint requires authentication."""
     url = "/api/users/options/"
@@ -167,6 +182,6 @@ def test_user_viewset_permissions(auth_client):
             response = auth_client.patch(url, {}, format="json")
 
         # Should not be unauthorized (might be 200, 204, or other success codes)
-        assert (
-            response.status_code != status.HTTP_401_UNAUTHORIZED
-        ), f"{method} {url} should work when authenticated"
+        assert response.status_code != status.HTTP_401_UNAUTHORIZED, (
+            f"{method} {url} should work when authenticated"
+        )
