@@ -1,20 +1,24 @@
+import Box from "@mui/material/Box";
+import Spinner from "@shared/components/Spinner";
+import { lazy, type ReactNode, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 
-import ProtectedRoute from "./components/ProtectedRoute";
 import RootErrorBoundary from "./components/RootErrorBoundry";
-import AdminPage from "./pages/AdminPage";
-import HomePage from "./pages/HomePage";
-import InboxPage from "./pages/InboxPage";
-import LabelsListPage from "./pages/LabelsListPage";
-import LabelTasksPage from "./pages/LabelTasksPage";
-import OnboardingPage from "./pages/OnboardingPage";
-import ProductivityPage from "./pages/ProductivityPage";
-import ProjectPage from "./pages/ProjectPage";
-import ProjectsListPage from "./pages/ProjectsListPage";
-import SettingsPage from "./pages/SettingsPage";
-import TaskPage from "./pages/TaskPage";
-import TodayPage from "./pages/TodayPage";
-import UpcomingPage from "./pages/UpcomingPage";
+
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const InboxPage = lazy(() => import("./pages/InboxPage"));
+const LabelsListPage = lazy(() => import("./pages/LabelsListPage"));
+const LabelTasksPage = lazy(() => import("./pages/LabelTasksPage"));
+const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
+const ProductivityPage = lazy(() => import("./pages/ProductivityPage"));
+const ProjectPage = lazy(() => import("./pages/ProjectPage"));
+const ProjectsListPage = lazy(() => import("./pages/ProjectsListPage"));
+const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const TaskPage = lazy(() => import("./pages/TaskPage"));
+const TodayPage = lazy(() => import("./pages/TodayPage"));
+const UpcomingPage = lazy(() => import("./pages/UpcomingPage"));
 
 const ADMIN = "admin";
 const APP = "app";
@@ -48,6 +52,16 @@ export const ROUTES = {
   UPCOMING,
 };
 
+const routeFallback = (
+  <Box display="flex" justifyContent="center" alignItems="center" p={3}>
+    <Spinner />
+  </Box>
+);
+
+function lazyRoute(element: ReactNode) {
+  return <Suspense fallback={routeFallback}>{element}</Suspense>;
+}
+
 const routes = [
   {
     path: "/",
@@ -55,23 +69,23 @@ const routes = [
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: lazyRoute(<HomePage />),
         name: ROUTES.HOME,
       },
       {
         path: "onboarding",
-        element: <OnboardingPage />,
+        element: lazyRoute(<OnboardingPage />),
         name: ROUTES.ONBOARDING,
       },
       {
         path: "admin/*",
-        element: <AdminPage />,
+        element: lazyRoute(<AdminPage />),
         name: ROUTES.ADMIN,
       },
       {
         path: "/",
         name: ROUTES.APP,
-        element: <ProtectedRoute />,
+        element: lazyRoute(<ProtectedRoute />),
         children: [
           {
             index: true,
@@ -79,53 +93,53 @@ const routes = [
           },
           {
             path: "today",
-            element: <TodayPage />,
+            element: lazyRoute(<TodayPage />),
             name: ROUTES.TODAY,
           },
           {
             path: "inbox",
-            element: <InboxPage />,
+            element: lazyRoute(<InboxPage />),
             name: ROUTES.INBOX,
           },
           {
             path: "upcoming",
-            element: <UpcomingPage />,
+            element: lazyRoute(<UpcomingPage />),
             name: ROUTES.UPCOMING,
           },
           {
             path: "projects",
-            element: <ProjectsListPage />,
+            element: lazyRoute(<ProjectsListPage />),
             name: ROUTES.PROJECTS,
             end: true,
           },
           {
             path: "project/:projectId",
-            element: <ProjectPage />,
+            element: lazyRoute(<ProjectPage />),
             name: ROUTES.PROJECT_DETAILS,
           },
           {
             path: "task/:taskId",
-            element: <TaskPage />,
+            element: lazyRoute(<TaskPage />),
             name: ROUTES.TASK,
           },
           {
             path: "labels",
-            element: <LabelsListPage />,
+            element: lazyRoute(<LabelsListPage />),
             name: ROUTES.LABELS,
           },
           {
             path: "label/:slug",
-            element: <LabelTasksPage />,
+            element: lazyRoute(<LabelTasksPage />),
             name: ROUTES.LABEL_TASKS,
           },
           {
             path: "productivity",
-            element: <ProductivityPage />,
+            element: lazyRoute(<ProductivityPage />),
             name: ROUTES.PRODUCTIVITY,
           },
           {
             path: "settings",
-            element: <SettingsPage />,
+            element: lazyRoute(<SettingsPage />),
             name: ROUTES.SETTINGS,
           },
           {
