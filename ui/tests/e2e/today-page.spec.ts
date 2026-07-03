@@ -415,6 +415,9 @@ test.describe("Today Page", () => {
     await page.goto("/today");
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/\/today/);
+    await expect(
+      page.getByRole("button", { name: "Open Tanstack query devtools" }),
+    ).toHaveCount(0);
   });
 
   test("shows planner check-in and suggested next action", async ({ page }) => {

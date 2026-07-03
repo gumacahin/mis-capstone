@@ -23,6 +23,8 @@ import { AuthProviderWrapper } from "./components/AuthProviderWrapper";
 import ThemeContextProvider from "./components/ThemeContextProvider.tsx";
 import ToolbarContextProvider from "./components/ToolbarContextProvider.tsx";
 const queryClient = new QueryClient();
+const showQueryDevtools =
+  import.meta.env.DEV && import.meta.env.VITE_ENABLE_QUERY_DEVTOOLS === "1";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -50,7 +52,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <ToolbarContextProvider>
             <App />
           </ToolbarContextProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
+          {showQueryDevtools ? (
+            <ReactQueryDevtools initialIsOpen={false} />
+          ) : null}
         </QueryClientProvider>
       </AuthProviderWrapper>
     </ThemeContextProvider>
