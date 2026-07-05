@@ -2,8 +2,10 @@ import {
   DragDropContext,
   Draggable,
   DraggableLocation,
+  type DraggableProvided,
   Droppable,
-} from "@hello-pangea/dnd";
+  type DroppableProvided,
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import AddIcon from "@mui/icons-material/Add";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -283,7 +285,7 @@ function DrawerContents({
         <Collapse in={isProjectListOpen} timeout="auto" unmountOnExit>
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="droppable">
-              {(provided) => (
+              {(provided: DroppableProvided) => (
                 <List
                   disablePadding
                   {...provided.droppableProps}
@@ -297,7 +299,7 @@ function DrawerContents({
                       draggableId={`${project.id}`}
                       index={index}
                     >
-                      {(provided) => (
+                      {(provided: DraggableProvided) => (
                         <ListItem
                           sx={{
                             backgroundColor: (theme) =>

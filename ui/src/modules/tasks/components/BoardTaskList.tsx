@@ -4,7 +4,7 @@ import {
   DraggableStateSnapshot,
   Droppable,
   DroppableProvided,
-} from "@hello-pangea/dnd";
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import CardContent, { type CardContentProps } from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import type { Section, Task } from "@shared";

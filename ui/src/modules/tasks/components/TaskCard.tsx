@@ -1,4 +1,7 @@
-import { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
+import {
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import EventIcon from "@mui/icons-material/Event";
 import InboxIcon from "@mui/icons-material/Inbox";

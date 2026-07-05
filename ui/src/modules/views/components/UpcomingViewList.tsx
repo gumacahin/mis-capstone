@@ -1,4 +1,4 @@
-import { DragDropContext } from "@hello-pangea/dnd";
+import { DragDropContext } from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

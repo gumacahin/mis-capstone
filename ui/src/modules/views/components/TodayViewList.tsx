@@ -1,4 +1,7 @@
-import { DragDropContext, type DraggableLocation } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  type DraggableLocation,
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import { Task } from "@shared";
 import { useRescheduleTask } from "@shared/hooks/queries";
 import ListDateTasks from "@tasks/components/ListDateTasks";

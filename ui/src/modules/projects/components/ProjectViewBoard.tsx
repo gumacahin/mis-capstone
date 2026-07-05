@@ -2,9 +2,11 @@ import {
   DragDropContext,
   Draggable,
   DraggableLocation,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
   Droppable,
   type DroppableProvided,
-} from "@hello-pangea/dnd";
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import CardActions from "@mui/material/CardActions";
 import { ProjectDetail, Section, Task } from "@shared";
 import {
@@ -54,7 +56,10 @@ const InnerList = memo(function InnerList({
               // Adjust index to because of non-draggable default section
               index={index - 1}
             >
-              {(provided, snapshot) => (
+              {(
+                provided: DraggableProvided,
+                snapshot: DraggableStateSnapshot,
+              ) => (
                 <BoardProjectSectionCard
                   key={section.id}
                   {...provided.draggableProps}

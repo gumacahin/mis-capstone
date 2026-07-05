@@ -42,7 +42,9 @@ function chunkForVendor(id: string) {
   }
 
   if (
-    normalizedId.includes("/@hello-pangea/dnd/") ||
+    normalizedId.includes(
+      "/@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration/",
+    ) ||
     normalizedId.includes("/@dnd-kit/")
   ) {
     return "vendor-dnd";

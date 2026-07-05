@@ -25,12 +25,12 @@
     "generate-api:watch": "npm run generate-api && echo 'API client generated. Restart if backend schema changes.'"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration": "^3.1.0",
     "@auth0/auth0-react": "^2.2.4",
     "@dnd-kit/sortable": "^10.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.0.13",
-    "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.4.8",
     "@mui/x-date-pickers": "^7.18.0",

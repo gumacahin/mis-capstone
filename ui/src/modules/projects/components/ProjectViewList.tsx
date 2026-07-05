@@ -2,9 +2,11 @@ import {
   DragDropContext,
   Draggable,
   DraggableLocation,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
   Droppable,
   DroppableProvided,
-} from "@hello-pangea/dnd";
+} from "@atlaskit/pragmatic-drag-and-drop-react-beautiful-dnd-migration";
 import { TextField, useMediaQuery } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -62,7 +64,10 @@ const InnerList = memo(function InnerList({ sections }: InnerListProps) {
               // Adjust index to because of non-draggable default section
               index={index - 1}
             >
-              {(provided, snapshot) => (
+              {(
+                provided: DraggableProvided,
+                snapshot: DraggableStateSnapshot,
+              ) => (
                 <Fragment key={section.id}>
                   <ListProjectSectionCard
                     key={section.id}
