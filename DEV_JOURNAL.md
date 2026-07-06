@@ -2502,3 +2502,57 @@ Targeted frontend suite: 6 files passed; 22 tests passed, 4 skipped
   planner-first product behavior.
 - One earlier Vitest run hit an OOM during heavy test setup; focused mocks and
   scoped assertions resolved the instability for the targeted suite.
+
+## 2026-07-06: Task Reorder Toast Fix And CI Follow-Up
+
+### Goal
+
+Fix duplicate success toasts when reordering tasks, keep user-facing wording
+consistent, and clear the resulting UI lint/typecheck CI failure.
+
+### Human Decisions And Constraints
+
+- Keep the behavioral change small and focused on toast handling.
+- Preserve existing drag-and-drop reorder flow and API behavior.
+- Do not include unrelated local changes (`Makefile`, `recordings/`) in these
+  commits.
+
+### Codex-Assisted Actions
+
+- Removed hook-level reorder success toast in
+  `ui/src/api/hooks/useTasks.ts` to avoid duplicate success notifications when
+  `toast.promise` is already used by project views.
+- Aligned task move toast copy in:
+  - `ui/src/modules/projects/components/ProjectViewList.tsx`
+  - `ui/src/modules/projects/components/ProjectViewBoard.tsx`
+- Added regression coverage in
+  `ui/src/api/hooks/__tests__/useTasks.test.tsx` to assert successful reorder
+  does not emit additional hook-level toasts.
+- Stabilized project-view smoke tests (avoiding auth-context failures) in:
+  - `ui/src/modules/projects/components/__tests__/ProjectViewList.test.tsx`
+  - `ui/src/modules/projects/components/__tests__/ProjectViewBoard.test.tsx`
+- Investigated failed GitHub check `CI / UI · Lint & Typecheck` and fixed
+  lint issues in:
+  - `ui/commitlint.config.cjs` (node/module lint context)
+  - `ui/tests/e2e/projects-page.spec.ts`
+  - `ui/tests/e2e/sorting-dnd.spec.ts`
+  - `ui/tests/e2e/upcoming-page.spec.ts`
+- Pushed:
+  - `65812b9` Fix task reorder toast duplication and align messaging
+  - `eb16fcd` Fix UI lint and typecheck CI regressions
+
+### Verification
+
+```text
+ui: npm run test:run -- src/api/hooks/__tests__/useTasks.test.tsx src/modules/projects/components/__tests__/ProjectViewList.test.tsx src/modules/projects/components/__tests__/ProjectViewBoard.test.tsx
+ui: npx tsc --noEmit --noUnusedLocals false
+ui: npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0
+ci: gh run view 28765889840 --log-failed (root-cause capture)
+```
+
+### Study Notes
+
+- Duplicate toast UX came from two success handlers on the same reorder path:
+  one in the shared hook and one in the view-level `toast.promise`.
+- Keeping user-facing toast messages centralized in the view-level promise
+  handlers makes wording consistency easier across list and board views.
