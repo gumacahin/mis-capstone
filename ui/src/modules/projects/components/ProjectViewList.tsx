@@ -259,9 +259,9 @@ export default function ProjectViewList({
         task: updatedTask,
       }),
       {
-        loading: "Reordering tasks...",
-        error: "Failed reordering tasks.",
-        success: "Tasks reordered successfully!",
+        loading: "Moving task...",
+        error: "Failed to move task.",
+        success: "Task moved successfully!",
       },
     );
   };

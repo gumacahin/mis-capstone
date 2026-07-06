@@ -554,12 +554,9 @@ export const useReorderTasks = (projectId: number) => {
         },
       );
     },
-    onSuccess: () => {
-      toast.success("Task moved successfully!");
-    },
     onError: (error) => {
       console.error("Failed to reorder task:", error);
-      toast.error("Failed to move task");
+      toast.error("Failed to move task.");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["project", { projectId }] });

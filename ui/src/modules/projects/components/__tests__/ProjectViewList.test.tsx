@@ -1,9 +1,18 @@
 import type { ProjectDetail } from "@shared";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render } from "@testing-library/react";
-import { describe, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import ProjectViewList from "../ProjectViewList";
+
+const reorderSectionsMock = vi.fn().mockResolvedValue(undefined);
+const reorderTasksMock = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("@shared/hooks/queries", () => ({
+  useAddSection: () => ({ mutateAsync: vi.fn().mockResolvedValue(undefined) }),
+  useReorderSections: () => ({ mutateAsync: reorderSectionsMock }),
+  useReorderTasks: () => ({ mutateAsync: reorderTasksMock }),
+}));
 
 function renderWithClient(ui: React.ReactElement) {
   const client = new QueryClient();
@@ -20,10 +29,14 @@ describe("ProjectViewList", () => {
     sections: [],
   } as ProjectDetail;
 
-  it("renders ProjectViewList for project with view 'list'", () => {
+  it("renders empty state without requiring auth context setup", () => {
+    reorderSectionsMock.mockClear();
+    reorderTasksMock.mockClear();
+
     renderWithClient(<ProjectViewList project={fakeProject} />);
-    // Insert a meaningful assertion based on known details/text in ProjectViewList.
-    // For example, if the project title is used in the UI:
-    // expect(screen.getByText("List Project")).toBeInTheDocument();
+
+    expect(screen.getByText("No sections found")).toBeInTheDocument();
+    expect(reorderSectionsMock).not.toHaveBeenCalled();
+    expect(reorderTasksMock).not.toHaveBeenCalled();
   });
 });

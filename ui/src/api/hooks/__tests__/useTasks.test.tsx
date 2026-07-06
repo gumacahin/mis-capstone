@@ -1,11 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import dayjs from "dayjs";
 import React from "react";
+import toast from "react-hot-toast";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useGeneratedApiClient } from "../../client";
-import { useAddTask, useTask, useTasksToday } from "../useTasks";
+import {
+  useAddTask,
+  useReorderTasks,
+  useTask,
+  useTasksToday,
+} from "../useTasks";
 
 // Mock the generated API client
 vi.mock("../../client", () => ({
@@ -300,6 +306,68 @@ describe("Task Hooks - Generated API Migration", () => {
         description: "New task description",
         priority: "LOW",
       });
+    });
+  });
+
+  describe("useReorderTasks", () => {
+    it("does not emit a success toast on successful reorder", async () => {
+      const updatedTask = {
+        id: 10,
+        title: "Task A",
+        section: 2,
+        project: 1,
+        project_title: "Test Project",
+        section_title: "Doing",
+        tags: [],
+        order: 1,
+        rrule: null,
+        dtstart: null,
+        anchor_mode: "SCHEDULED",
+        comments_count: "0",
+        due_date: null,
+        completion_date: null,
+        description: null,
+        priority: "LOW",
+      };
+
+      mockApiClient.api.apiTasksPartialUpdate.mockResolvedValue({
+        data: updatedTask,
+      });
+
+      const { result } = renderHook(() => useReorderTasks(1), {
+        wrapper: createWrapper(),
+      });
+
+      await act(async () => {
+        await result.current.mutateAsync({
+          sourceSectionId: 1,
+          destinationSectionId: 2,
+          reorderedSourceTasks: [],
+          reorderedDestinationTasks: [],
+          task: {
+            id: 10,
+            title: "Task A",
+            completion_date: null,
+            description: null,
+            priority: "LOW",
+            section: 2,
+            project: 1,
+            project_title: "Test Project",
+            section_title: "Doing",
+            tags: [],
+            order: 1,
+            rrule: null,
+            dtstart: null,
+            anchor_mode: "SCHEDULED",
+            comments_count: 0,
+            due_date: null,
+          },
+        });
+      });
+
+      expect(mockApiClient.api.apiTasksPartialUpdate).toHaveBeenCalledTimes(1);
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
     });
   });
 });
