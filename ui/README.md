@@ -2,6 +2,16 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Commit message checks
+
+After cloning, install the commit message hook once:
+
+```bash
+npm run setup:commit-msg-hook
+```
+
+This enforces the repository commit subject convention on every commit.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
