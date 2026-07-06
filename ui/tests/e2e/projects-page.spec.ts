@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 async function mockProjectsApis(page: Page) {
   await page.route(/\/(?:api\/)?users\/me\/?$/, async (route) => {

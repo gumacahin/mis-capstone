@@ -1,9 +1,30 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const projects = [
-  { id: 1, title: "Inbox", is_default: true, order: 1, view: "list", sections: [] },
-  { id: 2, title: "Alpha", is_default: false, order: 2, view: "list", sections: [] },
-  { id: 3, title: "Beta", is_default: false, order: 3, view: "list", sections: [] },
+  {
+    id: 1,
+    title: "Inbox",
+    is_default: true,
+    order: 1,
+    view: "list",
+    sections: [],
+  },
+  {
+    id: 2,
+    title: "Alpha",
+    is_default: false,
+    order: 2,
+    view: "list",
+    sections: [],
+  },
+  {
+    id: 3,
+    title: "Beta",
+    is_default: false,
+    order: 3,
+    view: "list",
+    sections: [],
+  },
 ];
 
 async function mockBaseApis(page: Page) {
@@ -31,9 +52,12 @@ async function mockBaseApis(page: Page) {
     });
   });
 
-  await page.route(/\/(?:api\/)?notifications\/unread_count\/?$/, async (route) => {
-    await route.fulfill({ json: { count: 0 } });
-  });
+  await page.route(
+    /\/(?:api\/)?notifications\/unread_count\/?$/,
+    async (route) => {
+      await route.fulfill({ json: { count: 0 } });
+    },
+  );
 
   await page.route(/\/(?:api\/)?notifications\/?$/, async (route) => {
     await route.fulfill({ json: [] });
@@ -47,7 +71,12 @@ async function mockBaseApis(page: Page) {
 
   await page.route(/\/api\/projects\/?(?:\?.*)?$/, async (route) => {
     await route.fulfill({
-      json: { count: projects.length, next: null, previous: null, results: projects },
+      json: {
+        count: projects.length,
+        next: null,
+        previous: null,
+        results: projects,
+      },
     });
   });
 
@@ -99,5 +128,4 @@ test.describe("Drag sorting", () => {
     expect(beta).toBeDefined();
     expect(alpha!.order).toBeGreaterThan(beta!.order);
   });
-
 });
